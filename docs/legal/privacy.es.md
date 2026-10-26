@@ -23,13 +23,15 @@ Tus lecciones, XP, racha, insignias, portafolio de práctica, metas, Misiones de
 - **Comentarios y respuestas de encuestas** que decidas enviar.
 - **Reportes de errores** cuando algo falla: el mensaje del error y en qué parte de la app pasó. No incluyen datos personales.
 - **Solicitudes de noticias y precios**, que no incluyen nada sobre ti.
+- **Recordatorios diarios, solo si los activas:** la dirección que el servicio de notificaciones de tu navegador le da a este dispositivo, la hora que elegiste, tu zona horaria e idioma, y unas palabras sobre lo que sigue (tu racha y los títulos de tu siguiente lección y de la misión de la semana), para que el recordatorio diga algo útil. Se guardan con un identificador aleatorio creado en tu dispositivo, no ligado a tu cuenta ni a las estadísticas de uso, y se borran cuando apagas los recordatorios o eliges "Borrar mis datos".
 
 **Si creas una cuenta, además guardamos:**
 
 - tu correo (para iniciar sesión y, si lo pides, para mandarte un enlace para restablecer tu contraseña) y tu contraseña, guardada solo en una forma codificada que no se puede volver a convertir en la contraseña;
 - tu apodo, el color de tu avatar y tu rango de edad (por ejemplo, "13–17");
 - si tienes de 13 a 17 años, la fecha en que confirmaste que tu mamá, papá o tutor estuvo de acuerdo;
-- tu progreso sincronizado, para que sea el mismo en todos tus dispositivos;
+- tu progreso sincronizado, para que sea el mismo en todos tus dispositivos, con unas palabras sobre lo que sigue (el avance de tus metas, la siguiente lección, la misión de la semana);
+- si activaste el resumen semanal por correo. Si lo haces, se arma con tu progreso sincronizado y se envía a tu correo los domingos por la tarde; cada correo tiene un enlace para apagarlo;
 - tu XP de la semana, para la liga (los demás solo ven tu apodo y tu XP);
 - cuántas preguntas le hiciste hoy al tutor (para que el servicio sea justo para todos).
 
@@ -46,7 +48,8 @@ El servidor usa tu dirección IP unos minutos para frenar intentos de adivinar c
 - **Nuestro proveedor de hospedaje** **[nombre, p. ej. Fly.io, y la región]** opera el servidor y guarda los datos.
 - **Anthropic** responde las preguntas del tutor y escribe los resúmenes de noticias.
 - **Twelve Data** nos envía precios del mercado. Nunca recibe nada sobre ti.
-- **Google (Gmail)** entrega los correos para restablecer contraseña, y solo esos. Recibe tu correo y el enlace. Nunca enviamos boletines ni publicidad.
+- **Google (Gmail)** entrega los correos para restablecer contraseña y, si lo activas, el resumen semanal. Recibe tu correo y el mensaje. Nunca enviamos boletines ni publicidad.
+- **El servicio de notificaciones de tu navegador** (Google, Apple, Mozilla o Microsoft, según tu navegador) entrega los recordatorios diarios si los activas. Cada recordatorio va cifrado para tu dispositivo, así que ese servicio no puede leerlo.
 
 ## Cuánto tiempo los guardamos
 

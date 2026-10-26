@@ -190,6 +190,22 @@ try {
   // Money Missions: counted by mission; a note is only ever a yes/no.
   await ev(A1, [e("mission_start", addDays(today, -1), { mission: "track3" }), e("mission_done", addDays(today, -1), { mission: "track3", note: true, first: true })]);
   await ev(B1, [e("mission_done", addDays(today, -3), { mission: "track3", note: "my secret note" })]);
+  // What brings people back (no new days, so the numbers above hold): A got
+  // the welcome-back screen 8 days ago, lost and repaired a streak, turned on
+  // reminders and opened one; B lost a streak 3 days ago and opened a recap.
+  await ev(A1, [e("comeback", addDays(today, -8), { away: 5 }), e("comeback_start", addDays(today, -8)), e("streak_lost", addDays(today, -8), { lost: 4 }), e("streak_repair", addDays(today, -8), { streak: 4 }), e("push_on", addDays(today, -7)), e("push_open", addDays(today, -1), { kind: "streak" })]);
+  await ev(B1, [e("streak_lost", addDays(today, -3), { lost: 2 }), e("recap_open", addDays(today, -3))]);
+  // Reminders: this server's public key; only browsers' push services.
+  const key = (await call("/api/push/key")).json.key;
+  assert.equal(Buffer.from(key, "base64url").length, 65);
+  const device = { id: "33333333-3333-4333-8333-333333333333", time: "12:00", tz: "America/Mexico_City", lang: "es", summary: { next: "Comisiones" } };
+  const p256dh = "BCVxsr7N_eNgVRqvHtD0zTZsEc6-VV-JvLexhqUzORcxaOzi6-AYWXvTBHm4bjyPjs7Vd8pZGH6SRpkNtoIAiw4";
+  assert.equal((await call("/api/push", { method: "PUT", body: { ...device, sub: { endpoint: "http://127.0.0.1:9/steal", keys: { p256dh, auth: "BTBZMqHH6r4Tts7J_aSIgg" } } } })).status, 400, "not a push service");
+  assert.equal((await call("/api/push", { method: "PUT", body: { ...device, sub: { endpoint: "https://fcm.googleapis.com/fcm/send/x", keys: { p256dh, auth: "BTBZMqHH6r4Tts7J_aSIgg" } } } })).status, 200);
+  // The weekly recap: opt-in on the account (email "works" here: it's printed).
+  assert.equal((await call("/api/me", { method: "PATCH", body: { recap: true }, cookie: A })).json.user.recap, true);
+  assert.equal((await call("/api/health", { cookie: A })).json.recap, true);
+  assert.equal((await call("/api/recap/off", { method: "POST", body: { token: "nope.nope" } })).status, 400);
   assert.equal((await ev("not-an-id", [])).status, 400);
   assert.equal((await call("/api/survey", { method: "POST", body: { installId: A1, answer: "very", why: "I finally get investing", lessons: 3 } })).status, 200);
   assert.equal((await call("/api/feedback", { method: "POST", body: { installId: B1, kind: "content", text: "<b>Step 2 is confusing</b>", context: "budget-1 · step 2", screen: "lessons" } })).status, 200);
@@ -216,11 +232,22 @@ try {
   assert.equal("installId" in st.feedback[0], false, "the admin page doesn't see install IDs");
   assert.equal(st.errors[0].count, 2, "the same error counts up");
   assert.equal(st.ai.budget > 0, true);
+  assert.deepEqual(st.retention.day30, { pct: null, of: 0 }, "no one started 30+ days ago yet");
+  const cb = st.comingBack;
+  assert.deepEqual(cb.comeback, { shown: 1, started: 1, lessonSameDay: 0, back7: { pct: 100, of: 1 } });
+  assert.deepEqual(cb.repair, { lost: 2, repaired: 1, back7Repaired: { pct: 100, of: 1 }, back7NotRepaired: { pct: null, of: 0 } }, "B's loss is under 7 days old");
+  assert.equal(cb.push.learnersOn, 1);
+  assert.equal(cb.push.opened, 1);
+  assert.equal(cb.push.devicesNow, 1);
+  assert.deepEqual(cb.recap, { sent: 0, failed: 0, opened: 1, openPct: null, optedIn: 1, emailOn: true });
+  assert.equal((await call("/api/push", { method: "DELETE", body: { id: device.id } })).status, 200);
+  assert.equal((await admin("test-admin-token-123456789")).json.comingBack.push.devicesNow, 0, "reminders off: the device is deleted");
   assert.equal((await call("/api/events", { method: "DELETE", body: { installId: A1 } })).status, 200);
   const after = (await admin("test-admin-token-123456789")).json;
   assert.equal(after.learners, 1, "Delete my data removes this device's stats");
   assert.equal(after.survey.answers, 0);
-  console.log("ok: day-1/day-7 return, quit points, lessons, missions (never the notes), tutor, survey, feedback and errors on a token-protected admin page; deletable");
+  console.log("ok: day-1/day-7/day-30 return, quit points, lessons, missions (never the notes), tutor, survey, feedback and errors on a token-protected admin page; deletable");
+  console.log("ok: what brings people back on the admin page: the welcome-back screen, streak repair, reminders (push services only; deleted when off), the weekly recap (opt-in)");
 
   // --- forgot password: same answer either way, a one-time link, everyone else signed out ---
   const forgot = (email) => call("/api/auth/forgot", { method: "POST", body: { email, lang: "es" } });

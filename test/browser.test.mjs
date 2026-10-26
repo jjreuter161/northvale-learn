@@ -27,7 +27,7 @@ const BROKEN = /\{[@$]?[A-Za-z_][^{}]*\}|\bNaN\b|\bundefined\b|\[object Object\]
 
 // The server, on throwaway data, with every outside service off.
 const port = 20000 + Math.floor(Math.random() * 20000);
-const env = { ...process.env, PORT: String(port), NORTHVALE_DATA: mkdtempSync(join(tmpdir(), "nvlearn-browser-")), ANTHROPIC_API_KEY: "", ANTHROPIC_AUTH_TOKEN: "", TWELVEDATA_API_KEY: "", SMTP_USER: "", SMTP_PASS: "", ALERT_WEBHOOK_URL: "", NEWS_FEEDS: JSON.stringify({ US: [], MX: [] }), SIGNUP_CODE: "" };
+const env = { ...process.env, PORT: String(port), NORTHVALE_DATA: mkdtempSync(join(tmpdir(), "nvlearn-browser-")), ANTHROPIC_API_KEY: "", ANTHROPIC_AUTH_TOKEN: "", TWELVEDATA_API_KEY: "", SMTP_USER: "", SMTP_PASS: "", ALERT_WEBHOOK_URL: "", NEWS_FEEDS: JSON.stringify({ US: [], MX: [] }), SIGNUP_CODE: "", ADMIN_TOKEN: "browser-test-admin-token-1234" };
 const server = spawn(process.execPath, [join(ROOT, "server/index.js")], { env, stdio: ["ignore", "pipe", "inherit"] });
 await new Promise((resolve) => server.stdout.on("data", (d) => String(d).includes("Northvale Learn on") && resolve()));
 const BASE = `http://127.0.0.1:${port}/`;
@@ -186,6 +186,60 @@ try {
       await page.keyboard.press("Escape");
     }
     console.log("ok: the same in Spanish (Mexico): every screen and calculator");
+    await app.close();
+  }
+
+  // --- back after 5 days away, with a 4-day streak that ended ---
+  {
+    const day = (n) => new Date(Date.now() + n * 864e5).toLocaleDateString("en-CA", { timeZone: "America/Mexico_City" });
+    const lessonDays = [day(-8), day(-7), day(-6), day(-5)];
+    const lessons = Object.fromEntries(ALL_LESSONS.slice(0, 4).map((l, i) => [l.id, { done: true, at: lessonDays[i], last: lessonDays[i], best: 0, times: 1 }]));
+    const seed = { version: 1, updatedAt: 1, profile: { onboarded: true, nickname: "Dani", ageBand: "18-25", avatar: 0 }, settings: { lang: "en", region: "US", look: "white", reduceMotion: true }, progress: { xp: 60, days: Object.fromEntries(lessonDays.map((d) => [d, 15])), streak: { count: 4, last: day(-5), best: 4, frozen: [] }, freezes: 0, dailyGoal: 20, lessons, lessonDays, badges: {}, counters: { lessons: 4 }, practiced: {}, startUnit: "budget", placed: [], seen: day(-5) }, modules: {} };
+    const app = await open(seed);
+    const { page, top, button, clean, menu } = app;
+    await page.getByRole("dialog", { name: "Welcome back, Dani" }).waitFor();
+    await top().getByText("It's been 5 days.").waitFor();
+    await clean("welcome back");
+    await button("Repair my streak", top()).click();
+    await top().getByText("Your 4-day streak is back.").waitFor();
+    await button(/^Ease back in: /, top()).click();
+    await page.getByRole("dialog", { name: ALL_LESSONS[4].title.en }).waitFor();
+    await play(app);
+    await top().getByText("5-day streak").waitFor();
+    await clean("lesson after a break");
+    console.log("ok: back after 5 days: a welcome-back screen, the free streak repair, one lesson to restart (streak 4 → 5)");
+
+    // Reminders, in Settings: times outside quiet hours by default.
+    await button("Done", top()).click();
+    await menu("Settings");
+    await page.getByText("Turn on reminders").waitFor();
+    const times = await page.getByRole("combobox", { name: "Time" }).evaluate((s) => [...s.options].map((o) => o.value));
+    assert.equal(times[0], "08:00");
+    assert.equal(times.at(-1), "20:30");
+    await clean("settings: reminders");
+    // Opened from a reminder, and a bad "turn off the recap" link.
+    await page.goto(`${BASE}?from=push&kind=mission`);
+    await page.getByRole("heading", { name: "Money Missions" }).waitFor();
+    assert.equal(new URL(page.url()).search, "", "the address is tidied");
+    await page.goto(`${BASE}?recap_off=nope.nope`);
+    await page.getByText("That link isn't valid anymore.").waitFor();
+    console.log("ok: reminder settings (quiet hours by default); a reminder opens where it points; the recap's turn-off link");
+    await app.close();
+  }
+
+  // --- the admin page ---
+  {
+    const app = await open();
+    const { page, clean } = app;
+    await page.goto(`${BASE}admin`);
+    await page.getByPlaceholder("Admin token").fill(env.ADMIN_TOKEN);
+    await page.keyboard.press("Enter");
+    await page.getByText("What brings people back").waitFor();
+    await page.getByText("Day-30 return").waitFor();
+    await page.getByRole("button", { name: "Send a test reminder to every device" }).click();
+    await page.getByText("0 of 0 delivered.").waitFor();
+    await clean("admin");
+    console.log("ok: the admin page, with what brings people back");
     await app.close();
   }
 

@@ -458,8 +458,10 @@ registerModule({
     return { unitsDone: done, pathDone: done === UNITS.length };
   },
   services: {
-    // How many concepts are due for review (Home shows it).
+    // How many concepts are due for review (Home shows it), and when the
+    // next one is (reminders).
     reviewStatus,
+    reviewDueOn: () => M.nextDue(conceptsNow()),
     // For Money Missions: units with a finished lesson (or tested out of),
     // and units studied in the last week.
     unitActivity: () => {

@@ -161,3 +161,42 @@ assert.equal(items[0].title, "Banxico baja la tasa & los CETES");
 assert.equal(items[0].description, "Uno dos");
 assert.equal(items[0].published, "2026-10-23T22:21:36.000Z");
 console.log("ok: RSS headlines parsed (CDATA, entities, dates); items without links skipped");
+
+// --- streak repair and time away ---
+{
+  const days = ["2026-10-01", "2026-10-02", "2026-10-03", "2026-10-04"];
+  let p = { ...P.newProgress(), freezes: 0 };
+  for (const d of days) p = P.completeLesson(p, { id: `l-${d}`, perfect: true }, d).p;
+  const broke = P.settleStreak(p, "2026-10-07"); // missed the 5th and 6th
+  assert.equal(broke.event.type, "streak_reset");
+  assert.deepEqual(broke.p.streak.broken, { count: 4, last: "2026-10-04", on: "2026-10-07" });
+  assert.ok(P.canRepair(broke.p, "2026-10-07"));
+  assert.ok(!P.canRepair(broke.p, "2026-10-15"), "only within 7 days of ending");
+  // Repaired before a new lesson: 4 days, and today's lesson makes 5.
+  let r = P.repairStreak(broke.p, "2026-10-07");
+  assert.equal(r.streak.count, 4);
+  assert.equal(r.streak.last, "2026-10-06");
+  assert.deepEqual(r.streak.frozen.slice(-2), ["2026-10-05", "2026-10-06"], "the missing days count like freeze days");
+  assert.equal(r.streak.broken, undefined);
+  assert.equal(P.completeLesson(r, { id: "x", perfect: true }, "2026-10-07").p.streak.count, 5);
+  assert.ok(!P.canRepair(r, "2026-10-07"), "used up");
+  // Once a month: the next break this month can't be repaired; next month it can.
+  const again = P.settleStreak({ ...r, streak: { ...r.streak, count: 3, last: "2026-10-20" } }, "2026-10-23");
+  assert.ok(!P.canRepair(again.p, "2026-10-23"), "one repair a month");
+  assert.ok(P.canRepair(P.settleStreak({ ...r, streak: { ...r.streak, count: 3, last: "2026-10-30" } }, "2026-11-02").p, "2026-11-02"), "a new month, a new repair");
+  // Repaired after the new streak's first lesson: the two join up.
+  const fresh = P.completeLesson(broke.p, { id: "y", perfect: true }, "2026-10-07").p;
+  assert.equal(fresh.streak.count, 1);
+  r = P.repairStreak(fresh, "2026-10-07");
+  assert.equal(r.streak.count, 5);
+  assert.equal(r.streak.last, "2026-10-07");
+  assert.equal(r.streak.best, 5);
+  // A 1-day streak isn't worth a repair.
+  const short = P.settleStreak(P.completeLesson({ ...P.newProgress(), freezes: 0 }, { id: "z" }, "2026-10-01").p, "2026-10-04");
+  assert.ok(!P.canRepair(short.p, "2026-10-04"));
+  // Time away: from `seen`, or (older saves) the last active day.
+  assert.equal(P.awayDays({ ...p, seen: "2026-10-05" }, "2026-10-09"), 4);
+  assert.equal(P.awayDays(p, "2026-10-09"), 5, "no `seen` yet: the last lesson day");
+  assert.equal(P.awayDays(P.newProgress(), "2026-10-09"), null);
+  console.log("ok: streak repair (2+ days, within 7 days, once a month, joins a new streak); days away");
+}

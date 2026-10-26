@@ -5,9 +5,10 @@ import { useAppState, update, resetState } from "./store.js";
 import { LANGS, REGIONS } from "./i18n.js";
 import { DAILY_GOALS } from "./progress.js";
 import { AVATARS, Button, Card, Field, Label, Note, Segmented, Sheet, Switch, Title, toast } from "./ui.jsx";
-import { useSession, signIn, signUp, signOut, changePassword, deleteAccount, setNickname, forgotPassword, resetPassword } from "./session.js";
+import { useSession, signIn, signUp, signOut, changePassword, deleteAccount, setNickname, setRecap, forgotPassword, resetPassword } from "./session.js";
 import { analyticsOn, installId, forgetInstall } from "./analytics.js";
 import { api } from "./api.js";
+import { ReminderSettings, turnOff as remindersOff } from "./reminders.jsx";
 
 
 const setSetting = (k, v) => update((s) => ({ ...s, settings: { ...s.settings, [k]: v } }));
@@ -202,6 +203,7 @@ function downloadReminder(t, time) {
 // usage stats on the server, and everything saved on this device.
 async function deleteEverything(signedIn, password) {
   if (signedIn) await deleteAccount(password);
+  await remindersOff();
   const id = installId();
   forgetInstall();
   await api("/api/events", { method: "DELETE", body: { installId: id } }).catch(() => {});
@@ -242,6 +244,7 @@ export default function Settings({ t, locale, go }) {
           <>
             <div style={{ fontWeight: 750, fontSize: 17 }}>{session.user.email}</div>
             <div style={{ fontSize: 14, color: "var(--mid)", margin: "4px 0 14px" }}>{t("account.synced")}</div>
+            {session.recap && row(t("recap.title"), t("recap.sub"), <Switch label={t("recap.title")} checked={!!session.user.recap} onChange={(v) => setRecap(v).then(() => toast(t(v ? "recap.on" : "recap.off"), "good"), (e) => toast(e.message))} />)}
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               <Button kind="secondary" size="md" onClick={() => signOut().then(() => toast(t("account.signed_out")))}>
                 {t("account.signout")}
@@ -277,16 +280,25 @@ export default function Settings({ t, locale, go }) {
       <Card>
         <div style={{ fontWeight: 650, marginBottom: 10 }}>{t("settings.daily_goal")}</div>
         <Segmented label={t("settings.daily_goal")} value={progress.dailyGoal} onChange={(v) => update((s) => ({ ...s, progress: { ...s.progress, dailyGoal: v } }))} options={DAILY_GOALS.map((g) => ({ value: g, label: t("goal.minutes", { n: g / 2 }) }))} />
-        <div style={{ marginTop: 16, display: "flex", alignItems: "flex-end", gap: 10 }}>
-          <label style={{ flex: 1 }}>
-            <span style={{ display: "block", fontWeight: 650, marginBottom: 6 }}>{t("settings.reminder")}</span>
-            <input type="time" value={time} onChange={(e) => setTime(e.target.value)} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 14, padding: "11px 12px", background: "var(--surface)", color: "var(--ink)" }} />
-          </label>
-          <Button size="md" onClick={() => downloadReminder(t, time)}>
-            {t("settings.reminder.add")}
-          </Button>
+        <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid var(--line)" }}>
+          <ReminderSettings
+            t={t}
+            calendar={
+              <>
+                <div style={{ display: "flex", alignItems: "flex-end", gap: 10 }}>
+                  <label style={{ flex: 1 }}>
+                    <span style={{ display: "block", fontWeight: 650, marginBottom: 6 }}>{t("settings.reminder")}</span>
+                    <input type="time" value={time} onChange={(e) => setTime(e.target.value)} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 14, padding: "11px 12px", background: "var(--surface)", color: "var(--ink)" }} />
+                  </label>
+                  <Button size="md" onClick={() => downloadReminder(t, time)}>
+                    {t("settings.reminder.add")}
+                  </Button>
+                </div>
+                <p style={{ fontSize: 13, color: "var(--low)", margin: "8px 0 0", lineHeight: 1.4 }}>{t("settings.reminder.how")}</p>
+              </>
+            }
+          />
         </div>
-        <p style={{ fontSize: 13, color: "var(--low)", margin: "8px 0 0", lineHeight: 1.4 }}>{t("settings.reminder.how")}</p>
       </Card>
 
       <Label>{t("settings.language")}</Label>

@@ -14,6 +14,7 @@ import { addStrings, makeT, money, shortDate, text } from "../../core/i18n.js";
 import { dayKey } from "../../core/progress.js";
 import { Button, Card, Field, Icon, Label, Legend, LineChart, Note, Segmented, Sheet, Slider, Title, toast } from "../../core/ui.jsx";
 import { AgeCard } from "../../core/Settings.jsx";
+import { ReminderCard } from "../../core/reminders.jsx";
 import { PATHS, exampleRates } from "./engine.js";
 import * as P from "./plan.js";
 import { DEFAULTS, amt, dur, pathLabel, PATH_COLORS, TOOLS, BudgetTool, LeakTool, CompareTool, DebtTool, EarlyTool, InvestTool, RetireTool } from "./tools.jsx";
@@ -622,6 +623,8 @@ function Home({ t, locale, go, data, setOpen, sheets }) {
         <>
           <Title sub={t("home.empty.sub")}>{t("home.empty.title")}</Title>
           <TemplateGrid t={t} onPick={(id) => sheets.newGoal(id)} />
+          <AgeCard t={t} />
+          <ReminderCard t={t} />
         </>
       ) : (
         <>
@@ -635,6 +638,7 @@ function Home({ t, locale, go, data, setOpen, sheets }) {
           <Label>{t("home.next_lesson")}</Label>
           <NextLessonCard t={t} locale={locale} go={go} row={leadRow} />
           <AgeCard t={t} />
+          <ReminderCard t={t} />
           <MissionCard t={t} locale={locale} go={go} />
           {others.length > 0 && <Label>{t("home.other_goals")}</Label>}
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -1048,6 +1052,16 @@ registerModule({
       return (lead ? [lead, ...goals.filter((g) => g !== lead)] : goals).map((g) => ({ id: g.id, kind: g.template, name: nameOf(g, t) }));
     },
     // For the tutor: kinds and numbers only, never the names people type.
+    // For the weekly email: each goal's name and progress, in words.
+    progressLines: (locale) => {
+      const t = makeT(locale);
+      return goalsNow()
+        .filter((g) => g.status !== "paused")
+        .slice(0, 3)
+        .map((g) => ({ name: nameOf(g, t), saved: money(P.saved(g), { ...locale, currency: g.currency }), target: money(g.target, { ...locale, currency: g.currency }), percent: Math.round(P.percentOf(g, P.saved(g))) }));
+    },
+    // The last Sunday check-in done (reminders skip it once done).
+    checkInDone: () => (getState().modules.goals || {}).checkIn || null,
     summary: () =>
       goalsNow()
         .slice(0, 5)

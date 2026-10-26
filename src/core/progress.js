@@ -8,6 +8,9 @@
 //   automatically. You start with one, earn another every 7 streak days,
 //   and hold at most 2. No freeze left: the streak starts over — no guilt
 //   trips, the best streak is kept.
+// - Streak repair: once a calendar month, a streak of 2+ days that ended
+//   can be brought back for free, within 7 days of ending (the days in
+//   between count like freeze days).
 // - XP: 10 a lesson (+5 if perfect), 5 for replaying a finished lesson,
 //   and a little for doing things in the practice tools (once a day each).
 // - Money Missions: 20 XP the first time you finish each one. They don't
@@ -70,7 +73,35 @@ export function settleStreak(p, today) {
     const frozen = Array.from({ length: missed }, (_, i) => addDays(s.last, i + 1));
     return { p: { ...p, freezes: p.freezes - missed, streak: { ...s, last: addDays(today, -1), frozen: [...s.frozen, ...frozen].slice(-60) } }, event: { type: "freeze_used", count: missed, streak: s.count } };
   }
-  return { p: { ...p, streak: { ...s, count: 0 } }, event: { type: "streak_reset", lost: s.count } };
+  return { p: { ...p, streak: { ...s, count: 0, broken: { count: s.count, last: s.last, on: today } } }, event: { type: "streak_reset", lost: s.count } };
+}
+
+// STREAK REPAIR — see the rules above. Works before or after the first
+// lesson of the new streak (then the two join up).
+const REPAIR_DAYS = 7;
+export const monthOf = (key) => key.slice(0, 7);
+export function canRepair(p, today) {
+  const s = p.streak;
+  const b = s.broken;
+  return !!b && b.count >= 2 && daysBetween(b.on, today) <= REPAIR_DAYS && s.repaired !== monthOf(today);
+}
+export function repairStreak(p, today) {
+  if (!canRepair(p, today)) return p;
+  const s = p.streak;
+  const b = s.broken;
+  // The new streak's first day (or today, if there isn't one yet).
+  const resume = s.count > 0 ? addDays(s.last, -(s.count - 1)) : today;
+  const gap = Array.from({ length: Math.max(0, daysBetween(b.last, resume) - 1) }, (_, i) => addDays(b.last, i + 1));
+  const count = b.count + s.count;
+  const { broken, ...rest } = s;
+  return { ...p, streak: { ...rest, count, last: s.count > 0 ? s.last : addDays(today, -1), best: Math.max(s.best, count), frozen: [...s.frozen, ...gap].slice(-60), repaired: monthOf(today) } };
+}
+
+// Days since the app was last opened (null: never recorded). Older saves
+// don't have `seen`; their last active day stands in.
+export function awayDays(p, today) {
+  const last = p.seen || [...(p.lessonDays || []), ...Object.keys(p.days || {})].sort().pop();
+  return last ? daysBetween(last, today) : null;
 }
 
 // A finished lesson: XP, then the streak for today.

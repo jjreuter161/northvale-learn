@@ -59,6 +59,7 @@ export const store = {
   },
   changed: () => save(),
   userCount: () => Object.keys(data.users).length,
+  allUsers: () => Object.values(data.users),
   userById: (id) => data.users[id] || null,
   userByEmail: (email) => Object.values(data.users).find((u) => u.email === email) || null,
   addUser({ email, passwordHash, nickname, ageBand, avatar, guardianConsentAt = null }) {

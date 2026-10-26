@@ -114,6 +114,17 @@ Forgotten-password emails are sent from a Gmail account you control, through Goo
 
 `PUBLIC_URL` is the address the link opens. `CONTACT_EMAIL` is shown to testers who need help.
 
+**The same Gmail also sends the weekly recap** that learners can turn on in Settings (Sunday evenings). It's off on the server until these settings are in, and locally the recap is printed in the terminal instead. At ~500 emails a day, Gmail covers a few hundred weekly recaps; past that, you'd move to an email service (that would be an account and possibly a cost, so ask first).
+
+## 4b. Daily reminders (no key, no account)
+
+Reminders need nothing from you: the server makes its own key pair (VAPID) the first time it starts and keeps it in its data file. Browsers' push services (Google, Apple, Mozilla, Microsoft) deliver them for free. Two things help:
+
+- set `CONTACT_EMAIL` (or `PUBLIC_URL`): push services use it to reach you if something's wrong;
+- keep the data file (and its backups): losing it means a new key, and everyone has to turn reminders on again.
+
+To check them on a real phone: open the app, turn on reminders in Settings, then on `/admin` press **Send a test reminder to every device**. On an iPhone, add the app to the Home Screen first (Share → Add to Home Screen) and turn reminders on from there.
+
 ## 5. Other settings for the beta
 
 ```

@@ -1,11 +1,13 @@
 // WHAT TESTERS DO — usage events, the "how disappointed would you be"
 // survey, feedback, and errors, kept as small counts per random install ID
 // (made on the device; not linked to an account, name, email or IP), plus
-// the numbers the admin page shows: day-1 and day-7 return, lessons per
-// learner, where people stop inside a lesson, streaks, tutor questions.
+// the numbers the admin page shows: day-1, day-7 and day-30 return,
+// lessons per learner, where people stop inside a lesson, streaks, tutor
+// questions, and what brings people back (reminders, the welcome-back
+// screen, streak repair, the weekly email) and whether it works.
 import { store } from "./store.js";
 
-const EVENTS = new Set(["app_open", "onboarding", "lesson_step", "lesson_complete", "review_complete", "challenge_complete", "placement", "tutor_ask", "practice", "account_created", "mission_start", "mission_done"]);
+const EVENTS = new Set(["app_open", "onboarding", "lesson_step", "lesson_complete", "review_complete", "challenge_complete", "placement", "tutor_ask", "practice", "account_created", "mission_start", "mission_done", "comeback", "comeback_start", "streak_lost", "streak_repair", "push_on", "push_off", "push_open", "recap_open"]);
 const ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const DAY = /^\d{4}-\d{2}-\d{2}$/;
 const str = (x, n = 64) => String(x == null ? "" : x).replace(/[\u0000-\u001f]/g, " ").slice(0, n);
@@ -57,6 +59,17 @@ export function record({ installId, events }, ip) {
         inst.lessons++;
       }
     }
+    // Days with a finished lesson or review, and the retention features —
+    // so the admin page can show what happened after each.
+    if (e.name === "lesson_complete" || e.name === "review_complete") inst.lessonDays = addTo(inst.lessonDays, e.day, 90);
+    if (e.name === "comeback") inst.comebacks = addTo(inst.comebacks, e.day, 30);
+    if (e.name === "comeback_start") a.comebackStarts = (a.comebackStarts || 0) + 1;
+    if (e.name === "streak_lost") inst.lost = addTo(inst.lost, e.day, 30);
+    if (e.name === "streak_repair") inst.repairs = addTo(inst.repairs, e.day, 30);
+    if (e.name === "push_on") Object.assign(inst, { push: true, pushOn: inst.pushOn || e.day });
+    if (e.name === "push_off") inst.push = false;
+    if (e.name === "push_open") (a.pushOpens ||= {})[str(p.kind, 16)] = (a.pushOpens[str(p.kind, 16)] || 0) + 1;
+    if (e.name === "recap_open") a.recapOpens = (a.recapOpens || 0) + 1;
     if (e.name === "tutor_ask") inst.tutor++;
     if (e.name === "practice") a.practice[str(p.kind, 16)] = (a.practice[str(p.kind, 16)] || 0) + 1;
     if (e.name === "account_created") inst.account = true;
@@ -74,6 +87,21 @@ export function record({ installId, events }, ip) {
   }
   store.changed();
   return { ok: true };
+}
+
+const addTo = (list, day, max) => ((list || []).includes(day) ? list : [...(list || []), day].sort().slice(-max));
+
+// Reminders and recaps sent by the server (push.js, recap.js).
+export function countPush(kind, ok) {
+  const s = (A().pushSent ||= { kinds: {}, failed: 0 });
+  if (ok) s.kinds[kind] = (s.kinds[kind] || 0) + 1;
+  else s.failed++;
+  store.changed();
+}
+export function countRecap(ok) {
+  const s = (A().recapSent ||= { sent: 0, failed: 0 });
+  s[ok ? "sent" : "failed"]++;
+  store.changed();
 }
 
 export function forget(installId) {
@@ -133,6 +161,32 @@ const addDays = (key, n) => {
   return d.toISOString().slice(0, 10);
 };
 const pct = (a, b) => (b ? Math.round((a / b) * 1000) / 10 : null);
+// Active on any day after `day`, up to 7 days later.
+const backWithin7 = (i, day) => i.days.some((d) => d > day && d <= addDays(day, 7));
+
+// WHAT BRINGS PEOPLE BACK, and what happened next. "Back within 7 days"
+// only counts events at least 7 days old, so recent ones don't drag it down.
+function comingBack(installs, a, today) {
+  const old = (d) => d <= addDays(today, -7);
+  const comebacks = installs.flatMap((i) => (i.comebacks || []).map((day) => ({ i, day })));
+  const losses = installs.flatMap((i) => (i.lost || []).map((day) => ({ i, day, repaired: (i.repairs || []).some((r) => r >= day && r <= addDays(day, 7)) })));
+  const rate = (list) => ({ pct: pct(list.filter((x) => old(x.day) && backWithin7(x.i, x.day)).length, list.filter((x) => old(x.day)).length), of: list.filter((x) => old(x.day)).length });
+  const pushOn = installs.filter((i) => i.pushOn);
+  const d7 = (list) => {
+    const cohort = list.filter((i) => i.first <= addDays(today, -7));
+    return { pct: pct(cohort.filter((i) => i.days.includes(addDays(i.first, 7))).length, cohort.length), of: cohort.length };
+  };
+  const sent = (a.pushSent && a.pushSent.kinds) || {};
+  const opens = a.pushOpens || {};
+  const sentTotal = Object.values(sent).reduce((t, n) => t + n, 0);
+  const openTotal = Object.values(opens).reduce((t, n) => t + n, 0);
+  return {
+    comeback: { shown: comebacks.length, started: a.comebackStarts || 0, lessonSameDay: pct(comebacks.filter((x) => (x.i.lessonDays || []).includes(x.day)).length, comebacks.length), back7: rate(comebacks) },
+    repair: { lost: losses.length, repaired: losses.filter((x) => x.repaired).length, back7Repaired: rate(losses.filter((x) => x.repaired)), back7NotRepaired: rate(losses.filter((x) => !x.repaired)) },
+    push: { learnersOn: pushOn.length, onNow: installs.filter((i) => i.push).length, sent: sentTotal, failed: (a.pushSent && a.pushSent.failed) || 0, opened: openTotal, openPct: pct(openTotal, sentTotal), kinds: Object.keys({ ...sent, ...opens }).map((k) => ({ kind: k, sent: sent[k] || 0, opened: opens[k] || 0 })), day7With: d7(pushOn), day7Without: d7(installs.filter((i) => !i.pushOn)) },
+    recap: { sent: (a.recapSent && a.recapSent.sent) || 0, failed: (a.recapSent && a.recapSent.failed) || 0, opened: a.recapOpens || 0, openPct: pct(a.recapOpens || 0, (a.recapSent && a.recapSent.sent) || 0) },
+  };
+}
 const median = (xs) => {
   if (!xs.length) return 0;
   const s = [...xs].sort((a, b) => a - b);
@@ -147,6 +201,7 @@ export function stats(today, titles = {}, missionTitles = {}) {
   const installs = Object.values(a.installs);
   const d1Cohort = installs.filter((i) => i.first <= addDays(today, -1));
   const d7Cohort = installs.filter((i) => i.first <= addDays(today, -7));
+  const d30Cohort = installs.filter((i) => i.first <= addDays(today, -30));
   const back = (i, n) => i.days.includes(addDays(i.first, n));
   const within7 = (i) => i.days.some((d) => d > i.first && d <= addDays(i.first, 7));
   const quits = {};
@@ -171,7 +226,9 @@ export function stats(today, titles = {}, missionTitles = {}) {
       day1: { pct: pct(d1Cohort.filter((i) => back(i, 1)).length, d1Cohort.length), of: d1Cohort.length },
       day7: { pct: pct(d7Cohort.filter((i) => back(i, 7)).length, d7Cohort.length), of: d7Cohort.length },
       within7: { pct: pct(d7Cohort.filter(within7).length, d7Cohort.length), of: d7Cohort.length },
+      day30: { pct: pct(d30Cohort.filter((i) => back(i, 30)).length, d30Cohort.length), of: d30Cohort.length },
     },
+    comingBack: comingBack(installs, a, today),
     lessons: { total: installs.reduce((t, i) => t + i.lessons, 0), perLearnerAvg: installs.length ? Math.round((installs.reduce((t, i) => t + i.lessons, 0) / installs.length) * 10) / 10 : 0, perLearnerMedian: median(installs.map((i) => i.lessons)), zero: installs.filter((i) => !i.lessons).length },
     quitPoints: Object.entries(quits)
       .sort((x, y) => y[1] - x[1])

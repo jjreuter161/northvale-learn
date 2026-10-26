@@ -20,6 +20,12 @@ Set a goal, get a plan, and learn what it takes to reach it, five minutes a day.
   - Me shows a skills overview.
 - **Money Missions.** Small real-life tasks that put a lesson to work: "Track everything you spend for 3 days", "Find the fees on a bank account", "Read a real pay stub", "Spot 3 ads that use FOMO", "Set aside any amount toward your goal". There are 31, one suggested each week on Home. They're picked for your country, age range (some are 18+, and some have a 13–17 version that involves a parent) and goal, and for what you studied this week. A finished lesson suggests its unit's mission. You do them on your own, mark them done and can add a short private note. They earn 20 XP the first time (weekly ones once a week) and three achievements, but don't count for the learning streak. No money moves and nothing is collected; usage stats count only that a mission was finished.
 - **First minutes.** Pick a reason, set your first goal (amount and date, prefilled for your country), optionally take a 2-minute placement check that skips units you already know, pick a daily time, and you're in the lesson that helps that goal most. Signing up is offered only after that lesson.
+- **Bringing people back.** Everything here is calm and opt-in:
+  - **Daily reminders** (notifications from the installed app). The learner picks the time; quiet hours (none 9 pm–8 am) are on by default; at most one a day, and only when something's waiting: a streak at risk, the Sunday check-in, a review, this week's mission or the next lesson. Offered once on Home after a second day of learning, and in Settings. Where a browser can't do it (an iPhone before "Add to Home Screen"), it says how, and the calendar reminder still works.
+  - **Welcome back.** After 3+ days away, a short catch-up (your goal, the next lesson, one button to restart) instead of a broken-streak message.
+  - **Streak repair.** Once a month, a streak of 2+ days that ended can be brought back for free, within 7 days.
+  - **Weekly email recap** (accounts, opt-in, once email is set up): Sunday evening, your goals, the week's lessons and the next step. It stops after 4 weeks without a lesson, and one link turns it off.
+  - The admin page shows how each one does: how many people see or use it, and how many come back within 7 days after. It also shows day-30 return and has a "send a test reminder" button.
 - **Habit.** XP, levels, a daily streak with automatic streak freezes, a daily XP target, achievements and a weekly league (real people only), kept quiet and in the background. The top bar shows only the streak; XP lives on Me. Achievements come from learning and from goal milestones, which never give XP (savings are self-reported). There's also a calendar reminder.
 - **Practice portfolio.** $10,000 (or $200,000 MXN) of pretend money. Safe investments, funds and single stocks unlock as you learn. Holdings linked to a goal are tagged with it. Prices are real and delayed with a market data key; otherwise they're samples, clearly labeled.
 - **Calculators.** Budget planner, debt payoff, starting early, investing range, retirement, paycheck and side hustle, on Home and as lesson steps.
@@ -50,8 +56,8 @@ Everything works without keys. To turn on the AI tutor, real prices and reset em
 | `ADMIN_TOKEN` | 20+ characters; opens the private stats page at `/admin`. |
 | `ALERT_WEBHOOK_URL` | A Discord or Slack webhook for new errors, budget alerts and failed backups. |
 | `SIGNUP_CODE` | Accounts need this code (for a closed beta). |
-| `SMTP_USER`, `SMTP_PASS`, `PUBLIC_URL` | Password reset emails, sent from a dedicated Gmail with an app password (docs/SETUP-KEYS.md §4). |
-| `CONTACT_EMAIL` | Shown to testers who need help, and in the legal pages. |
+| `SMTP_USER`, `SMTP_PASS`, `PUBLIC_URL` | Password reset emails and the weekly recap, sent from a dedicated Gmail with an app password (docs/SETUP-KEYS.md §4). Reminders need no key: the server makes its own (VAPID) on first start. |
+| `CONTACT_EMAIL` | Shown to testers who need help, and in the legal pages. Also how browsers' push services can reach you about reminders (or `PUBLIC_URL`). |
 | `PORT`, `HOST`, `ALLOWED_HOSTS`, `TRUST_PROXY`, `NORTHVALE_DATA` | Server and hosting settings. |
 
 ## Docs
@@ -117,6 +123,8 @@ The core and the other modules don't change. Goals are already built for this: a
 - **Analytics:**
   - first-party only, with a random install ID; no name, email, IP or trackers;
   - can be switched off, and are off automatically with Global Privacy Control or Do Not Track.
+- **Reminders** are tied to a random ID made on the device (not the account or the usage-stats ID). The server keeps the browser's push address, the time, time zone and language, and a few words about what's next (streak, next lesson, mission titles). It's deleted when reminders are turned off or with Delete my data. Push addresses are accepted only from browsers' push services.
+- **The weekly recap** is off unless the learner turns it on; it's built from their synced progress.
 - **Mission notes** are private: saved with your progress (synced only if you have an account), never sent with usage stats. The note box asks people to leave out account numbers and passwords.
 - **Fonts are self-hosted,** so opening the app contacts no third party.
 - **Delete my data** (Settings → Privacy) removes the account, this device's usage stats and the device's data.
@@ -138,14 +146,17 @@ See COMPLIANCE.md and SECURITY-REVIEW.md for details.
   - money by country and the facts;
   - portfolio and goal math;
   - all 59 lessons, 31 Money Missions, every piece of app text and the glossary being complete in both languages and both countries;
-  - Money Missions: who each fits, their order, the weekly suggestion, notes, XP once and achievements.
+  - Money Missions: who each fits, their order, the weekly suggestion, notes, XP once and achievements;
+  - streak repair (2+ days, within 7 days, once a month) and days away.
+- **Reminders and the recap** (`test/retention.test.mjs`): encryption checked against RFC 8291's example, the VAPID signature, what each reminder says and when (time zone, quiet hours, once a day), push services only; the recap's content in both languages, Sunday evening once a week, stopping after 4 quiet weeks, the turn-off link.
 - **The server:**
   - accounts, with the age and guardian rules;
   - progress sync and leagues (with the XP cap);
   - the tutor: server-side prompt, limits and monthly budget, and goal facts without goal names;
   - news, including dropping steered summaries;
   - prices;
-  - analytics and retention math, quit points, the survey, feedback and errors, behind the admin token;
+  - analytics and retention math (day 1, 7 and 30, and what brings people back), quit points, the survey, feedback and errors, behind the admin token;
+  - reminder sign-up (push services only, deleted when off) and the recap opt-in;
   - password reset (the same answer for any email, a link that works once, other sessions signed out);
   - deleting data and accounts.
 

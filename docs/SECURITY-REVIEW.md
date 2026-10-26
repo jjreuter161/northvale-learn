@@ -28,6 +28,11 @@
   - a password change signs out other devices;
   - deleting the account ends all of its sessions.
 - **Guessing:** 5 failed sign-ins per email and 20 per address in 15 minutes, then a pause. The admin token gets 5.
+- **Reminders (Phase 4, `server/push.js`):**
+  - the server only ever sends to push addresses on browsers' push services (Google FCM, Mozilla, Apple, Microsoft), over HTTPS, so a made-up "push address" can't make it call other machines (no SSRF);
+  - each message is encrypted for the device (RFC 8291) and signed with the server's own VAPID key (made on first start, kept in the data file);
+  - the summary a device sends is cut down to known fields and lengths; sign-ups are rate-limited per address and capped at 50,000 devices; a random device ID (122 bits) is the only way to change or delete one.
+- **The weekly recap's turn-off link** carries an HMAC of the account ID (a server secret made on first start), checked in constant time; it can only turn the recap off, and only for that account.
 - **Cross-site attacks:** every API call needs an `X-Northvale` header, which other sites can't send without permission (and the server never grants it), plus SameSite=Strict cookies. A host allowlist blocks DNS-rebinding.
 - **Page security:**
   - a strict content policy: scripts and connections only to our own server, no inline scripts;

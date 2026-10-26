@@ -23,13 +23,15 @@ Your lessons, XP, streak, badges, practice portfolio, goals, Money Missions (and
 - **Feedback and survey answers** you choose to send.
 - **Error reports** when something breaks: the error message and where in the app it happened. These contain no personal information.
 - **Requests for news and prices.** These don't include anything about you.
+- **Daily reminders, only if you turn them on.** The address your browser's push service gives this device, the time you picked, your time zone and language, and a few words about what's next (your streak, and the titles of your next lesson and this week's mission), so the reminder can say something useful. They're kept under a random ID made on your device, not linked to your account or usage stats, and deleted when you turn reminders off or choose "Delete my data".
 
 **If you create an account, we also keep:**
 
 - your email (to sign in, and to send you a password reset link if you ask for one) and your password, stored only in a scrambled form that can't be turned back into the password;
 - your nickname, avatar color and age range (for example "13–17");
 - for ages 13–17, the date you confirmed a parent or guardian agreed;
-- your synced progress, so it's the same on every device;
+- your synced progress, so it's the same on every device, with a few words about what's next (your goals' progress, the next lesson, this week's mission);
+- whether you turned on the weekly email recap. If you do, it's made from your synced progress and sent to your email on Sunday evenings; every email has a link to turn it off;
 - your weekly XP, so you can be in a league (other learners see only your nickname and XP);
 - how many tutor questions you asked today (to keep the service fair).
 
@@ -46,7 +48,8 @@ The server uses your IP address for a few minutes to stop password-guessing and 
 - **Our hosting provider** **[name, e.g. Fly.io, and the region]** runs the server and stores the data.
 - **Anthropic** answers tutor questions and writes the news summaries.
 - **Twelve Data** sends us market prices. It never receives anything about you.
-- **Google (Gmail)** delivers password reset emails, and only those. It receives your email address and the reset link. We never send newsletters or marketing.
+- **Google (Gmail)** delivers password reset emails and, if you turn it on, the weekly recap. It receives your email address and the email. We never send newsletters or marketing.
+- **Your browser's push service** (Google, Apple, Mozilla or Microsoft, depending on your browser) delivers daily reminders if you turn them on. Each reminder is encrypted for your device, so the push service can't read it.
 
 ## How long we keep it
 

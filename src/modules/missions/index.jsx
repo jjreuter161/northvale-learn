@@ -333,6 +333,14 @@ registerModule({
   services: {
     WeekCard,
     TryCard,
+    // For reminders and the weekly email: the mission in progress (else
+    // this week's suggestion), and the week the last one was finished.
+    status: (locale) => {
+      const s = sliceOf("missions", DEFAULTS);
+      const w = thisWeek(s, ctxNow(), dayKey());
+      const m = w.active || w.suggestion;
+      return { mission: m && { title: text(m.title, locale), started: (w.active && s.active.day) || null }, missionWeek: (s.log[s.log.length - 1] || {}).week || null };
+    },
   },
 });
 

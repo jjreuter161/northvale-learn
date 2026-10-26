@@ -3,7 +3,7 @@
 // progress.js to the saved state. Badges that check module facts (units
 // done, holdings…) ask the registry, so no module is imported here.
 import { update, getState, emit } from "./store.js";
-import { completeLesson, completeReview, completeMission, practiced, settleStreak, awardBadges, dayKey, goalMet } from "./progress.js";
+import { completeLesson, completeReview, completeMission, practiced, settleStreak, repairStreak, canRepair, awayDays, awardBadges, dayKey, goalMet } from "./progress.js";
 import { facts } from "./registry.js";
 import { track } from "./analytics.js";
 
@@ -88,16 +88,30 @@ export function checkBadges() {
   return fresh;
 }
 
-// On opening the app: missed days use streak freezes, or the streak ends.
+// On opening the app: missed days use streak freezes, or the streak ends;
+// and how many days it's been since the last visit (3+: "welcome back").
 export function settleOnOpen() {
   const today = dayKey();
   let event = null;
+  let away = null;
   update((s) => {
+    away = awayDays(s.progress, today);
     const r = settleStreak(s.progress, today);
     event = r.event;
-    return r.p === s.progress ? s : { ...s, progress: r.p };
+    return r.p === s.progress && s.progress.seen === today ? s : { ...s, progress: { ...r.p, seen: today } };
   });
-  return event;
+  if (event && event.type === "streak_reset") track("streak_lost", { lost: event.lost });
+  return { event, away };
+}
+
+// The free monthly streak repair (progress.js has the rules).
+export const repairAvailable = () => canRepair(getState().progress, dayKey());
+export function repairNow() {
+  const today = dayKey();
+  update((s) => ({ ...s, progress: repairStreak(s.progress, today) }));
+  const count = getState().progress.streak.count;
+  track("streak_repair", { streak: count });
+  return count;
 }
 
 export const progressNow = () => getState().progress;

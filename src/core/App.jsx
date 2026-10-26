@@ -9,6 +9,9 @@ import { allModules, getModule } from "./registry.js";
 import { LOOKS, GLOBAL_CSS, Icon, Wordmark, Toasts, Sheet, toast, Button } from "./ui.jsx";
 import { useSession, refreshSession, schedulePush } from "./session.js";
 import { settleOnOpen } from "./game.js";
+import { OpenNotice, RepairOffer, COMEBACK_DAYS } from "./Comeback.jsx";
+import { scheduleReminderUpdate } from "./reminders.jsx";
+import { api } from "./api.js";
 import { dayKey, addDays, MAX_FREEZES, BADGES } from "./progress.js";
 import Onboarding from "./Onboarding.jsx";
 import Me from "./Me.jsx";
@@ -63,13 +66,15 @@ export default function App() {
   useEffect(() => {
     refreshSession();
   }, []);
-  // Missed days: a freeze covers them, or the streak starts over. Said kindly.
+  // Missed days: a freeze covers them, or the streak starts over; after 3+
+  // days away, a short catch-up instead (Comeback.jsx). Said kindly.
   useEffect(() => {
     if (!profile.onboarded) return;
     const p = progress;
     track("app_open", { streak: p.streak.count, lessons: p.counters.lessons || 0 });
-    const e = settleOnOpen();
-    if (e) setNotice(e);
+    const n = settleOnOpen();
+    if (n.away >= COMEBACK_DAYS) track("comeback", { away: Math.min(n.away, 365) });
+    if (n.event || n.away >= COMEBACK_DAYS) setNotice(n);
   }, [profile.onboarded]);
   useEffect(() => {
     const offStore = on("badges.earned", ({ ids }) => ids.forEach((id) => toast(t("badge.earned", { name: t(`badge.${id}`) }), "good")));
@@ -79,7 +84,24 @@ export default function App() {
   const updatedAt = useAppState((s) => s.updatedAt);
   useEffect(() => {
     if (session.user) schedulePush();
+    scheduleReminderUpdate();
   }, [updatedAt, session.user]);
+  // Opened from a reminder (?from=push&kind=…) or the weekly email
+  // (?from=recap, or its "turn off" link ?recap_off=…): count it, go where
+  // it points, then tidy the address.
+  useEffect(() => {
+    const q = new URLSearchParams(location.search);
+    if (!q.has("from") && !q.has("recap_off")) return;
+    const kind = q.get("kind");
+    if (q.get("from") === "push") track("push_open", { kind });
+    if (q.get("from") === "recap") track("recap_open");
+    if (q.has("recap_off")) api("/api/recap/off", { method: "POST", body: { token: q.get("recap_off") } }).then(() => toast(t("recap.unsubscribed"), "good"), (e) => toast(e.message));
+    history.replaceState(null, "", location.pathname);
+    if (!profile.onboarded) return;
+    if (kind === "review") go("lessons", { review: true });
+    else if (kind === "mission") go("missions");
+    else if (kind === "streak" || kind === "next") go("lessons");
+  }, []);
 
   const go = (id, params = {}) => {
     setRoute({ id, params });
@@ -214,17 +236,7 @@ export default function App() {
           <m.Overlay key={m.id} {...ctx} />
         ))}
       <StreakSheet open={streakOpen} onClose={() => setStreakOpen(false)} t={t} progress={progress} today={today} />
-      <Sheet open={!!notice} onClose={() => setNotice(null)} title={notice && notice.type === "freeze_used" ? t("streak.saved.title") : t("streak.reset.title")}>
-        {notice && (
-          <div style={{ textAlign: "center", padding: "6px 4px 4px" }}>
-            <div style={{ width: 64, height: 64, borderRadius: 32, margin: "0 auto", background: "var(--brandSoft)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <Icon name={notice.type === "freeze_used" ? "snow" : "refresh"} size={30} color="var(--sky)" />
-            </div>
-            <p style={{ fontSize: 17, lineHeight: 1.5, margin: "8px 0 18px" }}>{notice.type === "freeze_used" ? t("streak.saved.body", { n: notice.count, streak: notice.streak }) : t("streak.reset.body", { n: notice.lost })}</p>
-            <Button full onClick={() => (setNotice(null), go("lessons"))}>{t("streak.cta")}</Button>
-          </div>
-        )}
-      </Sheet>
+      <OpenNotice t={t} locale={locale} notice={notice} onClose={() => setNotice(null)} go={go} />
       <Toasts />
     </div>
   );
@@ -264,7 +276,10 @@ function StreakSheet({ open, onClose, t, progress, today }) {
           <div style={{ fontSize: 14, color: "var(--mid)", lineHeight: 1.4 }}>{t("streak.freezes.how")}</div>
         </div>
       </div>
-      <p style={{ fontSize: 14, color: "var(--mid)", lineHeight: 1.5, margin: "14px 2px 0" }}>{t("streak.rule")}</p>
+      <div style={{ marginTop: 14 }}>
+        <RepairOffer t={t} />
+      </div>
+      <p style={{ fontSize: 14, color: "var(--mid)", lineHeight: 1.5, margin: "0 2px" }}>{t("streak.rule")}</p>
     </Sheet>
   );
 }

@@ -13,4 +13,5 @@ import "./modules/feedback/index.jsx";
 
 createRoot(document.getElementById("root")).render(<App />);
 
-if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("/sw.js").catch(() => {});
+// The service worker: offline use and reminders (also on this machine, to try them).
+if ("serviceWorker" in navigator && (location.protocol === "https:" || ["localhost", "127.0.0.1"].includes(location.hostname))) navigator.serviceWorker.register("/sw.js").catch(() => {});

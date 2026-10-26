@@ -11,6 +11,39 @@ const pct = (x) => (x == null ? "—" : `${x}%`);
 const card = (label, value, note) => el("div", { class: "card" }, el("div", { class: "label" }, label), el("div", { class: "big" }, value), note ? el("div", { class: "label" }, note) : "");
 const table = (head, rows) => el("table", {}, el("tr", {}, head.map((h) => el("th", {}, h))), rows.length ? rows.map((r) => el("tr", {}, r.map((c) => el("td", {}, c)))) : el("tr", {}, el("td", { colspan: head.length, class: "muted" }, "Nothing yet.")));
 
+// What brings people back, and whether it works. "Back within 7 days" =
+// used the app again in the 7 days after (only events 7+ days old count).
+const back = (r) => `${pct(r.pct)} back within 7 days (of ${r.of})`;
+function comingBack(c) {
+  const p = c.push;
+  return [
+    el("h2", {}, "What brings people back"),
+    el(
+      "div",
+      { class: "grid" },
+      card("Welcome-back screen (3+ days away)", c.comeback.shown, `${c.comeback.started} started a lesson from it · ${pct(c.comeback.lessonSameDay)} finished one that day · ${back(c.comeback.back7)}`),
+      card("Streak repairs", `${c.repair.repaired} of ${c.repair.lost}`, `streaks lost and repaired · repaired: ${back(c.repair.back7Repaired)} · not: ${back(c.repair.back7NotRepaired)}`),
+      card("Reminders on", p.devicesNow, `${p.learnersOn} ${p.learnersOn === 1 ? "learner" : "learners"} ever turned them on · day-7 return with: ${pct(p.day7With.pct)} (of ${p.day7With.of}), without: ${pct(p.day7Without.pct)} (of ${p.day7Without.of})`),
+      card("Reminders sent", p.sent, `${p.opened} opened (${pct(p.openPct)}) · ${p.failed} failed`),
+      card("Weekly email recap", c.recap.emailOn ? c.recap.optedIn : "off", c.recap.emailOn ? `opted in · ${c.recap.sent} sent · ${c.recap.opened} opened (${pct(c.recap.openPct)}) · ${c.recap.failed} failed` : "email isn't set up on the server yet")
+    ),
+    table(["Reminder", "Sent", "Opened"], p.kinds.map((k) => [{ streak: "Streak at risk", checkin: "Sunday check-in", review: "Review ready", mission: "Mission", next: "Next lesson" }[k.kind] || k.kind, k.sent, k.opened])),
+    el("p", {}, testButton()),
+  ];
+}
+// Checks that reminders reach real phones: one test reminder to every device.
+function testButton() {
+  const out = el("span", { class: "muted" });
+  const b = el("button", { type: "button" }, "Send a test reminder to every device");
+  b.addEventListener("click", async () => {
+    out.textContent = " Sending…";
+    const res = await fetch("/api/admin/push-test", { method: "POST", headers: { "X-Northvale": "1", "X-Admin-Token": sessionStorage.getItem("nvl-admin") || "" } });
+    const r = await res.json();
+    out.textContent = res.ok ? ` ${r.delivered} of ${r.devices} delivered${r.failed ? `, ${r.failed} failed` : ""}.` : ` ${(r.error && r.error.message) || "Failed."}`;
+  });
+  return [b, out];
+}
+
 async function load(token) {
   $("error").textContent = "";
   const res = await fetch("/api/admin/stats", { headers: { "X-Northvale": "1", "X-Admin-Token": token } });
@@ -29,7 +62,8 @@ async function load(token) {
       card("Somewhat / not disappointed", `${s.survey.somewhat} / ${s.survey.not}`)
     ),
     el("h2", {}, "Coming back"),
-    el("div", { class: "grid" }, card("Day-1 return", pct(s.retention.day1.pct), `of ${s.retention.day1.of} who started 1+ days ago`), card("Day-7 return", pct(s.retention.day7.pct), `of ${s.retention.day7.of} who started 7+ days ago`), card("Back within a week", pct(s.retention.within7.pct), `of ${s.retention.within7.of}`), card("Active today", s.activeToday, `${s.learners} learners · ${s.accounts} accounts`)),
+    el("div", { class: "grid" }, card("Day-1 return", pct(s.retention.day1.pct), `of ${s.retention.day1.of} who started 1+ days ago`), card("Day-7 return", pct(s.retention.day7.pct), `of ${s.retention.day7.of} who started 7+ days ago`), card("Back within a week", pct(s.retention.within7.pct), `of ${s.retention.within7.of}`), card("Day-30 return", pct(s.retention.day30.pct), `of ${s.retention.day30.of} who started 30+ days ago`), card("Active today", s.activeToday, `${s.learners} learners · ${s.accounts} accounts`)),
+    ...comingBack(s.comingBack),
     el("h2", {}, "Learning"),
     el("div", { class: "grid" }, card("Lessons finished", s.lessons.total), card("Per learner", `${s.lessons.perLearnerAvg} avg`, `median ${s.lessons.perLearnerMedian} · ${s.lessons.zero} finished none`), card("Streaks", `${s.streaks.median} median`, `longest ${s.streaks.max} · ${s.streaks.atLeast3} at 3+ · ${s.streaks.atLeast7} at 7+`), card("Tutor questions", s.tutor.questions, `${s.tutor.learnersAsking} learners asked`)),
     el("h2", {}, "Money Missions"),

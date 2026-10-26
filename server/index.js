@@ -26,6 +26,8 @@ const { MISSIONS } = await import("../src/modules/missions/catalog.js");
 const auth = await import("./auth.js");
 const market = await import("./market.js");
 const news = await import("./news.js");
+const push = await import("./push.js");
+const recap = await import("./recap.js");
 const { weekXp, weekStart, dayKey } = await import("../src/core/progress.js");
 // Anthropic's SDK loads only when there's a key, so the rest needs nothing installed.
 const ai = process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_AUTH_TOKEN ? await import("./ai.js") : null;
@@ -83,7 +85,7 @@ const https = (req) => (TRUST_PROXY ? req.headers["x-forwarded-proto"] === "http
 // Behind a proxy, only the last X-Forwarded-For entry is the proxy's word.
 const ipOf = (req) => (TRUST_PROXY && req.headers["x-forwarded-for"] ? req.headers["x-forwarded-for"].split(",").pop().trim() : req.socket.remoteAddress);
 const fail = (status, message, code = null) => Object.assign(new Error(message), { status, code });
-const publicUser = (u) => ({ email: u.email, nickname: u.nickname, avatar: u.avatar, ageBand: u.ageBand, createdAt: u.createdAt });
+const publicUser = (u) => ({ email: u.email, nickname: u.nickname, avatar: u.avatar, ageBand: u.ageBand, recap: !!u.recap, createdAt: u.createdAt });
 function startSession(c, user) {
   const s = auth.newSession();
   store.addSession(s.hash, user.id, s.expiresAt);
@@ -104,7 +106,7 @@ const xpThisWeek = (state, week) => {
 
 // The API. `open` routes work signed out; the rest need an account.
 const routes = {
-  "GET /api/health": { open: true, run: async (c) => ({ ok: true, ai: aiOpen(), aiPaused: !!ai && !aiOpen(), news: true, passwordReset: mail.mailMode() !== "off", contact: process.env.CONTACT_EMAIL || null, market: market.marketInfo(), signup: !process.env.SIGNUP_CODE || "code", user: c.user ? publicUser(c.user) : null }) },
+  "GET /api/health": { open: true, run: async (c) => ({ ok: true, ai: aiOpen(), aiPaused: !!ai && !aiOpen(), news: true, passwordReset: mail.mailMode() !== "off", recap: mail.mailMode() !== "off", contact: process.env.CONTACT_EMAIL || null, market: market.marketInfo(), signup: !process.env.SIGNUP_CODE || "code", user: c.user ? publicUser(c.user) : null }) },
 
   "POST /api/auth/signup": {
     open: true,
@@ -204,6 +206,11 @@ const routes = {
       const patch = {};
       if ("nickname" in c.body) patch.nickname = cleanNickname(c.body.nickname);
       if ("avatar" in c.body) patch.avatar = Math.max(0, Math.min(9, Number(c.body.avatar) || 0));
+      // The weekly email recap: opt-in, and only once email is set up.
+      if ("recap" in c.body) {
+        if (c.body.recap === true && mail.mailMode() === "off") throw fail(503, "Email isn't set up on this server yet.");
+        patch.recap = c.body.recap === true;
+      }
       return { user: publicUser(store.updateUser(c.user.id, patch)) };
     },
   },
@@ -280,6 +287,11 @@ const routes = {
   // TESTER INSIGHTS — usage events, the survey, feedback, app errors.
   "POST /api/events": { open: true, limit: 32000, run: async (c) => insights.record(c.body, c.ip) },
   "DELETE /api/events": { open: true, run: async (c) => (insights.forget(String(c.body.installId || "")), { ok: true }) },
+  // REMINDERS (push.js) and the weekly recap's "turn off" link (recap.js).
+  "GET /api/push/key": { open: true, run: async () => ({ key: push.publicKey() }) },
+  "PUT /api/push": { open: true, limit: 8000, run: async (c) => push.save(c.body, c.ip) },
+  "DELETE /api/push": { open: true, run: async (c) => push.remove(c.body.id) },
+  "POST /api/recap/off": { open: true, run: async (c) => recap.turnOff(c.body.token, c.ip) },
   "POST /api/survey": { open: true, run: async (c) => insights.survey(c.body) },
   "POST /api/feedback": { open: true, limit: 16000, run: async (c) => insights.feedback(c.body, c.user && c.user.id, c.ip) },
   "POST /api/errors": {
@@ -296,7 +308,19 @@ const routes = {
     run: async (c) => {
       adminOnly(c);
       const ai = store.aiSpend(thisMonth());
-      return { ...insights.stats(dayKey(), titles, missionTitles), accounts: store.userCount(), ai: { ...ai, budget: AI_BUDGET, on: aiOpen() }, generatedAt: new Date().toISOString() };
+      const s = insights.stats(dayKey(), titles, missionTitles);
+      s.comingBack.push.devicesNow = push.deviceCount();
+      s.comingBack.recap.optedIn = store.allUsers().filter((u) => u.recap).length;
+      s.comingBack.recap.emailOn = mail.mailMode() !== "off";
+      return { ...s, accounts: store.userCount(), ai: { ...ai, budget: AI_BUDGET, on: aiOpen() }, generatedAt: new Date().toISOString() };
+    },
+  },
+
+  "POST /api/admin/push-test": {
+    open: true,
+    run: async (c) => {
+      adminOnly(c);
+      return push.sendTest();
     },
   },
 
@@ -431,6 +455,10 @@ http
     };
     daily();
     setInterval(daily, 6 * 3600000).unref();
+    // Reminders each minute; recaps every 10 minutes (Sunday evenings).
+    setInterval(() => push.tick().catch((e) => serverError(e)), 60000).unref();
+    const base = process.env.PUBLIC_URL || `http://localhost:${PORT}`;
+    setInterval(() => recap.tick(new Date(), { users: store.allUsers, progressOf: store.progress, base }).catch((e) => serverError(e)), 600000).unref();
     const m = market.marketInfo();
     console.log(`Northvale Learn on http://${HOST === "0.0.0.0" ? "localhost" : HOST}:${PORT}`);
     console.log(`  tutor:  ${ai ? `Claude (${ai.TUTOR_MODEL}), budget $${AI_BUDGET}/month` : "glossary only (set ANTHROPIC_API_KEY for the AI tutor and news summaries)"}`);

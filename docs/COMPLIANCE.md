@@ -79,6 +79,10 @@ If schools ever adopt Northvale Learn, other rules can apply: FERPA, state stude
   - 13–17 versions involve a parent or guardian (reading a pay stub together, help with account security, talking before taking on any work);
   - missions that touch outside sites say "just reading — don't apply / sign up / pay", and point only to official sites (AnnualCreditReport.com, Buró de Crédito, sat.gob.mx, e-sar.com.mx, CONDUSEF);
   - for classroom mode (Phase 5): teachers may see that a mission was finished, never the note.
+- **Bringing people back (Phase 4):**
+  - reminders are opt-in, at a time the learner picks, never 9 pm–8 am unless they turn quiet hours off, at most one a day, and calm (no guilt, no countdowns). The server keeps them under a random device ID, not the account, and deletes them when turned off;
+  - the weekly email is opt-in on the account, has a turn-off link that works without signing in, and stops by itself after 4 weeks without a lesson. It's a progress summary, not marketing; **lawyer to confirm** whether CAN-SPAM's postal-address and unsubscribe rules apply to it, and Mexico's LFPDPPP notice;
+  - for 13–17, both are still the learner's own choice (no default-on). **Your decision:** whether reminders or the recap for 13–17 should need a parent's OK, as sign-up does.
 - **Safety in the product:**
   - "educational only" on every money screen;
   - the tutor is told to send minors to an adult for real accounts, flag scams, and handle distress kindly.
