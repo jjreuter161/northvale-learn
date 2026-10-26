@@ -92,8 +92,8 @@ export const MISSIONS = [
     time: 15,
     title: T("Find the fees on a bank account", "Encuentra las comisiones de una cuenta"),
     how: T("Open a bank's public fee schedule (search \"[bank name] fee schedule\" — no need to sign in). Find the monthly fee, the overdraft fee and the out-of-network ATM fee, and how to avoid each one.", "Abre la lista pública de comisiones de un banco (busca \"[nombre del banco] fee schedule\"; no necesitas iniciar sesión). Encuentra la comisión mensual, la de sobregiro (overdraft) y la de cajeros fuera de la red, y cómo evitar cada una.", {
-      en: "Open a bank's public fee page (search \"[bank name] comisiones\" — no need to sign in) or CONDUSEF's Buró de Entidades Financieras. Find the account-management fee, the minimum-balance fee and the fee for other banks' ATMs.",
-      es: "Abre la página pública de comisiones de un banco (busca \"[nombre del banco] comisiones\"; no necesitas iniciar sesión) o el Buró de Entidades Financieras de la CONDUSEF. Encuentra la comisión por manejo de cuenta, la de saldo mínimo y la de cajeros de otros bancos.",
+      en: "Open a bank's public fee page (search \"[bank name] comisiones\" — no need to sign in) or CONDUSEF's Buró de Entidades Financieras, which compares banks and other financial institutions on complaints, fines and fees. Find the account-management fee, the minimum-balance fee and the fee for other banks' ATMs.",
+      es: "Abre la página pública de comisiones de un banco (busca \"[nombre del banco] comisiones\"; no necesitas iniciar sesión) o el Buró de Entidades Financieras de la CONDUSEF, que compara a bancos y otras instituciones financieras por quejas, multas y comisiones. Encuentra la comisión por manejo de cuenta, la de saldo mínimo y la de cajeros de otros bancos.",
     }),
     ask: T("Which fee would be easiest to pay by accident?", "¿Qué comisión sería más fácil de pagar sin querer?"),
   }),

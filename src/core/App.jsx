@@ -41,6 +41,9 @@ export default function App() {
   const t = useMemo(() => makeT(locale), [locale]);
   const [route, setRoute] = useState({ id: "goals", params: {} });
   const [menu, setMenu] = useState(false);
+  // A tap in the menu always opens that screen fresh (Home's overview,
+  // not the goal that was open).
+  const [visit, setVisit] = useState(0);
   const [streakOpen, setStreakOpen] = useState(false);
   const [notice, setNotice] = useState(null);
   const [resetToken, setResetToken] = useState(() => (/^#reset=([\w-]{20,})$/.exec(location.hash) || [])[1] || null);
@@ -130,7 +133,7 @@ export default function App() {
       </div>
       {[...nav, null, ...coreNav].map((n, i) =>
         n ? (
-          <button key={n.id} onClick={() => go(n.id)} aria-current={route.id === n.id ? "page" : undefined} className="nv-press" style={{ display: "flex", alignItems: "center", gap: 14, width: "100%", border: "none", borderRadius: 14, padding: "12px 12px", minHeight: 48, background: route.id === n.id ? "var(--brandSoft)" : "transparent", color: "var(--ink)", fontSize: 16, fontWeight: 650, cursor: "pointer", textAlign: "left" }}>
+          <button key={n.id} onClick={() => (setVisit((v) => v + 1), go(n.id))} aria-current={route.id === n.id ? "page" : undefined} className="nv-press" style={{ display: "flex", alignItems: "center", gap: 14, width: "100%", border: "none", borderRadius: 14, padding: "12px 12px", minHeight: 48, background: route.id === n.id ? "var(--brandSoft)" : "transparent", color: "var(--ink)", fontSize: 16, fontWeight: 650, cursor: "pointer", textAlign: "left" }}>
             <Icon name={n.icon} size={22} />
             {n.label}
           </button>
@@ -189,7 +192,7 @@ export default function App() {
         {wide && <aside style={{ width: 260, flexShrink: 0, position: "sticky", top: 0, height: "100dvh", borderRight: "1px solid var(--line)" }}>{sidebar}</aside>}
         <div style={{ flex: 1, minWidth: 0, maxWidth: wide ? 720 : 640 }}>
           {header}
-          <main key={route.id} className="nv-in" style={{ padding: "16px 16px calc(32px + env(safe-area-inset-bottom))" }}>
+          <main key={`${route.id}:${visit}`} className="nv-in" style={{ padding: "16px 16px calc(32px + env(safe-area-inset-bottom))" }}>
             <Boundary t={t} screen={route.id}>{Screen ? <Screen {...ctx} /> : null}</Boundary>
             <div style={{ textAlign: "center", marginTop: 36 }}>
               <button onClick={() => getModule("feedback") && getModule("feedback").services.open({})} style={{ border: "none", background: "transparent", color: "var(--low)", fontSize: 14, fontWeight: 600, cursor: "pointer", padding: "10px 12px", minHeight: 44 }}>

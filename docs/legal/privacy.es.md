@@ -13,7 +13,7 @@ Northvale Learn enseña de dinero e inversiones con dinero ficticio. Lo hicimos 
 
 ## Lo que se queda en tu dispositivo
 
-Tus lecciones, XP, racha, insignias, portafolio de práctica, metas, Misiones de dinero (y las notas que escribas en ellas) y la conversación con el tutor se guardan en el navegador de este dispositivo. No los vemos a menos que crees una cuenta.
+Tus lecciones, XP, racha, insignias, portafolio de práctica, metas, Misiones de dinero (y las notas que escribas en ellas), tu rango de edad si eliges uno y la conversación con el tutor se guardan en el navegador de este dispositivo. No los vemos a menos que crees una cuenta.
 
 ## Lo que recibe el servidor
 

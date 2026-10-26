@@ -17,11 +17,17 @@ const set = (patch) => {
 export const useSession = () => useSyncExternalStore((l) => (listeners.add(l), () => listeners.delete(l)), () => status);
 export const sessionNow = () => status;
 
+// An account's age range (asked at sign-up) fills in "not asked yet".
+function adoptAge(user) {
+  if (user && user.ageBand && !getState().profile.ageBand) update((x) => ({ ...x, profile: { ...x.profile, ageBand: user.ageBand } }));
+}
+
 export async function refreshSession() {
   try {
     const h = await api("/api/health");
     set({ checked: true, online: true, ai: !!h.ai, market: h.market || null, news: !!h.news, signup: h.signup !== false, passwordReset: !!h.passwordReset, contact: h.contact || null, user: h.user || null });
     if (h.user) await pull();
+    adoptAge(h.user);
   } catch {
     set({ checked: true, online: false, user: null });
   }
@@ -65,6 +71,7 @@ export async function signIn({ email, password }) {
   const r = await api("/api/auth/login", { method: "POST", body: { email, password } });
   set({ user: r.user });
   await pull();
+  adoptAge(r.user);
   return r.user;
 }
 export async function forgotPassword(email, lang) {
@@ -76,6 +83,7 @@ export async function resetPassword(token, password) {
   const r = await api("/api/auth/reset", { method: "POST", body: { token, password } });
   set({ user: r.user });
   await pull();
+  adoptAge(r.user);
   return r.user;
 }
 export async function signOut() {

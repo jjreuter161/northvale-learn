@@ -14,7 +14,8 @@ All of these are in **`src/core/facts.js`**. Text facts (like a filing deadline)
 | `cetesMinimum` | $100 MXN | Compound interest 3 (Mexico) · glossary "CETES" | cetesdirecto.com | yearly |
 | `cetesExampleRate` | 7% | goal simulator (Mexico savings path) · sample CETES price | Banxico 28-day auction; also set `CETES_RATE` on the server | monthly |
 | `savingsExampleRate` | 3.5% | goal simulator (US savings path) | typical high-yield savings | every few months |
-| `indexExampleRate` | 7% | goal simulator, retirement and start-early tools, Compound interest 2 | keep as a teaching example | rarely |
+| `indexExampleRate` | 7% | goal simulator, retirement and start-early tools, Compound interest 2 | teaching example; matches the after-inflation average, so tool results are roughly in today's money | rarely |
+| `marketAvgNominal` / `marketAvgReal` | 10% / 7% | Scams 2 ("guaranteed returns") | US stock market long-run yearly average before / after inflation (advisor, Phase 3 review) | rarely |
 | `indexRangeLow` / `indexRangeHigh` | 3% / 10% | "investing range" band | teaching example | rarely |
 | `matchExampleUS` | 50% | retirement tool, Retirement 2 | teaching example | rarely |
 | `aforeExtraExampleMX` | 30% | retirement tool (Mexico), Retirement 2 | AFORE contribution rates rise yearly through 2030 under the 2020 reform | yearly |

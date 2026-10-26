@@ -13,6 +13,7 @@ import { recordPractice, checkBadges } from "../../core/game.js";
 import { addStrings, makeT, money, shortDate, text } from "../../core/i18n.js";
 import { dayKey } from "../../core/progress.js";
 import { Button, Card, Field, Icon, Label, Legend, LineChart, Note, Segmented, Sheet, Slider, Title, toast } from "../../core/ui.jsx";
+import { AgeCard } from "../../core/Settings.jsx";
 import { PATHS, exampleRates } from "./engine.js";
 import * as P from "./plan.js";
 import { DEFAULTS, amt, dur, pathLabel, PATH_COLORS, TOOLS, BudgetTool, LeakTool, CompareTool, DebtTool, EarlyTool, InvestTool, RetireTool } from "./tools.jsx";
@@ -633,6 +634,7 @@ function Home({ t, locale, go, data, setOpen, sheets }) {
           )}
           <Label>{t("home.next_lesson")}</Label>
           <NextLessonCard t={t} locale={locale} go={go} row={leadRow} />
+          <AgeCard t={t} />
           <MissionCard t={t} locale={locale} go={go} />
           {others.length > 0 && <Label>{t("home.other_goals")}</Label>}
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>

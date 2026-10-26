@@ -126,6 +126,32 @@ export function AccountForm({ t, mode: start = "signup", signinOnly, onDone }) {
 }
 
 // The page the emailed reset link opens (#reset=token).
+// Learners without an age range (no account, or from before it was asked)
+// count as 13–17, which hides what's for 18 and up. Asked once, on Home,
+// after the first lesson.
+export function AgeCard({ t }) {
+  const profile = useAppState((x) => x.profile);
+  const lessons = useAppState((x) => x.progress.counters.lessons || 0);
+  if (profile.ageBand || profile.ageAsked || !lessons) return null;
+  const answer = (ageBand) => update((x) => ({ ...x, profile: { ...x.profile, ageBand, ageAsked: true } }));
+  return (
+    <Card style={{ marginTop: 12 }}>
+      <div style={{ fontWeight: 750, fontSize: 17 }}>{t("onb.age.title")}</div>
+      <p style={{ fontSize: 14, color: "var(--mid)", lineHeight: 1.45, margin: "4px 0 12px" }}>{t("age.ask.sub")}</p>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+        {[["13-17", "13–17"], ["18-25", "18–25"], ["26+", t("onb.age.26")]].map(([v, label]) => (
+          <Button key={v} kind="secondary" size="md" style={{ border: "1px solid var(--line)" }} onClick={() => answer(v)}>
+            {label}
+          </Button>
+        ))}
+        <Button kind="ghost" size="md" onClick={() => answer(null)}>
+          {t("age.ask.later")}
+        </Button>
+      </div>
+    </Card>
+  );
+}
+
 export function ResetPassword({ t, token, onDone }) {
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);

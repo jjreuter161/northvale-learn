@@ -231,7 +231,7 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
 
   if (result && mode !== "lesson")
     return (
-      <Overlay>
+      <Overlay label={run.title}>
         <SessionDone t={t} locale={locale} mode={mode} result={result} answers={firsts.current} onDone={onExit} />
       </Overlay>
     );
@@ -247,7 +247,7 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
       ...(mistakes === 0 ? [t("lessons.perfect")] : []),
     ];
     return (
-      <Overlay>
+      <Overlay label={run.title}>
         <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", gap: 18, paddingBottom: 18 }}>
           <div style={{ textAlign: "center" }}>
             <div style={{ width: 56, height: 56, borderRadius: 28, margin: "0 auto 14px", background: "var(--accentSoft)", color: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -311,7 +311,7 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
   const canCheck = (step.type === "choice" || step.type === "tf") && picked !== null && !checked;
 
   return (
-    <Overlay>
+    <Overlay label={run.title}>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
         <button onClick={() => setQuit(true)} aria-label={t("common.close")} style={{ border: "none", background: "transparent", color: "var(--low)", width: 44, height: 44, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
           <Icon name="close" />
@@ -391,7 +391,7 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
 }
 
 // Full screen, above everything — a lesson is a focused moment.
-function Overlay({ children }) {
+function Overlay({ label, children }) {
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -401,7 +401,7 @@ function Overlay({ children }) {
   }, []);
   return (
     <Layer>
-      <div style={{ position: "fixed", inset: 0, zIndex: 40, background: "var(--bg)", color: "var(--ink)", overflowY: "auto" }}>
+      <div role="dialog" aria-modal="true" aria-label={label} style={{ position: "fixed", inset: 0, zIndex: 40, background: "var(--bg)", color: "var(--ink)", overflowY: "auto" }}>
         <div style={{ maxWidth: 640, minHeight: "100%", margin: "0 auto", display: "flex", flexDirection: "column", padding: "calc(10px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom))" }}>{children}</div>
       </div>
     </Layer>

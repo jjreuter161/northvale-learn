@@ -13,7 +13,7 @@ Northvale Learn teaches money and investing with pretend money. We built it to c
 
 ## What stays on your device
 
-Your lessons, XP, streak, badges, practice portfolio, goals, Money Missions (and any notes you write for them) and tutor chat are saved in your browser on this device. We can't see them unless you create an account.
+Your lessons, XP, streak, badges, practice portfolio, goals, Money Missions (and any notes you write for them), your age range if you choose one, and tutor chat are saved in your browser on this device. We can't see them unless you create an account.
 
 ## What the server receives
 

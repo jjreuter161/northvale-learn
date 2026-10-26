@@ -19,7 +19,9 @@ export const FACTS = {
   cetesExampleRate: { value: 7, kind: "pct", check: "banxico.org.mx — latest 28-day CETES auction (also the CETES_RATE server setting)", review: "monthly" },
   // Simulator examples (yearly %)
   savingsExampleRate: { value: 3.5, kind: "pct", check: "a typical high-yield savings rate in the US", review: "every few months" },
-  indexExampleRate: { value: 7, kind: "pct", check: "long-run stock index average after inflation is often taught as ~5–7%; keep it an example", review: "rarely" },
+  indexExampleRate: { value: 7, kind: "pct", check: "an example yearly return: about the US market's long-run average after inflation (marketAvgReal), so results are roughly in today's money", review: "rarely" },
+  marketAvgNominal: { value: 10, kind: "pct", check: "US stock market (S&P 500), long-run yearly average before inflation — roughly 10%", review: "rarely" },
+  marketAvgReal: { value: 7, kind: "pct", check: "the same average after inflation — about 7%", review: "rarely" },
   indexRangeLow: { value: 3, kind: "pct", check: "a weak-stretch example", review: "rarely" },
   indexRangeHigh: { value: 10, kind: "pct", check: "a strong-stretch example", review: "rarely" },
   matchExampleUS: { value: 50, kind: "pct", check: "an example employer match (50% of what you put in)", review: "rarely" },

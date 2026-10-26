@@ -61,7 +61,7 @@ addStrings({
   "retire.result": S("At {@retirementAge}: about {amount} (you put in {putIn}).", "A los {@retirementAge}: alrededor de {amount} (tú pusiste {putIn})."),
   "retire.with_extra": S("With the extra: about {amount}.", "Con el extra: alrededor de {amount}."),
   "retire.go": S("See it at {@retirementAge}", "Verlo a los {@retirementAge}"),
-  "retire.note": S("Uses an example {@indexExampleRate} a year. Amounts aren't adjusted for inflation, so they'd buy less than the same amount today. An illustration, not a promise.", "Usa un {@indexExampleRate} anual de ejemplo. Las cantidades no están ajustadas por inflación, así que alcanzarían para menos que hoy. Es una ilustración, no una promesa."),
+  "retire.note": S("Uses an example {@indexExampleRate} a year, about the US market's long-run average after inflation, so amounts are roughly in today's money. An illustration, not a promise.", "Usa un {@indexExampleRate} anual de ejemplo, cerca del promedio de largo plazo de la bolsa de EE. UU. después de inflación, así que las cantidades están más o menos en dinero de hoy. Es una ilustración, no una promesa."),
 });
 
 export const DEFAULTS = { goals: [], budget: null };

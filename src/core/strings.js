@@ -53,6 +53,8 @@ addStrings({
   "onb.age.under13": S("Under 13", "Menos de 13"),
   "onb.age.26": S("26 or older", "26 o más"),
   "onb.age.why": S("So lessons fit where you are. We don't ask for your birthday.", "Para que las lecciones vayan con tu etapa. No te pedimos tu fecha de nacimiento."),
+  "age.ask.sub": S("Some missions are for 18 and up. Your answer is saved with your progress; we never ask for your birthday.", "Algunas misiones son para mayores de 18. Tu respuesta se guarda con tu progreso; nunca te pedimos tu fecha de nacimiento."),
+  "age.ask.later": S("Not now", "Ahora no"),
   "onb.age.too_young": S("Northvale Learn is for ages 13 and up.", "Northvale Learn es para personas de 13 años en adelante."),
   "onb.lang.title": S("Language", "Idioma"),
   "onb.region.title": S("Where do you live?", "¿Dónde vives?"),

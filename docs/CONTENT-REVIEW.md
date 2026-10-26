@@ -103,3 +103,8 @@ Added detail: the seguro facultativo is for students at public high schools and 
 6. **Mexico: CONDUSEF.** The Buró de Entidades Financieras compares bank fees.
 7. **US: colleges.** College websites have a net price calculator (required for schools that take federal student aid).
 8. **US: Social Security card.** Keep it somewhere safe at home, not in your wallet (SSA guidance).
+
+**Advisor's review (2026-10-26).** All 8, plus the three left over from Phase 2 (W-2 timing and work permits, behavioral findings, index returns), were confirmed correct. Wording changed:
+- **Index returns** (Scams 2): now "roughly 10% a year before inflation, or about 7% after inflation, over long periods." Both are in facts.js (`marketAvgNominal`, `marketAvgReal`). The retirement tool's note was also fixed: its example 7% is the after-inflation figure, so its amounts are roughly in today's money (it used to say the opposite).
+- **CONDUSEF** (bank fees mission): the Buró de Entidades Financieras is described as comparing financial institutions on complaints, fines and fees.
+- **ITIN** (Taxes): "for people who need to pay US taxes but can't get a Social Security number."
