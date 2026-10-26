@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Northvale Learn · Admin</title>
+    <style>
+      :root { --bg: #f5f7fb; --card: #fff; --ink: #0e1b2e; --mid: #4a5568; --low: #8792a6; --line: #e2e7ef; --good: #0fa968; --bad: #e0484d; --brand: #13315c; }
+      * { box-sizing: border-box }
+      body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.45 Inter, system-ui, -apple-system, "Segoe UI", sans-serif; font-variant-numeric: tabular-nums }
+      main { max-width: 1040px; margin: 0 auto; padding: 24px 16px 48px }
+      h1 { font-size: 24px; margin: 0 0 4px; letter-spacing: -.4px }
+      h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .5px; color: var(--low); margin: 28px 0 10px }
+      .muted { color: var(--mid) }
+      .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px }
+      .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px }
+      .big { font-size: 28px; font-weight: 700; letter-spacing: -.5px }
+      .label { font-size: 13px; color: var(--mid) }
+      table { width: 100%; border-collapse: collapse; background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden }
+      th, td { text-align: left; padding: 9px 12px; border-top: 1px solid var(--line); vertical-align: top; font-size: 14px }
+      th { background: #fafbfd; font-weight: 600; color: var(--mid); border-top: none }
+      form { display: flex; gap: 8px; margin: 24px 0 }
+      input { flex: 1; font: inherit; padding: 11px 12px; border: 1px solid var(--line); border-radius: 10px }
+      button { font: inherit; font-weight: 600; padding: 11px 16px; border: 0; border-radius: 10px; background: var(--brand); color: #fff; cursor: pointer }
+      .err { color: var(--bad) }
+      .bar { height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; margin-top: 8px }
+      .bar > div { height: 100%; background: var(--good) }
+      pre { white-space: pre-wrap; font-size: 12px; color: var(--mid); margin: 6px 0 0 }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Northvale Learn · Admin</h1>
+      <p class="muted" id="sub">Private. Enter the ADMIN_TOKEN from the server's settings.</p>
+      <form id="login"><input id="token" type="password" autocomplete="off" placeholder="Admin token" /><button>Show stats</button></form>
+      <p class="err" id="error"></p>
+      <div id="out"></div>
+    </main>
+    <script src="/admin.js"></script>
+  </body>
+</html>

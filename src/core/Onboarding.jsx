@@ -1,0 +1,156 @@
+// FIRST RUN — a few taps, then straight into a lesson: why you're here,
+// any first-run step a module adds (Goals: the first goal, which picks the
+// first unit), and how much time a day (the daily goal). No account, no
+// age, no name first: the first lesson is the hook, and the account offer
+// comes after it (that's where the age check lives).
+import { useState } from "react";
+import { update } from "./store.js";
+import { LANGS, REGIONS } from "./i18n.js";
+import { Button, Wordmark, Icon } from "./ui.jsx";
+import { AccountForm } from "./Settings.jsx";
+import { START_UNITS } from "./progress.js";
+import { track } from "./analytics.js";
+import { allModules } from "./registry.js";
+
+const REASONS = [
+  ["save", "target"],
+  ["invest", "chart"],
+  ["debt", "card"],
+  ["curious", "sparkles"],
+];
+// Minutes a day → daily XP goal (a lesson is about 10 XP, ~4 minutes).
+const TIMES = [
+  [5, 10],
+  [10, 20],
+  [15, 30],
+];
+
+export default function Onboarding({ t, locale, onDone }) {
+  const [step, setStep] = useState(0);
+  const [reason, setReason] = useState(null);
+  const [startUnit, setStartUnit] = useState(null);
+  const [signingIn, setSigningIn] = useState(false);
+  // Module steps, in menu order (Goals' first goal, then Lessons' placement).
+  const extra = allModules()
+    .filter((m) => m.Onboard)
+    .sort((a, b) => ((a.nav && a.nav.order) ?? 99) - ((b.nav && b.nav.order) ?? 99));
+  const steps = 2 + extra.length; // reason, module steps, time
+  const setSetting = (k, v) => update((s) => ({ ...s, settings: { ...s.settings, [k]: v } }));
+  const finish = (minutes, goal) => {
+    const start = startUnit || START_UNITS[reason] || START_UNITS.curious;
+    update((s) => ({ ...s, profile: { ...s.profile, onboarded: true, reason, minutes }, progress: { ...s.progress, dailyGoal: goal, startUnit: start } }));
+    track("onboarding", { reason, minutes });
+    onDone(start);
+  };
+
+  const wrap = (children) => (
+    <div className="nv-in" key={step} style={{ maxWidth: 520, margin: "0 auto", minHeight: "100dvh", display: "flex", flexDirection: "column", padding: "calc(16px + env(safe-area-inset-top)) 18px calc(20px + env(safe-area-inset-bottom))" }}>
+      {children}
+    </div>
+  );
+  const top = (title, sub, back = () => setStep(step - 1)) => (
+    <>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 22, minHeight: 44 }}>
+        <button onClick={back} aria-label={t("common.back")} style={{ border: "none", background: "transparent", color: "var(--ink)", width: 44, height: 44, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+          <Icon name="back" />
+        </button>
+        <div style={{ flex: 1, height: 6, borderRadius: 3, background: "var(--surface2)", overflow: "hidden" }}>
+          <div style={{ width: `${(step / (steps + 1)) * 100}%`, height: "100%", background: "var(--accent)", borderRadius: 3, transition: "width .4s" }} />
+        </div>
+      </div>
+      <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: -0.5, margin: "0 0 8px", lineHeight: 1.2 }}>{title}</h1>
+      {sub && <p style={{ fontSize: 16, color: "var(--mid)", margin: "0 0 22px", lineHeight: 1.45 }}>{sub}</p>}
+    </>
+  );
+  const option = (key, icon, label, sub, onClick) => (
+    <button key={key} onClick={onClick} className="nv-press" style={{ display: "flex", alignItems: "center", gap: 14, width: "100%", textAlign: "left", border: "1px solid var(--line)", background: "var(--surface)", color: "var(--ink)", borderRadius: 14, padding: "14px 16px", marginBottom: 10, cursor: "pointer", minHeight: 64 }}>
+      {icon && (
+        <span style={{ width: 38, height: 38, borderRadius: 10, background: "var(--brandSoft)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+          <Icon name={icon} size={20} />
+        </span>
+      )}
+      <span style={{ flex: 1 }}>
+        <span style={{ display: "block", fontSize: 16, fontWeight: 650 }}>{label}</span>
+        {sub && <span style={{ display: "block", fontSize: 14, color: "var(--mid)", marginTop: 2 }}>{sub}</span>}
+      </span>
+      <Icon name="next" size={18} color="var(--low)" />
+    </button>
+  );
+
+  if (signingIn)
+    return wrap(
+      <>
+        <button onClick={() => setSigningIn(false)} aria-label={t("common.back")} style={{ border: "none", background: "transparent", color: "var(--ink)", width: 44, height: 44, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", marginBottom: 12 }}>
+          <Icon name="back" />
+        </button>
+        <h1 style={{ fontSize: 26, fontWeight: 700, margin: "0 0 16px" }}>{t("account.signin")}</h1>
+        <AccountForm t={t} mode="signin" signinOnly onDone={() => update((s) => ({ ...s, profile: { ...s.profile, onboarded: true } }))} />
+      </>
+    );
+
+  if (step === 0)
+    return (
+      <div className="nv-in" style={{ maxWidth: 520, margin: "0 auto", minHeight: "100dvh", display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", padding: "calc(24px + env(safe-area-inset-top)) 22px calc(24px + env(safe-area-inset-bottom))" }}>
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: 10 }}>
+          <img src="/icon.svg" alt="" width={72} height={72} style={{ borderRadius: 18 }} />
+          <Wordmark size={52} />
+          <div style={{ fontSize: 13, fontWeight: 650, letterSpacing: 2, color: "var(--low)" }}>LEARN</div>
+          <p style={{ fontSize: 18, fontWeight: 500, color: "var(--mid)", maxWidth: 320, lineHeight: 1.45, margin: "12px 0 0" }}>{t("onb.tagline")}</p>
+        </div>
+        <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 10 }}>
+          <Button full onClick={() => setStep(1)}>
+            {t("onb.start")}
+          </Button>
+          <Button full kind="secondary" onClick={() => setSigningIn(true)}>
+            {t("onb.have_account")}
+          </Button>
+          <div style={{ display: "flex", justifyContent: "center", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
+            {Object.entries(LANGS).map(([k, name]) => (
+              <button key={k} onClick={() => setSetting("lang", k)} aria-pressed={locale.lang === k} style={chip(locale.lang === k)}>
+                {name}
+              </button>
+            ))}
+            <span style={{ width: 1, background: "var(--line)", margin: "6px 4px" }} />
+            {Object.entries(REGIONS).map(([k, r]) => (
+              <button key={k} onClick={() => setSetting("region", k)} aria-pressed={locale.region === k} aria-label={r.name[locale.lang]} style={chip(locale.region === k)}>
+                {r.flag} {r.currency}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+
+  if (step === 1)
+    return wrap(
+      <>
+        {top(t("onb.reason.title"), t("onb.reason.sub"))}
+        {REASONS.map(([k, icon]) => option(k, icon, t(`onb.reason.${k}`), t(`onb.reason.${k}.sub`), () => (setReason(k), setStep(2))))}
+      </>
+    );
+
+  const mod = extra[step - 2];
+  if (mod)
+    return wrap(
+      <mod.Onboard
+        t={t}
+        locale={locale}
+        reason={reason}
+        header={top}
+        onNext={(r = {}) => {
+          if (r.startUnit) setStartUnit(r.startUnit);
+          setStep(step + 1);
+        }}
+      />
+    );
+
+  return wrap(
+    <>
+      {top(t("onb.time.title"), t("onb.time.sub"))}
+      {TIMES.map(([min, goal]) => option(min, null, t("onb.time.min", { n: min }), t(`onb.time.${min}`), () => finish(min, goal)))}
+      <p style={{ fontSize: 13, color: "var(--low)", margin: "auto 2px 0", lineHeight: 1.45, paddingTop: 16 }}>{t("disclaimer.short")}</p>
+    </>
+  );
+}
+
+const chip = (on) => ({ border: "none", background: on ? "var(--brandSoft)" : "transparent", color: "var(--ink)", borderRadius: 999, padding: "8px 12px", fontWeight: 600, fontSize: 14, cursor: "pointer", minHeight: 40 });
