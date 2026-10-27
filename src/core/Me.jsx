@@ -37,6 +37,8 @@ function League({ t, session, go }) {
       {mode !== "everyone" && <p style={{ fontSize: 13, color: "var(--low)", margin: "8px 2px 0", lineHeight: 1.4 }}>{t("league.with.sub")}</p>}
     </div>
   );
+  // The everyone league keeps 13–17 and 18+ apart (server/store.js).
+  const teens = mode === "everyone" && session.user.ageBand === "13-17" && <p style={{ fontSize: 13, color: "var(--low)", margin: "0 2px 8px", lineHeight: 1.4 }}>{t("league.teens")}</p>;
   if (!mode)
     return (
       <Card>
@@ -52,12 +54,13 @@ function League({ t, session, go }) {
         </Button>
       </Card>
     );
-  if (!league) return <>{picker}<Card><span className="nv-pulse">…</span></Card></>;
-  if (league.error) return <>{picker}<Card><span style={{ color: "var(--mid)" }}>{t("league.error")}</span></Card></>;
+  if (!league) return <>{picker}{teens}<Card><span className="nv-pulse">…</span></Card></>;
+  if (league.error) return <>{picker}{teens}<Card><span style={{ color: "var(--mid)" }}>{t("league.error")}</span></Card></>;
   const resets = Math.max(1, 7 - Math.round((new Date(`${dayKey()}T12:00:00`) - new Date(`${weekStart(dayKey())}T12:00:00`)) / 864e5));
   return (
     <>
     {picker}
+    {teens}
     <Card pad={0}>
       <div style={{ padding: "12px 16px 8px", fontSize: 13, color: "var(--mid)" }}>{t("league.resets", { n: resets })}</div>
       {league.standings.map((r, i) => (

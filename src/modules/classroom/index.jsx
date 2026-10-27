@@ -37,7 +37,9 @@ addStrings({
   "cls.sees.notes": S("Your mission notes", "Tus notas de misiones"),
   "cls.sees.tutor": S("What you ask the tutor", "Lo que le preguntas al tutor"),
   "cls.sees.age": S("Your age or email", "Tu edad ni tu correo"),
-  "cls.sees.before": S("Anything from before you join", "Nada de antes de unirte"),
+  "cls.sees.before": S("Anything from before you join, unless you choose to count lessons you already finished for assignments", "Nada de antes de unirte, salvo que elijas contar para las tareas las lecciones que ya terminaste"),
+  "cls.earlier": S("Count lessons I already finished for class assignments", "Contar para las tareas de la clase las lecciones que ya terminé"),
+  "cls.earlier.sub": S("Only lessons in assigned units, and only toward those assignments.", "Solo lecciones de unidades asignadas, y solo para esas tareas."),
   "cls.sees.board": S("Your nickname and this week's XP show on the class leaderboard. You can hide yourself anytime.", "Tu apodo y tu XP de la semana aparecen en la tabla de la clase. Puedes ocultarte cuando quieras."),
   "cls.sees.leave": S("You can leave anytime. Then your teacher no longer sees anything about you.", "Puedes salirte cuando quieras. Después, tu profe ya no ve nada sobre ti."),
   "cls.sees.messages": S("There are no messages: nobody can contact you through the class.", "No hay mensajes: nadie puede contactarte por la clase."),
@@ -126,16 +128,21 @@ function drop(m) {
   const user = sessionNow().user;
   if (!memberships().length && user && user.league === "class") setLeague("everyone").catch(() => {});
 }
-// Lessons this learner finished since joining (what the class counts).
-const doneSince = (m) => new Set(Object.entries(getState().progress.lessons).filter(([, l]) => l.done && (l.last || l.at) >= m.joined).map(([id]) => id));
+// Lessons that count toward assignments: finished since joining, plus
+// earlier ones if the student chose to count them.
+const counted = (m) => new Set(Object.entries(getState().progress.lessons).filter(([, l]) => l.done && (m.shareEarlier || (l.last || l.at) >= m.joined)).map(([id]) => id));
+const setMember = (m, patch) => save((s) => ({ ...s, memberships: s.memberships.map((x) => (x.memberId === m.memberId ? { ...x, ...patch } : x)) }));
 
 // Each class gets this device's report a few seconds after a change. A
 // class that's gone (left elsewhere, removed, deleted) is forgotten.
 async function sendReports() {
   const today = dayKey();
   for (const m of memberships()) {
-    const report = classReport(getState(), m, today, service("lessons", "conceptsNow")() || {});
-    await api("/api/class/report", { method: "POST", body: { ...who(m), report } }).catch((e) => e.status === 404 && (drop(m), toast(tNow()("cls.gone", { name: m.name }))));
+    const assignedLessons = units().filter((u) => (m.assigned || []).includes(u.id)).flatMap((u) => u.lessons.map((l) => l.id));
+    const report = classReport(getState(), { ...m, assignedLessons }, today, service("lessons", "conceptsNow")() || {});
+    const r = await api("/api/class/report", { method: "POST", body: { ...who(m), report } }).catch((e) => (e.status === 404 && (drop(m), toast(tNow()("cls.gone", { name: m.name }))), null));
+    // Newly assigned units: the next report can count earlier lessons in them.
+    if (r && r.assigned && r.assigned.join() !== (m.assigned || []).join()) setMember(m, { assigned: r.assigned });
   }
 }
 
@@ -174,6 +181,7 @@ function JoinSheet({ t, go, initialCode, onClose }) {
   const [name, setName] = useState(null);
   const [nickname, setNickname] = useState(profile.nickname || "");
   const [age, setAge] = useState(profile.ageBand || "");
+  const [shareEarlier, setShareEarlier] = useState(false);
   const [error, setError] = useState(null);
   const [busy, setBusy] = useState(false);
   const run = async (fn) => {
@@ -195,7 +203,7 @@ function JoinSheet({ t, go, initialCode, onClose }) {
     run(async () => {
       const base = conceptCounts(service("lessons", "conceptsNow")() || {});
       const r = await api("/api/class/join", { method: "POST", body: { code, nickname, ageBand: age } });
-      save((s) => ({ ...s, memberships: [...s.memberships, { classId: r.classId, memberId: r.memberId, key: r.key, name: r.name, joined: r.joined, nickname: nickname.trim(), base }] }));
+      save((s) => ({ ...s, memberships: [...s.memberships, { classId: r.classId, memberId: r.memberId, key: r.key, name: r.name, joined: r.joined, nickname: nickname.trim(), base, shareEarlier }] }));
       if (!profile.ageBand) update((s) => ({ ...s, profile: { ...s.profile, ageBand: age, ageAsked: true } }));
       sendReports();
       toast(t("cls.joined", { name: r.name }), "good");
@@ -233,6 +241,13 @@ function JoinSheet({ t, go, initialCode, onClose }) {
             </label>
           )}
           {age === "under13" && <Note tone="bad" icon="info" style={{ marginBottom: 12 }}>{t("cls.age.young")}</Note>}
+          <label style={{ display: "flex", gap: 10, alignItems: "flex-start", fontSize: 15, lineHeight: 1.45, marginBottom: 14, cursor: "pointer" }}>
+            <input type="checkbox" checked={shareEarlier} onChange={(e) => setShareEarlier(e.target.checked)} style={{ width: 20, height: 20, marginTop: 1, accentColor: "var(--brand)", flexShrink: 0 }} />
+            <span>
+              {t("cls.earlier")}
+              <span style={{ display: "block", fontSize: 13, color: "var(--mid)" }}>{t("cls.earlier.sub")}</span>
+            </span>
+          </label>
           {error && <Note tone="bad" style={{ marginBottom: 12 }}>{error}</Note>}
           <Button full type="submit" disabled={busy || !nickname.trim() || !age || age === "under13"}>
             {t("cls.join.yes")}
@@ -251,14 +266,18 @@ function ClassCard({ t, locale, go, m }) {
   const [sheet, setSheet] = useState(null);
   const [error, setError] = useState(null);
   const load = () =>
-    api("/api/class/view", { method: "POST", body: who(m) }).then(setView, (e) => {
+    api("/api/class/view", { method: "POST", body: who(m) }).then((v) => {
+      setView(v);
+      const assigned = v.assignments.map((a) => a.unit);
+      if (assigned.join() !== (m.assigned || []).join()) setMember(m, { assigned });
+    }, (e) => {
       if (e.status === 404) (drop(m), toast(t("cls.gone", { name: m.name })));
       else setError(errorText(t, e));
     });
   useEffect(() => {
     load();
   }, [m.memberId]);
-  const done = doneSince(m);
+  const done = counted(m);
   const leave = () =>
     api("/api/class/leave", { method: "POST", body: who(m) })
       .catch((e) => {
@@ -314,6 +333,13 @@ function ClassCard({ t, locale, go, m }) {
               {view.hidden && <div style={{ fontSize: 14, color: "var(--mid)" }}>{t("cls.board.hidden")}</div>}
             </div>
             <Switch label={t("cls.board.show")} checked={!view.hidden} onChange={(v) => api("/api/class/hide", { method: "POST", body: { ...who(m), hidden: !v } }).then(load, (e) => setError(errorText(t, e)))} />
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, paddingTop: 12 }}>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontWeight: 650 }}>{t("cls.earlier")}</div>
+              <div style={{ fontSize: 14, color: "var(--mid)" }}>{t("cls.earlier.sub")}</div>
+            </div>
+            <Switch label={t("cls.earlier")} checked={!!m.shareEarlier} onChange={(v) => setMember(m, { shareEarlier: v })} />
           </div>
         </>
       )}

@@ -196,6 +196,7 @@ addStrings({
   "league.with.class": S("My class", "Mi clase"),
   "league.with.sub": S("Friends or your class only: you leave the everyone league, so people you don't know won't see you there.", "Solo amigos o tu clase: sales de la liga de todos, así que quienes no conoces no te ven ahí."),
   "league.friends.none": S("No friends here yet. When a friend with an account opens your invite link, they can add you.", "Aún no hay amigos aquí. Cuando alguien con cuenta abra tu enlace de invitación, te puede agregar."),
+  "league.teens": S("You're in a league with other learners aged 13–17 only.", "Estás en una liga solo con aprendices de 13 a 17 años."),
   "league.remove": S("Remove {name} from your friends", "Quitar a {name} de tus amigos"),
   "account.verified": S("Email confirmed", "Correo confirmado"),
 

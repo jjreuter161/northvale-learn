@@ -116,13 +116,19 @@ try {
   assert.ok([413, "ECONNRESET", "EPIPE"].includes(big.status), `too large: ${big.status}`);
   assert.equal((await call("/api/health")).status, 200);
   await call("/api/progress", { method: "PUT", body: { state: { progress: { xp: 90, days: { [today]: 90, [weekStart(today) > "2000" ? "1999-01-01" : today]: 500 } } }, updatedAt: 3000 }, cookie: B });
+  // Another teen and another adult.
+  const S = (await call("/api/auth/signup", { method: "POST", body: { email: "sofi@example.com", password: "a good long password", nickname: "Sofi", ageBand: "13-17", guardian: true } })).headers.get("set-cookie").split(";")[0];
+  const M = (await call("/api/auth/signup", { method: "POST", body: { email: "mo@example.com", password: "a good long password", nickname: "Mo", ageBand: "26+" } })).headers.get("set-cookie").split(";")[0];
+  await call("/api/progress", { method: "PUT", body: { state: { progress: { xp: 60, days: { [today]: 60 } } }, updatedAt: 3000 }, cookie: S });
+  await call("/api/progress", { method: "PUT", body: { state: { progress: { xp: 20, days: { [today]: 20 } } }, updatedAt: 3000 }, cookie: M });
   const league = (await call("/api/league", { cookie: A })).json;
   assert.equal(league.week, weekStart(today));
-  assert.deepEqual(league.standings, [{ nickname: "Leo", avatar: 0, xp: 90, you: false }, { nickname: "Dani script", avatar: 2, xp: 40, you: true }], "this week's XP only; nicknames, never emails");
+  assert.deepEqual(league.standings, [{ nickname: "Sofi", avatar: 0, xp: 60, you: false }, { nickname: "Dani script", avatar: 2, xp: 40, you: true }], "this week's XP only; nicknames, never emails; 13–17 only with 13–17");
+  assert.deepEqual((await call("/api/league", { cookie: B })).json.standings.map((x) => [x.nickname, x.xp]), [["Leo", 90], ["Mo", 20]], "18+ only with 18+");
   assert.equal((await call("/api/league")).status, 401);
   await call("/api/progress", { method: "PUT", body: { state: { progress: { xp: 99999, days: { [today]: 99999 } } }, updatedAt: 4000 }, cookie: B });
-  assert.equal((await call("/api/league", { cookie: A })).json.standings[0].xp, 500, "a hand-edited XP counts at most 500 a day");
-  console.log("ok: progress syncs (newest wins, size-limited); league ranks this week's XP by nickname");
+  assert.equal((await call("/api/league", { cookie: M })).json.standings[0].xp, 500, "a hand-edited XP counts at most 500 a day");
+  console.log("ok: progress syncs (newest wins, size-limited); league ranks this week's XP by nickname, teens (13–17) and adults (18+) apart");
 
   // --- tutor ---
   const ask = (body, cookie = A) => fetch(`${base}/api/tutor/turn`, { method: "POST", headers: { "X-Northvale": "1", "Content-Type": "application/json", ...(cookie ? { Cookie: cookie } : {}) }, body: JSON.stringify(body) });
@@ -311,7 +317,7 @@ try {
   assert.deepEqual(fl.map((x) => [x.nickname, x.you]), [["Leo", true], ["Dani script", false]]);
   assert.ok(fl[1].link && !("email" in fl[1]));
   assert.equal((await call("/api/me", { method: "PATCH", body: { league: "friends" }, cookie: A })).json.user.league, "friends");
-  assert.deepEqual((await call("/api/league", { cookie: B })).json.standings.map((x) => x.nickname), ["Leo"], "competing with friends instead: out of the everyone league");
+  assert.deepEqual((await call("/api/league", { cookie: S })).json.standings.map((x) => x.nickname), ["Sofi"], "competing with friends instead: out of the everyone league");
   const st2 = (await admin("test-admin-token-123456789")).json;
   assert.deepEqual(st2.flags.find((f) => f.flag === "classroom").accounts, ["leo@example.com"]);
   assert.equal(st2.classroom.classes, 1);
@@ -322,7 +328,8 @@ try {
   assert.equal((await call("/api/me", { method: "DELETE", body: { password: "nope nope nope" }, cookie: A })).status, 401);
   assert.equal((await call("/api/me", { method: "DELETE", body: { password: "a good long password" }, cookie: A })).status, 200);
   assert.equal((await call("/api/progress", { cookie: A })).status, 401);
-  assert.deepEqual((await call("/api/league", { cookie: B })).json.standings.map((s) => s.nickname), ["Leo"], "a deleted account leaves the league");
+  assert.deepEqual((await call("/api/league", { cookie: B })).json.standings.map((s) => s.nickname), ["Leo", "Mo"], "a deleted account leaves the league");
+  assert.ok(!(await call("/api/league", { cookie: S })).json.standings.some((s) => s.nickname === "Dani script"), "…and the teen league");
   assert.deepEqual((await call("/api/league?with=friends", { cookie: B })).json.standings.map((s) => s.nickname), ["Leo"], "and its friend links");
   console.log("ok: deleting an account removes it, its sessions and its league spot");
   // --- the monthly AI budget stops the AI when it's spent ---

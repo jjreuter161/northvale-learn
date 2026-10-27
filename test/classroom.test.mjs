@@ -111,7 +111,18 @@ assert.deepEqual(view.assignments.map((a) => [a.unit, a.done, a.of]), [["budget"
 assert.equal(view.students.find((s) => s.nickname === "Caro").missions, 500, "capped");
 assert.deepEqual(view.concepts.map((c) => [c.id, c.students, c.seen, c.missed]), [["budgeting", 3, 6, 4]], "class-wide totals, only for concepts 3+ students answered");
 assert.doesNotMatch(JSON.stringify(view), /secret|Car for mom|5000|@example|13-17|how do I|fake_concept|nope/, "nothing else reaches the teacher");
-console.log("ok: the teacher sees nicknames, lessons/units/missions since joining, assignment progress and class-wide concept totals (3+ students) — never goals, amounts, notes, tutor questions, age or email");
+// Earlier lessons: only if the student chooses, only in assigned units, only for assignments.
+const save = UNITS.find((u) => u.id === "save");
+assert.deepEqual(classReport(state, membership, today).earlier, [], "off by default");
+assert.deepEqual(classReport(state, { ...membership, shareEarlier: true, assignedLessons: save.lessons.map((l) => l.id) }, today).earlier, ["save-1"], "on: lessons in assigned units finished before joining");
+classes.assign(teacher, id, { unit: "save", due: addDays(today, 14) });
+assert.deepEqual(classes.report(who(s3), { lessons: [lessonIds[0]], earlier: [save.lessons[0].id, lessonIds[1], "credit-1", lessonIds[0]], week: weekStart(today), xp: 999999 }).assigned, ["budget", "save"]);
+const caro = classes.teacherView(teacher, id).students.find((s) => s.nickname === "Caro");
+assert.equal(caro.lessons, 1, "earlier lessons don't count as finished since joining");
+const [aBudget, aSave] = classes.teacherView(teacher, id).assignments;
+assert.deepEqual([caro.assignments[aBudget.id].done, caro.assignments[aSave.id].done], [2, 1], "…only toward assignments (and only assigned units)");
+classes.unassign(teacher, id, aSave.id);
+console.log("ok: the teacher sees nicknames, lessons/units/missions since joining, assignment progress (earlier lessons only if the student chooses) and class-wide concept totals (3+ students) — never goals, amounts, notes, tutor questions, age or email");
 
 // --- the student's side: leaderboard, hiding, leaving ---
 let sv = classes.studentView(who(s2));

@@ -40,6 +40,8 @@ await new Promise((resolve) => server.stdout.on("data", (d) => ((serverOut += d)
 const BASE = `http://127.0.0.1:${port}/`;
 const post = (path, body, extra = {}) => fetch(`${BASE.slice(0, -1)}${path}`, { method: "POST", headers: { "X-Northvale": "1", "Content-Type": "application/json", ...extra }, body: JSON.stringify(body) }).then((r) => r.json());
 const admin = (path, body) => post(path, body, { "X-Admin-Token": env.ADMIN_TOKEN });
+// A new account (from outside the browser); returns its session cookie.
+const account = (body) => fetch(`${BASE}api/auth/signup`, { method: "POST", headers: { "X-Northvale": "1", "Content-Type": "application/json" }, body: JSON.stringify({ password: "a long enough password", guardian: true, ...body }) }).then((r) => r.headers.get("set-cookie").split(";")[0]);
 const day = (n) => new Date(Date.now() + n * 864e5).toLocaleDateString("en-CA", { timeZone: "America/Mexico_City" });
 // A learner who's been through onboarding.
 const learner = (profile, progress = {}, modules = {}) => ({ version: 1, updatedAt: 1, profile: { onboarded: true, nickname: "", avatar: 0, ...profile }, settings: { lang: "en", region: "US", look: "white", reduceMotion: true }, progress: { xp: 0, days: {}, streak: { count: 0, last: null, best: 0, frozen: [] }, freezes: 1, dailyGoal: 20, lessons: {}, lessonDays: [], badges: {}, counters: {}, practiced: {}, startUnit: "budget", placed: [], ...progress }, modules });
@@ -57,8 +59,10 @@ try {
 }
 
 let current = null; // on a failure, what the page showed
-async function open(seed) {
+// `cookie`: signed in to that account.
+async function open(seed, { cookie } = {}) {
   const context = await browser.newContext({ viewport: { width: 390, height: 800 }, locale: "en-US", timezoneId: "America/Mexico_City", serviceWorkers: "block", reducedMotion: "reduce" });
+  if (cookie) await context.addCookies([{ name: "nvl_session", value: cookie.split("=")[1], url: BASE }]);
   if (seed) await context.addInitScript((s) => localStorage.getItem("northvale-learn-v1") || localStorage.setItem("northvale-learn-v1", s), JSON.stringify(seed));
   const page = await context.newPage();
   current = page;
@@ -265,7 +269,7 @@ try {
     const student = await open(
       learner(
         { ageBand: "13-17", nickname: "Ana" },
-        { lessons: { [ALL_LESSONS[0].id]: { done: true, at: before, last: before, best: 0, times: 1 } }, lessonDays: [before], counters: { lessons: 1 }, days: { [before]: 15 }, xp: 15 },
+        { lessons: Object.fromEntries(ALL_LESSONS.slice(0, 2).map((l) => [l.id, { done: true, at: before, last: before, best: 0, times: 1 }])), lessonDays: [before], counters: { lessons: 1 }, days: { [before]: 30 }, xp: 30 }, // (lessons: 1 keeps the after-lesson-3 survey away)
         { goals: { goals: [newGoal({ id: "g1", templateId: "car", name: "Secret Car Fund", target: 5000, start: 1234, months: 24, today: before })] }, missions: { log: [{ id: MISSIONS[0].id, day: before, week: weekStart(before), note: "my private note" }] } }
       )
     );
@@ -306,9 +310,10 @@ try {
     await S.page.goto(`${BASE}?join=${code}`);
     await S.page.getByRole("dialog", { name: "Before you join" }).waitFor();
     await S.top().getByText("Class: Period 3").waitFor();
-    for (const line of ["Your teacher sees", "Lessons and units you finish from now on", "Your teacher never sees", "Your goals or any amounts", "Your mission notes", "What you ask the tutor", "Your age or email", "Anything from before you join", "You can leave anytime. Then your teacher no longer sees anything about you."]) await S.top().getByText(line, { exact: true }).waitFor();
+    for (const line of ["Your teacher sees", "Lessons and units you finish from now on", "Your teacher never sees", "Your goals or any amounts", "Your mission notes", "What you ask the tutor", "Your age or email", "Anything from before you join, unless you choose to count lessons you already finished for assignments", "You can leave anytime. Then your teacher no longer sees anything about you."]) await S.top().getByText(line, { exact: true }).waitFor();
     await S.clean("what your teacher sees, before joining");
     assert.equal(await S.top().getByLabel("Nickname for this class").inputValue(), "Ana");
+    assert.equal(await S.top().getByRole("checkbox", { name: /Count lessons I already finished/ }).isChecked(), false, "earlier lessons aren't shared unless the student chooses");
     await S.button("Join class", S.top()).click();
     await S.page.getByText("You joined Period 3").waitFor();
     await S.page.getByText("Budgeting").waitFor();
@@ -338,6 +343,16 @@ try {
     await T.clean("teacher: the class with a student");
     console.log("ok: the teacher sees Ana's lessons since joining and assignment progress — none of her goals, amounts, notes or age");
 
+    // Ana chooses to count the lesson she'd finished before joining.
+    await S.page.getByRole("switch", { name: "Count lessons I already finished for class assignments" }).click();
+    await S.page.getByText("2 of 3 lessons").waitFor();
+    await S.page.waitForTimeout(6000);
+    await T.button("All classes").click();
+    await T.page.getByText("4 students ·").click();
+    await T.page.getByRole("cell", { name: "Ana" }).waitFor();
+    assert.match(await T.page.evaluate(() => document.body.innerText), /Ana\s+1\s+0\s+0\s+2\/3/, "it counts toward the assignment, not as a lesson since joining");
+    console.log("ok: a student can choose to count lessons finished before joining — for assignments only");
+
     await S.button("What your teacher sees").click();
     await S.top().getByText("Your teacher never sees", { exact: true }).waitFor();
     await S.page.keyboard.press("Escape");
@@ -359,15 +374,38 @@ try {
     await T.page.getByText("3 students ·").click();
     await T.page.getByRole("cell", { name: "Beto" }).waitFor();
     assert.equal(await T.page.getByRole("cell", { name: "Ana" }).count(), 0, "Ana is gone from the teacher's view");
+    // An old or duplicate entry: the teacher removes it.
+    await T.page.getByRole("row", { name: /Dani/ }).getByRole("button", { name: "Remove" }).click();
+    await T.button("Remove", T.top()).click();
+    await T.page.getByRole("cell", { name: "Dani" }).waitFor({ state: "detached" });
     await T.menu("Settings");
     await T.page.getByRole("radio", { name: "Español" }).click();
     await T.menu("Clases");
-    await T.page.getByText("3 estudiantes ·").click();
+    await T.page.getByText("2 estudiantes ·").click();
     await T.page.getByText("Temas que se le dificultan al grupo", { exact: false }).waitFor();
     await T.clean("docente: la clase");
-    console.log("ok: the student can hide from the class leaderboard and leave (here in Spanish); leaving removes them from the teacher's view");
+    console.log("ok: the student can hide from the class leaderboard and leave (here in Spanish); leaving removes them from the teacher's view; a teacher removes an old entry");
     await S.close();
     await T.close();
+  }
+
+  // --- the everyone league: 13–17 only with 13–17, 18+ only with 18+ ---
+  {
+    const sync = (cookie, xp) => fetch(`${BASE}api/progress`, { method: "PUT", headers: { "X-Northvale": "1", "Content-Type": "application/json", Cookie: cookie }, body: JSON.stringify({ state: { progress: { xp, days: { [day(0)]: xp } } }, updatedAt: 1 }) });
+    const tia = await account({ email: "tia@example.test", nickname: "Tia", ageBand: "13-17" });
+    const tom = await account({ email: "tom@example.test", nickname: "Tom", ageBand: "13-17" });
+    const ada = await account({ email: "ada@example.test", nickname: "Ada", ageBand: "26+" });
+    await Promise.all([sync(tia, 30), sync(tom, 50), sync(ada, 80)]);
+    for (const [cookie, nickname, ageBand, sees, never] of [[tia, "Tia", "13-17", "Tom", "Ada"], [ada, "Ada", "26+", "Ada (you)", "Tom"]]) {
+      const app = await open(learner({ ageBand, nickname }), { cookie });
+      await app.menu("Me");
+      await app.page.getByText(sees, { exact: true }).waitFor();
+      assert.equal(await app.page.getByText(never, { exact: true }).count(), 0, `${nickname} doesn't see ${never}`);
+      if (ageBand === "13-17") await app.page.getByText("You're in a league with other learners aged 13–17 only.").waitFor();
+      await app.clean(`league (${ageBand})`);
+      await app.close();
+    }
+    console.log("ok: the everyone league keeps 13–17 and 18+ apart");
   }
 
   // --- share cards: no names or amounts unless an adult turns them on for that card ---

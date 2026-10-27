@@ -148,10 +148,12 @@ export const store = {
     save();
   },
 
-  // A learner's league this week: up to 30 people who joined the week
-  // around the same time.
+  // A learner's league this week: up to 30 people of the same age group
+  // (13–17, or 18 and up) who joined the week around the same time — so
+  // teens never compete with adults they don't know.
   league(userId, week, xpOf) {
-    const w = data.weeks[week] || [];
+    const group = (id) => (data.users[id] && data.users[id].ageBand === "13-17" ? "teen" : "adult");
+    const w = (data.weeks[week] || []).filter((id) => data.users[id] && group(id) === group(userId));
     const i = w.indexOf(userId);
     if (i < 0) return [];
     const start = Math.floor(i / LEAGUE_SIZE) * LEAGUE_SIZE;

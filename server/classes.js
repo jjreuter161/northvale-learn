@@ -7,8 +7,10 @@
 //   secret key; the device then sends a short report about what it did
 //   since joining (src/modules/classroom/report.js), and nothing else:
 //   lessons finished, how many missions finished, answers per concept,
-//   this week's XP. Never goals, amounts, the portfolio, mission notes,
-//   tutor questions, age or email.
+//   this week's XP — plus, only if the student chooses, lessons in assigned
+//   units they'd finished before joining (counted for assignments only).
+//   Never goals, amounts, the portfolio, mission notes, tutor questions,
+//   age or email.
 // - The teacher sees only teacherView() below; concept totals appear only
 //   once 3+ students have answered on that concept.
 // - Students can hide from the class leaderboard and leave at any time
@@ -99,7 +101,8 @@ export const list = (user) =>
 export function teacherView(user, id) {
   const c = mine(user, id);
   const members = Object.entries(c.members).map(([mid, m]) => ({ mid, nickname: m.nickname, r: m.report || { lessons: [], missions: 0, concepts: {} } }));
-  const progressOn = (r, a) => ({ done: unitLessons[a.unit].filter((l) => r.lessons.includes(l)).length, of: unitLessons[a.unit].length });
+  // Assignments also count earlier lessons the student chose to share.
+  const progressOn = (r, a) => ({ done: unitLessons[a.unit].filter((l) => r.lessons.includes(l) || (r.earlier || []).includes(l)).length, of: unitLessons[a.unit].length });
   const concepts = {};
   for (const { r } of members)
     for (const [cid, [seen, missed]] of Object.entries(r.concepts)) {
@@ -220,15 +223,19 @@ export function report(who, r = {}) {
     const seen = int(v[0], 10000);
     if (seen) concepts[id] = [seen, Math.min(seen, int(v[1], 10000))];
   }
+  const lessons = [...new Set((Array.isArray(r.lessons) ? r.lessons : []).filter((id) => LESSONS.has(id)))];
+  const assigned = new Set(c.assignments.flatMap((a) => unitLessons[a.unit]));
   m.report = {
-    lessons: [...new Set((Array.isArray(r.lessons) ? r.lessons : []).filter((id) => LESSONS.has(id)))],
+    lessons,
+    earlier: [...new Set((Array.isArray(r.earlier) ? r.earlier : []).filter((id) => assigned.has(id) && !lessons.includes(id)))],
     missions: int(r.missions, 500),
     concepts,
     week: DAY.test(String(r.week)) ? r.week : null,
     xp: int(r.xp, 3500),
   };
   store.changed();
-  return { ok: true };
+  // The assigned units, so the device knows which earlier lessons may count.
+  return { ok: true, assigned: c.assignments.map((a) => a.unit) };
 }
 
 // The class as a student sees it: its name, assignments, and the

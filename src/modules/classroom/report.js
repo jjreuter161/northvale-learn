@@ -5,6 +5,9 @@
 //             minus the ones saved at joining, `base`)
 //   missions  how many Money Missions were finished since joining
 //   week, xp  this week's XP since joining (the class leaderboard)
+//   earlier   only if the student chose to (`shareEarlier`): lessons in
+//             assigned units they'd finished before joining — counted
+//             toward assignments, nothing else
 // No goals, amounts, portfolio, mission notes, tutor questions, age or
 // email are ever read here. server/classes.js checks and caps it again.
 import { addDays, weekStart } from "../../core/progress.js";
@@ -12,7 +15,7 @@ import { addDays, weekStart } from "../../core/progress.js";
 // Today's answers per concept, as [answered, missed].
 export const conceptCounts = (concepts = {}) => Object.fromEntries(Object.entries(concepts).map(([id, r]) => [id, [r.seen || 0, (r.seen || 0) - (r.right || 0)]]));
 
-export function classReport(state, { joined, base = {} }, today, concepts = (state.modules.lessons || {}).concepts) {
+export function classReport(state, { joined, base = {}, shareEarlier = false, assignedLessons = [] }, today, concepts = (state.modules.lessons || {}).concepts) {
   const p = state.progress;
   const concepts2 = {};
   for (const [id, [seen, missed]] of Object.entries(conceptCounts(concepts))) {
@@ -27,6 +30,11 @@ export function classReport(state, { joined, base = {} }, today, concepts = (sta
     lessons: Object.entries(p.lessons || {})
       .filter(([, l]) => l.done && (l.last || l.at) >= joined)
       .map(([id]) => id),
+    earlier: shareEarlier
+      ? Object.entries(p.lessons || {})
+          .filter(([id, l]) => l.done && (l.last || l.at) < joined && assignedLessons.includes(id))
+          .map(([id]) => id)
+      : [],
     concepts: concepts2,
     missions: (((state.modules.missions || {}).log) || []).filter((e) => e.day >= joined).length,
     week,
