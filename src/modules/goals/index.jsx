@@ -13,6 +13,7 @@ import { recordPractice, checkBadges } from "../../core/game.js";
 import { addStrings, makeT, money, shortDate, text } from "../../core/i18n.js";
 import { dayKey } from "../../core/progress.js";
 import { Button, Card, Field, Icon, Label, Legend, LineChart, Note, Segmented, Sheet, Slider, Title, toast } from "../../core/ui.jsx";
+import { openShare } from "../../core/share.jsx";
 import { AgeCard } from "../../core/Settings.jsx";
 import { ReminderCard } from "../../core/reminders.jsx";
 import { PATHS, exampleRates } from "./engine.js";
@@ -741,6 +742,10 @@ function GoalPage({ t, locale, go, row, data, onBack, sheets }) {
         <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
           <Button size="md" style={{ flex: 1 }} onClick={() => sheets.record(g.id)}>
             <Icon name="plus" size={18} /> {t("goal.record")}
+          </Button>
+          {/* The card shows only the percent unless the learner (18+) turns the name and amounts on. */}
+          <Button size="md" kind="secondary" onClick={() => openShare({ kind: "goal", pct: Math.floor(pct), name: nameOf(g, t), saved: fmt(saved), target: fmt(g.target) })}>
+            <Icon name="share" size={18} /> {t("share.button")}
           </Button>
         </div>
       </Card>

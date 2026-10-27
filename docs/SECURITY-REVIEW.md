@@ -58,6 +58,17 @@
   - the learner snapshot is size-limited;
   - no email or nickname is sent.
 - **Dependencies:** `npm audit` found no known vulnerabilities in the runtime dependencies.
+- **Classroom mode (Phase 5, `server/classes.js`):**
+  - off unless the admin turns the `classroom` switch on for an account (admin token only); a class stops working when its teacher loses the switch;
+  - teacher routes need a session, the switch, and ownership of the class; a teacher can't open another teacher's class (tested);
+  - class codes: 6 characters from 31 (about 887 million codes), wrong codes throttled at 120 per address per 15 minutes, joins capped at 300 per address per hour; teachers can close joins and change the code;
+  - a student's member key is 24 random bytes, kept only as a SHA-256 and compared in constant time; it travels in the request body, never the address;
+  - the teacher's view is built field by field; a student's report is checked against real lesson and concept IDs and capped (missions, answers, XP), extra fields are dropped, and reports are rate-limited per member (tested with goals, notes, email and age in a forged report: none reach the teacher);
+  - lookups by ID use own properties only, so names like `__proto__` can't reach object internals.
+- **Email confirmation:** a one-time link valid 24 hours, kept only as a SHA-256, of a separate kind from password reset (a confirmation link can't reset a password; tested), 5 sends per hour per account.
+- **Invites and friends (`server/invites.js`):** random codes; each link's key kept only as a SHA-256; rewards at most 20 per link and once per invited person; opens and joins rate-limited per address; friend links only between accounts, removable by either; all removed with the account.
+- **Share cards** are drawn in the browser; nothing about them reaches the server except their kind.
+- **Teacher guide pages** have no inline scripts (the print button is a script file), so the content policy stays strict.
 
 ## Known limits (accepted for the beta)
 
@@ -67,3 +78,7 @@
 - **Rate limits live in memory,** so a server restart resets them. That's fine with one server; move them to a shared store if you run more than one.
 - **One JSON data file.** It's fine for hundreds or a few thousand testers. Move to a database (for example SQLite or Postgres) before growing past that or running more than one server.
 - **Usage stats can be faked** by anyone who posts events. They're also rate-limited per install and per address. Read the admin numbers as directional.
+- **Class progress is self-reported** by the student's device, like XP. It's checked and capped, but a determined student could inflate their own numbers. Fine for teaching; don't use it for grades that matter.
+- **Ages are self-declared,** for teachers (18+) and students (13+). The school agreement, not the app, is the real check.
+- **Class membership lives on the device** (and in the account's synced progress, if any). A lost device means the student joins again; the teacher removes the old row.
+- **Invite rewards can be farmed** a little (new browser profiles), up to 20 per link, and freezes are capped at 2 anyway.

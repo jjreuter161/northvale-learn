@@ -53,9 +53,9 @@ export const validPassword = (p) => typeof p === "string" && p.length >= PASSWOR
 // or office shares one, so it gets more room).
 // ponytail: in memory, so a restart forgets; fine for one server process.
 const WINDOW = 15 * 60000;
-// Sign-ups get more room per address: a whole class on school Wi-Fi
-// shares one.
-const limitOf = (key) => (key.startsWith("signup:") ? 120 : key.startsWith("ip:") ? 20 : 5);
+// Sign-ups and class codes get more room per address: a whole class on
+// school Wi-Fi shares one.
+const limitOf = (key) => (key.startsWith("signup:") || key.startsWith("join:") ? 120 : key.startsWith("ip:") ? 20 : 5);
 const misses = new Map();
 export function throttled(keys) {
   const now = Date.now();

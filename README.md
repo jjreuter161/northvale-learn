@@ -26,6 +26,12 @@ Set a goal, get a plan, and learn what it takes to reach it, five minutes a day.
   - **Streak repair.** Once a month, a streak of 2+ days that ended can be brought back for free, within 7 days.
   - **Weekly email recap** (accounts, opt-in, once email is set up): Sunday evening, your goals, the week's lessons and the next step. It stops after 4 weeks without a lesson, and one link turns it off.
   - The admin page shows how each one does: how many people see or use it, and how many come back within 7 days after. It also shows day-30 return and has a "send a test reminder" button.
+- **Growth and schools.** Built around privacy for teens:
+  - **Invite a friend** (Me): a personal link the learner shares however they like (copy, or the phone's share sheet). When the friend finishes a first lesson, both get a streak freeze. No contacts are read and nothing is sent for anyone.
+  - **Share cards:** a clean image of a streak, a finished unit, an achievement or a goal's progress, through the phone's share sheet or saved. No names, location or class on any card; a goal's name and amounts only if an adult turns that on for that one card (13–17 can't).
+  - **Compete with** everyone (this week's group), friends (linked through invite links) or your class. Friends or class takes you out of the everyone league. No public profiles.
+  - **Classroom mode** (a test feature, **off** except for accounts turned on from the admin page): a teacher (18+, confirmed email, teacher terms) creates a class, shares a code or link, assigns units with due dates, and sees nicknames, lessons and units finished since joining, missions finished, assignment progress and the class's hardest topics as class totals. Students join without an account, after a screen that says exactly what the teacher sees and doesn't, can hide from the class leaderboard and leave any time. No messages. Archived classes are deleted after 90 days. A printable teacher guide in English and Spanish is at `/teacher-guide.html` and `/guia-docente.html`.
+  - The admin page shows invites (made, opened, joined, freezes earned), friend links, shares by kind, classes and students, and the feature switches.
 - **Habit.** XP, levels, a daily streak with automatic streak freezes, a daily XP target, achievements and a weekly league (real people only), kept quiet and in the background. The top bar shows only the streak; XP lives on Me. Achievements come from learning and from goal milestones, which never give XP (savings are self-reported). There's also a calendar reminder.
 - **Practice portfolio.** $10,000 (or $200,000 MXN) of pretend money. Safe investments, funds and single stocks unlock as you learn. Holdings linked to a goal are tagged with it. Prices are real and delayed with a market data key; otherwise they're samples, clearly labeled.
 - **Calculators.** Budget planner, debt payoff, starting early, investing range, retirement, paycheck and side hustle, on Home and as lesson steps.
@@ -58,6 +64,7 @@ Everything works without keys. To turn on the AI tutor, real prices and reset em
 | `SIGNUP_CODE` | Accounts need this code (for a closed beta). |
 | `SMTP_USER`, `SMTP_PASS`, `PUBLIC_URL` | Password reset emails and the weekly recap, sent from a dedicated Gmail with an app password (docs/SETUP-KEYS.md §4). Reminders need no key: the server makes its own (VAPID) on first start. |
 | `CONTACT_EMAIL` | Shown to testers who need help, and in the legal pages. Also how browsers' push services can reach you about reminders (or `PUBLIC_URL`). |
+| `MAIL_POSTAL_ADDRESS` | A mailing address for the weekly recap's footer (a P.O. box or virtual mailbox, not a home address). Leave empty until the public launch (docs/COMPLIANCE.md). |
 | `PORT`, `HOST`, `ALLOWED_HOSTS`, `TRUST_PROXY`, `NORTHVALE_DATA` | Server and hosting settings. |
 
 ## Docs
@@ -72,14 +79,16 @@ Everything works without keys. To turn on the AI tutor, real prices and reset em
 | [docs/CONTENT-STYLE.md](docs/CONTENT-STYLE.md) | How lessons are written: voice, reading level, numbers, two countries, never advice |
 | [docs/COMPLIANCE.md](docs/COMPLIANCE.md) | COPPA, state laws, Mexico's data law, financial-advice rules, open decisions |
 | [docs/SECURITY-REVIEW.md](docs/SECURITY-REVIEW.md) | The security review, what was fixed, known limits |
-| [docs/legal/](docs/legal) | Privacy policy and terms (English/Spanish) — **drafts for a lawyer**. The app shows these same files. |
+| [docs/legal/](docs/legal) | Privacy policy, terms and teacher terms (English/Spanish) — **drafts for a lawyer**. The app shows these same files. |
+| [web/teacher-guide.html](web/teacher-guide.html), [web/guia-docente.html](web/guia-docente.html) | The printable teacher guide (PDFs in docs/design/m4-phase5/) |
 
 ## How it's built: a core plus modules
 
 ```
 src/core/       accounts and sync, profile, XP/streak engine (progress.js),
                 facts (facts.js), analytics, errors, settings, English/Spanish,
-                design system, legal pages
+                design system, legal pages, reminders, share cards
+                (share.jsx) and invite links (invites.jsx)
 src/modules/
   lessons/      the path, the player (lessons, reviews, challenges), the
                 course rules (content.js), one file per unit with its
@@ -95,8 +104,12 @@ src/modules/
   tutor/        AI tutor + offline glossary
   news/         news, explained
   feedback/     "Send feedback" and the survey
+  classroom/    classroom mode (behind a feature switch): joining with a
+                code, what a student's device reports (report.js), the
+                teacher's class view
 server/         accounts, progress sync, leagues, tutor (with budget),
                 news, prices, insights (analytics/feedback/errors), alerts,
+                classes, invites/friends, feature switches (flags.js),
                 backups
 web/            the page, offline service worker, icons, fonts, admin page
 scripts/        validate-content.mjs — checks every lesson, mission and piece
@@ -104,7 +117,7 @@ scripts/        validate-content.mjs — checks every lesson, mission and piece
                 tutor-check.mjs — safety check against the real AI (costs money)
 ```
 
-The core never imports a module. Each module calls `registerModule({ id, nav, Screen, Overlay, Onboard, actions, facts, services })` and gets its own slice of saved state. `Onboard` is an optional first-run step (Goals uses it for the first goal). Modules don't touch each other's state; they talk through events (`emit`/`on`) or named services (`service("tutor", "open")`). A lesson's final step names an action, such as `"portfolio.buy"`, and whichever module provides it renders it.
+The core never imports a module. Each module calls `registerModule({ id, nav, Screen, Overlay, Onboard, actions, facts, services })` (`nav.show({ session })` can hide a menu item, as classroom mode does) and gets its own slice of saved state. `Onboard` is an optional first-run step (Goals uses it for the first goal). Modules don't touch each other's state; they talk through events (`emit`/`on`) or named services (`service("tutor", "open")`). A lesson's final step names an action, such as `"portfolio.buy"`, and whichever module provides it renders it.
 
 ### Future modules (not built; this is where they plug in)
 
@@ -124,7 +137,9 @@ The core and the other modules don't change. Goals are already built for this: a
   - first-party only, with a random install ID; no name, email, IP or trackers;
   - can be switched off, and are off automatically with Global Privacy Control or Do Not Track.
 - **Reminders** are tied to a random ID made on the device (not the account or the usage-stats ID). The server keeps the browser's push address, the time, time zone and language, and a few words about what's next (streak, next lesson, mission titles). It's deleted when reminders are turned off or with Delete my data. Push addresses are accepted only from browsers' push services.
-- **The weekly recap** is off unless the learner turns it on; it's built from their synced progress.
+- **The weekly recap** is off unless the learner turns it on; it's built from their synced progress. After 4 weeks without a lesson it pauses itself, with one short note.
+- **Classes** (testers only for now): students join with a nickname and an age range, no account or email. Their device sends only what the teacher may see (lessons since joining, a mission count, answers per topic, weekly XP). Leaving, or Delete my data, deletes it.
+- **Invites and share cards:** no contacts read, nothing sent for you; share cards are made on the device and only their kind is counted.
 - **Mission notes** are private: saved with your progress (synced only if you have an account), never sent with usage stats. The note box asks people to leave out account numbers and passwords.
 - **Fonts are self-hosted,** so opening the app contacts no third party.
 - **Delete my data** (Settings → Privacy) removes the account, this device's usage stats and the device's data.
@@ -137,7 +152,7 @@ See COMPLIANCE.md and SECURITY-REVIEW.md for details.
 
 ## Tests
 
-**Click-through tests in a real browser** (`test/browser.test.mjs`, last in `npm test`, about 15 seconds). Headless Chrome uses the app the way a learner does, on a throwaway server: onboarding, a full lesson, the age question, a Money Mission with a note, a new goal, every calculator, a review, a practice buy, every lesson's "do it" tool, and every screen in English (US) and Spanish (Mexico). Any screen it passes fails the test if it shows a raw text key (like `compare.go`), an unfilled `{placeholder}`, `NaN` or `undefined`, or logs a console error. It uses the installed Google Chrome; on a machine without it, run `npx playwright-core install chromium` once. `npm run test:browser` runs only this part.
+**Click-through tests in a real browser** (`test/browser.test.mjs`, last in `npm test`, about 15 seconds). Headless Chrome uses the app the way a learner does, on a throwaway server: onboarding, a full lesson, the age question, a Money Mission with a note, a new goal, every calculator, a review, a practice buy, every lesson's "do it" tool, and every screen in English (US) and Spanish (Mexico). It also runs classroom mode end to end (a teacher turned on from the admin page confirms their email, accepts the terms and makes a class; a student joins after the "what your teacher sees" screen, does an assigned lesson, hides from the leaderboard and leaves; the teacher's screen and data are checked for every private detail), share cards (no goal name or amounts by default; no option at all for 13–17), and an invite link's streak freezes. Any screen it passes fails the test if it shows a raw text key (like `compare.go`), an unfilled `{placeholder}`, `NaN` or `undefined`, or logs a console error. It uses the installed Google Chrome; on a machine without it, run `npx playwright-core install chromium` once. `npm run test:browser` runs only this part.
 
 `npm test` runs `test/engines.test.mjs`, `test/content.test.mjs` (the content validator: both languages and countries, concept tags, explanations, facts, actions, 3–5 minutes, missions, and no missing or duplicated app text), `test/mastery.test.mjs` (mastery levels, spacing, review picking, the migration for existing learners, placement), `test/missions.test.mjs` (which missions fit, their order, the weekly suggestion, notes, XP once, achievements), `test/goals.test.mjs` (plans; on track / behind / ahead; what it takes from here; saved vs. "with practice investments"; milestones once each; re-planning that keeps entries; the Sunday check-in; per-goal currency and conversion; templates), `test/mail.test.mjs` (the reset email, against a fake mail server), `test/server.test.mjs` and `test/browser.test.mjs` (see below). The server tests run against stand-ins for Claude, the news feeds and Twelve Data, so nothing real is called. They cover:
 
@@ -148,6 +163,7 @@ See COMPLIANCE.md and SECURITY-REVIEW.md for details.
   - all 59 lessons, 31 Money Missions, every piece of app text and the glossary being complete in both languages and both countries;
   - Money Missions: who each fits, their order, the weekly suggestion, notes, XP once and achievements;
   - streak repair (2+ days, within 7 days, once a month) and days away.
+- **Growth and schools** (`test/classroom.test.mjs`): the classroom switch; what a teacher needs (18+, confirmed email, terms); joining (13+, one nickname per class, closed classes, new codes, wrong-code throttling); what the device reports and what the teacher sees (never goals, amounts, notes, tutor questions, age or email; topic totals only from 3+ students); the class leaderboard and hiding; leaving and removing; paused, archived and deleted classes; invite rewards (once per friend, 20 at most) and friends; the recap's pause note and mailing address.
 - **Reminders and the recap** (`test/retention.test.mjs`): encryption checked against RFC 8291's example, the VAPID signature, what each reminder says and when (time zone, quiet hours, once a day), push services only; the recap's content in both languages, Sunday evening once a week, stopping after 4 quiet weeks, the turn-off link.
 - **The server:**
   - accounts, with the age and guardian rules;

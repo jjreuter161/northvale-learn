@@ -82,10 +82,7 @@ export const store = {
     delete data.progress[id];
     delete data.usage[id];
     for (const [k, r] of Object.entries(data.resets || {})) if (r.userId === id) delete data.resets[k];
-    for (const w of Object.values(data.weeks)) {
-      const i = w.indexOf(id);
-      if (i >= 0) w.splice(i, 1);
-    }
+    store.leaveLeagues(id);
     for (const [k, s] of Object.entries(data.sessions)) if (s.userId === id) delete data.sessions[k];
     save();
   },
@@ -103,18 +100,19 @@ export const store = {
     delete data.sessions[hash];
     save();
   },
-  // PASSWORD RESET — one link at a time per account, kept only as its
-  // SHA-256, good for 30 minutes, used once.
-  addReset(hash, userId) {
+  // EMAILED LINKS — password reset (30 minutes) and confirming an email
+  // address ("verify", 24 hours): one link of each kind at a time per
+  // account, kept only as its SHA-256, used once.
+  addReset(hash, userId, kind = "reset", ttl = 30 * 60000) {
     const now = Date.now();
     data.resets ||= {};
-    for (const [k, r] of Object.entries(data.resets)) if (r.expiresAt < now || r.userId === userId) delete data.resets[k];
-    data.resets[hash] = { userId, expiresAt: now + 30 * 60000 };
+    for (const [k, r] of Object.entries(data.resets)) if (r.expiresAt < now || (r.userId === userId && (r.kind || "reset") === kind)) delete data.resets[k];
+    data.resets[hash] = { userId, kind, expiresAt: now + ttl };
     save();
   },
-  takeReset(hash) {
+  takeReset(hash, kind = "reset") {
     const r = data.resets && data.resets[hash];
-    if (!r) return null;
+    if (!r || (r.kind || "reset") !== kind) return null;
     delete data.resets[hash];
     save();
     return r.expiresAt > Date.now() ? data.users[r.userId] || null : null;
@@ -130,13 +128,23 @@ export const store = {
 
   // PROGRESS SYNC — the app's saved state, newest copy wins.
   progress: (userId) => data.progress[userId] || null,
-  setProgress(userId, state, updatedAt, week) {
+  setProgress(userId, state, updatedAt, week, league = true) {
     data.progress[userId] = { state, updatedAt };
-    // Joining this week's league happens on the first sync of the week.
+    // Joining this week's league happens on the first sync of the week
+    // (unless the learner chose friends or their class instead).
     const w = (data.weeks[week] ||= []);
-    if (!w.includes(userId)) w.push(userId);
+    if (league && !w.includes(userId)) w.push(userId);
     // Old weeks go after a month.
     for (const k of Object.keys(data.weeks)) if (k < weekMinus(week, 5)) delete data.weeks[k];
+    save();
+  },
+
+  // Out of every weekly league (competing with friends or a class instead).
+  leaveLeagues(userId) {
+    for (const w of Object.values(data.weeks)) {
+      const i = w.indexOf(userId);
+      if (i >= 0) w.splice(i, 1);
+    }
     save();
   },
 

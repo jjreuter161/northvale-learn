@@ -1,27 +1,43 @@
 // ME — your level, streak, today's goal, this week, the weekly league, and
-// badges. The league is real people only (signed-in learners on this
-// server, grouped by week); with nobody else yet, it says so.
+// badges. The league is real people only: this week's group of signed-in
+// learners, your friends (through invite links), or your class — the
+// learner picks. With nobody else yet, it says so.
 import { useEffect, useState } from "react";
 import { useAppState } from "./store.js";
 import { api } from "./api.js";
 import { level, xpOn, weekXp, weekStart, addDays, dayKey, BADGES, MAX_FREEZES } from "./progress.js";
-import { AVATARS, Card, Icon, Label, Progress, Ring, Title, Button } from "./ui.jsx";
-import { allModules } from "./registry.js";
+import { AVATARS, Card, Icon, Label, Progress, Ring, Title, Button, Segmented, toast } from "./ui.jsx";
+import { allModules, service } from "./registry.js";
+import { setLeague as saveLeague } from "./session.js";
+import { InviteCard, FriendOffer } from "./invites.jsx";
+import { openShare } from "./share.jsx";
 
 function League({ t, session, go }) {
   const [league, setLeague] = useState(null);
+  const [reload, setReload] = useState(0);
   const progress = useAppState((s) => s.progress);
+  const inClass = !!service("classroom", "inClass")();
+  const modes = [...(session.user ? ["everyone", "friends"] : []), ...(inClass ? ["class"] : [])];
+  const mode = modes.includes(session.user && session.user.league) ? session.user.league : modes[0];
   useEffect(() => {
-    if (!session.user) return;
+    if (!mode) return;
     let gone = false;
-    api("/api/league")
-      .then((r) => !gone && setLeague(r))
+    setLeague(null);
+    (mode === "class" ? service("classroom", "board")() : api(mode === "friends" ? "/api/league?with=friends" : "/api/league"))
+      .then((r) => !gone && setLeague(r || { standings: [] }))
       .catch(() => !gone && setLeague({ error: true }));
     return () => {
       gone = true;
     };
-  }, [session.user, progress.xp]);
-  if (!session.user)
+  }, [mode, progress.xp, reload]);
+  const unfriend = (r) => api("/api/friends", { method: "DELETE", body: { link: r.link } }).then(() => setReload((n) => n + 1), (e) => toast(e.message));
+  const picker = modes.length > 1 && (
+    <div style={{ marginBottom: 10 }}>
+      <Segmented label={t("league.with")} value={mode} onChange={(v) => (session.user ? saveLeague(v).catch((e) => toast(e.message)) : null)} options={modes.map((m) => ({ value: m, label: t(`league.with.${m}`) }))} />
+      {mode !== "everyone" && <p style={{ fontSize: 13, color: "var(--low)", margin: "8px 2px 0", lineHeight: 1.4 }}>{t("league.with.sub")}</p>}
+    </div>
+  );
+  if (!mode)
     return (
       <Card>
         <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
@@ -36,10 +52,12 @@ function League({ t, session, go }) {
         </Button>
       </Card>
     );
-  if (!league) return <Card><span className="nv-pulse">…</span></Card>;
-  if (league.error) return <Card><span style={{ color: "var(--mid)" }}>{t("league.error")}</span></Card>;
+  if (!league) return <>{picker}<Card><span className="nv-pulse">…</span></Card></>;
+  if (league.error) return <>{picker}<Card><span style={{ color: "var(--mid)" }}>{t("league.error")}</span></Card></>;
   const resets = Math.max(1, 7 - Math.round((new Date(`${dayKey()}T12:00:00`) - new Date(`${weekStart(dayKey())}T12:00:00`)) / 864e5));
   return (
+    <>
+    {picker}
     <Card pad={0}>
       <div style={{ padding: "12px 16px 8px", fontSize: 13, color: "var(--mid)" }}>{t("league.resets", { n: resets })}</div>
       {league.standings.map((r, i) => (
@@ -48,10 +66,16 @@ function League({ t, session, go }) {
           <span style={{ width: 32, height: 32, borderRadius: 16, background: AVATARS[r.avatar % AVATARS.length] || AVATARS[0], color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 650, fontSize: 14 }}>{(r.nickname || "?")[0].toUpperCase()}</span>
           <span style={{ flex: 1, fontWeight: r.you ? 650 : 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.you ? t("league.you", { name: r.nickname || t("league.anon") }) : r.nickname || t("league.anon")}</span>
           <span style={{ fontWeight: 600, color: "var(--mid)", fontVariantNumeric: "tabular-nums" }}>{r.xp} XP</span>
+          {r.link && (
+            <button onClick={() => unfriend(r)} aria-label={t("league.remove", { name: r.nickname || t("league.anon") })} style={{ border: "none", background: "transparent", color: "var(--low)", width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+              <Icon name="close" size={16} />
+            </button>
+          )}
         </div>
       ))}
-      {league.standings.length < 2 && <p style={{ fontSize: 14, color: "var(--mid)", padding: "8px 16px 14px", margin: 0, lineHeight: 1.45 }}>{t("league.alone")}</p>}
+      {league.standings.length < 2 && <p style={{ fontSize: 14, color: "var(--mid)", padding: "8px 16px 14px", margin: 0, lineHeight: 1.45 }}>{t(mode === "friends" ? "league.friends.none" : "league.alone")}</p>}
     </Card>
+    </>
   );
 }
 
@@ -133,20 +157,25 @@ export default function Me({ t, locale, session, go }) {
         ))}
 
       <Label>{t("league.title")}</Label>
+      <FriendOffer t={t} session={session} />
       <League t={t} session={session} go={go} />
+      <div style={{ marginTop: 10 }}>
+        <InviteCard t={t} session={session} />
+      </div>
 
       <Label>{t("me.badges")}</Label>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(96px, 1fr))", gap: 10 }}>
         {BADGES.map((b) => {
           const got = progress.badges[b.id];
+          const Tile = got ? "button" : "div";
           return (
-            <div key={b.id} title={t(`badge.${b.id}.how`)} style={{ background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 14, padding: "14px 8px", textAlign: "center", opacity: got ? 1 : 0.6 }}>
+            <Tile key={b.id} title={t(`badge.${b.id}.how`)} {...(got ? { onClick: () => openShare({ kind: "badge", name: t(`badge.${b.id}`) }), "aria-label": `${t("share.button")}: ${t(`badge.${b.id}`)}`, className: "nv-press" } : {})} style={{ background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 14, padding: "14px 8px", textAlign: "center", opacity: got ? 1 : 0.6, color: "var(--ink)", font: "inherit", cursor: got ? "pointer" : "default" }}>
               <div style={{ width: 40, height: 40, margin: "0 auto", borderRadius: 20, background: got ? "var(--brandSoft)" : "var(--surface2)", color: got ? "var(--brand)" : "var(--low)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <Icon name={got ? b.icon : "lock"} size={18} color="currentColor" />
               </div>
               <div style={{ fontSize: 13, fontWeight: 650, marginTop: 6, lineHeight: 1.2 }}>{t(`badge.${b.id}`)}</div>
               <div style={{ fontSize: 12, color: "var(--mid)", marginTop: 4, lineHeight: 1.3 }}>{got ? t("badge.got") : t(`badge.${b.id}.how`)}</div>
-            </div>
+            </Tile>
           );
         })}
       </div>

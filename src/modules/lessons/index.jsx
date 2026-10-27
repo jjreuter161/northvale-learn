@@ -7,6 +7,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { registerModule, actionWidget, service } from "../../core/registry.js";
 import { useAppState, getState } from "../../core/store.js";
 import { recordLesson, recordReview } from "../../core/game.js";
+import { openShare } from "../../core/share.jsx";
 import { track } from "../../core/analytics.js";
 import { text, addStrings } from "../../core/i18n.js";
 import { xpOn, dayKey, addDays } from "../../core/progress.js";
@@ -289,6 +290,11 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
           </Card>
         )}
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {result.unitJustDone && (
+            <Button full kind="secondary" style={{ border: "1px solid var(--line)" }} onClick={() => openShare({ kind: "unit", title: tx(unit.title) })}>
+              <Icon name="share" size={18} /> {t("share.button")}
+            </Button>
+          )}
           {nl && nl.id !== lesson.id && (
             <Button full onClick={() => go("lessons", { lesson: nl.id })}>
               {t("lessons.next_named", { title: tx(nl.title) })}
@@ -432,7 +438,8 @@ function sessionFor(params, t, locale) {
   const start = params.startUnit && ((progress.placed || []).includes(params.startUnit) ? nextFor(progress, service("goals", "recommendedUnits")() || []) : (UNITS.find((u) => u.id === params.startUnit) || { lessons: [] }).lessons[0]);
   const id = params.lesson || (start && start.id);
   const l = id && lessonById(id);
-  return l && lessonState(progress, id) !== "locked" ? { mode: "lesson", lesson: l, title: text(l.title, locale), steps: l.steps } : null;
+  // A lesson a teacher assigned opens even if the path hasn't reached it.
+  return l && (lessonState(progress, id) !== "locked" || params.assigned) ? { mode: "lesson", lesson: l, title: text(l.title, locale), steps: l.steps } : null;
 }
 
 function Screen(ctx) {
@@ -471,6 +478,11 @@ registerModule({
       const unitsOf = (list) => [...new Set(list.map(([id]) => lessonById(id).unit))];
       return { started: [...new Set([...unitsOf(done), ...(p.placed || [])])], recent: unitsOf(done.filter(([, l]) => (l.last || l.at) >= weekAgo)) };
     },
+    // For classes: the course's units and lessons (titles), each concept's
+    // name, and the learner's answers per concept.
+    units: () => UNITS.map((u) => ({ id: u.id, title: u.title, lessons: u.lessons.map((l) => ({ id: l.id, title: l.title })) })),
+    conceptTitle: (id) => (conceptById(id) || {}).name || null,
+    conceptsNow,
     // The next open lesson for these units (in order), else what's next
     // on the path; null when everything's done.
     nextFor: (units) => {

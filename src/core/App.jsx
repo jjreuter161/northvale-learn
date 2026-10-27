@@ -7,10 +7,12 @@ import { useAppState, update, on } from "./store.js";
 import { makeT } from "./i18n.js";
 import { allModules, getModule } from "./registry.js";
 import { LOOKS, GLOBAL_CSS, Icon, Wordmark, Toasts, Sheet, toast, Button } from "./ui.jsx";
-import { useSession, refreshSession, schedulePush } from "./session.js";
+import { useSession, refreshSession, schedulePush, verifyEmail } from "./session.js";
 import { settleOnOpen } from "./game.js";
 import { OpenNotice, RepairOffer, COMEBACK_DAYS } from "./Comeback.jsx";
 import { scheduleReminderUpdate } from "./reminders.jsx";
+import { ShareHost, openShare } from "./share.jsx";
+import { arrived, claimRewards } from "./invites.jsx";
 import { api } from "./api.js";
 import { dayKey, addDays, MAX_FREEZES, BADGES } from "./progress.js";
 import Onboarding from "./Onboarding.jsx";
@@ -50,6 +52,8 @@ export default function App() {
   const [streakOpen, setStreakOpen] = useState(false);
   const [notice, setNotice] = useState(null);
   const [resetToken, setResetToken] = useState(() => (/^#reset=([\w-]{20,})$/.exec(location.hash) || [])[1] || null);
+  // Opened from a teacher's class link: that comes first, not "welcome back".
+  const [classLink] = useState(() => new URLSearchParams(location.search).has("join"));
   const wide = useWide();
   const swipe = useRef(null);
 
@@ -74,7 +78,8 @@ export default function App() {
     track("app_open", { streak: p.streak.count, lessons: p.counters.lessons || 0 });
     const n = settleOnOpen();
     if (n.away >= COMEBACK_DAYS) track("comeback", { away: Math.min(n.away, 365) });
-    if (n.event || n.away >= COMEBACK_DAYS) setNotice(n);
+    if ((n.event || n.away >= COMEBACK_DAYS) && !classLink) setNotice(n);
+    claimRewards(t).catch(() => {});
   }, [profile.onboarded]);
   useEffect(() => {
     const offStore = on("badges.earned", ({ ids }) => ids.forEach((id) => toast(t("badge.earned", { name: t(`badge.${id}`) }), "good")));
@@ -86,17 +91,23 @@ export default function App() {
     if (session.user) schedulePush();
     scheduleReminderUpdate();
   }, [updatedAt, session.user]);
-  // Opened from a reminder (?from=push&kind=…) or the weekly email
-  // (?from=recap, or its "turn off" link ?recap_off=…): count it, go where
-  // it points, then tidy the address.
+  // Opened from a reminder (?from=push&kind=…), the weekly email
+  // (?from=recap, or its "turn off" link ?recap_off=…), a friend's invite
+  // link (?invite=…) or the "confirm your email" link (#verify=…): count
+  // it, go where it points, then tidy the address. (A class link, ?join=…,
+  // is the classroom module's.)
   useEffect(() => {
     const q = new URLSearchParams(location.search);
-    if (!q.has("from") && !q.has("recap_off")) return;
+    const verify = (/^#verify=([\w-]{20,})$/.exec(location.hash) || [])[1];
+    if (verify) verifyEmail(verify).then(() => toast(t("account.verified"), "good"), (e) => toast(e.message));
+    if (!q.has("from") && !q.has("recap_off") && !q.has("invite") && !verify) return;
     const kind = q.get("kind");
     if (q.get("from") === "push") track("push_open", { kind });
     if (q.get("from") === "recap") track("recap_open");
     if (q.has("recap_off")) api("/api/recap/off", { method: "POST", body: { token: q.get("recap_off") } }).then(() => toast(t("recap.unsubscribed"), "good"), (e) => toast(e.message));
-    history.replaceState(null, "", location.pathname);
+    if (q.has("invite")) arrived(q.get("invite"));
+    ["from", "kind", "recap_off", "invite"].forEach((k) => q.delete(k));
+    history.replaceState(null, "", location.pathname + (q.size ? `?${q}` : ""));
     if (!profile.onboarded) return;
     if (kind === "review") go("lessons", { review: true });
     else if (kind === "mission") go("missions");
@@ -134,7 +145,7 @@ export default function App() {
   }
 
   const nav = allModules()
-    .filter((m) => m.nav)
+    .filter((m) => m.nav && (!m.nav.show || m.nav.show({ session })))
     .sort((a, b) => a.nav.order - b.nav.order)
     .map((m) => ({ id: m.id, icon: m.nav.icon, label: t(m.nav.label) }));
   const coreNav = [
@@ -237,6 +248,7 @@ export default function App() {
         ))}
       <StreakSheet open={streakOpen} onClose={() => setStreakOpen(false)} t={t} progress={progress} today={today} />
       <OpenNotice t={t} locale={locale} notice={notice} onClose={() => setNotice(null)} go={go} />
+      <ShareHost t={t} />
       <Toasts />
     </div>
   );
@@ -280,6 +292,11 @@ function StreakSheet({ open, onClose, t, progress, today }) {
         <RepairOffer t={t} />
       </div>
       <p style={{ fontSize: 14, color: "var(--mid)", lineHeight: 1.5, margin: "0 2px" }}>{t("streak.rule")}</p>
+      {s.count >= 2 && (
+        <Button full kind="secondary" style={{ marginTop: 14 }} onClick={() => (onClose(), openShare({ kind: "streak", n: s.count }))}>
+          <Icon name="share" size={18} /> {t("share.button")}
+        </Button>
+      )}
     </Sheet>
   );
 }

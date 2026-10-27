@@ -114,6 +114,10 @@ Forgotten-password emails are sent from a Gmail account you control, through Goo
 
 `PUBLIC_URL` is the address the link opens. `CONTACT_EMAIL` is shown to testers who need help.
 
+**Before the public launch,** also set `MAIL_POSTAL_ADDRESS` (a P.O. box or virtual mailbox, not your home address); it goes at the bottom of the weekly recap. A lawyer question: see COMPLIANCE.md.
+
+**The same Gmail also sends the "confirm your email" link** a teacher needs before making a class (classroom mode is off unless you turn it on for an account on `/admin`).
+
 **The same Gmail also sends the weekly recap** that learners can turn on in Settings (Sunday evenings). It's off on the server until these settings are in, and locally the recap is printed in the terminal instead. At ~500 emails a day, Gmail covers a few hundred weekly recaps; past that, you'd move to an email service (that would be an account and possibly a cost, so ask first).
 
 ## 4b. Daily reminders (no key, no account)

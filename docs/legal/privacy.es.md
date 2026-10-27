@@ -13,7 +13,9 @@ Northvale Learn enseña de dinero e inversiones con dinero ficticio. Lo hicimos 
 
 ## Lo que se queda en tu dispositivo
 
-Tus lecciones, XP, racha, insignias, portafolio de práctica, metas, Misiones de dinero (y las notas que escribas en ellas), tu rango de edad si eliges uno y la conversación con el tutor se guardan en el navegador de este dispositivo. No los vemos a menos que crees una cuenta.
+Tus lecciones, XP, racha, insignias, portafolio de práctica, metas, Misiones de dinero (y las notas que escribas en ellas), tu rango de edad si eliges uno, la conversación con el tutor, las clases en las que estás y tu enlace de invitación se guardan en el navegador de este dispositivo. No los vemos a menos que crees una cuenta (o te unas a una clase, abajo).
+
+**Las tarjetas para compartir** (imágenes como "Racha de 12 días") se hacen en tu dispositivo. Nunca muestran nombres, ubicación ni tu clase, y solo muestran el nombre o las cantidades de una meta si lo activas para esa tarjeta (no es posible de 13 a 17 años). Solo contamos que se compartió o guardó una tarjeta de cierto tipo (racha, unidad, insignia, meta).
 
 ## Lo que recibe el servidor
 
@@ -24,6 +26,8 @@ Tus lecciones, XP, racha, insignias, portafolio de práctica, metas, Misiones de
 - **Reportes de errores** cuando algo falla: el mensaje del error y en qué parte de la app pasó. No incluyen datos personales.
 - **Solicitudes de noticias y precios**, que no incluyen nada sobre ti.
 - **Recordatorios diarios, solo si los activas:** la dirección que el servicio de notificaciones de tu navegador le da a este dispositivo, la hora que elegiste, tu zona horaria e idioma, y unas palabras sobre lo que sigue (tu racha y los títulos de tu siguiente lección y de la misión de la semana), para que el recordatorio diga algo útil. Se guardan con un identificador aleatorio creado en tu dispositivo, no ligado a tu cuenta ni a las estadísticas de uso, y se borran cuando apagas los recordatorios o eliges "Borrar mis datos".
+- **Una clase, solo si te unes a una** (una función de prueba, activa solo para docentes invitados). No se necesita cuenta ni correo. Guardamos la clase en la que estás, el apodo que eliges para ella, tu rango de edad (para confirmar que tienes 13 años o más) y, desde el día en que te unes: qué lecciones terminas, cuántas Misiones de dinero terminas (nunca tus notas), cuántas preguntas respondiste y fallaste de cada tema, y tu XP de la semana. **Tu profe ve** tu apodo, las lecciones y unidades que terminaste desde que te uniste, cuántas misiones terminaste y tu avance en lo que asigna. Los resultados por tema le llegan solo como totales de todo el grupo, cuando ya respondieron 3 o más estudiantes. **Tu profe nunca ve** tus metas, cantidades, portafolio de práctica, notas de misiones, preguntas al tutor, edad ni correo, ni nada de antes de que te unieras. Tus compañeros ven tu apodo y tu XP de la semana en la tabla de la clase, salvo que te ocultes. No hay mensajes de ningún tipo.
+- **Enlaces de invitación, solo si creas o abres uno.** Tu enlace es un código aleatorio. Cuando alguien lo abre y termina su primera lección, lo contamos con un identificador aleatorio creado solo para eso (no su identificador de estadísticas ni su cuenta), para que ambos reciban un protector de racha. Nunca leemos tus contactos ni enviamos nada por ti.
 
 **Si creas una cuenta, además guardamos:**
 
@@ -32,7 +36,9 @@ Tus lecciones, XP, racha, insignias, portafolio de práctica, metas, Misiones de
 - si tienes de 13 a 17 años, la fecha en que confirmaste que tu mamá, papá o tutor estuvo de acuerdo;
 - tu progreso sincronizado, para que sea el mismo en todos tus dispositivos, con unas palabras sobre lo que sigue (el avance de tus metas, la siguiente lección, la misión de la semana);
 - si activaste el resumen semanal por correo. Si lo haces, se arma con tu progreso sincronizado y se envía a tu correo los domingos por la tarde; cada correo tiene un enlace para apagarlo;
-- tu XP de la semana, para la liga (los demás solo ven tu apodo y tu XP);
+- tu XP de la semana, para la liga (los demás solo ven tu apodo y tu XP), y con quién compites: todos los de tu grupo de la semana, solo amigos o solo tu clase;
+- los amigos que agregaste con un enlace de invitación: cada quien ve solo el apodo y el XP de la semana del otro, y cualquiera puede quitar la amistad;
+- si confirmas tu correo (se necesita para dar una clase), la fecha en que lo hiciste; si das clases, la fecha en que aceptaste los términos para docentes y tus clases (nombres, códigos y tareas).
 - cuántas preguntas le hiciste hoy al tutor (para que el servicio sea justo para todos).
 
 ## El tutor con IA y los resúmenes de noticias
@@ -56,6 +62,8 @@ El servidor usa tu dirección IP unos minutos para frenar intentos de adivinar c
 - **Los datos de tu cuenta** se guardan hasta que la borres. Lo borrado puede seguir hasta 14 días en nuestros respaldos.
 - **Las estadísticas** se guardan como conteos pequeños y se borran cuando eliges "Borrar mis datos".
 - **Los comentarios** se guardan hasta 2 años. Después de "Borrar mis datos", ya no quedan ligados a tu dispositivo.
+- **Los datos de una clase** se guardan hasta que te sales, tu profe te quita o se borra la clase. Una clase que el profe archiva se borra 90 días después, y si un profe borra su cuenta se borran sus clases. "Borrar mis datos" te saca de todas tus clases.
+- **Los enlaces de invitación** se guardan hasta que eliges "Borrar mis datos" (o borras tu cuenta, lo que quita tus amistades).
 - Si la beta termina, borramos todo en un plazo de 30 días.
 
 ## Menores de edad
@@ -63,6 +71,8 @@ El servidor usa tu dirección IP unos minutos para frenar intentos de adivinar c
 Northvale Learn es para personas de 13 años en adelante. No recopilamos a sabiendas datos de menores de 13 y, si nos enteramos, los borramos.
 
 Las personas de 13 a 17 años necesitan el permiso de su mamá, papá o tutor para crear una cuenta. **[Correo de contacto]**
+
+Las clases son para estudiantes de 13 años o más. Para unirse no se necesita cuenta ni correo: solo un apodo y un rango de edad. Quien da la clase debe ser una persona adulta con correo confirmado que acepte los términos para docentes, que le piden obtener primero el visto bueno de su escuela.
 
 ## Tus derechos (ARCO)
 

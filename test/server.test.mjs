@@ -110,7 +110,11 @@ try {
   assert.equal((await call("/api/progress", { method: "PUT", body: { state: { progress: { xp: 1, days: {} } }, updatedAt: 1000 }, cookie: A })).json.kept, "server", "an older copy doesn't overwrite a newer one");
   assert.deepEqual((await call("/api/progress", { cookie: A })).json.state, stateA);
   assert.equal((await call("/api/progress", { method: "PUT", body: { state: "nope" }, cookie: A })).status, 400);
-  assert.equal((await call("/api/progress", { method: "PUT", body: { state: { progress: {}, junk: "x".repeat(700000) } }, cookie: A })).status, 413);
+  // Too large: refused with 413 — or, while the upload is still going, the
+  // connection is cut — and the server keeps answering either way.
+  const big = await call("/api/progress", { method: "PUT", body: { state: { progress: {}, junk: "x".repeat(700000) } }, cookie: A }).catch((e) => ({ status: e.cause && e.cause.code }));
+  assert.ok([413, "ECONNRESET", "EPIPE"].includes(big.status), `too large: ${big.status}`);
+  assert.equal((await call("/api/health")).status, 200);
   await call("/api/progress", { method: "PUT", body: { state: { progress: { xp: 90, days: { [today]: 90, [weekStart(today) > "2000" ? "1999-01-01" : today]: 500 } } }, updatedAt: 3000 }, cookie: B });
   const league = (await call("/api/league", { cookie: A })).json;
   assert.equal(league.week, weekStart(today));
@@ -239,7 +243,7 @@ try {
   assert.equal(cb.push.learnersOn, 1);
   assert.equal(cb.push.opened, 1);
   assert.equal(cb.push.devicesNow, 1);
-  assert.deepEqual(cb.recap, { sent: 0, failed: 0, opened: 1, openPct: null, optedIn: 1, emailOn: true });
+  assert.deepEqual(cb.recap, { sent: 0, failed: 0, paused: 0, opened: 1, openPct: null, optedIn: 1, emailOn: true });
   assert.equal((await call("/api/push", { method: "DELETE", body: { id: device.id } })).status, 200);
   assert.equal((await admin("test-admin-token-123456789")).json.comingBack.push.devicesNow, 0, "reminders off: the device is deleted");
   assert.equal((await call("/api/events", { method: "DELETE", body: { installId: A1 } })).status, 200);
@@ -267,11 +271,59 @@ try {
   assert.equal((await call("/api/auth/login", { method: "POST", body: { email: "leo@example.com", password: "a brand new passphrase" } })).status, 200);
   console.log("ok: password reset — same answer for any email, link works once, other sessions signed out");
 
+  // --- confirming an email, the classroom flag, a class over HTTP, friends ---
+  const adminPost = (path, body, token = "test-admin-token-123456789") => fetch(`${base}${path}`, { method: "POST", headers: { "X-Northvale": "1", "Content-Type": "application/json", "X-Admin-Token": token }, body: JSON.stringify(body) }).then(async (r) => ({ status: r.status, json: await r.json() }));
+  assert.deepEqual((await call("/api/health", { cookie: B })).json.flags, { classroom: false }, "classroom mode is off by default");
+  assert.equal((await call("/api/teach", { cookie: B })).status, 403);
+  assert.equal((await adminPost("/api/admin/flags", { flag: "classroom", email: "leo@example.com", on: true }, "wrong-token-wrong-token")).status, 401);
+  assert.equal((await adminPost("/api/admin/flags", { flag: "classroom", email: "leo@example.com", on: true })).status, 200);
+  assert.equal((await call("/api/health", { cookie: B })).json.flags.classroom, true, "on for this tester only");
+  assert.equal((await call("/api/health", { cookie: A })).json.flags.classroom, false);
+  assert.deepEqual((await call("/api/teach", { cookie: B })).json.ready, { adult: true, verified: false, terms: false });
+  assert.equal((await call("/api/auth/verify/send", { method: "POST", body: { lang: "en" }, cookie: B })).status, 200);
+  await new Promise((r) => setTimeout(r, 200));
+  const vtoken = (/#verify=([\w-]+)/.exec(serverOut) || [])[1];
+  assert.ok(vtoken, "the confirmation link is emailed (printed here)");
+  assert.equal((await call("/api/auth/reset", { method: "POST", body: { token: vtoken, password: "a sneaky new password" } })).status, 400, "a confirmation link can't reset a password");
+  assert.equal((await call("/api/auth/verify", { method: "POST", body: { token: vtoken } })).status, 200);
+  assert.equal((await call("/api/auth/verify", { method: "POST", body: { token: vtoken } })).json.error.code, "BAD_LINK", "once");
+  assert.equal((await call("/api/me", { method: "PATCH", body: { teacherTerms: true }, cookie: A })).status, 403, "teachers are 18+");
+  const leoNow = (await call("/api/me", { method: "PATCH", body: { teacherTerms: true }, cookie: B })).json.user;
+  assert.equal(leoNow.verified && leoNow.teacherTerms, true);
+  const cls = (await call("/api/teach/classes", { method: "POST", body: { name: "Money Club" }, cookie: B })).json;
+  const ccode = (await call(`/api/teach/class?id=${cls.id}`, { cookie: B })).json.code;
+  assert.equal((await call(`/api/teach/class?id=${cls.id}`, { cookie: A })).status, 403, "only its teacher");
+  assert.deepEqual((await call("/api/class/lookup", { method: "POST", body: { code: ccode } })).json, { name: "Money Club" });
+  const zoe = (await call("/api/class/join", { method: "POST", body: { code: ccode, nickname: "Zoe", ageBand: "13-17" } })).json;
+  const me2 = { classId: zoe.classId, memberId: zoe.memberId, key: zoe.key };
+  await call("/api/class/report", { method: "POST", body: { ...me2, report: { lessons: ["budget-1"], missions: 1, concepts: {}, week: weekStart(today), xp: 15, goals: [{ name: "Secret car", amount: 9000 }] } } });
+  assert.deepEqual((await call("/api/class/view", { method: "POST", body: me2 })).json.board, [{ nickname: "Zoe", xp: 15, you: true }]);
+  const tv = (await call(`/api/teach/class?id=${cls.id}`, { cookie: B })).json;
+  assert.deepEqual(tv.students.map((x) => [x.nickname, x.lessons, x.missions]), [["Zoe", 1, 1]]);
+  assert.doesNotMatch(JSON.stringify(tv), /Secret car|9000/);
+  assert.equal((await call("/api/class/leave", { method: "POST", body: me2 })).status, 200);
+  assert.equal((await call("/api/class/view", { method: "POST", body: me2 })).status, 404, "left: gone");
+  assert.equal((await call(`/api/teach/class?id=${cls.id}`, { cookie: B })).json.students.length, 0);
+  // Friends: Dani's invite link, opened by Leo; then Dani competes with friends only.
+  const inv = (await call("/api/invite", { method: "PUT", body: {}, cookie: A })).json;
+  assert.equal((await call("/api/friends", { method: "POST", body: { code: inv.code }, cookie: B })).status, 200);
+  const fl = (await call("/api/league?with=friends", { cookie: B })).json.standings;
+  assert.deepEqual(fl.map((x) => [x.nickname, x.you]), [["Leo", true], ["Dani script", false]]);
+  assert.ok(fl[1].link && !("email" in fl[1]));
+  assert.equal((await call("/api/me", { method: "PATCH", body: { league: "friends" }, cookie: A })).json.user.league, "friends");
+  assert.deepEqual((await call("/api/league", { cookie: B })).json.standings.map((x) => x.nickname), ["Leo"], "competing with friends instead: out of the everyone league");
+  const st2 = (await admin("test-admin-token-123456789")).json;
+  assert.deepEqual(st2.flags.find((f) => f.flag === "classroom").accounts, ["leo@example.com"]);
+  assert.equal(st2.classroom.classes, 1);
+  assert.equal(st2.growth.friendLinks, 1);
+  console.log("ok: classroom mode per tester (admin page); confirming an email by link; a class over HTTP (join, report, leaderboard, leave); invite links and the friends league");
+
   // --- delete ---
   assert.equal((await call("/api/me", { method: "DELETE", body: { password: "nope nope nope" }, cookie: A })).status, 401);
   assert.equal((await call("/api/me", { method: "DELETE", body: { password: "a good long password" }, cookie: A })).status, 200);
   assert.equal((await call("/api/progress", { cookie: A })).status, 401);
   assert.deepEqual((await call("/api/league", { cookie: B })).json.standings.map((s) => s.nickname), ["Leo"], "a deleted account leaves the league");
+  assert.deepEqual((await call("/api/league?with=friends", { cookie: B })).json.standings.map((s) => s.nickname), ["Leo"], "and its friend links");
   console.log("ok: deleting an account removes it, its sessions and its league spot");
   // --- the monthly AI budget stops the AI when it's spent ---
   const port2 = port + 1;

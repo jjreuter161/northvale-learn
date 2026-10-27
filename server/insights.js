@@ -7,7 +7,7 @@
 // screen, streak repair, the weekly email) and whether it works.
 import { store } from "./store.js";
 
-const EVENTS = new Set(["app_open", "onboarding", "lesson_step", "lesson_complete", "review_complete", "challenge_complete", "placement", "tutor_ask", "practice", "account_created", "mission_start", "mission_done", "comeback", "comeback_start", "streak_lost", "streak_repair", "push_on", "push_off", "push_open", "recap_open"]);
+const EVENTS = new Set(["app_open", "onboarding", "lesson_step", "lesson_complete", "review_complete", "challenge_complete", "placement", "tutor_ask", "practice", "account_created", "mission_start", "mission_done", "comeback", "comeback_start", "streak_lost", "streak_repair", "push_on", "push_off", "push_open", "recap_open", "share"]);
 const ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const DAY = /^\d{4}-\d{2}-\d{2}$/;
 const str = (x, n = 64) => String(x == null ? "" : x).replace(/[\u0000-\u001f]/g, " ").slice(0, n);
@@ -70,6 +70,8 @@ export function record({ installId, events }, ip) {
     if (e.name === "push_off") inst.push = false;
     if (e.name === "push_open") (a.pushOpens ||= {})[str(p.kind, 16)] = (a.pushOpens[str(p.kind, 16)] || 0) + 1;
     if (e.name === "recap_open") a.recapOpens = (a.recapOpens || 0) + 1;
+    // Share cards: which kind only (what's on a card stays on the device).
+    if (e.name === "share") (a.shares ||= {})[str(p.kind, 16)] = (a.shares[str(p.kind, 16)] || 0) + 1;
     if (e.name === "tutor_ask") inst.tutor++;
     if (e.name === "practice") a.practice[str(p.kind, 16)] = (a.practice[str(p.kind, 16)] || 0) + 1;
     if (e.name === "account_created") inst.account = true;
@@ -98,9 +100,10 @@ export function countPush(kind, ok) {
   else s.failed++;
   store.changed();
 }
-export function countRecap(ok) {
+export function countRecap(ok, paused = false) {
   const s = (A().recapSent ||= { sent: 0, failed: 0 });
   s[ok ? "sent" : "failed"]++;
+  if (ok && paused) s.paused = (s.paused || 0) + 1;
   store.changed();
 }
 
@@ -184,7 +187,7 @@ function comingBack(installs, a, today) {
     comeback: { shown: comebacks.length, started: a.comebackStarts || 0, lessonSameDay: pct(comebacks.filter((x) => (x.i.lessonDays || []).includes(x.day)).length, comebacks.length), back7: rate(comebacks) },
     repair: { lost: losses.length, repaired: losses.filter((x) => x.repaired).length, back7Repaired: rate(losses.filter((x) => x.repaired)), back7NotRepaired: rate(losses.filter((x) => !x.repaired)) },
     push: { learnersOn: pushOn.length, onNow: installs.filter((i) => i.push).length, sent: sentTotal, failed: (a.pushSent && a.pushSent.failed) || 0, opened: openTotal, openPct: pct(openTotal, sentTotal), kinds: Object.keys({ ...sent, ...opens }).map((k) => ({ kind: k, sent: sent[k] || 0, opened: opens[k] || 0 })), day7With: d7(pushOn), day7Without: d7(installs.filter((i) => !i.pushOn)) },
-    recap: { sent: (a.recapSent && a.recapSent.sent) || 0, failed: (a.recapSent && a.recapSent.failed) || 0, opened: a.recapOpens || 0, openPct: pct(a.recapOpens || 0, (a.recapSent && a.recapSent.sent) || 0) },
+    recap: { sent: (a.recapSent && a.recapSent.sent) || 0, failed: (a.recapSent && a.recapSent.failed) || 0, paused: (a.recapSent && a.recapSent.paused) || 0, opened: a.recapOpens || 0, openPct: pct(a.recapOpens || 0, (a.recapSent && a.recapSent.sent) || 0) },
   };
 }
 const median = (xs) => {
@@ -241,6 +244,7 @@ export function stats(today, titles = {}, missionTitles = {}) {
     tutor: { questions: installs.reduce((t, i) => t + i.tutor, 0), learnersAsking: installs.filter((i) => i.tutor > 0).length },
     reasons: installs.reduce((m, i) => (i.reason ? { ...m, [i.reason]: (m[i.reason] || 0) + 1 } : m), {}),
     practice: a.practice,
+    shares: a.shares || {},
     missions: {
       done: installs.reduce((t, i) => t + (i.missions || 0), 0),
       learners: installs.filter((i) => i.missions).length,

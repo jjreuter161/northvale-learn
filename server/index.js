@@ -8,7 +8,8 @@
 // ANTHROPIC_API_KEY, TUTOR_MODEL, NEWS_MODEL, AI_MONTHLY_BUDGET_USD,
 // TUTOR_DAILY_LIMIT, TUTOR_PER_MINUTE, TWELVEDATA_API_KEY, CETES_RATE,
 // CETES_RATE_DATE, ADMIN_TOKEN, ALERT_WEBHOOK_URL, SMTP_USER, SMTP_PASS,
-// MAIL_FROM, PUBLIC_URL, CONTACT_EMAIL, NORTHVALE_DATA — see README.
+// MAIL_FROM, MAIL_POSTAL_ADDRESS, PUBLIC_URL, CONTACT_EMAIL, NORTHVALE_DATA
+// — see README.
 import http from "node:http";
 import { readFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
@@ -28,6 +29,9 @@ const market = await import("./market.js");
 const news = await import("./news.js");
 const push = await import("./push.js");
 const recap = await import("./recap.js");
+const flags = await import("./flags.js");
+const classes = await import("./classes.js");
+const invites = await import("./invites.js");
 const { weekXp, weekStart, dayKey } = await import("../src/core/progress.js");
 // Anthropic's SDK loads only when there's a key, so the rest needs nothing installed.
 const ai = process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_AUTH_TOKEN ? await import("./ai.js") : null;
@@ -85,7 +89,10 @@ const https = (req) => (TRUST_PROXY ? req.headers["x-forwarded-proto"] === "http
 // Behind a proxy, only the last X-Forwarded-For entry is the proxy's word.
 const ipOf = (req) => (TRUST_PROXY && req.headers["x-forwarded-for"] ? req.headers["x-forwarded-for"].split(",").pop().trim() : req.socket.remoteAddress);
 const fail = (status, message, code = null) => Object.assign(new Error(message), { status, code });
-const publicUser = (u) => ({ email: u.email, nickname: u.nickname, avatar: u.avatar, ageBand: u.ageBand, recap: !!u.recap, createdAt: u.createdAt });
+const publicUser = (u) => ({ email: u.email, nickname: u.nickname, avatar: u.avatar, ageBand: u.ageBand, recap: !!u.recap, verified: !!u.emailVerifiedAt, teacherTerms: !!u.teacherTermsAt, league: u.league || "everyone", createdAt: u.createdAt });
+// Links in emails point here.
+const baseOf = (c) => process.env.PUBLIC_URL || `${c.secure ? "https" : "http"}://${c.req.headers.host}`;
+const LEAGUES = ["everyone", "friends", "class"];
 function startSession(c, user) {
   const s = auth.newSession();
   store.addSession(s.hash, user.id, s.expiresAt);
@@ -106,7 +113,7 @@ const xpThisWeek = (state, week) => {
 
 // The API. `open` routes work signed out; the rest need an account.
 const routes = {
-  "GET /api/health": { open: true, run: async (c) => ({ ok: true, ai: aiOpen(), aiPaused: !!ai && !aiOpen(), news: true, passwordReset: mail.mailMode() !== "off", recap: mail.mailMode() !== "off", contact: process.env.CONTACT_EMAIL || null, market: market.marketInfo(), signup: !process.env.SIGNUP_CODE || "code", user: c.user ? publicUser(c.user) : null }) },
+  "GET /api/health": { open: true, run: async (c) => ({ ok: true, ai: aiOpen(), aiPaused: !!ai && !aiOpen(), news: true, passwordReset: mail.mailMode() !== "off", recap: mail.mailMode() !== "off", contact: process.env.CONTACT_EMAIL || null, market: market.marketInfo(), signup: !process.env.SIGNUP_CODE || "code", flags: flags.flagsFor(c.user), user: c.user ? publicUser(c.user) : null }) },
 
   "POST /api/auth/signup": {
     open: true,
@@ -160,7 +167,7 @@ const routes = {
       if (user) {
         const s = auth.newSession();
         store.addReset(s.hash, user.id);
-        const base = process.env.PUBLIC_URL || `${c.secure ? "https" : "http"}://${c.req.headers.host}`;
+        const base = baseOf(c);
         const es = c.body.lang === "es";
         // The token rides in the #fragment, so it never reaches server logs.
         const link = `${base}/#reset=${s.token}`;
@@ -192,6 +199,41 @@ const routes = {
       return startSession(c, user);
     },
   },
+  // CONFIRMING AN EMAIL ADDRESS — needed to teach a class. The link
+  // (#verify=…) works for 24 hours, once.
+  "POST /api/auth/verify/send": {
+    run: async (c) => {
+      if (c.user.emailVerifiedAt) return { ok: true };
+      if (!insights.allowed(`verify:${c.user.id}`, 5)) throw fail(429, "That's a few links already. Check your inbox (and spam), or try again in an hour.");
+      if (mail.mailMode() === "off") throw fail(503, "Email isn't set up on this server yet.", "NO_MAIL");
+      const s = auth.newSession();
+      store.addReset(s.hash, c.user.id, "verify", 24 * 3600000);
+      const link = `${baseOf(c)}/#verify=${s.token}`;
+      const es = c.body.lang === "es";
+      mail
+        .sendMail({
+          to: c.user.email,
+          subject: es ? "Confirma tu correo de Northvale Learn" : "Confirm your Northvale Learn email",
+          text: es ? `Hola${c.user.nickname ? ` ${c.user.nickname}` : ""}:\n\nPara confirmar que este correo es tuyo, abre este enlace (funciona durante 24 horas y una sola vez):\n\n${link}\n\nSi no lo pediste, ignora este correo.\n\nNorthvale Learn` : `Hi${c.user.nickname ? ` ${c.user.nickname}` : ""},\n\nTo confirm this email address is yours, open this link (it works for 24 hours, once):\n\n${link}\n\nIf you didn't ask for this, ignore this email.\n\nNorthvale Learn`,
+        })
+        .catch((e) => serverError(e));
+      return { ok: true };
+    },
+  },
+  "POST /api/auth/verify": {
+    open: true,
+    run: async (c) => {
+      const keys = [`ip:${c.ip}`];
+      if (auth.throttled(keys)) throw fail(429, "Too many tries. Wait 15 minutes, then try again.");
+      const user = store.takeReset(auth.sha256(String(c.body.token || "")), "verify");
+      if (!user) {
+        auth.recordMiss(keys);
+        throw fail(400, "That link has expired or was already used. Ask for a new one.", "BAD_LINK");
+      }
+      store.updateUser(user.id, { emailVerifiedAt: new Date().toISOString() });
+      return { ok: true };
+    },
+  },
   "POST /api/auth/logout": {
     open: true,
     run: async (c) => {
@@ -210,6 +252,18 @@ const routes = {
       if ("recap" in c.body) {
         if (c.body.recap === true && mail.mailMode() === "off") throw fail(503, "Email isn't set up on this server yet.");
         patch.recap = c.body.recap === true;
+      }
+      // Who to compete with: everyone (this week's group), friends, or a
+      // class — the last two take you out of the everyone league.
+      if ("league" in c.body) {
+        if (!LEAGUES.includes(c.body.league)) throw fail(400, "Pick everyone, friends or your class.");
+        patch.league = c.body.league;
+        if (c.body.league !== "everyone") store.leaveLeagues(c.user.id);
+      }
+      // The teacher terms (docs/legal/teacher.*.md), adults only.
+      if (c.body.teacherTerms === true) {
+        if (!classes.readiness(c.user).adult) throw fail(403, "Teacher accounts are for adults (18 and up).", "ADULT");
+        patch.teacherTermsAt = c.user.teacherTermsAt || new Date().toISOString();
       }
       return { user: publicUser(store.updateUser(c.user.id, patch)) };
     },
@@ -236,6 +290,9 @@ const routes = {
         auth.recordMiss(keys);
         throw fail(401, "That password isn't right.");
       }
+      classes.dropTeacher(c.user.id);
+      invites.dropUser(c.user.id);
+      flags.forget(c.user.id);
       store.removeUser(c.user.id);
       c.setCookie(auth.clearedCookie(c.secure));
       return { ok: true };
@@ -255,17 +312,50 @@ const routes = {
       // ponytail: XP is the app's word (no server-side replay of lessons) —
       // fine for friendly leagues; verify lesson events server-side if
       // prizes ever ride on it.
-      store.setProgress(c.user.id, state, at, thisWeek());
+      store.setProgress(c.user.id, state, at, thisWeek(), (c.user.league || "everyone") === "everyone");
       return { ok: true, updatedAt: at };
     },
   },
+  // This week's league: the group you joined the week with, or (?with=
+  // friends) you and your friends.
   "GET /api/league": {
     run: async (c) => {
       const week = thisWeek();
-      const rows = store.league(c.user.id, week, xpThisWeek).sort((a, b) => b.xp - a.xp);
-      return { week, standings: rows.map((r) => ({ nickname: r.user.nickname || null, avatar: r.user.avatar || 0, xp: r.xp, you: r.id === c.user.id })) };
+      const xpOf = (id) => xpThisWeek(store.progress(id) && store.progress(id).state, week);
+      const rows =
+        c.query.get("with") === "friends"
+          ? [{ id: c.user.id, user: c.user, xp: xpOf(c.user.id) }, ...invites.friendsOf(c.user.id).map((f) => ({ id: f.userId, link: f.id, user: store.userById(f.userId), xp: xpOf(f.userId) }))]
+          : store.league(c.user.id, week, xpThisWeek);
+      return { week, standings: rows.sort((a, b) => b.xp - a.xp).map((r) => ({ nickname: r.user.nickname || null, avatar: r.user.avatar || 0, xp: r.xp, you: r.id === c.user.id, ...(r.link ? { link: r.link } : {}) })) };
     },
   },
+
+  // INVITES and FRIENDS (invites.js).
+  "PUT /api/invite": { open: true, run: async (c) => invites.ensure(c.body, c.user, c.ip) },
+  "POST /api/invite/open": { open: true, run: async (c) => invites.opened(c.body.code, c.body.by, c.ip) },
+  "POST /api/invite/joined": { open: true, run: async (c) => invites.joined(c.body.code, c.body.by, c.ip) },
+  "POST /api/invite/claim": { open: true, run: async (c) => invites.claim(c.body.code, c.body.key) },
+  "DELETE /api/invite": { open: true, run: async (c) => invites.forget(c.body.code, c.body.key) },
+  "POST /api/friends": { run: async (c) => invites.befriend(c.user, c.body.code) },
+  "DELETE /api/friends": { run: async (c) => invites.unfriend(c.user, c.body.link) },
+
+  // CLASSROOM MODE (classes.js). Teachers, with an account:
+  "GET /api/teach": { run: async (c) => ({ ready: classes.readiness(c.user), classes: classes.list(c.user) }) },
+  "POST /api/teach/classes": { run: async (c) => classes.create(c.user, c.body.name) },
+  "GET /api/teach/class": { run: async (c) => classes.teacherView(c.user, c.query.get("id")) },
+  "PATCH /api/teach/class": { run: async (c) => classes.update(c.user, c.body.id, c.body) },
+  "DELETE /api/teach/class": { run: async (c) => classes.remove(c.user, c.body.id) },
+  "POST /api/teach/assign": { run: async (c) => classes.assign(c.user, c.body.id, c.body) },
+  "DELETE /api/teach/assign": { run: async (c) => classes.unassign(c.user, c.body.id, c.body.assignment) },
+  "DELETE /api/teach/student": { run: async (c) => classes.removeStudent(c.user, c.body.id, c.body.student) },
+  // …and students, with the class code, then their member key (in the
+  // body, never the address).
+  "POST /api/class/lookup": { open: true, run: async (c) => classes.lookup(c.body.code, c.ip) },
+  "POST /api/class/join": { open: true, run: async (c) => classes.join(c.body, c.ip) },
+  "POST /api/class/report": { open: true, limit: 32000, run: async (c) => classes.report(c.body, c.body.report) },
+  "POST /api/class/view": { open: true, run: async (c) => classes.studentView(c.body) },
+  "POST /api/class/hide": { open: true, run: async (c) => classes.hide(c.body, c.body.hidden) },
+  "POST /api/class/leave": { open: true, run: async (c) => classes.leave(c.body) },
 
   // One tutor reply, streamed as Server-Sent Events: "text" as it's
   // written, then "done" (or "error").
@@ -312,7 +402,15 @@ const routes = {
       s.comingBack.push.devicesNow = push.deviceCount();
       s.comingBack.recap.optedIn = store.allUsers().filter((u) => u.recap).length;
       s.comingBack.recap.emailOn = mail.mailMode() !== "off";
-      return { ...s, accounts: store.userCount(), ai: { ...ai, budget: AI_BUDGET, on: aiOpen() }, generatedAt: new Date().toISOString() };
+      return { ...s, accounts: store.userCount(), growth: invites.stats(), classroom: classes.stats(), flags: flags.list(), ai: { ...ai, budget: AI_BUDGET, on: aiOpen() }, generatedAt: new Date().toISOString() };
+    },
+  },
+  // Features that are built but off: on for one account, or everyone.
+  "POST /api/admin/flags": {
+    open: true,
+    run: async (c) => {
+      adminOnly(c);
+      return flags.set(c.body.flag, c.body);
     },
   },
 
@@ -452,6 +550,7 @@ http
       } catch (e) {
         alert("backup", `Backup failed: ${e.message}`);
       }
+      classes.purge();
     };
     daily();
     setInterval(daily, 6 * 3600000).unref();

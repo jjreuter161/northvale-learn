@@ -9,6 +9,7 @@ import "./modules/goals/index.jsx";
 import "./modules/missions/index.jsx";
 import "./modules/news/index.jsx";
 import "./modules/tutor/index.jsx";
+import "./modules/classroom/index.jsx";
 import "./modules/feedback/index.jsx";
 
 createRoot(document.getElementById("root")).render(<App />);

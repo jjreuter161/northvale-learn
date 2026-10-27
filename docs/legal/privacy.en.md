@@ -13,7 +13,9 @@ Northvale Learn teaches money and investing with pretend money. We built it to c
 
 ## What stays on your device
 
-Your lessons, XP, streak, badges, practice portfolio, goals, Money Missions (and any notes you write for them), your age range if you choose one, and tutor chat are saved in your browser on this device. We can't see them unless you create an account.
+Your lessons, XP, streak, badges, practice portfolio, goals, Money Missions (and any notes you write for them), your age range if you choose one, tutor chat, the classes you're in and your invite link are saved in your browser on this device. We can't see them unless you create an account (or join a class, below).
+
+**Share cards** (images like "12-day streak") are made on your device. They never show names, location or your class, and they show a goal's name or amounts only if you turn that on for that one card (not possible for ages 13–17). We only count that a card of a certain kind (streak, unit, badge, goal) was shared or saved.
 
 ## What the server receives
 
@@ -24,6 +26,8 @@ Your lessons, XP, streak, badges, practice portfolio, goals, Money Missions (and
 - **Error reports** when something breaks: the error message and where in the app it happened. These contain no personal information.
 - **Requests for news and prices.** These don't include anything about you.
 - **Daily reminders, only if you turn them on.** The address your browser's push service gives this device, the time you picked, your time zone and language, and a few words about what's next (your streak, and the titles of your next lesson and this week's mission), so the reminder can say something useful. They're kept under a random ID made on your device, not linked to your account or usage stats, and deleted when you turn reminders off or choose "Delete my data".
+- **A class, only if you join one** (a test feature that's on only for invited teachers). No account or email is needed. We keep the class you're in, the nickname you pick for it, your age range (to check you're 13 or older) and, from the day you join: which lessons you finish, how many Money Missions you finish (never your notes), how many questions you answered and missed on each topic, and this week's XP. **Your teacher sees** your nickname, the lessons and units you've finished since joining, how many missions you've finished, and your progress on what they assign. Topic results reach the teacher only as totals for the whole class, once 3 or more students have answered. **Your teacher never sees** your goals, amounts, practice portfolio, mission notes, tutor questions, age or email, or anything from before you joined. Classmates see your nickname and weekly XP on the class leaderboard, unless you hide yourself. There are no messages of any kind.
+- **Invite links, only if you make or open one.** Your link is a random code. When someone opens it and finishes a first lesson, we count it under a random ID made just for that (not their usage-stats ID or account), so both of you get a streak freeze. We never read your contacts or send anything for you.
 
 **If you create an account, we also keep:**
 
@@ -32,7 +36,9 @@ Your lessons, XP, streak, badges, practice portfolio, goals, Money Missions (and
 - for ages 13–17, the date you confirmed a parent or guardian agreed;
 - your synced progress, so it's the same on every device, with a few words about what's next (your goals' progress, the next lesson, this week's mission);
 - whether you turned on the weekly email recap. If you do, it's made from your synced progress and sent to your email on Sunday evenings; every email has a link to turn it off;
-- your weekly XP, so you can be in a league (other learners see only your nickname and XP);
+- your weekly XP, so you can be in a league (other learners see only your nickname and XP), and who you compete with: everyone in this week's group, only friends, or only your class;
+- friends you added through an invite link: each of you sees the other's nickname and weekly XP, nothing else, and either can remove the link;
+- if you confirm your email (needed to teach a class), the date you did; if you teach, the date you accepted the teacher terms and your classes (their names, codes and assignments).
 - how many tutor questions you asked today (to keep the service fair).
 
 ## The AI tutor and AI news summaries
@@ -56,6 +62,8 @@ The server uses your IP address for a few minutes to stop password-guessing and 
 - **Account data** stays until you delete the account. Deleted data can stay in our backups for up to 14 days.
 - **Usage stats** are kept as small counts and deleted when you choose "Delete my data".
 - **Feedback** is kept for up to 2 years. After "Delete my data" it's no longer linked to your device.
+- **Class data** stays until you leave the class, your teacher removes you, or the class is deleted. A class the teacher archives is deleted 90 days later, and deleting a teacher's account deletes their classes. "Delete my data" takes you out of every class.
+- **Invite links** stay until you choose "Delete my data" (or delete your account, which removes your friend links).
 - If the beta ends, we delete everything within 30 days.
 
 ## Children and teens
@@ -63,6 +71,8 @@ The server uses your IP address for a few minutes to stop password-guessing and 
 Northvale Learn is for people 13 and older. We don't knowingly collect personal information from anyone under 13. If we learn that we have, we delete it. **[Contact email]**
 
 People aged 13–17 need a parent's or guardian's permission to create an account.
+
+Classes are for students 13 and older. Joining one needs no account or email: only a nickname and an age range. Teachers must be adults with a confirmed email who accept the teacher terms, which ask them to get their school's OK first.
 
 ## Your rights
 

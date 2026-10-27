@@ -25,7 +25,7 @@ function comingBack(c) {
       card("Streak repairs", `${c.repair.repaired} of ${c.repair.lost}`, `streaks lost and repaired · repaired: ${back(c.repair.back7Repaired)} · not: ${back(c.repair.back7NotRepaired)}`),
       card("Reminders on", p.devicesNow, `${p.learnersOn} ${p.learnersOn === 1 ? "learner" : "learners"} ever turned them on · day-7 return with: ${pct(p.day7With.pct)} (of ${p.day7With.of}), without: ${pct(p.day7Without.pct)} (of ${p.day7Without.of})`),
       card("Reminders sent", p.sent, `${p.opened} opened (${pct(p.openPct)}) · ${p.failed} failed`),
-      card("Weekly email recap", c.recap.emailOn ? c.recap.optedIn : "off", c.recap.emailOn ? `opted in · ${c.recap.sent} sent · ${c.recap.opened} opened (${pct(c.recap.openPct)}) · ${c.recap.failed} failed` : "email isn't set up on the server yet")
+      card("Weekly email recap", c.recap.emailOn ? c.recap.optedIn : "off", c.recap.emailOn ? `opted in · ${c.recap.sent} sent (${c.recap.paused} of them "paused" notes after 4 quiet weeks) · ${c.recap.opened} opened (${pct(c.recap.openPct)}) · ${c.recap.failed} failed` : "email isn't set up on the server yet")
     ),
     table(["Reminder", "Sent", "Opened"], p.kinds.map((k) => [{ streak: "Streak at risk", checkin: "Sunday check-in", review: "Review ready", mission: "Mission", next: "Next lesson" }[k.kind] || k.kind, k.sent, k.opened])),
     el("p", {}, testButton()),
@@ -42,6 +42,53 @@ function testButton() {
     out.textContent = res.ok ? ` ${r.delivered} of ${r.devices} delivered${r.failed ? `, ${r.failed} failed` : ""}.` : ` ${(r.error && r.error.message) || "Failed."}`;
   });
   return [b, out];
+}
+
+// Invites, share cards and classes.
+function growth(s) {
+  const g = s.growth;
+  const c = s.classroom;
+  const kinds = { streak: "Streak", unit: "Finished unit", badge: "Badge", goal: "Goal progress" };
+  return [
+    el("h2", {}, "Invites and sharing"),
+    el("div", { class: "grid" }, card("Invite links made", g.links), card("Opened", g.opened, "people who opened someone's link"), card("Joined", g.joined, "finished a first lesson through a link"), card("Freezes earned", g.rewarded, "by people who invited someone"), card("Friend links", g.friendLinks, "pairs in a friends league"), card("Share cards shared", Object.values(s.shares).reduce((t, n) => t + n, 0))),
+    table(["Share card", "Shared or saved"], Object.entries(s.shares).map(([k, n]) => [kinds[k] || k, n])),
+    el("h2", {}, "Classroom mode (testers only)"),
+    el("div", { class: "grid" }, card("Classes", c.classes, `${c.archived} archived (deleted 90 days after archiving)`), card("Teachers", c.teachers), card("Students", c.students, `${c.reporting} have sent progress`)),
+  ];
+}
+// Built but switched off: turn a feature on for one account (testers) or everyone.
+function flagsSection(list) {
+  return [
+    el("h2", {}, "Feature switches"),
+    ...list.map((f) => {
+      const out = el("span", { class: "muted" });
+      const email = el("input", { type: "email", placeholder: "Account email", autocomplete: "off" });
+      const send = async (body) => {
+        out.textContent = " Saving…";
+        const res = await fetch("/api/admin/flags", { method: "POST", headers: { "X-Northvale": "1", "Content-Type": "application/json", "X-Admin-Token": sessionStorage.getItem("nvl-admin") || "" }, body: JSON.stringify({ flag: f.flag, ...body }) });
+        const r = await res.json();
+        if (!res.ok) return (out.textContent = ` ${(r.error && r.error.message) || "Failed."}`);
+        load(sessionStorage.getItem("nvl-admin"));
+      };
+      const add = el("button", { type: "button" }, "Turn on for this account");
+      add.addEventListener("click", () => send({ email: email.value, on: true }));
+      const everyone = el("button", { type: "button", class: f.all ? "" : "quiet" }, f.all ? "Turn off for everyone" : "Turn on for everyone");
+      everyone.addEventListener("click", () => (f.all || confirm(`Turn ${f.flag} on for EVERYONE?`)) && send({ all: !f.all }));
+      return el(
+        "div",
+        { class: "card" },
+        el("div", { class: "big", style: "font-size:18px" }, `${f.flag}: ${f.all ? "on for everyone" : f.accounts.length ? `on for ${f.accounts.length} ${f.accounts.length === 1 ? "account" : "accounts"}` : "off"}`),
+        el("div", { class: "label" }, f.about),
+        el("ul", {}, f.accounts.map((a) => {
+          const off = el("button", { type: "button", class: "quiet" }, "Turn off");
+          off.addEventListener("click", () => send({ email: a, on: false }));
+          return el("li", {}, `${a} `, off);
+        })),
+        el("div", { class: "row" }, email, add, everyone, out)
+      );
+    }),
+  ];
 }
 
 async function load(token) {
@@ -64,6 +111,7 @@ async function load(token) {
     el("h2", {}, "Coming back"),
     el("div", { class: "grid" }, card("Day-1 return", pct(s.retention.day1.pct), `of ${s.retention.day1.of} who started 1+ days ago`), card("Day-7 return", pct(s.retention.day7.pct), `of ${s.retention.day7.of} who started 7+ days ago`), card("Back within a week", pct(s.retention.within7.pct), `of ${s.retention.within7.of}`), card("Day-30 return", pct(s.retention.day30.pct), `of ${s.retention.day30.of} who started 30+ days ago`), card("Active today", s.activeToday, `${s.learners} learners · ${s.accounts} accounts`)),
     ...comingBack(s.comingBack),
+    ...growth(s),
     el("h2", {}, "Learning"),
     el("div", { class: "grid" }, card("Lessons finished", s.lessons.total), card("Per learner", `${s.lessons.perLearnerAvg} avg`, `median ${s.lessons.perLearnerMedian} · ${s.lessons.zero} finished none`), card("Streaks", `${s.streaks.median} median`, `longest ${s.streaks.max} · ${s.streaks.atLeast3} at 3+ · ${s.streaks.atLeast7} at 7+`), card("Tutor questions", s.tutor.questions, `${s.tutor.learnersAsking} learners asked`)),
     el("h2", {}, "Money Missions"),
@@ -73,6 +121,7 @@ async function load(token) {
     table(["Lesson", "Stopped at step", "Learners", "Started"], s.quitPoints.map((q) => [q.title, q.step, q.learners, q.ofStarted])),
     el("h2", {}, "Why they came"),
     table(["Reason", "Learners"], Object.entries(s.reasons).map(([k, v]) => [k, v])),
+    ...flagsSection(s.flags),
     el("h2", {}, "AI spending this month"),
     el("div", { class: "card" }, el("div", { class: "big" }, `$${s.ai.spent.toFixed(2)} of $${s.ai.budget}`), el("div", { class: "label" }, `${s.ai.calls} calls · tutor $${(s.ai.tutor || 0).toFixed(2)} · news $${(s.ai.news || 0).toFixed(2)} · ${s.ai.on ? "on" : "paused"}`), el("div", { class: "bar" }, el("div", { style: `width:${Math.min(100, (s.ai.spent / s.ai.budget) * 100)}%` }))),
     el("h2", {}, "Survey answers (latest)"),

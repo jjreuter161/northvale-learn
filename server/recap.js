@@ -1,8 +1,10 @@
 // THE WEEKLY EMAIL RECAP — for learners with an account who turn it on
 // (Settings), and only once email is set up on the server. Sunday evening
 // in their time zone: their goals, the week's lessons, and the next step.
-// It stops on its own after 4 weeks without a lesson (no nagging), and the
-// link at the bottom turns it off without signing in.
+// After 4 weeks without a lesson it pauses itself (one short note says
+// so, then nothing — no nagging), and the link at the bottom turns it off
+// without signing in. MAIL_POSTAL_ADDRESS, when set, goes in the footer
+// (docs/COMPLIANCE.md: a lawyer question before the public launch).
 import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import { store } from "./store.js";
 import { sendMail, mailMode } from "./mail.js";
@@ -43,6 +45,8 @@ const WORDS = {
     open: (u) => `Open Northvale Learn: ${u}`,
     why: (u) => `You get this because you turned on the weekly recap. Turn it off: ${u}`,
     fine: "Northvale Learn is for learning. All money in the app is pretend, and nothing here is financial advice.",
+    paused: "Your weekly recaps are paused",
+    pausedBody: "We've paused your weekly recaps. Turn them back on anytime in Settings.",
   },
   es: {
     subject: "Tu semana en Northvale Learn",
@@ -57,8 +61,13 @@ const WORDS = {
     open: (u) => `Abre Northvale Learn: ${u}`,
     why: (u) => `Te llega porque activaste el resumen semanal. Para apagarlo: ${u}`,
     fine: "Northvale Learn es para aprender. Todo el dinero en la app es de práctica y nada aquí es asesoría financiera.",
+    paused: "Pausamos tu resumen semanal",
+    pausedBody: "Pausamos tu resumen semanal. Puedes volver a activarlo cuando quieras en Ajustes.",
   },
 };
+
+const langOf = (state) => WORDS[state && state.settings && state.settings.lang === "es" ? "es" : "en"];
+const footer = (L) => [L.fine, ...(process.env.MAIL_POSTAL_ADDRESS ? [str(process.env.MAIL_POSTAL_ADDRESS, 200)] : [])];
 
 // The email for one learner's week (`today` is their Sunday), or null when
 // there's nothing to send (no lesson in 4 weeks).
@@ -75,14 +84,19 @@ export function recapFor({ user, state, today, base }) {
     xp: weekXp({ days: p.days || {} }, today),
     streak: (p.streak && p.streak.count) || 0,
   };
-  const L = WORDS[state.settings && state.settings.lang === "es" ? "es" : "en"];
+  const L = langOf(state);
   const goals = (Array.isArray(snap.goals) ? snap.goals : []).slice(0, 3).map((g) => ({ name: str(g.name, 60), saved: str(g.saved, 24), target: str(g.target, 24), percent: Math.round(Number(g.percent) || 0) }));
   const lines = [L.hi(str(user.nickname, 24)), "", w.lessons ? L.week(w) : L.quiet];
   if (goals.length) lines.push("", L.goals, ...goals.map(L.goal));
   const next = [snap.next && L.lesson(str(snap.next, 120)), snap.mission && snap.mission.title && L.mission(str(snap.mission.title, 120))].filter(Boolean);
   if (next.length) lines.push("", L.next, ...next);
-  lines.push("", L.open(`${base}/?from=recap`), "", "--", L.why(`${base}/?recap_off=${offToken(user.id)}`), L.fine);
+  lines.push("", L.open(`${base}/?from=recap`), "", "--", L.why(`${base}/?recap_off=${offToken(user.id)}`), ...footer(L));
   return { subject: L.subject, text: lines.join("\n") };
+}
+// The last one, when it pauses itself.
+export function pauseFor({ user, state, base }) {
+  const L = langOf(state);
+  return { subject: L.paused, text: [L.hi(str(user.nickname, 24)), "", L.pausedBody, "", L.open(`${base}/?from=recap`), "", "--", ...footer(L)].join("\n") };
 }
 
 // Every so often: whoever has the recap on and whose Sunday evening it is
@@ -103,9 +117,9 @@ export async function tick(now = new Date(), { users, progressOf, base, send = s
     }
     if (new Date(`${at.day}T12:00:00Z`).getUTCDay() !== 0 || at.min < SEND_FROM || user.recapWeek === weekStart(at.day)) continue;
     store.updateUser(user.id, { recapWeek: weekStart(at.day) });
-    const mail = recapFor({ user, state, today: at.day, base });
-    if (!mail) continue;
-    const ok = await send({ to: user.email, ...mail }).then(() => true, () => false);
-    countRecap(ok);
+    const week = recapFor({ user, state, today: at.day, base });
+    if (!week) store.updateUser(user.id, { recap: false });
+    const ok = await send({ to: user.email, ...(week || pauseFor({ user, state, base })) }).then(() => true, () => false);
+    countRecap(ok, !week);
   }
 }

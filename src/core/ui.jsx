@@ -133,6 +133,9 @@ const PATHS = {
   flag: "M5 21V4m0 0h11l-2 4 2 4H5",
   home: "M4 11l8-7 8 7M6 9.5V20h12V9.5M10 20v-5h4v5",
   car: "M5 16V12l2-5h10l2 5v4M5 16h14M5 16v2h3v-2m8 0v2h3v-2M4 12h16M8 13.5h.01M16 13.5h.01",
+  users: "M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM22 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75",
+  share: "M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13",
+  copy: "M20 9h-9a2 2 0 00-2 2v9a2 2 0 002 2h9a2 2 0 002-2v-9a2 2 0 00-2-2zM5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1",
 };
 
 export function Icon({ name, size = 22, color = "currentColor", stroke = 2, fill = "none", label }) {

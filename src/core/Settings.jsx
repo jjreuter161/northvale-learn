@@ -9,6 +9,8 @@ import { useSession, signIn, signUp, signOut, changePassword, deleteAccount, set
 import { analyticsOn, installId, forgetInstall } from "./analytics.js";
 import { api } from "./api.js";
 import { ReminderSettings, turnOff as remindersOff } from "./reminders.jsx";
+import { forgetInvite } from "./invites.jsx";
+import { service } from "./registry.js";
 
 
 const setSetting = (k, v) => update((s) => ({ ...s, settings: { ...s.settings, [k]: v } }));
@@ -200,9 +202,12 @@ function downloadReminder(t, time) {
 }
 
 // Everything about you, everywhere: the account (if any), this device's
-// usage stats on the server, and everything saved on this device.
+// usage stats on the server, class memberships (the teacher stops seeing
+// you), your invite link, reminders, and everything saved on this device.
 async function deleteEverything(signedIn, password) {
   if (signedIn) await deleteAccount(password);
+  await service("classroom", "leaveAll")();
+  await forgetInvite();
   await remindersOff();
   const id = installId();
   forgetInstall();
