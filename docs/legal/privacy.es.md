@@ -11,6 +11,15 @@ Northvale Learn enseña de dinero e inversiones con dinero ficticio. Lo hicimos 
 - No mostramos anuncios, no vendemos ni compartimos tus datos y no usamos rastreadores de terceros.
 - Puedes borrar tu cuenta y tus datos cuando quieras: Ajustes → Privacidad → Borrar mis datos.
 
+## La lista de espera
+
+Si te unes a la lista de espera en nuestro sitio (/bienvenida), guardamos solo lo que pide el formulario: tu correo, tu país, si eres estudiante, docente, mamá/papá/tutor u otra cosa, y tu rango de edad. Si tienes de 13 a 17 años, también guardamos la fecha en que confirmaste que tu mamá, papá o tutor está de acuerdo (las personas menores de 13 no pueden unirse). Además guardamos el idioma de la página que usaste y la fecha en que te uniste.
+
+- **Para qué:** solo para avisarte de la beta (y, a docentes, cuando el modo de clase esté listo). Nada de boletines ni publicidad de nadie más.
+- **Correo:** cuando nuestro correo esté configurado, recibirás una confirmación corta (enviada por Gmail de Google) con un enlace para salir de la lista. Te volveremos a escribir cuando haya un lugar para ti.
+- **El sitio no tiene rastreadores,** ni fuentes externas, ni cookies. Contra el spam, tiene un campo oculto que solo llenan los bots, y el servidor limita cuántas veces puede registrarse una misma dirección de red (la dirección se usa un momento para eso y no se guarda con tu registro).
+- **Para salir:** usa el enlace del correo (o de la pantalla "Ya estás en la lista"), o escríbenos. Tu registro se borra en ese momento. Si no, borramos la lista dentro de los 30 días posteriores al fin de la beta.
+
 ## Lo que se queda en tu dispositivo
 
 Tus lecciones, XP, racha, insignias, portafolio de práctica, metas, Misiones de dinero (y las notas que escribas en ellas), tu rango de edad si eliges uno, la conversación con el tutor, las clases en las que estás y tu enlace de invitación se guardan en el navegador de este dispositivo. No los vemos a menos que crees una cuenta (o te unas a una clase, abajo).

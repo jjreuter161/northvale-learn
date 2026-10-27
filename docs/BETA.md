@@ -14,6 +14,8 @@
 
 Keep the beta closed: set `SIGNUP_CODE` and give the code only in your invite. People can still use the app without an account; the code only gates accounts.
 
+**The landing page** (`/welcome`, Spanish `/bienvenida`) is the link to post or send to people you don't know yet. They join the waitlist; you see them on `/admin` (and can download the list as a CSV) and invite them from there. Friends and family you invite directly can get the app link below.
+
 ## What to tell testers
 
 - It's a 5-minute-a-day app that teaches money and investing with pretend money.

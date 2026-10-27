@@ -324,6 +324,37 @@ try {
   assert.equal(st2.growth.friendLinks, 1);
   console.log("ok: classroom mode per tester (admin page); confirming an email by link; a class over HTTP (join, report, leaderboard, leave); invite links and the friends league");
 
+  // --- the landing page and its waitlist ---
+  for (const [path, lang, og] of [["/welcome", "en", "og-en.jpg"], ["/bienvenida", "es", "og-es.jpg"]]) {
+    const pg = await call(path, { header: false });
+    assert.equal(pg.status, 200);
+    assert.match(pg.headers.get("content-security-policy"), /script-src 'self'/);
+    assert.match(pg.text, new RegExp(`<html lang="${lang}">`));
+    assert.ok(pg.text.includes(`<meta property="og:image" content="${base}/${og}" />`), "share previews name this server's address");
+    assert.ok(!pg.text.includes("{{BASE}}"));
+    assert.doesNotMatch(pg.text, /https?:\/\/(?!127\.0\.0\.1)[\w.-]+\//, "nothing loads from another site");
+  }
+  const js = await fetch(`${base}/app.js`, { headers: { "Accept-Encoding": "gzip" } });
+  assert.equal(js.headers.get("content-encoding"), "gzip", "text goes out compressed");
+  assert.match(await js.text(), /createRoot|React/);
+  const shot = await call("/shots/en-1.jpg", { header: false });
+  assert.equal(shot.headers.get("content-type"), "image/jpeg");
+  assert.match(shot.headers.get("cache-control"), /max-age=86400/);
+  assert.match((await call("/robots.txt", { header: false })).text, /Disallow: \/admin/);
+  const wl = (b) => call("/api/waitlist", { method: "POST", body: { email: "pat@example.com", country: "US", role: "parent", ageBand: "26+", lang: "en", ...b } });
+  assert.equal((await wl({ ageBand: "under13" })).json.error.code, "AGE");
+  const joinedWl = (await wl({})).json;
+  assert.ok(joinedWl.token && joinedWl.mailed === false, "on the list (the confirmation is printed here, not mailed)");
+  assert.match(serverOut, /You're on the Northvale Learn waitlist/);
+  assert.equal((await adminPost("/api/admin/waitlist/export", {}, "wrong-token-wrong-token")).status, 401);
+  assert.match((await adminPost("/api/admin/waitlist/export", {})).json.csv, /"pat@example\.com","US","parent","26\+"/);
+  const wlStats = (await admin("test-admin-token-123456789")).json.waitlist;
+  assert.equal(wlStats.total, 1);
+  assert.equal((await adminPost("/api/admin/waitlist/delete", { id: wlStats.latest[0].id })).status, 200);
+  assert.equal((await admin("test-admin-token-123456789")).json.waitlist.total, 0, "deleted from the admin page");
+  assert.equal((await call("/api/waitlist/leave", { method: "POST", body: { token: joinedWl.token } })).status, 200);
+  console.log("ok: the landing pages (English/Spanish, share previews with this server's address, nothing from other sites), the waitlist with its age rule, and the admin page's export and delete");
+
   // --- delete ---
   assert.equal((await call("/api/me", { method: "DELETE", body: { password: "nope nope nope" }, cookie: A })).status, 401);
   assert.equal((await call("/api/me", { method: "DELETE", body: { password: "a good long password" }, cookie: A })).status, 200);

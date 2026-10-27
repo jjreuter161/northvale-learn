@@ -255,6 +255,8 @@ try {
     await page.getByRole("button", { name: "Send a test reminder to every device" }).click();
     await page.getByText("0 of 0 delivered.").waitFor();
     await page.getByText("Invites and sharing").waitFor();
+    await page.getByText("Waitlist (landing page)").waitFor();
+    await page.getByRole("button", { name: "Download the list (CSV)" }).waitFor();
     await page.getByText("classroom: off").waitFor();
     await clean("admin");
     console.log("ok: the admin page, with what brings people back");
@@ -455,6 +457,70 @@ try {
     console.log("ok: an invite link: the friend's first lesson gives each of them a streak freeze");
     await inviter.close();
   }
+
+  // --- the landing page and its waitlist, in English and Spanish ---
+  const LANDING = [
+    { path: "welcome", lang: "en", country: "US", labels: ["Email", "Country", "I'm a…", "Age range"], join: "Join the waitlist", young: "Northvale Learn is for ages 13 and up, so we can't add you to the list.", teen: "Please check with a parent or guardian before you join the list.", guardian: "A parent or guardian says it's OK.", guardianErr: "Check with a parent or guardian first, then tick the box.", done: "You're on the list.", leaveNow: "Changed your mind? Take me off the list", leaveLink: "Take me off the list", left: "You're off the list.", teacher: "Join as a teacher", privacy: "privacy policy", heading: "Privacy Policy" },
+    { path: "bienvenida", lang: "es", country: "MX", labels: ["Correo", "País", "Soy…", "Edad"], join: "Unirme a la lista de espera", young: "Northvale Learn es para mayores de 13 años, así que no podemos agregarte a la lista.", teen: "Antes de unirte a la lista, pregúntale a tu mamá, papá o tutor.", guardian: "Mi mamá, papá o tutor está de acuerdo.", guardianErr: "Primero pregúntale a tu mamá, papá o tutor y luego marca la casilla.", done: "Ya estás en la lista.", leaveNow: "¿Cambiaste de opinión? Sácame de la lista", leaveLink: "Sácame de la lista", left: "Ya saliste de la lista.", teacher: "Unirme como docente", privacy: "aviso de privacidad", heading: "Aviso de privacidad" },
+  ];
+  for (const L of LANDING) {
+    const context = await browser.newContext({ viewport: { width: 390, height: 800 }, locale: L.lang === "es" ? "es-MX" : "en-US", serviceWorkers: "block", reducedMotion: "reduce" });
+    const page = await context.newPage();
+    current = page;
+    page.setDefaultTimeout(5000);
+    const errors = [];
+    const outside = [];
+    page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
+    page.on("pageerror", (e) => errors.push(String(e)));
+    page.on("request", (r) => !r.url().startsWith(BASE) && !r.url().startsWith("data:") && outside.push(r.url()));
+    await page.goto(BASE + L.path);
+    // Every picture loads (scrolling past the lazy ones), nothing from other sites, clean text.
+    await page.evaluate(async () => {
+      for (const img of document.images) (img.scrollIntoView({ block: "center", inline: "center" }), await new Promise((r) => setTimeout(r, 50)));
+    });
+    await page.waitForFunction(() => [...document.images].every((i) => i.complete && i.naturalWidth > 0));
+    const text = await page.evaluate(() => document.body.innerText);
+    assert.deepEqual(text.match(BROKEN) || [], [], `${L.path}: broken text`);
+    assert.ok(!text.includes("{{"), `${L.path}: an unfilled address`);
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, `${L.path}: no sideways scrolling on a phone`);
+    const [email, country, role, age] = L.labels.map((x) => page.getByLabel(x, { exact: false }).first());
+    // Under 13: no sign-up.
+    await age.selectOption("under13");
+    await page.getByText(L.young).waitFor();
+    assert.equal(await page.getByRole("button", { name: L.join }).isDisabled(), true, "under 13 can't sign up");
+    // 13–17: a parent or guardian first.
+    await email.fill(`teen-${L.lang}@example.test`);
+    await country.selectOption(L.country);
+    await role.selectOption("student");
+    await age.selectOption("13-17");
+    await page.getByText(L.teen).waitFor();
+    await page.getByRole("button", { name: L.join }).click();
+    await page.getByText(L.guardianErr).waitFor();
+    await page.getByLabel(L.guardian).check();
+    await page.getByRole("button", { name: L.join }).click();
+    await page.getByText(L.done).waitFor();
+    if (L.lang === "en") {
+      await page.getByRole("button", { name: L.leaveNow }).click();
+    } else {
+      // From the link in the confirmation email (printed here: no email service).
+      await page.waitForTimeout(200);
+      const link = (/(http:\/\/\S+\/bienvenida\?leave=[\w.-]+)/.exec(serverOut) || [])[1];
+      assert.ok(link, "the confirmation email has a take-me-off link");
+      await page.goto(link);
+      await page.getByRole("button", { name: L.leaveLink, exact: true }).click();
+    }
+    await page.getByText(L.left).waitFor();
+    // The teacher button picks "Teacher"; the privacy policy opens in this language.
+    await page.goto(BASE + L.path);
+    await page.getByRole("link", { name: L.teacher }).click();
+    assert.equal(await role.inputValue(), "teacher");
+    await page.getByRole("link", { name: L.privacy }).first().click();
+    await page.getByRole("heading", { name: L.heading }).waitFor();
+    assert.deepEqual(errors, [], `${L.path}: console errors`);
+    assert.deepEqual(outside, [], `${L.path}: requests to other sites`);
+    await context.close();
+  }
+  console.log("ok: the landing page and waitlist in English and Spanish: real screenshots load, nothing from other sites, under 13 blocked, 13–17 with a parent's or guardian's OK, on and off the list (also from the email's link), the teacher button, the privacy policy");
 
   // --- a learner who has finished every lesson ---
   {

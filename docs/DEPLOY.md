@@ -70,6 +70,7 @@ You'll need the Fly account; I can't create it for you. Run these in Terminal fr
    ```
 
 6. Open `https://<name>.fly.dev` on your phone. Then:
+   - the landing page to send people is `https://<name>.fly.dev/welcome` (Spanish: `/bienvenida`). Set `PUBLIC_URL` so its share previews (the picture and title when you paste the link in a chat) point to the right address;
    - check `https://<name>.fly.dev/admin` with your `ADMIN_TOKEN`;
    - run `fly logs` to watch the server.
 

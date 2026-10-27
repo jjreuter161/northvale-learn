@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Northvale Learn — learn money by doing (free beta)</title>
+    <meta name="description" content="A free app for ages 13 and up: three-minute lessons, a goal planner and a practice portfolio with pretend money. In English and Spanish, for the US and Mexico. Join the beta." />
+    <link rel="canonical" href="{{BASE}}/welcome" />
+    <link rel="alternate" hreflang="en" href="{{BASE}}/welcome" />
+    <link rel="alternate" hreflang="es" href="{{BASE}}/bienvenida" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Northvale Learn" />
+    <meta property="og:title" content="Northvale Learn — learn money by doing" />
+    <meta property="og:description" content="Short lessons, a goal planner and a practice portfolio with pretend money. A free beta for ages 13 and up, in English and Spanish." />
+    <meta property="og:url" content="{{BASE}}/welcome" />
+    <meta property="og:image" content="{{BASE}}/og-en.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Northvale Learn: learn money by doing, with the app's goal screen" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:locale:alternate" content="es_MX" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#13315C" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/icon-180.png" />
+    <link rel="preload" href="/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <style>
+      @font-face { font-family: "Inter"; font-weight: 100 900; font-display: swap; src: url(/fonts/inter-latin-wght-normal.woff2) format("woff2"); }
+      @font-face { font-family: "EB Garamond"; font-weight: 600 700; font-display: swap; src: url(/fonts/eb-garamond-latin-600-normal.woff2) format("woff2"); }
+      :root { --bg: #f6f7f9; --surface: #fff; --surface2: #eef1f5; --ink: #0b1626; --mid: #4b5565; --low: #8a93a3; --line: #e3e7ed; --brand: #13315c; --brandSoft: #e9eef6; --accent: #1e7a5f; --accentSoft: #e6f2ee; --bad: #b42318; --badSoft: #fbecea; --warnSoft: #fbf0e2 }
+      * { box-sizing: border-box }
+      html { scroll-behavior: smooth; -webkit-text-size-adjust: 100% }
+      @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto } }
+      body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.55 Inter, system-ui, -apple-system, "Segoe UI", sans-serif }
+      a { color: var(--brand) }
+      .wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px }
+      header { position: sticky; top: 0; z-index: 5; background: rgba(246, 247, 249, .94); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line) }
+      header .wrap { display: flex; align-items: center; gap: 12px; min-height: 60px; padding-top: env(safe-area-inset-top) }
+      .mark { font-family: "EB Garamond", Georgia, serif; font-weight: 650; font-size: 26px; letter-spacing: -.3px; color: var(--ink); text-decoration: none; line-height: 1 }
+      .mark small { font-family: Inter, sans-serif; font-size: 11px; font-weight: 650; letter-spacing: 2.5px; color: var(--low); margin-left: 6px; vertical-align: 3px }
+      .grow { flex: 1 }
+      .lang { font-size: 15px; font-weight: 600; text-decoration: none; padding: 10px 6px }
+      .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 22px; border-radius: 14px; border: 0; background: var(--brand); color: #fff; font: inherit; font-weight: 650; text-decoration: none; cursor: pointer }
+      .btn.small { min-height: 40px; padding: 0 16px; font-size: 15px; border-radius: 12px }
+      .btn.secondary { background: var(--surface); color: var(--ink); border: 1px solid var(--line) }
+      .btn:disabled { opacity: .45; cursor: default }
+      .btn:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid #2b5cb3; outline-offset: 2px }
+      .pill { display: inline-block; font-size: 14px; font-weight: 650; color: var(--brand); background: var(--brandSoft); border-radius: 999px; padding: 5px 12px }
+      h1 { font-size: clamp(38px, 9vw, 60px); line-height: 1.04; letter-spacing: -1.5px; margin: 16px 0 14px }
+      h2 { font-size: clamp(26px, 5.5vw, 36px); line-height: 1.15; letter-spacing: -.6px; margin: 0 0 12px }
+      h3 { font-size: 19px; margin: 0 0 6px }
+      .lead { font-size: 19px; color: var(--mid); margin: 0 0 22px; max-width: 34em }
+      .fine { font-size: 14px; color: var(--mid) }
+      section { padding: 56px 0; scroll-margin-top: 60px }
+      .hero { display: grid; gap: 28px; align-items: center; padding-top: 36px; padding-bottom: 48px }
+      .hero .ctas { display: flex; flex-wrap: wrap; gap: 12px; align-items: center }
+      .phone { width: min(280px, 72vw); margin: 0 auto; border-radius: 30px; border: 8px solid var(--ink); background: var(--ink); overflow: hidden; box-shadow: 0 18px 40px rgba(11, 22, 38, .18) }
+      .phone img { display: block; width: 100%; height: auto }
+      .cards { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) }
+      .card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 20px }
+      .card p { margin: 0; color: var(--mid); font-size: 16px }
+      .num { display: inline-flex; width: 30px; height: 30px; border-radius: 9px; background: var(--brandSoft); color: var(--brand); font-weight: 750; align-items: center; justify-content: center; margin-bottom: 10px; font-size: 15px }
+      .shots { display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 4px 4px 14px; margin: 0 -4px }
+      .shots figure { flex: 0 0 min(230px, 62vw); margin: 0; scroll-snap-align: start }
+      .shots .phone { width: 100%; border-width: 6px; border-radius: 24px; box-shadow: none }
+      figcaption { font-size: 15px; color: var(--mid); margin-top: 10px; text-align: center }
+      .list { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px }
+      .list li { display: flex; gap: 10px; align-items: flex-start }
+      .list li::before { content: ""; flex: 0 0 8px; height: 8px; border-radius: 4px; background: var(--accent); margin-top: 9px }
+      .band { background: var(--surface); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line) }
+      .note { background: var(--warnSoft); border-radius: 14px; padding: 14px 16px; font-size: 16px }
+      form { display: grid; gap: 14px; max-width: 520px }
+      label.f { display: grid; gap: 6px; font-size: 15px; font-weight: 650; color: var(--mid) }
+      input[type="email"], select { width: 100%; font: inherit; font-size: 16px; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px; min-height: 48px }
+      .check { display: flex; gap: 10px; align-items: flex-start; font-size: 16px; cursor: pointer }
+      .check input { width: 22px; height: 22px; margin: 1px 0 0; accent-color: var(--brand); flex-shrink: 0 }
+      .hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden }
+      .msg { border-radius: 12px; padding: 12px 14px; font-size: 16px; margin: 0 }
+      .msg.bad { background: var(--badSoft); color: var(--bad) }
+      .msg.info { background: var(--brandSoft) }
+      .panel { background: var(--accentSoft); border-radius: 18px; padding: 22px; max-width: 520px }
+      .panel:focus { outline: none }
+      .linkish { background: none; border: 0; padding: 8px 0; font: inherit; font-size: 15px; color: var(--brand); text-decoration: underline; cursor: pointer }
+      footer { padding: 36px 0 calc(40px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); font-size: 15px; color: var(--mid) }
+      footer nav { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 12px }
+      .btn { white-space: nowrap }
+      @media (max-width: 440px) { header .btn { display: none } }
+      [hidden] { display: none !important }
+      @media (min-width: 820px) {
+        .hero { grid-template-columns: 1.2fr .8fr; padding-top: 64px; padding-bottom: 72px }
+        .phone { width: 300px }
+        .shots { overflow: visible; display: grid; grid-template-columns: repeat(4, 1fr) }
+        .shots figure { flex: none }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="wrap">
+        <a class="mark" href="/welcome">Northvale<small>LEARN</small></a>
+        <span class="grow"></span>
+        <a class="lang" href="/bienvenida" hreflang="es" lang="es">Español</a>
+        <a class="btn small" href="#join">Join the beta</a>
+      </div>
+    </header>
+
+    <main>
+      <div class="wrap hero">
+        <div>
+          <span class="pill">Free beta · US and Mexico</span>
+          <h1>Learn money by doing.</h1>
+          <p class="lead">Northvale Learn is an app for ages 13 and up. Set a goal, learn what it takes in three-minute lessons, and practice with pretend money — in English or Spanish.</p>
+          <div class="ctas">
+            <a class="btn" href="#join">Join the beta</a>
+            <a href="/" class="fine">Already invited? Open the app</a>
+          </div>
+          <p class="fine" style="margin-top: 18px">Educational only — not financial advice. No real money moves in the app.</p>
+        </div>
+        <div class="phone"><img src="/shots/en-1.jpg" width="585" height="1170" alt="The app's Home screen: a car goal with $1,150 of $5,000 saved, ahead of its monthly plan" fetchpriority="high" /></div>
+      </div>
+
+      <section class="band" aria-labelledby="how">
+        <div class="wrap">
+          <h2 id="how">How it works</h2>
+          <p class="lead">A few minutes a day, on your phone.</p>
+          <div class="cards">
+            <div class="card"><span class="num">1</span><h3>Set a goal</h3><p>A car, college, an emergency fund or your first investment. You get a monthly plan and see whether you're on track.</p></div>
+            <div class="card"><span class="num">2</span><h3>Learn in three minutes</h3><p>59 short lessons in 17 units: budgeting, your first paycheck, credit, scams, taxes, investing basics and more. Reviews bring back what you missed.</p></div>
+            <div class="card"><span class="num">3</span><h3>Practice with pretend money</h3><p>A practice portfolio with $10,000 (or $200,000 pesos) of pretend money. More choices unlock as you learn.</p></div>
+            <div class="card"><span class="num">4</span><h3>Ask, then try it for real</h3><p>An AI tutor explains terms and headlines in plain words, and never tells you what to buy. Money Missions are small real-life tasks, like finding the fees on a bank account.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="look">
+        <div class="wrap">
+          <h2 id="look">What it looks like</h2>
+          <p class="lead">Real screens from the app.</p>
+          <div class="shots">
+            <figure><div class="phone"><img src="/shots/en-1.jpg" width="585" height="1170" loading="lazy" alt="Home: a savings goal and its weekly check-in" /></div><figcaption>Your goal and its plan</figcaption></figure>
+            <figure><div class="phone"><img src="/shots/en-2.jpg" width="585" height="1170" loading="lazy" alt="A lesson question about what taxes pay for" /></div><figcaption>A three-minute lesson</figcaption></figure>
+            <figure><div class="phone"><img src="/shots/en-3.jpg" width="585" height="1170" loading="lazy" alt="The practice portfolio: $10,000 of pretend money with one practice fund" /></div><figcaption>The practice portfolio</figcaption></figure>
+            <figure><div class="phone"><img src="/shots/en-4.jpg" width="585" height="1170" loading="lazy" alt="Money Missions: this week's real-life task" /></div><figcaption>Money Missions</figcaption></figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="band" aria-labelledby="who">
+        <div class="wrap">
+          <h2 id="who">Who it's for</h2>
+          <div class="cards">
+            <div class="card"><h3>Teens, 13–17</h3><p>Learn the basics before the money gets real. Making an account needs a parent's or guardian's OK, and teens only compete with other teens.</p></div>
+            <div class="card"><h3>Young adults</h3><p>First paychecks, first credit card, first investments — without the jargon.</p></div>
+            <div class="card"><h3>Parents</h3><p>A calm way for your teen to learn about money: no real money, no ads, nothing to buy.</p></div>
+            <div class="card"><h3>Teachers and clubs</h3><p>A classroom mode is coming. <a href="#teachers">See below</a>.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="isnt">
+        <div class="wrap">
+          <h2 id="isnt">What it isn't</h2>
+          <ul class="list" style="max-width: 640px">
+            <li><span><strong>Not a bank or a broker.</strong> There's no real money, no real trades and no bank connections.</span></li>
+            <li><span><strong>Not advice.</strong> Lessons explain how money works. They never tell you what to buy or sell.</span></li>
+            <li><span><strong>No ads, and we never sell your data.</strong> Accounts are optional: without one, your progress stays on your phone.</span></li>
+            <li><span><strong>Not finished.</strong> It's a small beta, so things will change. There's a feedback button on every screen, and we read everything.</span></li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="band" id="teachers" aria-labelledby="teach">
+        <div class="wrap">
+          <h2 id="teach">For teachers and clubs</h2>
+          <p class="lead" style="margin-bottom: 14px">Classroom mode is coming soon. We're testing it with a few teachers now.</p>
+          <ul class="list" style="max-width: 640px; margin-bottom: 18px">
+            <li><span>Students join with a class code and a nickname — no email needed.</span></li>
+            <li><span>Teachers see lesson progress and which topics the class finds hard, never students' goals, amounts or notes.</span></li>
+            <li><span>Assign units with due dates. There's no messaging of any kind.</span></li>
+          </ul>
+          <p class="fine" style="margin: 0 0 16px">There's no date yet. Join the waitlist as a teacher and we'll tell you when it's ready.</p>
+          <a class="btn secondary" href="#join" data-role="teacher">Join as a teacher</a>
+        </div>
+      </section>
+
+      <section id="join" aria-labelledby="joinh">
+        <div class="wrap">
+          <h2 id="joinh">Join the beta</h2>
+          <p class="lead">Leave your email and we'll write when there's a spot for you. We'll use it only to tell you about the beta.</p>
+
+          <div id="leave-link" class="panel" hidden tabindex="-1">
+            <h3>Take yourself off the waitlist?</h3>
+            <p class="fine" style="margin: 0 0 14px">We'll delete your email and answers from the list.</p>
+            <button class="btn" type="button" id="leave-confirm">Take me off the list</button>
+          </div>
+
+          <form id="waitlist" novalidate data-err-email="Enter a real email address." data-err-age="Northvale Learn is for ages 13 and up." data-err-guardian="Check with a parent or guardian first, then tick the box." data-err-country="Pick a country." data-err-role="Pick what describes you." data-err-rate="Too many sign-ups from here. Try again in an hour." data-err-full="The waitlist is full for now." data-err-bad-link="That link isn't valid." data-err-offline="You seem to be offline. Try again when you're connected." data-err-other="Something went wrong. Try again in a minute.">
+            <label class="f">Email<input type="email" id="email" name="email" autocomplete="email" required maxlength="200" /></label>
+            <label class="f">Country
+              <select id="country" name="country" required>
+                <option value="" disabled selected>Choose…</option>
+                <option value="US">United States</option>
+                <option value="MX">Mexico</option>
+                <option value="other">Another country</option>
+              </select>
+            </label>
+            <label class="f">I'm a…
+              <select id="role" name="role" required>
+                <option value="" disabled selected>Choose…</option>
+                <option value="student">Student</option>
+                <option value="teacher">Teacher</option>
+                <option value="parent">Parent</option>
+                <option value="other">Other</option>
+              </select>
+            </label>
+            <label class="f">Age range
+              <select id="age" name="age" required>
+                <option value="" disabled selected>Choose…</option>
+                <option value="under13">Under 13</option>
+                <option value="13-17">13–17</option>
+                <option value="18-25">18–25</option>
+                <option value="26+">26 or older</option>
+              </select>
+            </label>
+            <p id="young" class="msg bad" role="alert" hidden>Northvale Learn is for ages 13 and up, so we can't add you to the list. Thanks for your interest!</p>
+            <div id="teen" hidden>
+              <p class="msg info" style="margin-bottom: 12px">Please check with a parent or guardian before you join the list.</p>
+              <label class="check"><input type="checkbox" id="guardian" name="guardian" />A parent or guardian says it's OK.</label>
+            </div>
+            <div class="hp" aria-hidden="true"><label>Website <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" /></label></div>
+            <p class="fine" style="margin: 0">By joining, you agree that we can email you about the beta. See the <a href="/?legal=privacy&amp;lang=en">privacy policy</a>.</p>
+            <p id="err" class="msg bad" role="alert" hidden></p>
+            <button class="btn" type="submit" id="submit">Join the waitlist</button>
+          </form>
+
+          <div id="done" class="panel" hidden tabindex="-1">
+            <h3 id="done-new">You're on the list.</h3>
+            <h3 id="done-already" hidden>You're already on the list.</h3>
+            <p style="margin: 0">We'll email you when there's a spot for you.</p>
+            <p id="done-mailed" class="fine" hidden style="margin: 8px 0 0">We've also sent you a short confirmation email.</p>
+            <p id="done-teacher" class="fine" hidden style="margin: 8px 0 0">We'll also tell you when classroom mode is ready.</p>
+            <button type="button" class="linkish" id="leave-now" hidden>Changed your mind? Take me off the list</button>
+          </div>
+          <div id="left" class="panel" hidden tabindex="-1">
+            <h3>You're off the list.</h3>
+            <p style="margin: 0">Thanks for your interest in Northvale Learn.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="wrap">
+        <a class="mark" href="/welcome" style="font-size: 22px">Northvale<small>LEARN</small></a>
+        <p style="margin: 12px 0 0; max-width: 46em">Educational only — not financial advice. All money in Northvale Learn is pretend, and nothing in it is a recommendation to buy or sell anything. Talk with a trusted adult or a licensed professional before real money decisions.</p>
+        <nav aria-label="More">
+          <a href="/?legal=privacy&amp;lang=en">Privacy policy</a>
+          <a href="/?legal=terms&amp;lang=en">Terms of use</a>
+          <a href="/bienvenida" hreflang="es" lang="es">Español</a>
+          <a href="/">Open the app</a>
+        </nav>
+        <p style="margin: 14px 0 0">© 2026 Northvale Learn · Beta</p>
+      </div>
+    </footer>
+    <script src="/welcome.js" defer></script>
+  </body>
+</html>

@@ -57,6 +57,29 @@ function growth(s) {
     el("div", { class: "grid" }, card("Classes", c.classes, `${c.archived} archived (deleted 90 days after archiving)`), card("Teachers", c.teachers), card("Students", c.students, `${c.reporting} have sent progress`)),
   ];
 }
+// The landing page's waitlist: who's on it, a CSV download, and deleting.
+const adminPost = (path, body = {}) => fetch(path, { method: "POST", headers: { "X-Northvale": "1", "Content-Type": "application/json", "X-Admin-Token": sessionStorage.getItem("nvl-admin") || "" }, body: JSON.stringify(body) }).then(async (r) => ({ ok: r.ok, json: await r.json() }));
+function waitlistSection(w) {
+  const roles = { student: "Students", teacher: "Teachers", parent: "Parents", other: "Other" };
+  const download = el("button", { type: "button" }, "Download the list (CSV)");
+  download.addEventListener("click", async () => {
+    const r = await adminPost("/api/admin/waitlist/export");
+    if (!r.ok) return;
+    const a = el("a", { href: URL.createObjectURL(new Blob([r.json.csv], { type: "text/csv" })), download: `northvale-waitlist-${new Date().toISOString().slice(0, 10)}.csv` });
+    a.click();
+  });
+  const del = (e) => {
+    const b = el("button", { type: "button", class: "quiet" }, "Delete");
+    b.addEventListener("click", async () => confirm(`Delete ${e.email} from the waitlist?`) && (await adminPost("/api/admin/waitlist/delete", { id: e.id })).ok && load(sessionStorage.getItem("nvl-admin")));
+    return b;
+  };
+  return [
+    el("h2", {}, "Waitlist (landing page)"),
+    el("div", { class: "grid" }, card("On the waitlist", w.total), ...Object.entries(roles).map(([k, label]) => card(label, w.byRole[k] || 0)), card("13–17", w.byAge["13-17"] || 0, "with a parent's or guardian's OK"), card("Mexico / US / other", `${w.byCountry.MX || 0} / ${w.byCountry.US || 0} / ${w.byCountry.other || 0}`)),
+    el("p", {}, download, el("span", { class: "muted" }, w.total > w.latest.length ? ` (the table shows the latest ${w.latest.length})` : "")),
+    table(["Joined", "Email", "Country", "Role", "Age", "Language", ""], w.latest.map((e) => [new Date(e.createdAt).toLocaleDateString(), e.email, e.country, e.role, e.ageBand, e.lang, del(e)])),
+  ];
+}
 // Built but switched off: turn a feature on for one account (testers) or everyone.
 function flagsSection(list) {
   return [
@@ -111,6 +134,7 @@ async function load(token) {
     el("h2", {}, "Coming back"),
     el("div", { class: "grid" }, card("Day-1 return", pct(s.retention.day1.pct), `of ${s.retention.day1.of} who started 1+ days ago`), card("Day-7 return", pct(s.retention.day7.pct), `of ${s.retention.day7.of} who started 7+ days ago`), card("Back within a week", pct(s.retention.within7.pct), `of ${s.retention.within7.of}`), card("Day-30 return", pct(s.retention.day30.pct), `of ${s.retention.day30.of} who started 30+ days ago`), card("Active today", s.activeToday, `${s.learners} learners · ${s.accounts} accounts`)),
     ...comingBack(s.comingBack),
+    ...waitlistSection(s.waitlist),
     ...growth(s),
     el("h2", {}, "Learning"),
     el("div", { class: "grid" }, card("Lessons finished", s.lessons.total), card("Per learner", `${s.lessons.perLearnerAvg} avg`, `median ${s.lessons.perLearnerMedian} · ${s.lessons.zero} finished none`), card("Streaks", `${s.streaks.median} median`, `longest ${s.streaks.max} · ${s.streaks.atLeast3} at 3+ · ${s.streaks.atLeast7} at 7+`), card("Tutor questions", s.tutor.questions, `${s.tutor.learnersAsking} learners asked`)),

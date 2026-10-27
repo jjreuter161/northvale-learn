@@ -119,6 +119,13 @@ Laws that can apply once a school uses it:
   - "educational only" on every money screen;
   - the tutor is told to send minors to an adult for real accounts, flag scams, and handle distress kindly.
 
+- **The landing page and waitlist (Phase 6):**
+  - honest content only: real app screenshots (made by `scripts/landing-shots.mjs` from the app itself), "beta" in plain view, no testimonials, ratings, user counts or "as seen in" logos;
+  - the waitlist asks only email, country, role and age range; under 13 can't join (the page and the server both refuse); 13–17 see "check with a parent or guardian" and must tick that they did (the date is kept);
+  - no trackers, outside fonts or cookies on the page; spam is stopped with a hidden field and per-address rate limits;
+  - the confirmation email (once Gmail is approved) is a transactional notice with a take-me-off link that asks before removing (so mail scanners can't); the admin page exports (CSV) and deletes entries;
+  - **lawyer:** whether waitlist emails to 13–17 need anything more in Mexico (LFPDPPP) or in US states with teen privacy laws; the same mailing-address question as the recap.
+
 ## Still open — your decisions or a lawyer's
 
 1. **Who is the data controller?** Your name or a company, the contact email, and a postal address are needed in both legal documents.

@@ -68,6 +68,8 @@
 - **Email confirmation:** a one-time link valid 24 hours, kept only as a SHA-256, of a separate kind from password reset (a confirmation link can't reset a password; tested), 5 sends per hour per account.
 - **Invites and friends (`server/invites.js`):** random codes; each link's key kept only as a SHA-256; rewards at most 20 per link and once per invited person; opens and joins rate-limited per address; friend links only between accounts, removable by either; all removed with the account.
 - **Share cards** are drawn in the browser; nothing about them reaches the server except their kind.
+- **The waitlist (Phase 6, `server/waitlist.js`):** a hidden honeypot field (bots get the same answer, nothing is stored), 10 sign-ups per address per hour, server-side checks of every field (13+ and the guardian rule too), at most 100,000 entries; the take-me-off link is an HMAC of the entry ID (a server secret), checked in constant time and rate-limited, and the page asks before using it; the admin CSV quotes every field and defuses spreadsheet formulas (`=`, `+`, `-`, `@`). The landing pages are static, load nothing from other sites (tested), and their share-preview address comes from `PUBLIC_URL` or the allow-listed Host header.
+- **Compression:** text files are gzipped once and cached in memory (no new dependency).
 - **Teacher guide pages** have no inline scripts (the print button is a script file), so the content policy stays strict.
 
 ## Known limits (accepted for the beta)
@@ -81,4 +83,5 @@
 - **Class progress is self-reported** by the student's device, like XP. It's checked and capped, but a determined student could inflate their own numbers. Fine for teaching; don't use it for grades that matter.
 - **Ages are self-declared,** for teachers (18+) and students (13+). The school agreement, not the app, is the real check.
 - **Class membership lives on the device** (and in the account's synced progress, if any). A lost device means the student joins again; the teacher removes the old row.
+- **The waitlist says "already on the list"** for an email that's on it, so someone could check whether an address signed up. It's rate-limited (10 per hour per address); accepted for a beta list.
 - **Invite rewards can be farmed** a little (new browser profiles), up to 20 per link, and freezes are capped at 2 anyway.

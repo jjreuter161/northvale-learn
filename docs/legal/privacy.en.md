@@ -11,6 +11,15 @@ Northvale Learn teaches money and investing with pretend money. We built it to c
 - We don't show ads, we don't sell or share your data, and there are no third-party trackers.
 - You can delete your account and your data at any time: Settings → Privacy → Delete my data.
 
+## The waitlist
+
+If you join the waitlist on our website (/welcome), we keep only what the form asks: your email, your country, whether you're a student, teacher, parent or other, and your age range. For ages 13–17, we also keep the date you confirmed a parent or guardian said it's OK (people under 13 can't join). We also keep the language of the page you used and the date you joined.
+
+- **Why:** only to tell you about the beta (and, for teachers, when classroom mode is ready). No newsletters or marketing from anyone else.
+- **Email:** once our email is set up, you get one short confirmation (sent through Google's Gmail), with a link to take yourself off the list. We'll write again when there's a spot for you.
+- **The website has no trackers,** no outside fonts and no cookies. To stop spam, it has a hidden field that only bots fill in, and the server limits how often one network address can sign up (the address is used for that briefly and not stored with your entry).
+- **Taking yourself off:** use the link in the email (or on the "You're on the list" screen), or write to us. Your entry is deleted right away. Otherwise we delete the list within 30 days after the beta ends.
+
 ## What stays on your device
 
 Your lessons, XP, streak, badges, practice portfolio, goals, Money Missions (and any notes you write for them), your age range if you choose one, tutor chat, the classes you're in and your invite link are saved in your browser on this device. We can't see them unless you create an account (or join a class, below).

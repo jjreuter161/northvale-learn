@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Northvale Learn — aprende de dinero practicando (beta gratuita)</title>
+    <meta name="description" content="Una app gratuita para mayores de 13 años: lecciones de tres minutos, un planeador de metas y un portafolio con dinero de práctica. En español e inglés, para México y Estados Unidos. Únete a la beta." />
+    <link rel="canonical" href="{{BASE}}/bienvenida" />
+    <link rel="alternate" hreflang="en" href="{{BASE}}/welcome" />
+    <link rel="alternate" hreflang="es" href="{{BASE}}/bienvenida" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Northvale Learn" />
+    <meta property="og:title" content="Northvale Learn — aprende de dinero practicando" />
+    <meta property="og:description" content="Lecciones cortas, un planeador de metas y un portafolio con dinero de práctica. Una beta gratuita para mayores de 13 años, en español e inglés." />
+    <meta property="og:url" content="{{BASE}}/bienvenida" />
+    <meta property="og:image" content="{{BASE}}/og-es.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Northvale Learn: aprende de dinero practicando, con la pantalla de metas de la app" />
+    <meta property="og:locale" content="es_MX" />
+    <meta property="og:locale:alternate" content="en_US" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#13315C" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/icon-180.png" />
+    <link rel="preload" href="/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <style>
+      @font-face { font-family: "Inter"; font-weight: 100 900; font-display: swap; src: url(/fonts/inter-latin-wght-normal.woff2) format("woff2"); }
+      @font-face { font-family: "EB Garamond"; font-weight: 600 700; font-display: swap; src: url(/fonts/eb-garamond-latin-600-normal.woff2) format("woff2"); }
+      :root { --bg: #f6f7f9; --surface: #fff; --surface2: #eef1f5; --ink: #0b1626; --mid: #4b5565; --low: #8a93a3; --line: #e3e7ed; --brand: #13315c; --brandSoft: #e9eef6; --accent: #1e7a5f; --accentSoft: #e6f2ee; --bad: #b42318; --badSoft: #fbecea; --warnSoft: #fbf0e2 }
+      * { box-sizing: border-box }
+      html { scroll-behavior: smooth; -webkit-text-size-adjust: 100% }
+      @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto } }
+      body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.55 Inter, system-ui, -apple-system, "Segoe UI", sans-serif }
+      a { color: var(--brand) }
+      .wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px }
+      header { position: sticky; top: 0; z-index: 5; background: rgba(246, 247, 249, .94); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line) }
+      header .wrap { display: flex; align-items: center; gap: 12px; min-height: 60px; padding-top: env(safe-area-inset-top) }
+      .mark { font-family: "EB Garamond", Georgia, serif; font-weight: 650; font-size: 26px; letter-spacing: -.3px; color: var(--ink); text-decoration: none; line-height: 1 }
+      .mark small { font-family: Inter, sans-serif; font-size: 11px; font-weight: 650; letter-spacing: 2.5px; color: var(--low); margin-left: 6px; vertical-align: 3px }
+      .grow { flex: 1 }
+      .lang { font-size: 15px; font-weight: 600; text-decoration: none; padding: 10px 6px }
+      .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 22px; border-radius: 14px; border: 0; background: var(--brand); color: #fff; font: inherit; font-weight: 650; text-decoration: none; cursor: pointer }
+      .btn.small { min-height: 40px; padding: 0 16px; font-size: 15px; border-radius: 12px }
+      .btn.secondary { background: var(--surface); color: var(--ink); border: 1px solid var(--line) }
+      .btn:disabled { opacity: .45; cursor: default }
+      .btn:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid #2b5cb3; outline-offset: 2px }
+      .pill { display: inline-block; font-size: 14px; font-weight: 650; color: var(--brand); background: var(--brandSoft); border-radius: 999px; padding: 5px 12px }
+      h1 { font-size: clamp(38px, 9vw, 60px); line-height: 1.04; letter-spacing: -1.5px; margin: 16px 0 14px }
+      h2 { font-size: clamp(26px, 5.5vw, 36px); line-height: 1.15; letter-spacing: -.6px; margin: 0 0 12px }
+      h3 { font-size: 19px; margin: 0 0 6px }
+      .lead { font-size: 19px; color: var(--mid); margin: 0 0 22px; max-width: 34em }
+      .fine { font-size: 14px; color: var(--mid) }
+      section { padding: 56px 0; scroll-margin-top: 60px }
+      .hero { display: grid; gap: 28px; align-items: center; padding-top: 36px; padding-bottom: 48px }
+      .hero .ctas { display: flex; flex-wrap: wrap; gap: 12px; align-items: center }
+      .phone { width: min(280px, 72vw); margin: 0 auto; border-radius: 30px; border: 8px solid var(--ink); background: var(--ink); overflow: hidden; box-shadow: 0 18px 40px rgba(11, 22, 38, .18) }
+      .phone img { display: block; width: 100%; height: auto }
+      .cards { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) }
+      .card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 20px }
+      .card p { margin: 0; color: var(--mid); font-size: 16px }
+      .num { display: inline-flex; width: 30px; height: 30px; border-radius: 9px; background: var(--brandSoft); color: var(--brand); font-weight: 750; align-items: center; justify-content: center; margin-bottom: 10px; font-size: 15px }
+      .shots { display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 4px 4px 14px; margin: 0 -4px }
+      .shots figure { flex: 0 0 min(230px, 62vw); margin: 0; scroll-snap-align: start }
+      .shots .phone { width: 100%; border-width: 6px; border-radius: 24px; box-shadow: none }
+      figcaption { font-size: 15px; color: var(--mid); margin-top: 10px; text-align: center }
+      .list { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px }
+      .list li { display: flex; gap: 10px; align-items: flex-start }
+      .list li::before { content: ""; flex: 0 0 8px; height: 8px; border-radius: 4px; background: var(--accent); margin-top: 9px }
+      .band { background: var(--surface); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line) }
+      .note { background: var(--warnSoft); border-radius: 14px; padding: 14px 16px; font-size: 16px }
+      form { display: grid; gap: 14px; max-width: 520px }
+      label.f { display: grid; gap: 6px; font-size: 15px; font-weight: 650; color: var(--mid) }
+      input[type="email"], select { width: 100%; font: inherit; font-size: 16px; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px; min-height: 48px }
+      .check { display: flex; gap: 10px; align-items: flex-start; font-size: 16px; cursor: pointer }
+      .check input { width: 22px; height: 22px; margin: 1px 0 0; accent-color: var(--brand); flex-shrink: 0 }
+      .hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden }
+      .msg { border-radius: 12px; padding: 12px 14px; font-size: 16px; margin: 0 }
+      .msg.bad { background: var(--badSoft); color: var(--bad) }
+      .msg.info { background: var(--brandSoft) }
+      .panel { background: var(--accentSoft); border-radius: 18px; padding: 22px; max-width: 520px }
+      .panel:focus { outline: none }
+      .linkish { background: none; border: 0; padding: 8px 0; font: inherit; font-size: 15px; color: var(--brand); text-decoration: underline; cursor: pointer }
+      footer { padding: 36px 0 calc(40px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); font-size: 15px; color: var(--mid) }
+      footer nav { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 12px }
+      .btn { white-space: nowrap }
+      @media (max-width: 440px) { header .btn { display: none } }
+      [hidden] { display: none !important }
+      @media (min-width: 820px) {
+        .hero { grid-template-columns: 1.2fr .8fr; padding-top: 64px; padding-bottom: 72px }
+        .phone { width: 300px }
+        .shots { overflow: visible; display: grid; grid-template-columns: repeat(4, 1fr) }
+        .shots figure { flex: none }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="wrap">
+        <a class="mark" href="/bienvenida">Northvale<small>LEARN</small></a>
+        <span class="grow"></span>
+        <a class="lang" href="/welcome" hreflang="en" lang="en">English</a>
+        <a class="btn small" href="#join">Únete a la beta</a>
+      </div>
+    </header>
+
+    <main>
+      <div class="wrap hero">
+        <div>
+          <span class="pill">Beta gratuita · México y EE. UU.</span>
+          <h1>Aprende de dinero practicando.</h1>
+          <p class="lead">Northvale Learn es una app para mayores de 13 años. Ponte una meta, aprende lo que se necesita en lecciones de tres minutos y practica con dinero de práctica — en español o en inglés.</p>
+          <div class="ctas">
+            <a class="btn" href="#join">Únete a la beta</a>
+            <a href="/" class="fine">¿Ya tienes invitación? Abre la app</a>
+          </div>
+          <p class="fine" style="margin-top: 18px">Solo educativa — no es asesoría financiera. En la app no se mueve dinero real.</p>
+        </div>
+        <div class="phone"><img src="/shots/es-1.jpg" width="585" height="1170" alt="La pantalla de Inicio de la app: una meta de coche con $13,000 de $60,000 ahorrados, adelantada respecto a su plan mensual" fetchpriority="high" /></div>
+      </div>
+
+      <section class="band" aria-labelledby="how">
+        <div class="wrap">
+          <h2 id="how">Cómo funciona</h2>
+          <p class="lead">Unos minutos al día, en tu celular.</p>
+          <div class="cards">
+            <div class="card"><span class="num">1</span><h3>Ponte una meta</h3><p>Un coche, la universidad, un fondo de emergencia o tu primera inversión. Recibes un plan mensual y ves si vas bien.</p></div>
+            <div class="card"><span class="num">2</span><h3>Aprende en tres minutos</h3><p>59 lecciones cortas en 17 unidades: presupuesto, tu primer sueldo, crédito, fraudes, impuestos, lo básico de invertir y más. Los repasos te traen de vuelta lo que fallaste.</p></div>
+            <div class="card"><span class="num">3</span><h3>Practica con dinero de práctica</h3><p>Un portafolio con $200,000 pesos (o $10,000 dólares) de dinero de práctica. Se desbloquean más opciones conforme aprendes.</p></div>
+            <div class="card"><span class="num">4</span><h3>Pregunta y pruébalo en la vida real</h3><p>Un tutor con IA explica términos y noticias en palabras sencillas, y nunca te dice qué comprar. Las Misiones de dinero son pequeñas tareas de la vida real, como encontrar las comisiones de una cuenta.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="look">
+        <div class="wrap">
+          <h2 id="look">Cómo se ve</h2>
+          <p class="lead">Pantallas reales de la app.</p>
+          <div class="shots">
+            <figure><div class="phone"><img src="/shots/es-1.jpg" width="585" height="1170" loading="lazy" alt="Inicio: una meta de ahorro y su revisión semanal" /></div><figcaption>Tu meta y su plan</figcaption></figure>
+            <figure><div class="phone"><img src="/shots/es-2.jpg" width="585" height="1170" loading="lazy" alt="Una pregunta de una lección sobre qué se paga con impuestos" /></div><figcaption>Una lección de tres minutos</figcaption></figure>
+            <figure><div class="phone"><img src="/shots/es-3.jpg" width="585" height="1170" loading="lazy" alt="El portafolio de práctica: $200,000 de dinero de práctica con un fondo de práctica" /></div><figcaption>El portafolio de práctica</figcaption></figure>
+            <figure><div class="phone"><img src="/shots/es-4.jpg" width="585" height="1170" loading="lazy" alt="Misiones de dinero: la tarea de la vida real de esta semana" /></div><figcaption>Misiones de dinero</figcaption></figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="band" aria-labelledby="who">
+        <div class="wrap">
+          <h2 id="who">Para quién es</h2>
+          <div class="cards">
+            <div class="card"><h3>Adolescentes de 13 a 17</h3><p>Aprende lo básico antes de que el dinero sea de verdad. Para crear una cuenta se necesita el permiso de tu mamá, papá o tutor, y solo compites con otros adolescentes.</p></div>
+            <div class="card"><h3>Jóvenes adultos</h3><p>Primer sueldo, primera tarjeta de crédito, primeras inversiones — sin tecnicismos.</p></div>
+            <div class="card"><h3>Mamás y papás</h3><p>Una forma tranquila de que tus hijos aprendan de dinero: sin dinero real, sin anuncios, sin nada que comprar.</p></div>
+            <div class="card"><h3>Docentes y clubes</h3><p>Viene un modo de clase. <a href="#teachers">Más abajo</a>.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="isnt">
+        <div class="wrap">
+          <h2 id="isnt">Lo que no es</h2>
+          <ul class="list" style="max-width: 640px">
+            <li><span><strong>No es un banco ni una casa de bolsa.</strong> No hay dinero real, ni compras reales, ni conexión con bancos.</span></li>
+            <li><span><strong>No es asesoría.</strong> Las lecciones explican cómo funciona el dinero. Nunca te dicen qué comprar o vender.</span></li>
+            <li><span><strong>Sin anuncios, y nunca vendemos tus datos.</strong> La cuenta es opcional: sin una, tu avance se queda en tu celular.</span></li>
+            <li><span><strong>No está terminada.</strong> Es una beta pequeña, así que habrá cambios. Hay un botón para comentarios en cada pantalla y leemos todo.</span></li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="band" id="teachers" aria-labelledby="teach">
+        <div class="wrap">
+          <h2 id="teach">Para docentes y clubes</h2>
+          <p class="lead" style="margin-bottom: 14px">El modo de clase llegará pronto. Ahora lo estamos probando con algunos docentes.</p>
+          <ul class="list" style="max-width: 640px; margin-bottom: 18px">
+            <li><span>Los estudiantes se unen con un código de clase y un apodo — sin correo.</span></li>
+            <li><span>El docente ve el avance en las lecciones y qué temas se le dificultan al grupo, nunca las metas, cantidades ni notas de sus estudiantes.</span></li>
+            <li><span>Puedes asignar unidades con fecha de entrega. No hay mensajes de ningún tipo.</span></li>
+          </ul>
+          <p class="fine" style="margin: 0 0 16px">Todavía no hay fecha. Únete a la lista de espera como docente y te avisaremos cuando esté listo.</p>
+          <a class="btn secondary" href="#join" data-role="teacher">Unirme como docente</a>
+        </div>
+      </section>
+
+      <section id="join" aria-labelledby="joinh">
+        <div class="wrap">
+          <h2 id="joinh">Únete a la beta</h2>
+          <p class="lead">Déjanos tu correo y te escribiremos cuando haya un lugar para ti. Solo lo usaremos para avisarte de la beta.</p>
+
+          <div id="leave-link" class="panel" hidden tabindex="-1">
+            <h3>¿Salir de la lista de espera?</h3>
+            <p class="fine" style="margin: 0 0 14px">Borraremos tu correo y tus respuestas de la lista.</p>
+            <button class="btn" type="button" id="leave-confirm">Sácame de la lista</button>
+          </div>
+
+          <form id="waitlist" novalidate data-err-email="Escribe un correo real." data-err-age="Northvale Learn es para mayores de 13 años." data-err-guardian="Primero pregúntale a tu mamá, papá o tutor y luego marca la casilla." data-err-country="Elige un país." data-err-role="Elige lo que te describe." data-err-rate="Demasiados registros desde aquí. Intenta de nuevo en una hora." data-err-full="Por ahora la lista de espera está llena." data-err-bad-link="Ese enlace no es válido." data-err-offline="Parece que no tienes conexión. Intenta de nuevo cuando la tengas." data-err-other="Algo salió mal. Intenta de nuevo en un minuto.">
+            <label class="f">Correo<input type="email" id="email" name="email" autocomplete="email" required maxlength="200" /></label>
+            <label class="f">País
+              <select id="country" name="country" required>
+                <option value="" disabled selected>Elige…</option>
+                <option value="MX">México</option>
+                <option value="US">Estados Unidos</option>
+                <option value="other">Otro país</option>
+              </select>
+            </label>
+            <label class="f">Soy…
+              <select id="role" name="role" required>
+                <option value="" disabled selected>Elige…</option>
+                <option value="student">Estudiante</option>
+                <option value="teacher">Docente</option>
+                <option value="parent">Mamá, papá o tutor</option>
+                <option value="other">Otra cosa</option>
+              </select>
+            </label>
+            <label class="f">Edad
+              <select id="age" name="age" required>
+                <option value="" disabled selected>Elige…</option>
+                <option value="under13">Menos de 13</option>
+                <option value="13-17">13–17</option>
+                <option value="18-25">18–25</option>
+                <option value="26+">26 o más</option>
+              </select>
+            </label>
+            <p id="young" class="msg bad" role="alert" hidden>Northvale Learn es para mayores de 13 años, así que no podemos agregarte a la lista. ¡Gracias por tu interés!</p>
+            <div id="teen" hidden>
+              <p class="msg info" style="margin-bottom: 12px">Antes de unirte a la lista, pregúntale a tu mamá, papá o tutor.</p>
+              <label class="check"><input type="checkbox" id="guardian" name="guardian" />Mi mamá, papá o tutor está de acuerdo.</label>
+            </div>
+            <div class="hp" aria-hidden="true"><label>Sitio web <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" /></label></div>
+            <p class="fine" style="margin: 0">Al unirte, aceptas que te escribamos sobre la beta. Consulta el <a href="/?legal=privacy&amp;lang=es">aviso de privacidad</a>.</p>
+            <p id="err" class="msg bad" role="alert" hidden></p>
+            <button class="btn" type="submit" id="submit">Unirme a la lista de espera</button>
+          </form>
+
+          <div id="done" class="panel" hidden tabindex="-1">
+            <h3 id="done-new">Ya estás en la lista.</h3>
+            <h3 id="done-already" hidden>Ya estabas en la lista.</h3>
+            <p style="margin: 0">Te escribiremos cuando haya un lugar para ti.</p>
+            <p id="done-mailed" class="fine" hidden style="margin: 8px 0 0">También te mandamos un correo corto de confirmación.</p>
+            <p id="done-teacher" class="fine" hidden style="margin: 8px 0 0">También te avisaremos cuando el modo de clase esté listo.</p>
+            <button type="button" class="linkish" id="leave-now" hidden>¿Cambiaste de opinión? Sácame de la lista</button>
+          </div>
+          <div id="left" class="panel" hidden tabindex="-1">
+            <h3>Ya saliste de la lista.</h3>
+            <p style="margin: 0">Gracias por tu interés en Northvale Learn.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="wrap">
+        <a class="mark" href="/bienvenida" style="font-size: 22px">Northvale<small>LEARN</small></a>
+        <p style="margin: 12px 0 0; max-width: 46em">Solo educativa — no es asesoría financiera. Todo el dinero en Northvale Learn es de práctica y nada en la app es una recomendación para comprar o vender algo. Antes de decidir con dinero real, platica con una persona adulta de confianza o con un profesional autorizado.</p>
+        <nav aria-label="Más">
+          <a href="/?legal=privacy&amp;lang=es">Aviso de privacidad</a>
+          <a href="/?legal=terms&amp;lang=es">Términos de uso</a>
+          <a href="/welcome" hreflang="en" lang="en">English</a>
+          <a href="/">Abrir la app</a>
+        </nav>
+        <p style="margin: 14px 0 0">© 2026 Northvale Learn · Beta</p>
+      </div>
+    </footer>
+    <script src="/welcome.js" defer></script>
+  </body>
+</html>

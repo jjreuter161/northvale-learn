@@ -52,6 +52,12 @@ export default function App() {
   const [streakOpen, setStreakOpen] = useState(false);
   const [notice, setNotice] = useState(null);
   const [resetToken, setResetToken] = useState(() => (/^#reset=([\w-]{20,})$/.exec(location.hash) || [])[1] || null);
+  // The privacy policy or terms on their own (?legal=privacy&lang=es), for
+  // the landing page's links — the same files the app shows.
+  const [legalPage] = useState(() => {
+    const q = new URLSearchParams(location.search);
+    return ["privacy", "terms", "teacher"].includes(q.get("legal")) ? { doc: q.get("legal"), lang: ["en", "es"].includes(q.get("lang")) ? q.get("lang") : settings.lang } : null;
+  });
   // Opened from a teacher's class link: that comes first, not "welcome back".
   const [classLink] = useState(() => new URLSearchParams(location.search).has("join"));
   const wide = useWide();
@@ -122,6 +128,18 @@ export default function App() {
 
   const look = LOOKS[settings.look] || LOOKS.white;
   const rootStyle = { ...look, background: "var(--bg)", color: "var(--ink)", minHeight: "100dvh", fontFamily: "'Inter', system-ui, sans-serif" };
+
+  if (legalPage) {
+    const lt = makeT({ ...locale, lang: legalPage.lang });
+    return (
+      <div style={rootStyle}>
+        <style>{GLOBAL_CSS}</style>
+        <main lang={legalPage.lang} style={{ maxWidth: 720, margin: "0 auto", padding: "calc(16px + env(safe-area-inset-top)) 18px 40px" }}>
+          <Legal route={{ params: { doc: legalPage.doc, from: "back" } }} locale={{ ...locale, lang: legalPage.lang }} t={lt} go={() => (history.length > 1 ? history.back() : location.assign(legalPage.lang === "es" ? "/bienvenida" : "/welcome"))} />
+        </main>
+      </div>
+    );
+  }
 
   // A password reset link (#reset=…) opens its own page, on any device.
   if (resetToken) {

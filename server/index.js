@@ -11,7 +11,8 @@
 // MAIL_FROM, MAIL_POSTAL_ADDRESS, PUBLIC_URL, CONTACT_EMAIL, NORTHVALE_DATA
 // — see README.
 import http from "node:http";
-import { readFile } from "node:fs/promises";
+import { readFile, stat } from "node:fs/promises";
+import { gzipSync } from "node:zlib";
 import { existsSync } from "node:fs";
 import { join, extname, resolve, sep } from "node:path";
 
@@ -32,6 +33,7 @@ const recap = await import("./recap.js");
 const flags = await import("./flags.js");
 const classes = await import("./classes.js");
 const invites = await import("./invites.js");
+const waitlist = await import("./waitlist.js");
 const { weekXp, weekStart, dayKey } = await import("../src/core/progress.js");
 // Anthropic's SDK loads only when there's a key, so the rest needs nothing installed.
 const ai = process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_AUTH_TOKEN ? await import("./ai.js") : null;
@@ -82,7 +84,17 @@ function tooFast(userId) {
   return false;
 }
 const HOSTS = new Set([`localhost:${PORT}`, `127.0.0.1:${PORT}`, `[::1]:${PORT}`, ...(process.env.ALLOWED_HOSTS || "").split(",").map((h) => h.trim()).filter(Boolean)]);
-const TYPES = { ".woff2": "font/woff2", ".txt": "text/plain; charset=utf-8", ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".map": "application/json", ".json": "application/json", ".webmanifest": "application/manifest+json", ".svg": "image/svg+xml", ".png": "image/png", ".ico": "image/x-icon" };
+const TYPES = { ".woff2": "font/woff2", ".txt": "text/plain; charset=utf-8", ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".map": "application/json", ".json": "application/json", ".webmanifest": "application/manifest+json", ".svg": "image/svg+xml", ".png": "image/png", ".jpg": "image/jpeg", ".ico": "image/x-icon" };
+// Pages by a friendlier address: the admin page and the landing page.
+const PAGES = { "/admin": "/admin.html", "/welcome": "/welcome.html", "/bienvenida": "/bienvenida.html" };
+// The landing pages name their own address in share previews.
+const TEMPLATED = new Set(["welcome.html", "bienvenida.html"]);
+// Text files go out gzipped when the browser accepts it (the app's script
+// shrinks to about a third: much faster on a slow phone). Each file is
+// compressed once and kept until it changes.
+// ponytail: in memory, a handful of files; fine for one server.
+const COMPRESS = new Set([".html", ".js", ".map", ".json", ".webmanifest", ".svg", ".txt", ".css"]);
+const zipped = new Map();
 
 // (The socket can already be gone — e.g. a too-large upload cut short.)
 const https = (req) => (TRUST_PROXY ? req.headers["x-forwarded-proto"] === "https" : !!(req.socket && req.socket.encrypted));
@@ -382,6 +394,9 @@ const routes = {
   "PUT /api/push": { open: true, limit: 8000, run: async (c) => push.save(c.body, c.ip) },
   "DELETE /api/push": { open: true, run: async (c) => push.remove(c.body.id) },
   "POST /api/recap/off": { open: true, run: async (c) => recap.turnOff(c.body.token, c.ip) },
+  // THE WAITLIST (waitlist.js), from the landing page.
+  "POST /api/waitlist": { open: true, run: async (c) => waitlist.join(c.body, c.ip, baseOf(c)) },
+  "POST /api/waitlist/leave": { open: true, run: async (c) => waitlist.leave(c.body.token, c.ip) },
   "POST /api/survey": { open: true, run: async (c) => insights.survey(c.body) },
   "POST /api/feedback": { open: true, limit: 16000, run: async (c) => insights.feedback(c.body, c.user && c.user.id, c.ip) },
   "POST /api/errors": {
@@ -402,7 +417,21 @@ const routes = {
       s.comingBack.push.devicesNow = push.deviceCount();
       s.comingBack.recap.optedIn = store.allUsers().filter((u) => u.recap).length;
       s.comingBack.recap.emailOn = mail.mailMode() !== "off";
-      return { ...s, accounts: store.userCount(), growth: invites.stats(), classroom: classes.stats(), flags: flags.list(), ai: { ...ai, budget: AI_BUDGET, on: aiOpen() }, generatedAt: new Date().toISOString() };
+      return { ...s, accounts: store.userCount(), waitlist: waitlist.summary(), growth: invites.stats(), classroom: classes.stats(), flags: flags.list(), ai: { ...ai, budget: AI_BUDGET, on: aiOpen() }, generatedAt: new Date().toISOString() };
+    },
+  },
+  "POST /api/admin/waitlist/export": {
+    open: true,
+    run: async (c) => {
+      adminOnly(c);
+      return { csv: waitlist.csv() };
+    },
+  },
+  "POST /api/admin/waitlist/delete": {
+    open: true,
+    run: async (c) => {
+      adminOnly(c);
+      return waitlist.remove(c.body.id);
     },
   },
   // Features that are built but off: on for one account, or everyone.
@@ -468,8 +497,21 @@ async function serveFile(req, res, path) {
   const file = resolve(WEB, `.${path === "/" ? "/index.html" : path}`);
   if (!file.startsWith(WEB + sep)) return send(req, res, 404, { error: { message: "Not found" } });
   try {
-    const data = await readFile(file);
-    res.writeHead(200, headers(req, { "Content-Type": TYPES[extname(file)] || "application/octet-stream", "Cache-Control": "no-cache", ...(file.endsWith(".html") ? { "Content-Security-Policy": CSP } : {}) }));
+    let data = await readFile(file);
+    const base = process.env.PUBLIC_URL || `${https(req) ? "https" : "http"}://${req.headers.host}`;
+    const templated = TEMPLATED.has(file.slice(WEB.length + 1));
+    if (templated) data = Buffer.from(String(data).replaceAll("{{BASE}}", base));
+    const gzip = COMPRESS.has(extname(file)) && data.length > 1024 && /\bgzip\b/.test(req.headers["accept-encoding"] || "");
+    if (gzip) {
+      const key = `${file}|${(await stat(file)).mtimeMs}|${templated ? base : ""}`;
+      if (!zipped.has(key)) {
+        for (const k of zipped.keys()) if (k.startsWith(`${file}|`)) zipped.delete(k);
+        zipped.set(key, gzipSync(data));
+      }
+      data = zipped.get(key);
+    }
+    // Screenshots and share images change rarely: a day in the cache.
+    res.writeHead(200, headers(req, { "Content-Type": TYPES[extname(file)] || "application/octet-stream", "Cache-Control": extname(file) === ".jpg" ? "public, max-age=86400" : "no-cache", ...(gzip ? { "Content-Encoding": "gzip", Vary: "Accept-Encoding" } : {}), ...(file.endsWith(".html") ? { "Content-Security-Policy": CSP } : {}) }));
     res.end(data);
   } catch {
     send(req, res, 404, { error: { message: "Not found" } });
@@ -499,7 +541,7 @@ async function handle(req, res) {
     }
     if (!HOSTS.has(req.headers.host)) return send(req, res, 421, { error: { message: "Unknown host" } });
     const url = new URL(req.url, "http://x");
-    if (!url.pathname.startsWith("/api/")) return req.method === "GET" ? serveFile(req, res, url.pathname === "/admin" ? "/admin.html" : url.pathname) : send(req, res, 405, {});
+    if (!url.pathname.startsWith("/api/")) return req.method === "GET" ? serveFile(req, res, PAGES[url.pathname] || url.pathname) : send(req, res, 405, {});
     // A header other sites can't send without asking first (and the server
     // never says yes), so a web page elsewhere can't drive this API.
     if (req.headers["x-northvale"] !== "1") return send(req, res, 403, { error: { message: "Forbidden" } });
