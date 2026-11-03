@@ -10,6 +10,8 @@ import { join } from "node:path";
 import assert from "node:assert/strict";
 import { dayKey, weekStart, addDays } from "../src/core/progress.js";
 
+// Stops a server and waits until it has saved and exited.
+const stop = (p) => new Promise((ok) => (p.exitCode !== null ? ok() : (p.on("exit", ok), p.kill("SIGTERM"))));
 const listen = (handler) => new Promise((resolve) => { const s = createServer(handler).listen(0, "127.0.0.1", () => resolve(s)); });
 const sse = (events) => events.map(([event, data]) => `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`).join("");
 
@@ -60,7 +62,7 @@ const td = await listen((req, res) => {
 
 const port = 20000 + Math.floor(Math.random() * 20000);
 const data = mkdtempSync(join(tmpdir(), "nvlearn-test-"));
-const env = { ...process.env, PORT: String(port), NORTHVALE_DATA: data, ANTHROPIC_API_KEY: "test-key", ANTHROPIC_BASE_URL: `http://127.0.0.1:${claude.address().port}`, TUTOR_DAILY_LIMIT: "3", ADMIN_TOKEN: "test-admin-token-123456789", TWELVEDATA_API_KEY: "test", TWELVEDATA_BASE: `http://127.0.0.1:${td.address().port}`, TWELVEDATA_PER_MINUTE: "50", NEWS_FEEDS: JSON.stringify({ MX: [{ url: `http://127.0.0.1:${feed.address().port}/rss`, source: "Test" }], US: [{ url: `http://127.0.0.1:${feed.address().port}/rss`, source: "Test" }] }), SIGNUP_CODE: "" };
+const env = { ...process.env, NORTHVALE_DOTENV: "0", PORT: String(port), NORTHVALE_DATA: data, ANTHROPIC_API_KEY: "test-key", ANTHROPIC_BASE_URL: `http://127.0.0.1:${claude.address().port}`, TUTOR_DAILY_LIMIT: "3", ADMIN_TOKEN: "test-admin-token-123456789", TWELVEDATA_API_KEY: "test", TWELVEDATA_BASE: `http://127.0.0.1:${td.address().port}`, TWELVEDATA_PER_MINUTE: "50", NEWS_FEEDS: JSON.stringify({ MX: [{ url: `http://127.0.0.1:${feed.address().port}/rss`, source: "Test" }], US: [{ url: `http://127.0.0.1:${feed.address().port}/rss`, source: "Test" }] }), SIGNUP_CODE: "" };
 const server = spawn(process.execPath, [join(import.meta.dirname, "../server/index.js")], { env, stdio: ["ignore", "pipe", "inherit"] });
 let serverOut = "";
 await new Promise((resolve) => server.stdout.on("data", (d) => ((serverOut += d), String(d).includes("Northvale Learn on") && resolve())));
@@ -383,11 +385,31 @@ try {
     assert.equal(h.aiPaused, true);
     console.log("ok: AI pauses for the month once its budget is spent");
   } finally {
-    s2.kill();
+    await stop(s2);
     rmSync(data2, { recursive: true, force: true });
   }
+  // --- a stop signal (a deploy or restart) saves the last changes first ---
+  const data3 = mkdtempSync(join(tmpdir(), "nvlearn-test-"));
+  const start3 = () => {
+    const p = spawn(process.execPath, [join(import.meta.dirname, "../server/index.js")], { env: { ...env, PORT: String(port + 2), NORTHVALE_DATA: data3, ANTHROPIC_API_KEY: "" }, stdio: ["ignore", "pipe", "inherit"] });
+    return new Promise((resolve) => p.stdout.on("data", (d) => String(d).includes("Northvale Learn on") && resolve(p)));
+  };
+  try {
+    const b3 = `http://127.0.0.1:${port + 2}`;
+    let s3 = await start3();
+    const su3 = await fetch(`${b3}/api/auth/signup`, { method: "POST", headers: { "X-Northvale": "1", "Content-Type": "application/json" }, body: JSON.stringify({ email: "last@example.com", password: "a good long password", ageBand: "18-25" }) });
+    assert.equal(su3.status, 200);
+    await stop(s3); // right away: inside the 200 ms save delay
+    s3 = await start3();
+    const in3 = await fetch(`${b3}/api/auth/login`, { method: "POST", headers: { "X-Northvale": "1", "Content-Type": "application/json" }, body: JSON.stringify({ email: "last@example.com", password: "a good long password" }) });
+    assert.equal(in3.status, 200, "the account made just before the stop is still there");
+    await stop(s3);
+    console.log("ok: a stop signal (deploy or restart) saves the last changes before the server exits");
+  } finally {
+    rmSync(data3, { recursive: true, force: true });
+  }
 } finally {
-  server.kill();
+  await stop(server);
   [claude, feed, td].forEach((s) => s.close());
   rmSync(data, { recursive: true, force: true });
 }

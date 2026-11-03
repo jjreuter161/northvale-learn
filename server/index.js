@@ -17,7 +17,9 @@ import { existsSync } from "node:fs";
 import { join, extname, resolve, sep } from "node:path";
 
 const ROOT = join(import.meta.dirname, "..");
-if (existsSync(join(ROOT, ".env"))) process.loadEnvFile(join(ROOT, ".env"));
+// The settings file (tests and demo servers set NORTHVALE_DOTENV=0 so your
+// real keys are never used by them).
+if (process.env.NORTHVALE_DOTENV !== "0" && existsSync(join(ROOT, ".env"))) process.loadEnvFile(join(ROOT, ".env"));
 
 const { store, AGE_BANDS, cleanNickname, backup } = await import("./store.js");
 const insights = await import("./insights.js");
@@ -125,7 +127,7 @@ const xpThisWeek = (state, week) => {
 
 // The API. `open` routes work signed out; the rest need an account.
 const routes = {
-  "GET /api/health": { open: true, run: async (c) => ({ ok: true, ai: aiOpen(), aiPaused: !!ai && !aiOpen(), news: true, passwordReset: mail.mailMode() !== "off", recap: mail.mailMode() !== "off", contact: process.env.CONTACT_EMAIL || null, market: market.marketInfo(), signup: !process.env.SIGNUP_CODE || "code", flags: flags.flagsFor(c.user), user: c.user ? publicUser(c.user) : null }) },
+  "GET /api/health": { open: true, run: async (c) => ({ ok: true, ai: aiOpen(), aiPaused: !!ai && !aiOpen(), news: true, passwordReset: mail.mailMode() !== "off", recap: mail.mailMode() !== "off", contact: process.env.CONTACT_EMAIL || null, market: market.marketInfo(), signup: !process.env.SIGNUP_CODE || "code", flags: flags.flagsFor(c.user), production: process.env.NODE_ENV === "production", user: c.user ? publicUser(c.user) : null }) },
 
   "POST /api/auth/signup": {
     open: true,

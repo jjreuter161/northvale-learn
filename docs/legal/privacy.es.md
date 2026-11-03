@@ -60,7 +60,7 @@ El servidor usa tu dirección IP unos minutos para frenar intentos de adivinar c
 
 ## Quién más trata datos
 
-- **Nuestro proveedor de hospedaje** **[nombre, p. ej. Fly.io, y la región]** opera el servidor y guarda los datos.
+- **Nuestro proveedor de hospedaje** **Fly.io, con servidores en Dallas, Texas (EE. UU.)** opera el servidor y guarda los datos.
 - **Anthropic** responde las preguntas del tutor y escribe los resúmenes de noticias.
 - **Twelve Data** nos envía precios del mercado. Nunca recibe nada sobre ti.
 - **Google (Gmail)** entrega los correos para restablecer contraseña y, si lo activas, el resumen semanal. Recibe tu correo y el mensaje. Nunca enviamos boletines ni publicidad.

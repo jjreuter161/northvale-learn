@@ -45,6 +45,8 @@ addStrings({
   "lessons.wrong.again": S("You'll see this one again at the end.", "Esta la vas a ver otra vez al final."),
   "lessons.do_it": S("Practice", "Práctica"),
   "lessons.done_it": S("Done", "Hecho"),
+  "lessons.action_wait": S("Try it above to continue", "Pruébalo arriba para continuar"),
+  "lessons.action_done": S("Done — continue", "Listo, continuar"),
   "lessons.explain": S("Explain more", "Explícame más"),
   "lessons.complete": S("Lesson complete", "Lección completa"),
   "lessons.xp": S("+{n} XP", "+{n} XP"),
@@ -370,7 +372,7 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
         {step.type === "action" && (
           <>
             <Button full disabled={!actionDone && !!Widget} onClick={advance}>
-              {actionDone ? `${t("lessons.done_it")} ${t("common.continue")}` : Widget ? t("lessons.do_it") : t("common.continue")}
+              {actionDone ? t("lessons.action_done") : Widget ? t("lessons.action_wait") : t("common.continue")}
             </Button>
             {Widget && !actionDone && (
               <Button full kind="ghost" onClick={advance} style={{ marginTop: 4 }}>

@@ -16,7 +16,7 @@ const ROOT = join(import.meta.dirname, "..");
 const OUT = join(ROOT, "web/shots");
 mkdirSync(OUT, { recursive: true });
 const port = 20000 + Math.floor(Math.random() * 20000);
-const env = { ...process.env, PORT: String(port), NORTHVALE_DATA: mkdtempSync(join(tmpdir(), "nvl-landing-")), ANTHROPIC_API_KEY: "", ANTHROPIC_AUTH_TOKEN: "", TWELVEDATA_API_KEY: "", SMTP_USER: "", SMTP_PASS: "", NEWS_FEEDS: JSON.stringify({ US: [], MX: [] }) };
+const env = { ...process.env, NORTHVALE_DOTENV: "0", PORT: String(port), NORTHVALE_DATA: mkdtempSync(join(tmpdir(), "nvl-landing-")), ANTHROPIC_API_KEY: "", ANTHROPIC_AUTH_TOKEN: "", TWELVEDATA_API_KEY: "", SMTP_USER: "", SMTP_PASS: "", NEWS_FEEDS: JSON.stringify({ US: [], MX: [] }) };
 const server = spawn(process.execPath, [join(ROOT, "server/index.js")], { env, stdio: ["ignore", "pipe", "inherit"] });
 await new Promise((r) => server.stdout.on("data", (d) => String(d).includes("Northvale Learn on") && r()));
 const BASE = `http://127.0.0.1:${port}/`;

@@ -113,7 +113,7 @@ addStrings({
   "account.create": S("Create a free account", "Crear cuenta gratis"),
   "account.signin": S("Sign in", "Iniciar sesión"),
   "account.have": S("I already have an account", "Ya tengo cuenta"),
-  "account.new": S("New here? Create an account", "¿Eres nuevo? Crea una cuenta"),
+  "account.new": S("New here? Create an account", "¿Primera vez aquí? Crea una cuenta"),
   "account.why": S("Optional. An account keeps your progress on every device, puts you in the weekly league, and turns on the AI tutor.", "Es opcional. Con una cuenta tu progreso está en todos tus dispositivos, entras a la liga semanal y se activa el tutor con IA."),
   "account.offline": S("Accounts need the Northvale Learn server, which isn't reachable right now. Everything else works on this device.", "Las cuentas necesitan el servidor de Northvale Learn, que no está disponible ahorita. Todo lo demás funciona en este dispositivo."),
   "account.created": S("Account created", "Cuenta creada"),

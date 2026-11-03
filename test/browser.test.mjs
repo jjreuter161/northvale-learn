@@ -33,7 +33,7 @@ const BROKEN = /\{[@$]?[A-Za-z_][^{}]*\}|\bNaN\b|\bundefined\b|\[object Object\]
 
 // The server, on throwaway data, with every outside service off.
 const port = 20000 + Math.floor(Math.random() * 20000);
-const env = { ...process.env, PORT: String(port), NORTHVALE_DATA: mkdtempSync(join(tmpdir(), "nvlearn-browser-")), ANTHROPIC_API_KEY: "", ANTHROPIC_AUTH_TOKEN: "", TWELVEDATA_API_KEY: "", SMTP_USER: "", SMTP_PASS: "", ALERT_WEBHOOK_URL: "", NEWS_FEEDS: JSON.stringify({ US: [], MX: [] }), SIGNUP_CODE: "", ADMIN_TOKEN: "browser-test-admin-token-1234" };
+const env = { ...process.env, NORTHVALE_DOTENV: "0", PORT: String(port), NORTHVALE_DATA: mkdtempSync(join(tmpdir(), "nvlearn-browser-")), ANTHROPIC_API_KEY: "", ANTHROPIC_AUTH_TOKEN: "", TWELVEDATA_API_KEY: "", SMTP_USER: "", SMTP_PASS: "", ALERT_WEBHOOK_URL: "", NEWS_FEEDS: JSON.stringify({ US: [], MX: [] }), SIGNUP_CODE: "", ADMIN_TOKEN: "browser-test-admin-token-1234" };
 const server = spawn(process.execPath, [join(ROOT, "server/index.js")], { env, stdio: ["ignore", "pipe", "inherit"] });
 let serverOut = ""; // emailed links are printed here (no email service)
 await new Promise((resolve) => server.stdout.on("data", (d) => ((serverOut += d), String(d).includes("Northvale Learn on") && resolve())));

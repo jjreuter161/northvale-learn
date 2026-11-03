@@ -36,7 +36,7 @@ addStrings({
   "level.mastered": S("Mastered", "Dominado"),
   "place.title": S("How much do you already know?", "¿Cuánto sabes ya?"),
   "place.sub": S("If you know some basics, a 2-minute check lets you skip what you already know.", "Si ya sabes lo básico, una prueba de 2 minutos te deja saltar lo que ya sabes."),
-  "place.new": S("I'm new to this", "Soy nuevo en esto"),
+  "place.new": S("I'm new to this", "Apenas voy empezando"),
   "place.new.sub": S("Start from the beginning", "Empezar desde el principio"),
   "place.some": S("I already know some basics", "Ya sé algo de lo básico"),
   "place.some.sub": S("Take a 2-minute check", "Hacer una prueba de 2 minutos"),

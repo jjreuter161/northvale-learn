@@ -1,5 +1,7 @@
 # Putting Northvale Learn online for testers
 
+> For launch day, follow [LAUNCH.md](LAUNCH.md): it puts these steps in order, with `npm run preflight` before and the live checks after. This page has the hosting details.
+
 ## Where to host it
 
 The server keeps its data in a file, so it needs a host with a **persistent disk**. That rules out free tiers that wipe the disk on every restart, such as Render's free tier. The options:

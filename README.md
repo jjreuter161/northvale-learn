@@ -50,6 +50,15 @@ npm run dev        # http://localhost:8950
 npm test
 ```
 
+**Going live:** follow **[docs/LAUNCH.md](docs/LAUNCH.md)**. `npm run preflight` checks everything before launch and prints a pass/fail list: the settings (never their values), Haiku and the AI cap, classroom mode off, every test (browser too), git clean with no keys or data in it, and the legal drafts' contact details. Add `-- --quick` to skip the tests.
+
+**Demo data and the preview:**
+
+- `npm run seed:demo` makes the demo people on a running local server (default `http://localhost:8950`; `-- --url …` for another port): Dani (the demo learner, with goals, three weeks of lessons, a streak and a practice fund) and this week's league (Maya, Leo and Ari; Sofía and Teo in the 13–17 league). Running it again resets them. It refuses any other address, a server that says it's production, and a machine set up as the live one. Sign in as `dani@example.test` (the test password is in `scripts/seed-demo.mjs`).
+- `PREVIEW_DIR=/path npm run preview:sync` builds the app and copies it into a preview's own folder (for a preview that can't read this one), keeping that copy's data. It makes the demo people too if they're missing, so an emptied preview folder comes back with one command. Restart the preview server afterwards.
+
+Tests and the demo scripts set `NORTHVALE_DOTENV=0`, so the servers they start never read your real `.env`.
+
 Everything works without keys. To turn on the AI tutor, real prices and reset emails, get the keys (see **[docs/SETUP-KEYS.md](docs/SETUP-KEYS.md)**), then run `npm run setup` and `npm run check-setup`. Keys go only in `.env`, which is never committed and never sent to the app.
 
 | Setting (`.env`) | What it does |
@@ -67,11 +76,13 @@ Everything works without keys. To turn on the AI tutor, real prices and reset em
 | `CONTACT_EMAIL` | Shown to testers who need help, and in the legal pages. Also how browsers' push services can reach you about reminders (or `PUBLIC_URL`). |
 | `MAIL_POSTAL_ADDRESS` | A mailing address for the weekly recap's footer (a P.O. box or virtual mailbox, not a home address). Leave empty until the public launch (docs/COMPLIANCE.md). |
 | `PORT`, `HOST`, `ALLOWED_HOSTS`, `TRUST_PROXY`, `NORTHVALE_DATA` | Server and hosting settings. |
+| `NORTHVALE_DOTENV` | `0` makes the server ignore `.env` (the tests and demo servers use it). |
 
 ## Docs
 
 | Doc | What's in it |
 |---|---|
+| [docs/LAUNCH.md](docs/LAUNCH.md) | **Launch day, in order:** your steps (accounts, keys, `.env`, Fly.io), the builder's steps after "go", the invite messages, the parent note, the one-week questions, and what to watch on `/admin` |
 | [docs/SETUP-KEYS.md](docs/SETUP-KEYS.md) | Getting the Twelve Data and Anthropic keys, AI costs by model, the tutor safety check |
 | [docs/DEPLOY.md](docs/DEPLOY.md) | Hosting recommendation, deploying to Fly.io step by step, backups, alerts, installing on phones |
 | [docs/BETA.md](docs/BETA.md) | Finding 20–50 testers, invite messages (English/Spanish), the one-week plan, what to ask |

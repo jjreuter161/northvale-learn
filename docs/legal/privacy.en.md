@@ -60,7 +60,7 @@ The server uses your IP address for a few minutes to stop password-guessing and 
 
 ## Who else processes data
 
-- **Our hosting provider** **[name, e.g. Fly.io, and the region]** runs the server and stores the data.
+- **Our hosting provider** **Fly.io, with servers in Dallas, Texas (US)** runs the server and stores the data.
 - **Anthropic** answers tutor questions and writes the news summaries.
 - **Twelve Data** sends us market prices. It never receives anything about you.
 - **Google (Gmail)** delivers password reset emails and, if you turn it on, the weekly recap. It receives your email address and the email. We never send newsletters or marketing.

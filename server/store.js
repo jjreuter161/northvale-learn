@@ -29,6 +29,9 @@ export function flush() {
   renameSync(`${FILE}.tmp`, FILE);
 }
 process.on("exit", flush);
+// A stop signal (a deploy, a restart, Ctrl-C) saves first: otherwise the
+// last 200 ms of changes would be lost.
+for (const [sig, code] of [["SIGTERM", 143], ["SIGINT", 130]]) process.on(sig, () => process.exit(code));
 
 // BACKUPS — once a day, a copy of the data file in backups/ (the last 14
 // days are kept). On a host, also turn on its disk snapshots (README).
