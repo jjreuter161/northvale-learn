@@ -410,6 +410,34 @@ try {
     console.log("ok: the everyone league keeps 13–17 and 18+ apart");
   }
 
+  // --- signing in on a new device keeps the account's progress ---
+  {
+    const cookie = await account({ email: "kim@example.test", nickname: "Kim", ageBand: "18-25" });
+    const saved = learner({ ageBand: "18-25", nickname: "Kim" }, { xp: 300, lessons: Object.fromEntries(ALL_LESSONS.slice(0, 6).map((l) => [l.id, { done: true, at: day(-3), last: day(-3), best: 0, times: 1 }])), counters: { lessons: 6 } }, { goals: { goals: [newGoal({ id: "k1", templateId: "travel", name: "Kim's trip", target: 1500, months: 12, today: day(-20) })] } });
+    await fetch(`${BASE}api/progress`, { method: "PUT", headers: { "X-Northvale": "1", "Content-Type": "application/json", Cookie: cookie }, body: JSON.stringify({ state: { ...saved, updatedAt: Date.now() - 864e5 }, updatedAt: Date.now() - 864e5 }) });
+    // A fresh phone: onboarding and a first lesson (so this copy is newer), then sign in.
+    const app = await open();
+    const { page, button, menu } = app;
+    await button("Get started").click();
+    await button(/^Save for something/).click();
+    await button(/^Car/).click();
+    await button("Continue").click();
+    await button(/^I'm new to this/).click();
+    await button(/^10 minutes a day/).click();
+    await play(app);
+    await button("Done", app.top()).click();
+    await menu("Settings");
+    await button("I already have an account").click();
+    await page.getByLabel("Email", { exact: true }).fill("kim@example.test");
+    await page.getByLabel("Password", { exact: true }).fill("a long enough password");
+    await button("Sign in").click();
+    await page.waitForFunction(() => JSON.parse(localStorage.getItem("northvale-learn-v1")).progress.xp === 300);
+    await menu("Home");
+    await page.getByText("Kim's trip").first().waitFor();
+    console.log("ok: signing in on a fresh device keeps the account's progress (the device's newer, emptier copy doesn't overwrite it)");
+    await app.close();
+  }
+
   // --- share cards: no names or amounts unless an adult turns them on for that card ---
   for (const ageBand of ["18-25", "13-17"]) {
     const app = await open(learner({ ageBand }, {}, { goals: { goals: [newGoal({ id: "g1", templateId: "car", name: "Secret Car Fund", target: 5000, start: 1234, months: 24, today: day(-10) })] } }));

@@ -40,11 +40,19 @@ const refreshFlags = () => api("/api/health").then((h) => set({ flags: h.flags |
 // Server copy newer → take it (keeping this device's look); otherwise
 // send ours. What's sent includes a few words about what's next, for the
 // weekly email (snapshot.js).
-async function pull() {
+// Signing in on a device is different from a device that's already signed
+// in: the device may have a fresh, almost empty copy (just went through
+// onboarding) that's newer than the account's real progress. So when
+// signing in, the account's copy wins unless this device has learned more
+// (more XP); afterwards, the newer copy wins.
+// ponytail: XP decides, no merge — a device's own goals are dropped if the
+// account has learned more; merge per section if testers hit that.
+async function pull({ signingIn = false } = {}) {
   try {
     const r = await api("/api/progress");
     const local = getState();
-    if (r.state && r.updatedAt > (local.updatedAt || 0)) replaceState({ ...r.state, settings: { ...r.state.settings, look: local.settings.look } });
+    const serverWins = r.state && (signingIn ? ((r.state.progress && r.state.progress.xp) || 0) >= (local.progress.xp || 0) : r.updatedAt > (local.updatedAt || 0));
+    if (serverWins) replaceState({ ...r.state, settings: { ...r.state.settings, look: local.settings.look } });
     else await push();
   } catch {
     // Offline for now; the next change tries again.
@@ -77,7 +85,7 @@ export async function signIn({ email, password }) {
   const r = await api("/api/auth/login", { method: "POST", body: { email, password } });
   set({ user: r.user });
   refreshFlags();
-  await pull();
+  await pull({ signingIn: true });
   adoptAge(r.user);
   return r.user;
 }
@@ -90,7 +98,7 @@ export async function resetPassword(token, password) {
   const r = await api("/api/auth/reset", { method: "POST", body: { token, password } });
   set({ user: r.user });
   refreshFlags();
-  await pull();
+  await pull({ signingIn: true });
   adoptAge(r.user);
   return r.user;
 }
