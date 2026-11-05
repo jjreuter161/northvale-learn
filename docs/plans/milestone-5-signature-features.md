@@ -63,6 +63,13 @@ Browser tests for every new feature (including the simulator's math, the remitta
 
 ---
 
+## Agreed (2026-11-05, the advisor and you)
+
+- **"Explain this" ships text-only first.** Photos come only after a lawyer review.
+- **Certificates never show a real name for anyone 13–17.**
+- **A short one-year simulator comes first,** to test with testers before the full multi-year game.
+- **Competitor claims are checked against the competitors' own websites,** not blog round-ups.
+
 ## Things to settle in Step 1 (first notes)
 
 - **"Explain this" with photos.**
