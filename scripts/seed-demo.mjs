@@ -58,7 +58,7 @@ const state = ({ nickname, ageBand, avatar, lang, region }, progress, modules = 
 });
 
 // Dani, three weeks in.
-function dani(today) {
+export function daniState(today) {
   const d = (n) => addDays(today, n);
   const units = ["budget", "save", "banking", "paycheck", "credit", "compound"];
   const done = ALL_LESSONS.filter((l) => units.includes(l.unit));
@@ -112,7 +112,7 @@ export async function hasDemo(base) {
 export async function seedDemo(base) {
   await checkSafe(base);
   const today = dayKey();
-  const people = [{ ...DANI, s: dani(today) }, ...LEAGUE.map((p) => ({ ...p, s: state(p, { xp: p.xp * 4, days: { [today]: p.xp }, lessonDays: [today] }) }))];
+  const people = [{ ...DANI, s: daniState(today) }, ...LEAGUE.map((p) => ({ ...p, s: state(p, { xp: p.xp * 4, days: { [today]: p.xp }, lessonDays: [today] }) }))];
   for (const p of people) {
     const cookie = await session(base, p);
     await api(base, "/api/me", { method: "PATCH", body: { nickname: p.nickname, avatar: p.avatar, league: "everyone" }, cookie });
