@@ -133,6 +133,17 @@ A **Voice** section in `docs/CONTENT-STYLE.md`:
    - A middle path: launch to testers now and build 4.5 during their first week. Step 2 doesn't change saved data, and testers could then react to it.
    - The advisor said that if you have to choose, choose launching.
 
+## Approved (2026-11-10)
+
+The plan is approved with all the pushbacks. The 7 decisions went with the recommendations:
+1. Mastering a concept: a quiet line on the finish screen, not full-screen.
+2. Vibration: on by default where phones allow it (Android), with a switch to turn it off.
+3. Myth or Fact: +2 XP toward the daily goal; it doesn't keep the streak.
+4. The real cost: in Practice, alternating everyday choices with hidden costs (interest, fees, subscriptions).
+5. Every lesson gets a third question, so each has at least 3 question types.
+6. Real-life choice: a reasonable option counts as right for mastery.
+7. Timing: launch first. Milestone 4.5 is built on the `milestone-4.5` branch and isn't merged or deployed during the testers' first week; what to merge is decided after reading their feedback.
+
 ## When Step 1 is approved
 
 Steps 2 to 5 in order, committing after each. Then browser tests for each new type and feature in both languages, the first-five-minutes check again, `npm run preflight` three times in a row, before-and-after screenshots, a short recording of the finish moment, and the decisions that come up along the way.
