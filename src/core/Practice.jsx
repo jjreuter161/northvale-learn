@@ -19,7 +19,7 @@ addStrings({
   "practice.locked.body": S("Practice investing with {cash} of pretend money, plus Money Missions, calculators and news.", "Practica invertir con {cash} de dinero de práctica, además de Misiones de dinero, calculadoras y noticias."),
   "practice.locked.n": S("{n} of 3 lessons", "{n} de 3 lecciones"),
   "practice.locked.go": S("Continue learning", "Seguir aprendiendo"),
-  "practice.fine": S("New tools appear here as you finish the lessons that use them.", "Las herramientas nuevas aparecen aquí al terminar las lecciones que las usan."),
+  "practice.fine": S("New tools show up here as you finish the lessons that use them.", "Las herramientas nuevas aparecen aquí al terminar las lecciones que las usan."),
   "practice.intro.title": S("New: Practice", "Nuevo: Práctica"),
   "practice.intro.body": S("You've finished 3 lessons, so Money Missions are open: small real-life tasks, like finding the fees on a bank account. You do them on your own; no money moves.", "Terminaste 3 lecciones, así que ya están abiertas las Misiones de dinero: pequeñas tareas de la vida real, como encontrar las comisiones de una cuenta. Las haces por tu cuenta; no se mueve dinero."),
   "practice.intro.more": S("The practice portfolio opens with the investing lessons, and News after 5 lessons.", "El portafolio de práctica se abre con las lecciones de inversión, y las noticias después de 5 lecciones."),

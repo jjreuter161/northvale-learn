@@ -21,8 +21,8 @@ addStrings({
   "fb.placeholder": S("Tell us in a sentence or two…", "Cuéntanos en una o dos frases…"),
   "fb.private": S("Don't include your name, email or anything private.", "No incluyas tu nombre, correo ni nada privado."),
   "fb.send": S("Send", "Enviar"),
-  "fb.thanks": S("Thanks — we got it.", "Gracias, lo recibimos."),
-  "fb.queued": S("Saved — it'll send when you're back online.", "Guardado: se enviará cuando vuelvas a tener conexión."),
+  "fb.thanks": S("Got it, thank you. We read every one.", "Recibido, gracias. Leemos todos."),
+  "fb.queued": S("Saved. It'll send when you're back online.", "Guardado. Se enviará cuando vuelvas a tener conexión."),
   "fb.about": S("About: {what}", "Sobre: {what}"),
   "survey.title": S("Quick question", "Una pregunta rápida"),
   "survey.q": S("How would you feel if you could no longer use Northvale?", "¿Cómo te sentirías si ya no pudieras usar Northvale?"),
@@ -32,7 +32,7 @@ addStrings({
   "survey.why": S("What's the main reason? (optional)", "¿Cuál es la razón principal? (opcional)"),
   "survey.send": S("Send", "Enviar"),
   "survey.skip": S("Not now", "Ahora no"),
-  "survey.thanks": S("Thank you — this helps a lot.", "Gracias, esto ayuda mucho."),
+  "survey.thanks": S("Thank you. This genuinely shapes what we build next.", "Gracias. Esto de verdad define lo que hacemos después."),
 });
 
 const DEFAULTS = { pending: [], survey: null };

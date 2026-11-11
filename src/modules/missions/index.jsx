@@ -29,7 +29,7 @@ addStrings({
   "mi.mark": S("Mark done", "Marcar como hecha"),
   "mi.stop": S("Stop this mission", "Dejar esta misión"),
   "mi.week_done": S("Mission done this week", "Misión de la semana cumplida"),
-  "mi.week_done.sub": S("A new one is suggested on Monday.", "El lunes te sugerimos otra."),
+  "mi.week_done.sub": S("Enjoy the rest of the week. A new one shows up on Monday.", "Disfruta el resto de la semana. El lunes aparece una nueva."),
   "mi.do_another": S("Do another", "Hacer otra"),
   "mi.all": S("More missions", "Más misiones"),
   "mi.done": S("Done", "Hechas"),

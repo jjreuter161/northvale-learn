@@ -8,26 +8,52 @@ People aged 15–25, many of them earning for the first time, in the US and Mexi
 
 ## Voice
 
-- **Calm, plain and respectful.**
-  - Like a good older cousin who works in finance: direct, warm, never cute.
-  - No exclamation marks in teaching text. No emoji.
-  - No slang that will date ("lit", "no cap").
+**A great teacher with a sense of humor.** Confident, warm, a little witty; never childish, never cute, never sarcastic about money problems. We respect people with little money: no lectures, no guilt, no "just stop buying coffee".
+
+- **Calm and plain.** Like a good older cousin who works in finance: direct and kind.
+- **A wit budget:** at most one light line per screen.
+  - Wit is a raised eyebrow, not a joke: "You're first in this week's league, which is easy when you're the only one."
+  - **No wit at all** on scams, debt, money stress, losses, errors that cost the learner something, or anything about someone's family or income.
+- No exclamation marks in teaching text. No emoji. No slang that will date ("lit", "no cap").
 - **Second person, present tense.** "Your employer withholds…", not "One's employer…".
 - **Spanish:**
   - informal Mexican "tú" throughout;
   - natural Mexican terms where they exist (gastos hormiga, aguinaldo, recibo de nómina);
-  - not a word-for-word translation of the English.
+  - written in Spanish, not translated: a line that's witty in English gets its own Spanish line, or a plain one;
+  - gender-neutral where it's easy ("no hay nadie más", not "eres el único").
 - **Reading level:** about grade 7–8.
   - Short sentences: aim for under 20 words.
   - One idea per sentence.
   - Every technical term is defined the first time it appears, in plain words.
 
+## The small text (buttons, empty screens, finishes, reminders, errors)
+
+- **Empty screens point somewhere.** Say what's missing and the one useful next step.
+  - Not "Set a goal".
+  - Instead: "No goal yet. Most people start with an emergency fund. It's the one that saves you from everything else."
+- **Errors are plain and reassuring.** What happened, what to do, and that nothing was lost (when that's true).
+  - Not "Something went wrong."
+  - Instead: "That didn't go through. Check your connection and try again. Nothing you did was lost."
+- **Finishes are calm.** A number, one sentence, the next step. No confetti words ("Amazing!!", "Crushing it").
+- **Reminders invite; they never guilt-trip.** No "you'll lose", no countdowns, no exclamation marks.
+  - "Your 12-day streak is still on. One 3-minute lesson keeps it that way."
+- **Buttons are verbs that say what happens:** "Start mission", "Make a plan", "Leave", not "OK" or "Submit".
+- **Texts the tests check word for word stay put.** Change them only together with the test.
+
 ## Lesson shape
 
-- **3–5 minutes.** The validator estimates this from word count, questions and the action. Most lessons have:
+- **3–4.5 minutes.** The validator estimates this from word count, questions and the action. Most lessons have:
   - 2 cards: one idea each, about 40–70 words per card;
-  - 1 multiple-choice question with 3 options;
-  - 1 true/false question;
+  - 3 questions of **at least 3 different kinds**:
+    - multiple choice;
+    - true/false;
+    - put in order;
+    - estimate;
+    - match;
+    - work it out;
+    - spot the problem;
+    - real-life choice.
+    The formats are in `units/helpers.js`. Pick the kind that fits the idea: rankings → put in order, calculations → work it out, trade-offs → real-life choice, a realistic text or statement → spot the problem;
   - 1 action at the end, so the learner does something:
     - a tool in the goal simulator;
     - the practice portfolio.
@@ -37,6 +63,7 @@ People aged 15–25, many of them earning for the first time, in the US and Mexi
   - explains the right answer in 1–2 sentences (`why`);
   - for multiple choice, says in 1–2 sentences why each wrong option is wrong (`miss`). Don't just repeat the right answer; explain the specific mistake that option represents.
 - **Wrong options are plausible mistakes**, not jokes. One obviously silly option per question is the most you should use.
+- **Every lesson has an "In real life" line** (`life`): one concrete thing to do this week, shown when the lesson is finished.
 - **Every concept has** another way to explain it (`explain`), an easier true/false (`easy`) and a harder multiple-choice (`challenge`).
 
 ## Numbers

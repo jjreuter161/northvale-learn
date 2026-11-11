@@ -53,7 +53,7 @@ addStrings({
   "cls.progress": S("{done} of {of} lessons", "{done} de {of} lecciones"),
   "cls.start": S("Start", "Empezar"),
   "cls.finished": S("Finished", "Terminada"),
-  "cls.assigned.none": S("No assignments right now.", "Por ahora no hay tareas."),
+  "cls.assigned.none": S("No assignments right now. Enjoy it.", "No hay tareas por ahora. Disfrútalo."),
   "cls.board": S("Class leaderboard", "Tabla de la clase"),
   "cls.board.show": S("Show me on the class leaderboard", "Mostrarme en la tabla de la clase"),
   "cls.board.hidden": S("Your row is hidden: only you see it.", "Tu fila está oculta: solo tú la ves."),

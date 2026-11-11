@@ -26,7 +26,7 @@ addStrings({
   "news.read_done": S("Read", "Leída"),
   "news.no_summary": S("Plain-words summaries appear here once the server's AI is turned on. For now: today's headlines and their sources.", "Los resúmenes en palabras sencillas aparecen aquí cuando el servidor tenga la IA activada. Por ahora: los titulares de hoy y sus fuentes."),
   "news.offline": S("News needs the Northvale Learn server, which isn't reachable right now.", "Las noticias necesitan el servidor de Northvale Learn, que no está disponible ahorita."),
-  "news.empty": S("No headlines right now. Check back later.", "No hay titulares ahorita. Vuelve más tarde."),
+  "news.empty": S("Quiet day: no headlines right now. Check back later.", "Día tranquilo: no hay titulares por ahora. Vuelve más tarde."),
   "news.loading": S("Loading today's headlines…", "Cargando los titulares de hoy…"),
   "news.disclaimer": S("Summaries are written by AI to explain the news simply — they can miss details, and they're not advice. Headlines link to the original publisher.", "Los resúmenes los escribe una IA para explicar la noticia de forma sencilla: pueden omitir detalles y no son recomendaciones. Los titulares llevan a la fuente original."),
   "news.from": S("From {source}", "De {source}"),
