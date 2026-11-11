@@ -1,5 +1,5 @@
 // UNIT — Your first paycheck. Its lessons and the concepts they teach (format in helpers.js).
-import { T, card, choice, tf, act, concept, match, number, spot, tap } from "./helpers.js";
+import { T, card, choice, tf, act, concept, match, number, spot, tap, order } from "./helpers.js";
 
 export default {
   id: "paycheck",
@@ -76,14 +76,7 @@ export default {
       steps: [
         card(T("The number on the offer", "El número de la oferta"), T("When a job says \"{$15|60} an hour\" or \"{$2000|9000} a month\", that's gross pay: before anything is taken out. It's the starting point, not what you'll get.", "Cuando un trabajo dice \"{$15|60} la hora\" o \"{$2000|9000} al mes\", eso es el sueldo bruto: antes de cualquier descuento. Es el punto de partida, no lo que vas a recibir.")),
         card(T("The number in your account", "El número en tu cuenta"), T("Net pay is what arrives after taxes and deductions. Build your budget on net pay — that's the money you actually have.", "El sueldo neto es lo que llega después de impuestos y descuentos. Arma tu presupuesto con el neto: es el dinero que de verdad tienes.")),
-        choice(
-          "gross_net",
-          T("Which number should your budget start from?", "¿Con qué número debería empezar tu presupuesto?"),
-          [T("Net pay — what actually reaches you", "El neto: lo que de verdad te llega"), T("Gross pay — what's on the offer", "El bruto: lo que dice la oferta"), T("Gross pay plus your next raise", "El bruto más tu siguiente aumento")],
-          0,
-          T("You can only spend and save what actually arrives.", "Solo puedes gastar y ahorrar lo que de verdad llega."),
-          [null, T("Part of gross pay never reaches you, so planning with it overspends.", "Una parte del bruto nunca te llega, así que planear con él te hace gastar de más."), T("Counting money you don't have yet is how budgets break.", "Contar dinero que todavía no tienes es como se rompen los presupuestos.")]
-        ),
+        order("gross_net", T("Order these from biggest to smallest.", "Ordena de mayor a menor."), [T("Gross pay: the number on the offer", "Sueldo bruto: el número de la oferta"), T("Net pay: what reaches your account", "Sueldo neto: lo que llega a tu cuenta"), T("Spending money: net pay after you save", "Dinero para gastar: el neto después de ahorrar")], T("Your budget starts from net pay, the money you actually get, not the gross on the offer.", "Tu presupuesto empieza con el sueldo neto, el dinero que de verdad recibes, no con el bruto de la oferta.")),
         tf("gross_net", T("Gross pay is usually bigger than net pay.", "El sueldo bruto suele ser mayor que el neto."), true, T("Deductions come out of gross to give you net.", "Los descuentos salen del bruto para dar el neto.")),
         number("gross_net", T("Your job offer says {$15|80} an hour, 20 hours a week. What's your gross pay for one week?", "Tu oferta de trabajo dice {$15|80} la hora, 20 horas a la semana. ¿Cuál es tu sueldo bruto de una semana?"), { unit: "money", answer: [300, 1600] }, [T("Gross is before anything comes out: {$15|80} × 20 hours.", "El bruto es antes de que te descuenten nada: {$15|80} × 20 horas."), T("That's {$300|1600}. Your net pay, after taxes, will be less.", "Son {$300|1600}. Tu sueldo neto, después de impuestos, será menor.")]),
         act("goals.paycheck", T("Move the gross pay and see what you'd take home.", "Mueve el sueldo bruto y mira cuánto te llegaría."), { gross: [1600, 12000] }),
@@ -137,7 +130,7 @@ export default {
           T("YTD columns add up everything since January.", "Las columnas YTD suman todo desde enero.", { en: "Percepciones are everything you earned; deducciones are what was taken out.", es: "Las percepciones son todo lo que ganaste; las deducciones, lo que te descontaron." }),
           [null, T("A refund, if any, comes after you file your taxes — not on a pay stub.", "Una devolución, si hay, llega después de declarar, no en el recibo de pago.", { en: "That's the \"deducciones\" part.", es: "Eso es la parte de deducciones." }), T("It's an amount, not a signature.", "Es un monto, no una firma.", { en: "It's a list of amounts, not notes.", es: "Es una lista de montos, no notas." })]
         ),
-        tf("pay_stub", T("Your pay stub can be used as proof of income.", "Tu recibo de pago sirve como comprobante de ingresos."), true, T("Landlords and lenders often ask for recent pay stubs.", "Arrendadores y prestamistas suelen pedir recibos recientes.")),
+        number("pay_stub", T("Your stub: gross $480, federal tax $38, Social Security $30, Medicare $7, state tax $14. What's your net pay?", "Tu recibo: bruto $480, impuesto federal $38, Seguro Social $30, Medicare $7, impuesto estatal $14. ¿Cuál es tu sueldo neto?", { en: "Your payslip: gross $2,700, ISR $230, IMSS $70. What's your net pay?", es: "Tu recibo: bruto $2,700, ISR $230, IMSS $70. ¿Cuál es tu sueldo neto?" }), { unit: "money", answer: [391, 2400] }, [T("Add what comes out: $38 + $30 + $7 + $14 = $89.", "Suma los descuentos: $38 + $30 + $7 + $14 = $89.", { en: "Add what comes out: $230 + $70 = $300.", es: "Suma los descuentos: $230 + $70 = $300." }), T("$480 − $89 = $391 reaches your account.", "$480 − $89 = $391 llegan a tu cuenta.", { en: "$2,700 − $300 = $2,400 reaches your account.", es: "$2,700 − $300 = $2,400 llegan a tu cuenta." })]),
         spot(
           "pay_stub",
           T("You worked 36 hours at {$16|90} an hour. Tap the 2 lines on this pay stub that are wrong.", "Trabajaste 36 horas a {$16|90} la hora. Toca las 2 líneas de este recibo que están mal."),

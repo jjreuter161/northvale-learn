@@ -1,5 +1,5 @@
 // UNIT — Reading financial news. Its lessons and the concepts they teach (format in helpers.js).
-import { T, card, choice, tf, act, concept, estimate, match, scenario, fit } from "./helpers.js";
+import { T, card, choice, tf, act, concept, estimate, match, scenario, fit, order, number } from "./helpers.js";
 
 export default {
   id: "news",
@@ -64,7 +64,7 @@ export default {
           T("Bear = down 20%+. Scary headline, normal event — it has happened many times before.", "Bajista = 20% abajo o más. Titular que asusta, evento normal: ha pasado muchas veces."),
           [null, T("A record high is the opposite — that's bull territory.", "Un máximo histórico es lo contrario: eso es territorio alcista."), T("A bear market is about falling prices, not trading hours.", "Un mercado bajista se trata de precios que caen, no de horarios.")]
         ),
-        tf("news_reactions", T("A scary headline is a reason to sell everything.", "Un titular que da miedo es razón para vender todo."), false, T("Headlines are written to grab attention. Your plan should be built for bad days too.", "Los titulares están hechos para llamar la atención. Tu plan debe estar hecho también para los días malos.")),
+        number("market_terms", T("“Stocks PLUNGE!” The index fell from 5,000 to 4,850. By what percent did it fall?", "“¡Se DESPLOMAN las acciones!” El índice bajó de 5,000 a 4,850. ¿Qué porcentaje bajó?"), { unit: "percent", answer: 3 }, [T("It fell 150 points.", "Bajó 150 puntos."), T("150 ÷ 5,000 = 3%. A normal bad day sounds a lot scarier in a headline.", "150 ÷ 5,000 = 3%. Un día malo normal suena mucho peor en un titular.")]),
         match(
           "market_terms",
           T("Match each headline word to what it means.", "Une cada palabra de los titulares con lo que significa."),
@@ -85,14 +85,7 @@ export default {
       steps: [
         card(T("Inflation", "Inflación"), T("Inflation means prices rise over time, so each dollar buys a bit less. The US central bank aims for about {@fedInflationTarget} a year.", "La inflación significa que los precios suben con el tiempo, así que cada peso compra un poco menos. El banco central de EE. UU. busca alrededor de {@fedInflationTarget} al año.", { en: "Inflation means prices rise over time, so each peso buys a bit less. Mexico's central bank, Banxico, aims for about {@banxicoInflationTarget} a year.", es: "La inflación significa que los precios suben con el tiempo, así que cada peso compra un poco menos. Banxico, el banco central de México, busca alrededor de {@banxicoInflationTarget} al año." })),
         card(T("Why rates matter", "Por qué importan las tasas"), T("To fight high inflation, the Federal Reserve (the Fed) raises interest rates. Loans get pricier and savings pay more. When it cuts rates, the opposite happens.", "Para frenar la inflación alta, la Reserva Federal (la Fed) sube las tasas de interés. Los préstamos se encarecen y el ahorro paga más. Cuando las baja, pasa lo contrario.", { en: "To fight high inflation, Banxico raises its interest rate. Loans get pricier and CETES pay more. When it cuts rates, the opposite happens.", es: "Para frenar la inflación alta, Banxico sube su tasa de interés. Los préstamos se encarecen y los CETES pagan más. Cuando la baja, pasa lo contrario." })),
-        choice(
-          "inflation_rates",
-          T("The central bank raises interest rates. What usually happens?", "El banco central sube las tasas de interés. ¿Qué suele pasar?"),
-          [T("Borrowing gets more expensive", "Pedir prestado se vuelve más caro"), T("Everything gets cheaper right away", "Todo se abarata al instante"), T("Savings accounts pay less", "Las cuentas de ahorro pagan menos")],
-          0,
-          T("Higher rates = pricier loans, and usually better rates on savings.", "Tasas más altas = préstamos más caros, y normalmente mejores rendimientos para el ahorro."),
-          [null, T("Higher rates can slow price rises over time, but prices don't drop right away.", "Tasas más altas pueden frenar la subida de precios con el tiempo, pero los precios no bajan de inmediato."), T("It's usually the opposite: savings rates tend to rise when the central bank's rate goes up.", "Suele ser lo contrario: las tasas de ahorro tienden a subir cuando sube la tasa del banco central.")]
-        ),
+        order("inflation_rates", T("Put the chain in order: what usually follows a rate rise.", "Ordena la cadena: lo que suele pasar después de una subida de tasas."), [T("The central bank raises interest rates", "El banco central sube las tasas de interés"), T("Loans and credit cards get more expensive", "Los préstamos y las tarjetas se encarecen"), T("People and companies borrow and spend less", "Las personas y las empresas piden prestado y gastan menos"), T("Prices rise more slowly", "Los precios suben más despacio")], T("Higher rates cool borrowing and spending, which slows inflation. Savings accounts usually pay more, too.", "Las tasas más altas enfrían el crédito y el gasto, y eso frena la inflación. Las cuentas de ahorro también suelen pagar más.")),
         tf("inflation_rates", T("If your savings earn less than inflation, your money loses buying power.", "Si tu ahorro gana menos que la inflación, tu dinero pierde poder de compra."), true, T("Earning 1% while prices rise 4% means you can buy less next year.", "Ganar 1% mientras los precios suben 4% significa que el próximo año puedes comprar menos.")),
         estimate("inflation_rates", T("If prices rise 3% a year, about what will {$100|1000} of groceries cost in 10 years?", "Si los precios suben 3% al año, ¿cuánto costará más o menos en 10 años el súper que hoy cuesta {$100|1000}?"), { unit: "money", min: [100, 1000], max: [300, 3000], step: [1, 10], answer: [134, 1340], tol: 0.1 }, T("Prices compound too: {$100|1000} × 1.03 ten times is about {$134|1340}. That's why savings need to earn something.", "Los precios también se componen: {$100|1000} × 1.03 diez veces son unos {$134|1340}. Por eso el ahorro tiene que ganar algo.")),
         act("portfolio.review", T("Check how your practice portfolio did since you started.", "Revisa cómo le ha ido a tu portafolio de práctica desde que empezaste."), {}),

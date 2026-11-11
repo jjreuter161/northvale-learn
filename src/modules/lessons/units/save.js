@@ -1,5 +1,5 @@
 // UNIT — Saving. Its lessons and the concepts they teach (format in helpers.js).
-import { T, card, choice, tf, act, concept, order, match, number } from "./helpers.js";
+import { T, card, choice, tf, act, concept, order, match, number, scenario, fit } from "./helpers.js";
 
 export default {
   id: "save",
@@ -64,7 +64,7 @@ export default {
           T("Savings come off the top, like a bill you owe to future-you.", "El ahorro sale primero, como un pago que le debes a tu yo del futuro."),
           [T("A treat is spending, not saving. Here, \"yourself\" means future-you's savings.", "Darte un gusto es gastar, no ahorrar. Aquí, \"tú\" es tu yo del futuro y su ahorro."), null, T("Paying people back matters, but this idea is about savings coming out first.", "Pagar lo que debes importa, pero esta idea trata de que el ahorro salga primero.")]
         ),
-        tf("pay_yourself_first", T("Saving a small amount every week is pointless.", "Ahorrar poquito cada semana no sirve de nada."), false, T("Small and steady wins. The habit matters more than the amount at first — and the amount can grow later.", "Poco y constante gana. Al principio importa más el hábito que la cantidad, y la cantidad puede crecer después.")),
+        number("pay_yourself_first", T("You save {$10|150} every week. How much is that after a year?", "Ahorras {$10|150} cada semana. ¿Cuánto es después de un año?"), { unit: "money", answer: [520, 7800] }, [T("{$10|150} × 52 weeks.", "{$10|150} × 52 semanas."), T("{$520|7800}. Small and steady adds up, and it builds the habit.", "{$520|7800}. Poco y constante se acumula, y crea el hábito.")]),
         order("pay_yourself_first", T("Payday. Put “pay yourself first” in order.", "Día de pago. Ordena “págate primero a ti”."), [T("Your pay lands in your account", "Tu sueldo llega a tu cuenta"), T("An automatic transfer moves your savings out", "Una transferencia automática aparta tu ahorro"), T("You pay for your needs", "Pagas tus necesidades"), T("You spend what's left on wants", "Gastas lo que queda en gustos")], T("Saving comes right after payday, before anything else gets a chance at it. Then needs, then wants.", "El ahorro va justo después del pago, antes de que otra cosa lo alcance. Luego las necesidades y luego los gustos.")),
         act("goals.create", T("Set a goal and pick how much you'll put aside each month.", "Pon una meta y elige cuánto vas a apartar cada mes."), {name: {en: "Savings goal",es: "Meta de ahorro"},target: [1000,15000],months: 12}),
       ],
@@ -75,13 +75,15 @@ export default {
       steps: [
         card(T("Money for surprises", "Dinero para imprevistos"), T("Phones break. Bikes get flat tires. An emergency fund is money you keep just for surprises, so a bad day doesn't turn into debt.", "Los celulares se rompen. Las bicis se ponchan. Un fondo de emergencia es dinero que guardas solo para imprevistos, para que un mal día no se convierta en deuda.")),
         card(T("How much?", "¿Cuánto?"), T("When you're starting out, aim for a small cushion like {$500|8000}. Once you have bills of your own, the usual goal is 3 to 6 months of expenses.", "Cuando vas empezando, apunta a un colchón pequeño, como {$500|8000}. Cuando ya tengas tus propios gastos fijos, la meta típica es de 3 a 6 meses de gastos.")),
-        choice(
+        scenario(
           "emergency_fund",
-          T("Which is a real emergency?", "¿Cuál es una emergencia de verdad?"),
-          [T("A concert you just found out about", "Un concierto del que te acabas de enterar"), T("Your phone screen cracks and you need it for work", "Se te rompe la pantalla del celular y lo necesitas para trabajar"), T("A sale on sneakers", "Una oferta de tenis")],
-          1,
-          T("Emergencies are unexpected and necessary. Sales and concerts are wants — save for them separately.", "Las emergencias son inesperadas y necesarias. Las ofertas y los conciertos son gustos: ahorra para ellos por separado."),
-          [T("A concert is fun, but it's not a surprise you can't avoid. Save for it separately.", "Un concierto es divertido, pero no es un imprevisto inevitable. Ahorra para eso por separado."), null, T("A sale is a want with a deadline, not an emergency.", "Una oferta es un gusto con fecha límite, no una emergencia.")]
+          T("Three things come up this month. Which one is your emergency fund for?", "Este mes pasan tres cosas. ¿Para cuál es tu fondo de emergencia?"),
+          [
+            fit(T("Your phone screen cracks, and you need the phone for work", "Se rompe la pantalla de tu celular y lo necesitas para trabajar"), "good", T("Sudden, necessary and unplanned: exactly what the fund is for.", "Repentino, necesario y no planeado: justo para eso es el fondo.")),
+            fit(T("Tickets for a concert you just heard about", "Boletos para un concierto del que te acabas de enterar"), "poor", T("A want, not an emergency. Save for it separately.", "Es un gusto, no una emergencia. Ahorra para eso aparte.")),
+            fit(T("A sale on sneakers you've wanted", "Una oferta de unos tenis que querías"), "poor", T("A good deal is still a want. The fund stays for real surprises.", "Una buena oferta sigue siendo un gusto. El fondo es para imprevistos de verdad.")),
+          ],
+          T("An emergency is sudden, necessary and unplanned. Everything else gets its own savings goal.", "Una emergencia es repentina, necesaria y no planeada. Todo lo demás tiene su propia meta de ahorro.")
         ),
         tf("emergency_fund", T("Your emergency fund should be easy to reach quickly.", "Tu fondo de emergencia debe estar a la mano rápido."), true, T("Keep it somewhere safe that you can get to in a day or two — not invested in something that might be down when you need it.", "Guárdalo en un lugar seguro al que puedas acceder en uno o dos días, no invertido en algo que pueda ir a la baja justo cuando lo necesites.")),
         number("emergency_fund", T("Your basic costs are {$500|7500} a month. A starter goal of 3 months of costs is how much?", "Tus gastos básicos son {$500|7500} al mes. Una meta inicial de 3 meses de gastos, ¿de cuánto es?"), { unit: "money", answer: [1500, 22500] }, [T("3 months × {$500|7500} a month.", "3 meses × {$500|7500} al mes."), T("That's {$1500|22500}. Building it a little at a time is normal.", "Son {$1500|22500}. Juntarlo poco a poco es lo normal.")]),

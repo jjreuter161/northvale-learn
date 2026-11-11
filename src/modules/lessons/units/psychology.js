@@ -1,5 +1,5 @@
 // UNIT — The psychology of money. Its lessons and the concepts they teach (format in helpers.js).
-import { T, card, choice, tf, act, concept, order, spot, tap, scenario, fit } from "./helpers.js";
+import { T, card, choice, tf, act, concept, order, spot, tap, scenario, fit, match } from "./helpers.js";
 
 export default {
   id: "psychology",
@@ -98,14 +98,7 @@ export default {
       steps: [
         card(T("Everyone else seems to have it", "Parece que todos lo tienen"), T("Social media shows highlights: new phones, trips, wins. It can make normal spending feel like falling behind. Remember that you see what people post, not their bills.", "Las redes muestran lo mejor de cada quien: celulares nuevos, viajes, logros. Eso puede hacer que gastar normal se sienta como quedarse atrás. Recuerda que ves lo que la gente publica, no sus cuentas por pagar.")),
         card(T("Spot the tactics", "Detecta las tácticas"), T("Countdowns, \"only 2 left\", \"everyone's buying\", limited drops. They're designed to speed you up. When you notice one, slow down on purpose.", "Cuentas regresivas, \"solo quedan 2\", \"todos lo están comprando\", lanzamientos limitados. Están hechas para apresurarte. Cuando notes una, ve más despacio a propósito.")),
-        choice(
-          "fomo",
-          T("\"Only 3 left at this price!\" is an example of…", "\"¡Solo quedan 3 a este precio!\" es un ejemplo de…"),
-          [T("A scarcity tactic", "Una táctica de escasez"), T("A guarantee of quality", "Una garantía de calidad"), T("A tax notice", "Un aviso de impuestos")],
-          0,
-          T("Scarcity — real or not — makes people decide faster.", "La escasez, real o no, hace que la gente decida más rápido."),
-          [null, T("It says nothing about quality — only about urgency.", "No dice nada de la calidad, solo de la urgencia."), T("It's marketing, not a tax message.", "Es publicidad, no un aviso fiscal.")]
-        ),
+        match("fomo", T("Match each line to the pressure trick behind it.", "Une cada frase con el truco de presión que usa."), [[T("“Only 3 left!”", "“¡Solo quedan 3!”"), T("Scarcity", "Escasez")], [T("“Sale ends at midnight”", "“La oferta termina a medianoche”"), T("A deadline", "Una fecha límite")], [T("“Everyone's buying it”", "“Todos lo están comprando”"), T("Social proof", "Prueba social")], [T("“Was {$80|1200}, now {$40|600}”", "“Antes {$80|1200}, ahora {$40|600}”"), T("Anchoring you to a higher price", "Anclarte a un precio más alto")]], T("Naming the trick takes away most of its power.", "Ponerle nombre al truco le quita casi todo su poder.")),
         tf("fomo", T("Social media shows a realistic picture of what people spend.", "Las redes sociales muestran una imagen realista de lo que la gente gasta."), false, T("You see the highlights, not the debts or the trade-offs.", "Ves lo mejor, no las deudas ni lo que sacrificaron.")),
         spot(
           "fomo",

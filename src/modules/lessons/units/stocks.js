@@ -1,5 +1,5 @@
 // UNIT — Stocks. Its lessons and the concepts they teach (format in helpers.js).
-import { T, card, choice, tf, act, concept, order, estimate, match } from "./helpers.js";
+import { T, card, choice, tf, act, concept, order, estimate, match, scenario, fit, number } from "./helpers.js";
 
 export default {
   id: "stocks",
@@ -64,7 +64,7 @@ export default {
           T("Shareholders are part-owners. Lending would be a bond.", "Los accionistas son dueños de una parte. Prestar sería un bono."),
           [T("Lending money to a company is a bond. A share is ownership.", "Prestarle dinero a una empresa es un bono. Una acción es propiedad."), null, T("Owning shares doesn't make you an employee.", "Tener acciones no te convierte en empleado.")]
         ),
-        tf("what_stock", T("Stock prices can go down as well as up.", "El precio de una acción puede bajar, no solo subir."), true, T("Always. Owning stocks means riding the ups and downs.", "Siempre. Tener acciones significa aguantar las subidas y las bajadas.")),
+        number("what_stock", T("A share goes from {$50|1000} to {$40|800}. By what percent did it fall?", "Una acción pasa de {$50|1000} a {$40|800}. ¿Qué porcentaje bajó?"), { unit: "percent", answer: 20 }, [T("It fell {$10|200}.", "Bajó {$10|200}."), T("{$10|200} ÷ {$50|1000} = 20%. Prices go down as well as up.", "{$10|200} ÷ {$50|1000} = 20%. Los precios bajan igual que suben.")]),
         match(
           "what_stock",
           T("Match each word to what it means.", "Une cada palabra con lo que significa."),
@@ -104,13 +104,15 @@ export default {
       steps: [
         card(T("Volatility", "Volatilidad"), T("Volatility is how much a price swings. Single companies can drop 30% or more in a year — even great ones.", "La volatilidad es cuánto se mueve un precio. Una sola empresa puede caer 30% o más en un año, incluso las buenas.")),
         card(T("Don't panic-sell", "No vendas por pánico"), T("Selling when prices drop locks in the loss. People who stay calm and hold good investments for years usually do better than those who jump in and out.", "Vender cuando los precios caen hace que la pérdida se vuelva real. Quienes mantienen la calma y conservan buenas inversiones por años suelen irles mejor que a quienes entran y salen.")),
-        choice(
+        scenario(
           "volatility",
-          T("Your practice stock drops 15% in a week. What's usually the smartest first step?", "Tu acción de práctica cae 15% en una semana. ¿Qué suele ser lo más inteligente primero?"),
-          [T("Sell everything right now", "Vender todo ya"), T("Find out why, and remember your plan", "Averiguar por qué y recordar tu plan"), T("Borrow money to buy more", "Pedir prestado para comprar más")],
-          1,
-          T("Understand first, act later. A drop isn't automatically a reason to sell.", "Primero entiende, luego actúa. Una caída no es automáticamente razón para vender."),
-          [T("Selling in a panic locks in the loss. Drops this size are common.", "Vender por pánico vuelve real la pérdida. Caídas de ese tamaño son comunes."), null, T("Borrowing to invest can multiply losses, and you still owe the loan.", "Pedir prestado para invertir puede multiplicar las pérdidas, y la deuda sigue ahí.")]
+          T("Your practice stock drops 15% in a week. What's your first move?", "Tu acción de práctica baja 15% en una semana. ¿Qué haces primero?"),
+          [
+            fit(T("Find out why, then check it against your plan", "Averiguar por qué y compararlo con tu plan"), "good", T("A drop with no real change at the company is often just noise.", "Una caída sin un cambio real en la empresa suele ser solo ruido.")),
+            fit(T("Do nothing for now and look again next month", "No hacer nada por ahora y revisar el próximo mes"), "ok", T("Calm, though knowing why helps you decide next time.", "Con calma, aunque saber por qué te ayuda a decidir la próxima vez.")),
+            fit(T("Sell everything right now", "Vender todo ahora mismo"), "poor", T("That locks in the loss, sometimes right before a bounce.", "Eso vuelve real la pérdida, a veces justo antes de un rebote.")),
+          ],
+          T("Ups and downs are normal. Your plan, not the week, decides what you do.", "Las subidas y bajadas son normales. Tu plan, no la semana, decide qué haces.")
         ),
         tf("volatility", T("Only invest money you won't need for several years.", "Solo invierte dinero que no vas a necesitar en varios años."), true, T("That way a bad year doesn't force you to sell at a low price.", "Así un mal año no te obliga a vender a un precio bajo.")),
         estimate("volatility", T("An investment drops 20%. How much does it then have to rise to get back to where it started?", "Una inversión baja 20%. ¿Cuánto tiene que subir después para volver a donde empezó?"), { unit: "percent", min: 0, max: 100, step: 1, answer: 25 }, T("{$100|1000} falls to {$80|800}. Getting back to {$100|1000} takes {$20|200} more, which is 25% of {$80|800}.", "{$100|1000} baja a {$80|800}. Volver a {$100|1000} requiere {$20|200} más, que es el 25% de {$80|800}.")),

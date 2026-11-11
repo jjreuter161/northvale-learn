@@ -1,5 +1,5 @@
 // UNIT — Scams and fraud. Its lessons and the concepts they teach (format in helpers.js).
-import { T, card, choice, tf, act, concept, match, number, spot, tap } from "./helpers.js";
+import { T, card, choice, tf, act, concept, match, number, spot, tap, estimate, scenario, fit } from "./helpers.js";
 
 export default {
   id: "scams",
@@ -106,14 +106,7 @@ export default {
           T("How to check", "Cómo revisar"),
           T("Look up the firm on FINRA's BrokerCheck or the SEC's website. If it isn't registered, or you can't find it, don't send money. Report scams to the FTC at ReportFraud.ftc.gov.", "Busca la empresa en BrokerCheck de FINRA o en el sitio de la SEC. Si no está registrada o no la encuentras, no mandes dinero. Reporta los fraudes a la FTC en ReportFraud.ftc.gov.", { en: "Check that the firm is authorized: the CNBV and CONDUSEF publish lists, including warnings about firms that aren't. If you can't confirm it, don't send money. You can report fraud to CONDUSEF.", es: "Revisa que la empresa esté autorizada: la CNBV y la CONDUSEF publican listas, incluso alertas sobre las que no lo están. Si no lo puedes confirmar, no mandes dinero. Puedes reportar fraudes a la CONDUSEF." })
         ),
-        choice(
-          "fake_investments",
-          T("An app promises 2% a day, guaranteed. That's about…", "Una app promete 2% diario, garantizado. Eso es más o menos…"),
-          [T("A sign it's almost certainly a scam", "Una señal de que casi seguro es un fraude"), T("A normal savings rate", "Una tasa de ahorro normal"), T("What index funds usually pay", "Lo que suelen pagar los fondos indexados")],
-          0,
-          T("2% a day would multiply money more than a thousand times in a year. No real investment can promise that.", "Un 2% diario multiplicaría el dinero más de mil veces en un año. Ninguna inversión real puede prometer eso."),
-          [null, T("Savings accounts pay a few percent a year, not per day.", "Las cuentas de ahorro pagan unos cuantos puntos al año, no al día."), T("Even the US stock market has averaged roughly {@marketAvgNominal} a year before inflation, or about {@marketAvgReal} after inflation, over long periods — a year, not a day, and with no guarantee.", "Incluso la bolsa de EE. UU. ha promediado más o menos {@marketAvgNominal} al año antes de inflación, o cerca de {@marketAvgReal} después de inflación, en periodos largos: al año, no al día, y sin garantía.")]
-        ),
+        estimate("fake_investments", T("An app promises 2% a day. If that were real, about what would {$100|1000} grow to in one year?", "Una app promete 2% diario. Si fuera cierto, ¿en cuánto se convertirían {$100|1000} en un año, más o menos?"), { unit: "money", min: [100, 1000], max: [500000, 5000000], step: [100, 1000], answer: [137700, 1377000], tol: 0.25 }, T("2% a day compounds to about 1,377 times your money in a year: about {$137700|1377000}. No real investment does that, which is how you know it's a scam.", "El 2% diario se compone a unas 1,377 veces tu dinero en un año: unos {$137700|1377000}. Ninguna inversión real hace eso, y así sabes que es un fraude.")),
         tf("fake_investments", T("Checking whether a firm is registered takes only a few minutes.", "Revisar si una empresa está registrada toma solo unos minutos."), true, T("A quick search on the regulator's site can save you from losing everything.", "Una búsqueda rápida en el sitio del regulador te puede salvar de perderlo todo.")),
         spot(
           "fake_investments",
@@ -168,7 +161,7 @@ export default {
           T("Unique passwords limit the damage of a leak; the second step stops most break-ins.", "Las contraseñas únicas limitan el daño de una filtración, y el segundo paso frena la mayoría de los accesos."),
           [null, T("However strong, one leaked password then opens everything.", "Por más fuerte que sea, una contraseña filtrada abre todo."), T("Plain notes aren't protected. A password manager is built for this.", "Las notas comunes no están protegidas. Un administrador de contraseñas está hecho para eso.")]
         ),
-        tf("account_security", T("It's fine to share a login code with a friend if they ask nicely.", "Está bien compartir un código de acceso con un amigo si te lo pide con amabilidad."), false, T("Never share codes. The \"friend\" may be someone who took over their account.", "Nunca compartas códigos. El \"amigo\" puede ser alguien que se robó su cuenta.")),
+        scenario("account_security", T("A friend texts: “I sent a code to your phone by mistake, can you send it to me?”", "Un amigo te escribe: “Te mandé un código por error, ¿me lo pasas?”"), [fit(T("Don't send it, and call your friend another way to check", "No mandarlo y llamarle a tu amigo por otro medio para confirmar"), "good", T("Their account may be hacked. That code is the key to yours.", "Su cuenta puede estar hackeada. Ese código es la llave de la tuya.")), fit(T("Just ignore the message", "Solo ignorar el mensaje"), "ok", T("Safe, though your friend may not know they've been hacked.", "Es seguro, aunque tu amigo quizá no sepa que lo hackearon.")), fit(T("Send it: it's your friend", "Mandarlo: es tu amigo"), "poor", T("This is one of the most common ways accounts get stolen.", "Esta es una de las formas más comunes de robar cuentas."))], T("Never share a login code, with anyone. Real friends and real companies never need it.", "Nunca compartas un código de acceso, con nadie. Ni los amigos ni las empresas de verdad lo necesitan.")),
         match(
           "account_security",
           T("Match each lock to what it does.", "Une cada protección con lo que hace."),

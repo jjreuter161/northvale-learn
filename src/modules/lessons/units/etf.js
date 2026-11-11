@@ -56,14 +56,7 @@ export default {
       steps: [
         card(T("Buy many at once", "Compra muchas a la vez"), T("An ETF (exchange-traded fund) is a basket of many investments you can buy as one. One share of an S&P 500 fund gives you a small piece of 500 big US companies.", "Un ETF (fondo cotizado) es una canasta con muchas inversiones que compras como una sola. Una parte de un fondo del S&P 500 te da un pedacito de 500 grandes empresas de Estados Unidos.", { en: "An ETF (exchange-traded fund) is a basket of many investments you can buy as one. NAFTRAC, for example, holds the biggest companies on the Mexican Stock Exchange, and from Mexico you can also buy US funds through the SIC (Sistema Internacional de Cotizaciones).", es: "Un ETF (fondo cotizado) es una canasta con muchas inversiones que compras como una sola. El NAFTRAC, por ejemplo, tiene a las empresas más grandes de la Bolsa Mexicana, y desde México también puedes comprar fondos de Estados Unidos a través del SIC (Sistema Internacional de Cotizaciones)." })),
         card(T("Why it helps", "Por qué ayuda"), T("If one company in the basket has a terrible year, it's just a small part of what you own. The others can make up for it.", "Si a una empresa de la canasta le va muy mal, es solo una parte pequeña de lo que tienes. Las demás pueden compensarlo.")),
-        choice(
-          "index_funds",
-          T("What does one share of an S&P 500 index fund hold?", "¿Qué tiene una parte de un fondo indexado del S&P 500?"),
-          [T("One company", "Una sola empresa"), T("Tiny pieces of about 500 companies", "Pedacitos de unas 500 empresas"), T("Government bonds only", "Solo bonos del gobierno")],
-          1,
-          T("That's the magic: instant variety in one purchase.", "Esa es la magia: variedad instantánea en una sola compra."),
-          [T("That's a single stock. A fund holds many.", "Eso es una sola acción. Un fondo tiene muchas."), null, T("The S&P 500 is made of stocks of about 500 large US companies, not bonds.", "El S&P 500 está formado por acciones de unas 500 grandes empresas de EE. UU., no por bonos.")]
-        ),
+        number("index_funds", T("A fund holds 500 companies in equal parts. One of them falls 50%. About how much does the whole fund fall?", "Un fondo tiene 500 empresas en partes iguales. Una de ellas baja 50%. ¿Cuánto baja todo el fondo, más o menos?"), { unit: "percent", answer: 0.1, tol: 0.05 }, [T("Each company is 1/500 of the fund, or 0.2%.", "Cada empresa es 1/500 del fondo, o 0.2%."), T("Half of 0.2% is 0.1%. One bad company barely moves a basket of 500.", "La mitad de 0.2% es 0.1%. Una empresa mala casi no mueve una canasta de 500.")]),
         tf("index_funds", T("ETFs trade on the stock market, like stocks.", "Los ETFs se compran y venden en la bolsa, como las acciones."), true, T("That's the \"exchange-traded\" part — you can buy and sell them any trading day.", "Esa es la parte de \"cotizado\": los puedes comprar y vender cualquier día hábil de la bolsa.")),
         scenario(
           "index_funds",

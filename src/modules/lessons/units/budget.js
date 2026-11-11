@@ -1,5 +1,5 @@
 // UNIT — Budgeting. Its lessons and the concepts they teach (format in helpers.js).
-import { T, card, choice, tf, act, concept, estimate, number, scenario, fit, match } from "./helpers.js";
+import { T, card, choice, tf, act, concept, estimate, number, scenario, fit, match, spot, tap } from "./helpers.js";
 
 export default {
   id: "budget",
@@ -104,7 +104,7 @@ export default {
           [T("That's only about a month. Multiply by 52 weeks: {$5|80} × 3 × 52.", "Eso es apenas un mes. Multiplica por 52 semanas: {$5|80} × 3 × 52."), T("That's about once a week for a year. Three times a week is three times as much.", "Eso es como una vez por semana durante un año. Tres veces por semana es el triple."), null]
         ),
         card(T("Track for one week", "Anótalo una semana"), T("Write down everything you spend for 7 days. Most people are surprised. You can't fix a leak you can't see.", "Anota todo lo que gastes durante 7 días. Casi a todos les sorprende. No puedes tapar una fuga que no ves.")),
-        tf("small_leaks", T("Subscriptions you forgot about are a common small leak.", "Las suscripciones que olvidaste son una fuga muy común."), true, T("Free trials turn into monthly charges. Check your app store subscriptions once in a while.", "Las pruebas gratis se vuelven cobros mensuales. Revisa de vez en cuando las suscripciones en tu tienda de apps.")),
+        spot("small_leaks", T("Your card statement. You use StreamBox and TuneUp every day. Tap the 2 subscriptions you could cancel.", "Tu estado de cuenta. Usas StreamBox y TuneUp todos los días. Toca las 2 suscripciones que podrías cancelar."), "receipt", T("Card statement · this month", "Estado de cuenta · este mes"), [tap(T("StreamBox −{$12|149}", "StreamBox −{$12|149}")), tap(T("MovieMax −{$10|120}", "MovieMax −{$10|120}"), true), tap(T("TuneUp music −{$11|129}", "TuneUp música −{$11|129}")), tap(T("FitPass app, last opened in March −{$15|180}", "App FitPass, abierta por última vez en marzo −{$15|180}"), true), tap(T("Groceries −{$46|690}", "Súper −{$46|690}"))], T("Two forgotten subscriptions are {$25|300} a month, or {$300|3600} a year: a classic small leak.", "Dos suscripciones olvidadas son {$25|300} al mes, o {$300|3600} al año: un gasto hormiga clásico.")),
         estimate("small_leaks", T("A {$4|60} drink, five days a week. About how much is that in a year?", "Una bebida de {$4|60}, cinco días a la semana. ¿Cuánto es más o menos en un año?"), { unit: "money", min: [100, 1500], max: [3000, 45000], step: [20, 300], answer: [1040, 15600] }, T("{$4|60} × 5 days × 52 weeks is about {$1040|15600}. A little, many times.", "{$4|60} × 5 días × 52 semanas son unos {$1040|15600}. Poco, muchas veces.")),
         act("goals.leak", T("See what cutting one small leak does to your goal.", "Mira qué le pasa a tu meta si tapas una fuga pequeña."), {leak: [5,80],perWeek: 3}),
       ],

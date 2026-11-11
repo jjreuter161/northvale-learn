@@ -19,7 +19,7 @@ import { fv } from "../src/modules/lessons/units/helpers.js";
 import { MISSIONS } from "../src/modules/missions/catalog.js";
 
 const root = join(import.meta.dirname, "..");
-const MINUTES = { min: 2.5, max: 5 };
+const MINUTES = { min: 2.5, max: 4.5 };
 
 // Every action kind a module provides (its `actions: { … }` block).
 export function actionKinds() {
