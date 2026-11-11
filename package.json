@@ -8,7 +8,7 @@
     "build": "esbuild src/main.jsx --bundle --minify --sourcemap --jsx=automatic --loader:.md=text --outfile=web/app.js",
     "start": "node server/index.js",
     "dev": "npm run build && node server/index.js",
-    "test": "node test/engines.test.mjs && node test/content.test.mjs && node test/goals.test.mjs && node test/missions.test.mjs && node test/mastery.test.mjs && node test/mail.test.mjs && node test/retention.test.mjs && node test/classroom.test.mjs && node test/waitlist.test.mjs && node test/seed.test.mjs && node test/server.test.mjs && npm run build --silent && node test/browser.test.mjs",
+    "test": "node test/engines.test.mjs && node test/look.test.mjs && node test/content.test.mjs && node test/goals.test.mjs && node test/missions.test.mjs && node test/mastery.test.mjs && node test/mail.test.mjs && node test/retention.test.mjs && node test/classroom.test.mjs && node test/waitlist.test.mjs && node test/seed.test.mjs && node test/server.test.mjs && npm run build --silent && node test/browser.test.mjs",
     "setup": "node scripts/setup.mjs",
     "check-setup": "node scripts/check-setup.mjs",
     "test:browser": "npm run build --silent && node test/browser.test.mjs",

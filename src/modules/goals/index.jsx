@@ -271,7 +271,7 @@ function useDailyBookkeeping(rows, holdings, onMilestone) {
 
 // ---- small pieces ---------------------------------------------------------
 
-const TONE = { on_track: ["var(--brandSoft)", "var(--brand)"], ahead: ["var(--accentSoft)", "var(--accent)"], done: ["var(--accent)", "#fff"], behind: ["var(--warnSoft)", "var(--warn)"], paused: ["var(--surface2)", "var(--mid)"] };
+const TONE = { on_track: ["var(--brandSoft)", "var(--brand)"], ahead: ["var(--accentSoft)", "var(--accent)"], done: ["var(--accent)", "var(--onBrand)"], behind: ["var(--warnSoft)", "var(--warn)"], paused: ["var(--surface2)", "var(--mid)"] };
 function StatusPill({ t, status }) {
   const [bg, fg] = TONE[status];
   return <span style={{ fontSize: 12, fontWeight: 650, background: bg, color: fg, borderRadius: 999, padding: "4px 10px", whiteSpace: "nowrap", letterSpacing: 0.1 }}>{t(`status.${status}`)}</span>;

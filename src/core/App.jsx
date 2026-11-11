@@ -259,7 +259,7 @@ function StreakSheet({ open, onClose, t, progress, today }) {
           const lesson = lessonDays.has(d);
           const frozen = s.frozen.includes(d);
           return (
-            <div key={d} title={d} style={{ aspectRatio: "1", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 650, background: frozen ? "var(--brandSoft)" : lesson ? "var(--flame)" : "var(--surface2)", color: lesson && !frozen ? "#fff" : "var(--mid)", outline: d === today ? "1px solid var(--ink)" : "none" }}>
+            <div key={d} title={d} style={{ aspectRatio: "1", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 650, background: frozen ? "var(--brandSoft)" : lesson ? "var(--flame)" : "var(--surface2)", color: lesson && !frozen ? "var(--onBrand)" : "var(--mid)", outline: d === today ? "1px solid var(--ink)" : "none" }}>
               {frozen ? <Icon name="snow" size={16} color="var(--sky)" /> : Number(d.slice(8))}
             </div>
           );

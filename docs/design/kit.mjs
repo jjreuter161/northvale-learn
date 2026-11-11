@@ -19,9 +19,10 @@ export const CSS = `
 @font-face{font-family:Garamond;font-weight:600 700;src:url(${font("eb-garamond-latin-600-normal.woff2")})}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#d9dde3;font-family:Inter,system-ui,sans-serif;padding:24px;display:flex;flex-wrap:wrap;gap:24px}
-.phone{--bg:#fff;--surface:#f4f5f7;--surface2:#e8ebef;--ink:#1f2328;--mid:#5b6573;--low:#6e7886;--line:#e4e7eb;--navy:#13315c;--onNavy:#fff;--navySoft:#e8edf5;--right:#1e7a5f;--rightSoft:#e6f2ee;--warn:#9a5b12;--warnSoft:#fbf1e4;
+.phone{--bg:#F7F2E8;--surface:#FFFDF8;--surface2:#EFE7D8;--ink:#22303F;--head:#13315C;--mid:#4C5866;--low:#5C6573;--line:#E6DCCB;--navy:#13315C;--onNavy:#FFFDF8;--navySoft:#E3E7EE;--right:#1B6F54;--rightSoft:#E1EFE6;--warn:#8C520E;--warnSoft:#F7E9D2;
   width:390px;height:844px;background:var(--bg);color:var(--ink);position:relative;overflow:hidden;font-size:16px;line-height:1.45}
-.phone.dark{--bg:#0f1216;--surface:#191d23;--surface2:#262b33;--ink:#e8eaed;--mid:#a6afbb;--low:#8a94a1;--line:#262b33;--navy:#9db8e6;--onNavy:#0f1216;--navySoft:#1d2a40;--right:#4db892;--rightSoft:#12302a}
+.phone.dark{--bg:#0D1A2D;--surface:#15253C;--surface2:#1F3150;--ink:#F2EBDC;--head:#F7F1E6;--mid:#CFC7B7;--low:#B3AC9E;--line:#2A3C58;--navy:#F0E3C6;--onNavy:#0D1A2D;--navySoft:#24344F;--right:#63C9A2;--rightSoft:#123A33}
+.phone h1,.phone .q{color:var(--head)}
 .top{height:56px;display:flex;align-items:center;gap:10px;padding:0 16px}
 .mark{font-family:Garamond,Georgia,serif;font-weight:650;font-size:25px;letter-spacing:-.3px}
 .grow{flex:1}

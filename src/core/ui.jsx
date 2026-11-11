@@ -1,72 +1,78 @@
-// DESIGN SYSTEM — the look (two of them: Light and Dark) as CSS variables,
+// DESIGN SYSTEM — the look (navy and cream, Light and Dark) as CSS variables,
 // and the small set of pieces every module builds with. Phone first: 44pt
 // tap targets, 16px inputs (so iPhones don't zoom), one column.
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
-// Mostly white and light grey, dark-grey text, and navy used sparingly:
-// the main button, progress, the active tab, links and the brand. Green
-// (--right) is only for a correct answer in a lesson; amber only for "not
-// quite"; red only for a loss or an error. One card style: a light-grey
-// fill, no border, no shadow. Two looks: Light ("white") and a charcoal
-// Dark ("navy", the saved name from before).
+// Navy and cream. Light: a soft cream page, lighter cream cards, deep navy
+// for headings, the main button, progress, the active tab, links and the
+// logo, and dark grey-navy body text. Dark: a deep navy page with cream
+// text and cream accents. Green (--right) is only for a correct answer in
+// a lesson; amber only for "not quite" or "behind"; red only for a loss or
+// an error. One card style: a fill, no border, no shadow. Every text pair
+// meets WCAG AA (test/look.test.mjs checks). The saved names stay "white"
+// (Light) and "navy" (Dark), so nobody's setting changes.
 export const LOOKS = {
   white: {
-    "--bg": "#FFFFFF",
-    "--surface": "#F4F5F7",
-    "--surface2": "#E8EBEF",
-    "--ink": "#1F2328",
-    "--mid": "#5B6573",
-    "--low": "#6E7886",
-    "--line": "#E4E7EB",
+    "--bg": "#F7F2E8",
+    "--surface": "#FFFDF8",
+    "--surface2": "#EFE7D8",
+    "--ink": "#22303F",
+    "--head": "#13315C",
+    "--mid": "#4C5866",
+    "--low": "#5C6573",
+    "--line": "#E6DCCB",
     "--brand": "#13315C",
-    "--onBrand": "#FFFFFF",
-    "--brandSoft": "#E8EDF5",
+    "--onBrand": "#FFFDF8",
+    "--brandSoft": "#E3E7EE",
     "--accent": "#13315C",
-    "--accentSoft": "#E8EDF5",
+    "--accentSoft": "#E3E7EE",
     "--good": "#13315C",
-    "--goodSoft": "#E8EDF5",
-    "--right": "#1E7A5F",
-    "--rightSoft": "#E6F2EE",
-    "--warn": "#9A5B12",
-    "--warnSoft": "#FBF1E4",
-    "--bad": "#B42318",
-    "--badSoft": "#FBECEA",
+    "--goodSoft": "#E3E7EE",
+    "--right": "#1B6F54",
+    "--rightSoft": "#E1EFE6",
+    "--warn": "#8C520E",
+    "--warnSoft": "#F7E9D2",
+    "--bad": "#A8231A",
+    "--badSoft": "#F9E7E2",
     "--flame": "#13315C",
     "--gold": "#13315C",
     "--sky": "#13315C",
-    "--level1": "#C9D4E6",
+    "--level1": "#CBD3E0",
     "--level2": "#6F89B3",
     "--level3": "#13315C",
+    "--focus": "#2B5CB3",
     "--shadow": "none",
   },
   navy: {
-    "--bg": "#0F1216",
-    "--surface": "#191D23",
-    "--surface2": "#252A32",
-    "--ink": "#E8EAED",
-    "--mid": "#A6AFBB",
-    "--low": "#8A94A1",
-    "--line": "#2A3038",
-    "--brand": "#9DB8E6",
-    "--onBrand": "#0F1216",
-    "--brandSoft": "#1D2A40",
-    "--accent": "#9DB8E6",
-    "--accentSoft": "#1D2A40",
-    "--good": "#9DB8E6",
-    "--goodSoft": "#1D2A40",
-    "--right": "#4DB892",
-    "--rightSoft": "#12302A",
-    "--warn": "#E3A44A",
-    "--warnSoft": "#33281A",
-    "--bad": "#F07167",
-    "--badSoft": "#3A1E26",
-    "--flame": "#9DB8E6",
-    "--gold": "#C9D8F0",
-    "--sky": "#9DB8E6",
-    "--level1": "#2B3B57",
-    "--level2": "#56719E",
-    "--level3": "#9DB8E6",
+    "--bg": "#0D1A2D",
+    "--surface": "#15253C",
+    "--surface2": "#1F3150",
+    "--ink": "#F2EBDC",
+    "--head": "#F7F1E6",
+    "--mid": "#CFC7B7",
+    "--low": "#B3AC9E",
+    "--line": "#2A3C58",
+    "--brand": "#F0E3C6",
+    "--onBrand": "#0D1A2D",
+    "--brandSoft": "#24344F",
+    "--accent": "#F0E3C6",
+    "--accentSoft": "#24344F",
+    "--good": "#F0E3C6",
+    "--goodSoft": "#24344F",
+    "--right": "#63C9A2",
+    "--rightSoft": "#123A33",
+    "--warn": "#EBB663",
+    "--warnSoft": "#3A2E19",
+    "--bad": "#F4907F",
+    "--badSoft": "#3B2224",
+    "--flame": "#F0E3C6",
+    "--gold": "#F0E3C6",
+    "--sky": "#F0E3C6",
+    "--level1": "#2E4568",
+    "--level2": "#7F9CC9",
+    "--level3": "#F0E3C6",
+    "--focus": "#A9C4F0",
     "--shadow": "none",
   },
 };
@@ -84,7 +90,8 @@ html{scroll-padding-top:calc(64px + env(safe-area-inset-top));scroll-padding-bot
 body{font-family:${FONT};color:var(--ink);-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;font-feature-settings:'cv11','ss01';font-variant-numeric:tabular-nums}
 button{font-family:inherit}
 input,select,textarea{font-family:inherit;font-size:16px}
-:focus-visible{outline:3px solid #2B5CB3;outline-offset:2px}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+h1,h2{color:var(--head)}
 .nv-press{transition:transform .15s cubic-bezier(.2,.7,.2,1),filter .15s;-webkit-tap-highlight-color:transparent}
 .nv-press:active{transform:scale(.98);filter:brightness(.97)}
 .nv-in{animation:nvIn .2s ease-out both}
@@ -174,8 +181,8 @@ export function Icon({ name, size = 22, color = "currentColor", stroke = 2, fill
 
 const BUTTON = {
   primary: { background: "var(--brand)", color: "var(--onBrand)" },
-  good: { background: "var(--good)", color: "#fff" },
-  bad: { background: "var(--bad)", color: "#fff" },
+  good: { background: "var(--good)", color: "var(--onBrand)" },
+  bad: { background: "var(--bad)", color: "var(--onBrand)" },
   secondary: { background: "var(--bg)", color: "var(--ink)", border: "1px solid var(--line)" },
   ghost: { background: "transparent", color: "var(--brand)", boxShadow: "none" },
 };
@@ -353,7 +360,7 @@ export function Title({ children, sub, right }) {
 export const Label = ({ children, style }) => <h2 style={{ fontSize: 18, fontWeight: 700, letterSpacing: -0.2, color: "var(--ink)", margin: "28px 0 10px", ...style }}>{children}</h2>;
 
 export function Wordmark({ size = 24 }) {
-  return <span style={{ fontFamily: SERIF, fontWeight: 650, fontSize: size, letterSpacing: -0.3, lineHeight: 1 }}>Northvale</span>;
+  return <span style={{ fontFamily: SERIF, fontWeight: 650, fontSize: size, letterSpacing: -0.3, lineHeight: 1, color: "var(--head)" }}>Northvale</span>;
 }
 
 // TOASTS — short notes at the top ("+5 XP", "Saved"). Anyone can call toast().
@@ -374,7 +381,7 @@ export function Toasts() {
   return (
     <div aria-live="polite" style={{ position: "fixed", top: "calc(10px + env(safe-area-inset-top))", left: 0, right: 0, zIndex: 80, display: "flex", flexDirection: "column", alignItems: "center", gap: 8, pointerEvents: "none" }}>
       {items.map((t) => (
-        <div key={t.id} className="nv-in" style={{ background: t.tone === "good" ? "var(--brand)" : t.tone === "bad" ? "var(--bad)" : "var(--ink)", color: t.tone === "good" ? "var(--onBrand)" : t.tone === "info" ? "var(--bg)" : "#fff", borderRadius: 999, padding: "10px 18px", fontWeight: 650, fontSize: 15, boxShadow: "var(--shadow)", maxWidth: "90vw" }}>
+        <div key={t.id} className="nv-in" style={{ background: t.tone === "good" ? "var(--brand)" : t.tone === "bad" ? "var(--bad)" : "var(--ink)", color: t.tone === "good" || t.tone === "bad" ? "var(--onBrand)" : "var(--bg)", borderRadius: 999, padding: "10px 18px", fontWeight: 650, fontSize: 15, boxShadow: "var(--shadow)", maxWidth: "90vw" }}>
           {t.message}
         </div>
       ))}
