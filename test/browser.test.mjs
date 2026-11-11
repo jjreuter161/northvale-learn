@@ -188,6 +188,7 @@ try {
     await page.getByRole("heading", { name: "Today" }).waitFor();
     await page.getByText("Building toward: Car").first().waitFor();
     await page.getByText("Lesson 2 of 3", { exact: false }).waitFor();
+    assert.equal(await page.getByText("Myth or fact?").count(), 0, "day 1 is just the first lesson: no myth card");
     await clean("today");
     console.log("ok: a full lesson, start to finish, then Today (the next lesson, and what it's building toward)");
 
@@ -444,6 +445,85 @@ try {
     await page.waitForFunction(() => JSON.parse(localStorage.getItem("northvale-learn-v1")).settings.sound === true);
     console.log("ok: a 7-day streak gets its moment (then the finish screen); sounds off and vibration on by default, both in Settings");
     await app.close();
+  }
+
+  // --- daily hooks: Money Myth or Fact, Your money week, The real cost ---
+  {
+    const d = (n) => new Date(Date.now() - n * 864e5).toLocaleDateString("en-CA", { timeZone: "America/Mexico_City" });
+    const seed = learner({ ageBand: "18-25" }, { lessonDays: [d(1)], days: { [d(1)]: 10 }, xp: 30, counters: { lessons: 3 }, streak: { count: 1, last: d(1), best: 1, frozen: [] } }, { goals: { goals: [newGoal({ id: "w1", templateId: "car", target: 5000, start: 300, months: 24, today: d(12) })] } });
+    const app = await open(seed);
+    const { page, top, button, clean, menu } = app;
+    // Myth or fact: two plain buttons, an answer, +2 XP; then one line until tomorrow.
+    const card = page.locator("[data-myth]");
+    await card.getByText("Myth or fact?").waitFor();
+    await clean("myth card");
+    await card.getByRole("button", { name: "Myth", exact: true }).click();
+    await card.getByRole("status").getByText(/(Right|Not quite): it's a (myth|fact)\./).waitFor();
+    await page.waitForFunction(() => JSON.parse(localStorage.getItem("northvale-learn-v1")).progress.xp === 32);
+    await clean("myth answered");
+    await page.reload();
+    await page.getByText("Today's myth: answered · another one tomorrow").waitFor();
+    console.log("ok: Money Myth or Fact on Today: not on day 1, +2 XP, then one line until tomorrow");
+    // Your money week: a short look back, then the check-in.
+    await page.getByRole("button", { name: /^Your money week/ }).click();
+    await top().getByText("You learned").waitFor();
+    await top().getByText(/^For next week$/).waitFor();
+    await top().getByText(/^Car: \$[\d,]+ → \$[\d,]+$/).waitFor();
+    await clean("your money week");
+    await button("Not this week", top()).click();
+    await page.waitForFunction(() => !!JSON.parse(localStorage.getItem("northvale-learn-v1")).modules.goals.checkIn);
+    assert.equal(await page.getByRole("button", { name: /^Your money week/ }).count(), 0, "done for the week");
+    console.log("ok: Your money week: what you learned, the streak, the goal, next week's lesson, then the check-in");
+    // The real cost, in Practice: an everyday choice or a hidden cost, by week.
+    await menu("Practice");
+    const rc = page.locator("[data-rc]");
+    await rc.waitFor();
+    if ((await rc.getAttribute("data-rc")) === "everyday") {
+      await rc.getByRole("radio", { name: /^Snack/ }).click();
+      await rc.getByText("$3 every day is about $1,095 a year.", { exact: false }).waitFor();
+      await rc.getByText("The point is choosing on purpose.", { exact: false }).waitFor();
+    } else await rc.getByRole("button", { name: /^Lesson: / }).waitFor();
+    await clean("the real cost");
+    // A week later it's the other kind (a page clock set 7 days ahead).
+    const kind = await rc.getAttribute("data-rc");
+    await app.close();
+    const later = await browser.newContext({ viewport: { width: 390, height: 800 }, locale: "en-US", timezoneId: "America/Mexico_City", serviceWorkers: "block", reducedMotion: "reduce" });
+    await later.addInitScript((x) => localStorage.getItem("northvale-learn-v1") || localStorage.setItem("northvale-learn-v1", x), JSON.stringify(seed));
+    const lp = await later.newPage();
+    lp.setDefaultTimeout(5000);
+    // (only the date moves a week ahead; timers and animation frames are untouched)
+    await later.addInitScript(() => {
+      const D = Date;
+      const shift = 7 * 864e5;
+      class Later extends D {
+        constructor(...a) {
+          super(...(a.length ? a : [D.now() + shift]));
+        }
+        static now() {
+          return D.now() + shift;
+        }
+      }
+      globalThis.Date = Later;
+    });
+    await lp.goto(BASE);
+    await lp.waitForTimeout(300);
+    if (await lp.getByRole("dialog").count()) await lp.keyboard.press("Escape"); // (a week away: welcome back)
+    await lp.getByRole("navigation").getByRole("button", { name: "Practice", exact: true }).click();
+    if (await lp.getByRole("dialog").count()) await lp.keyboard.press("Escape");
+    const other = lp.locator("[data-rc]");
+    await other.waitFor();
+    assert.notEqual(await other.getAttribute("data-rc"), kind, "the real cost alternates by week");
+    if ((await other.getAttribute("data-rc")) === "hidden") {
+      await other.getByRole("button", { name: /^Lesson: / }).waitFor();
+      assert.match(await other.innerText(), /(takes about \d+ years|a year)/);
+    } else await other.getByRole("radio", { name: /^Coffee/ }).waitFor();
+    assert.ok(!/NaN|undefined|\{/.test(await other.innerText()), "the other week's card reads cleanly");
+    await later.close();
+    console.log("ok: The real cost in Practice: everyday choices one week, a hidden cost with its lesson the next");
+    const es = await open({ ...seed, settings: { lang: "es", region: "MX", look: "white", reduceMotion: true } });
+    await es.page.locator("[data-myth]").getByText("¿Mito o realidad?").waitFor();
+    await es.clean("mito o realidad");
+    await es.close();
   }
 
   // --- the streak row opens the streak details ---

@@ -17,6 +17,7 @@ import { pick, fill } from "../src/core/i18n.js";
 import { minutes, isQuestion, QUESTION_TYPES } from "../src/modules/lessons/content.js";
 import { fv } from "../src/modules/lessons/units/helpers.js";
 import { MISSIONS } from "../src/modules/missions/catalog.js";
+import { MYTHS } from "../src/modules/lessons/myths.js";
 
 const root = join(import.meta.dirname, "..");
 const MINUTES = { min: 2.5, max: 4.5 };
@@ -179,6 +180,19 @@ export function validateContent() {
       if (m < MINUTES.min) fail(at, `about ${m.toFixed(1)} minutes — too short for a lesson`);
     }
   for (const [c] of concepts) if (!taught.has(c)) fail(`concept ${c}`, "isn't taught in any lesson");
+  // Money Myth or Fact: every statement and answer in both languages, at
+  // least 60 for each country.
+  const mythIds = new Set();
+  for (const x of MYTHS) {
+    const at = `myth ${x.id}`;
+    if (mythIds.has(x.id)) fail(at, "duplicate id");
+    mythIds.add(x.id);
+    if (!["myth", "fact"].includes(x.answer)) fail(at, "answer must be myth or fact");
+    if (x.only && !["US", "MX"].includes(x.only)) fail(at, "only: US or MX");
+    text(x.claim, `${at} statement`);
+    text(x.why, `${at} answer`);
+  }
+  for (const r of ["US", "MX"]) if (MYTHS.filter((x) => !x.only || x.only === r).length < 60) fail("myths", `fewer than 60 for ${r}`);
   let last = -1;
   for (const [unit, c] of PLACEMENT) {
     const i = UNITS.findIndex((u) => u.id === unit);

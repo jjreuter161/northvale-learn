@@ -34,7 +34,7 @@ export const START_UNITS = { save: "save", invest: "compound", debt: "credit", c
 
 export const MAX_FREEZES = 2;
 export const DAILY_GOALS = [10, 20, 30, 50];
-export const XP = { lesson: 10, perfect: 5, replay: 5, practice: 5, review: 10, mission: 20 };
+export const XP = { lesson: 10, perfect: 5, replay: 5, practice: 5, review: 10, mission: 20, myth: 2 };
 
 export function newProgress() {
   return { xp: 0, days: {}, streak: { count: 0, last: null, best: 0, frozen: [] }, freezes: 1, dailyGoal: 20, lessons: {}, lessonDays: [], badges: {}, counters: {}, practiced: {}, startUnit: null, placed: [] };
@@ -149,7 +149,8 @@ export function practiced(p, kind, today) {
   const days = p.practiced[kind] || [];
   const first = !days.includes(today);
   const next = { ...p, counters, practiced: { ...p.practiced, [kind]: first ? [...days, today].slice(-60) : days } };
-  return first ? { p: addXp(next, XP.practice, today), gained: XP.practice } : { p: next, gained: 0 };
+  const xp = kind === "myth" ? XP.myth : XP.practice;
+  return first ? { p: addXp(next, xp, today), gained: xp } : { p: next, gained: 0 };
 }
 
 export const goalMet = (p, today) => xpOn(p, today) >= p.dailyGoal;

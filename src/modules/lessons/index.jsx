@@ -5,8 +5,9 @@
 // goals, news), found through the registry.
 import { useEffect, useMemo, useRef, useState } from "react";
 import { registerModule, actionWidget, service } from "../../core/registry.js";
-import { useAppState, getState } from "../../core/store.js";
-import { recordLesson, recordReview } from "../../core/game.js";
+import { useAppState, getState, setSlice } from "../../core/store.js";
+import { recordLesson, recordReview, recordPractice } from "../../core/game.js";
+import { mythOf } from "./myths.js";
 import { openShare } from "../../core/share.jsx";
 import { track } from "../../core/analytics.js";
 import { text, addStrings } from "../../core/i18n.js";
@@ -98,8 +99,18 @@ addStrings({
   "today.streak.keep": S("Today's lesson keeps it going", "La lección de hoy la mantiene"),
   "today.streak.start": S("One lesson starts a streak. Three minutes is enough.", "Una lección empieza una racha. Tres minutos bastan."),
   "today.mission": S("This week's mission", "La misión de esta semana"),
-  "today.checkin": S("Sunday check-in", "Revisión del domingo"),
-  "today.checkin.sub": S("Record what you set aside this week", "Anota lo que apartaste esta semana"),
+  "today.week": S("Your money week", "Tu semana de dinero"),
+  "today.week.sub": S("A short look back, then the check-in", "Un repaso corto y luego la revisión"),
+  "myth.label": S("Myth or fact?", "¿Mito o realidad?"),
+  "myth.myth": S("Myth", "Mito"),
+  "myth.fact": S("Fact", "Realidad"),
+  "myth.meta": S("15 seconds · +2 XP", "15 segundos · +2 XP"),
+  "myth.is.myth": S("it's a myth", "es un mito"),
+  "myth.is.fact": S("it's a fact", "es realidad"),
+  "myth.right": S("Right: {it}.", "Correcto: {it}."),
+  "myth.wrong": S("Not quite: {it}.", "Casi: {it}."),
+  "myth.after": S("+2 XP · another one tomorrow", "+2 XP · mañana hay otro"),
+  "myth.done": S("Today's myth: answered · another one tomorrow", "El mito de hoy: respondido · mañana hay otro"),
 
   // The course path
   "path.title": S("Your course", "Tu curso"),
@@ -162,6 +173,17 @@ function Today({ t, locale, go, openStreak }) {
   const checkIn = service("goals", "checkInDue")();
   const PlanPrompt = service("goals", "PlanPrompt");
   const planDue = service("goals", "planPromptDue")();
+  const MoneyWeek = service("goals", "MoneyWeek");
+  const [weekOpen, setWeekOpen] = useState(false);
+  const profile = useAppState((s) => s.profile);
+  const myth = useAppState((s) => (s.modules.lessons || {}).myth);
+  // One daily card: Myth or Fact — not on the first day (that's for the
+  // first lesson), not while a question for the learner is waiting, and
+  // not on a Sunday with the money week to look at.
+  const day = dayKey();
+  const sunday = new Date(`${day}T12:00:00`).getDay() === 0;
+  const showMyth = (progress.lessonDays || []).some((d) => d < day) && !planDue && !!(profile.ageBand || profile.ageAsked) && !(sunday && checkIn);
+  const mythWaiting = showMyth && !(myth && myth.day === day);
   return (
     <div>
       <div style={{ fontSize: 14, color: "var(--mid)", fontWeight: 600, margin: "4px 2px 0" }}>{todayLine(locale)}</div>
@@ -194,7 +216,7 @@ function Today({ t, locale, go, openStreak }) {
       <List style={{ marginTop: 12 }}>
         {[
           due > 0 && <ListRow key="review" icon="refresh" title={t("review.title")} sub={t("today.review.sub", { n: Math.min(due, M.REVIEW_SIZE) })} onClick={() => go("lessons", { review: true })} />,
-          checkIn && <ListRow key="checkin" icon="calendar" title={t("today.checkin")} sub={t("today.checkin.sub")} onClick={() => go("goals")} />,
+          checkIn && <ListRow key="checkin" icon="calendar" title={t("today.week")} sub={t("today.week.sub")} onClick={() => setWeekOpen(true)} />,
           mission && <ListRow key="mission" icon="flag" title={t("today.mission")} sub={mission.title} onClick={() => go("practice")} />,
           <ListRow key="streak" icon="flame" title={progress.streak.count ? t("lessons.streak", { n: progress.streak.count }) : t("today.streak.none")} sub={doneToday ? t("today.streak.done") : progress.streak.count ? t("today.streak.keep") : t("today.streak.start")} onClick={openStreak} />,
         ]
@@ -206,11 +228,65 @@ function Today({ t, locale, go, openStreak }) {
       ) : (
         <>
           <AgeCard t={t} />
+          {showMyth && <MythCard t={t} locale={locale} />}
           {/* The reminder offer only when nothing else needs doing today. */}
-          {!due && !checkIn && <ReminderCard t={t} />}
+          {!due && !checkIn && !mythWaiting && <ReminderCard t={t} />}
         </>
       )}
+      {MoneyWeek && <MoneyWeek t={t} locale={locale} go={go} open={weekOpen} onClose={() => setWeekOpen(false)} />}
     </div>
+  );
+}
+
+// MONEY MYTH OR FACT — one statement a day (myths.js), two plain buttons,
+// a two-sentence answer and +2 XP (it doesn't keep the streak). Answered,
+// it shrinks to one line until tomorrow.
+function MythCard({ t, locale }) {
+  const day = dayKey();
+  const myth = mythOf(day, locale.region);
+  const tx = useLocaleText(locale);
+  const saved = useAppState((s) => (s.modules.lessons || {}).myth);
+  const answered = saved && saved.day === day ? saved : null;
+  const [now, setNow] = useState(false); // answered on this visit: show the answer
+  const pick = (a) => {
+    setSlice("lessons", (s) => ({ ...s, myth: { day, id: myth.id, picked: a } }));
+    recordPractice("myth");
+    setNow(true);
+  };
+  if (answered && !now)
+    return (
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 12, padding: "12px 16px", background: "var(--surface)", borderRadius: 18, fontSize: 14, color: "var(--mid)" }}>
+        <Icon name="check" size={16} /> {t("myth.done")}
+      </div>
+    );
+  const right = answered && answered.picked === myth.answer;
+  const btn = { flex: 1, minHeight: 46, borderRadius: 14, border: "1px solid var(--line)", background: "var(--bg)", color: "var(--ink)", fontWeight: 700, fontSize: 16, cursor: "pointer", font: "inherit" };
+  return (
+    <Card style={{ marginTop: 12 }} data-myth={myth.id}>
+      <div style={{ fontSize: 14, fontWeight: 650, color: "var(--mid)", marginBottom: 6 }}>{t("myth.label")}</div>
+      <div style={{ fontSize: 18, fontWeight: 700, lineHeight: 1.35, color: "var(--head)" }}>“{tx(myth.claim)}”</div>
+      {!answered ? (
+        <>
+          <div style={{ display: "flex", gap: 10, marginTop: 14 }}>
+            <button className="nv-press" style={btn} onClick={() => pick("myth")}>
+              {t("myth.myth")}
+            </button>
+            <button className="nv-press" style={btn} onClick={() => pick("fact")}>
+              {t("myth.fact")}
+            </button>
+          </div>
+          <div style={{ fontSize: 13, color: "var(--low)", marginTop: 10 }}>{t("myth.meta")}</div>
+        </>
+      ) : (
+        <div role="status">
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 12, fontWeight: 750, color: right ? "var(--right)" : "var(--warn)" }}>
+            <Icon name={right ? "check" : "info"} size={18} stroke={2.6} /> {t(right ? "myth.right" : "myth.wrong", { it: t(`myth.is.${myth.answer}`) })}
+          </div>
+          <p style={{ fontSize: 15, lineHeight: 1.5, margin: "4px 0 0" }}>{tx(myth.why)}</p>
+          <div style={{ fontSize: 13, color: "var(--low)", marginTop: 8 }}>{t("myth.after")}</div>
+        </div>
+      )}
+    </Card>
   );
 }
 
