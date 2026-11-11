@@ -1,5 +1,5 @@
 // UNIT — Scams and fraud. Its lessons and the concepts they teach (format in helpers.js).
-import { T, card, choice, tf, act, concept } from "./helpers.js";
+import { T, card, choice, tf, act, concept, match, number, spot, tap } from "./helpers.js";
 
 export default {
   id: "scams",
@@ -79,6 +79,21 @@ export default {
           [null, T("Logos are easy to copy. They prove nothing.", "Los logos son fáciles de copiar. No prueban nada."), T("Timing doesn't matter — what it asks for does.", "La hora no importa; lo que pide, sí.")]
         ),
         tf("phishing", T("If a message looks official, it's safe to use its link.", "Si un mensaje se ve oficial, es seguro usar su enlace."), false, T("Looking official is exactly what phishing does. Go to the app or website yourself.", "Verse oficial es justo lo que hace el phishing. Entra tú a la app o al sitio.")),
+        spot(
+          "phishing",
+          T("This text just arrived. Tap the 2 biggest red flags.", "Te acaba de llegar este mensaje. Toca las 2 señales de alerta más grandes."),
+          "sms",
+          T("Text message · +1 (555) 013-2291", "Mensaje de texto · +1 (555) 013-2291", { en: "Text message · 55 1234 0987", es: "SMS · 55 1234 0987" }),
+          [
+            tap(T("YourBank", "TuBanco")),
+            T(": Your account is LOCKED. ", ": Tu cuenta está BLOQUEADA. "),
+            tap(T("Verify within 1 hour", "Verifícala en menos de 1 hora"), true),
+            T(" at ", " en "),
+            tap(T("yourbank-secure-login.co", "tubanco-acceso-seguro.co"), true),
+            T(" or it will be closed.", " o será cancelada."),
+          ],
+          T("The link isn't your bank's real address, and the deadline is there to rush you. Your bank never asks you to log in from a text link: open its app instead.", "El enlace no es la dirección real de tu banco, y el plazo está para apresurarte. Tu banco nunca te pide entrar desde un enlace en un mensaje: abre su app.")
+        ),
         act("goals.scam", T("Spot the red flags in this message.", "Encuentra las señales de alerta en este mensaje."), { set: "phishing" }),
       ],
     },
@@ -100,6 +115,23 @@ export default {
           [null, T("Savings accounts pay a few percent a year, not per day.", "Las cuentas de ahorro pagan unos cuantos puntos al año, no al día."), T("Even the US stock market has averaged roughly {@marketAvgNominal} a year before inflation, or about {@marketAvgReal} after inflation, over long periods — a year, not a day, and with no guarantee.", "Incluso la bolsa de EE. UU. ha promediado más o menos {@marketAvgNominal} al año antes de inflación, o cerca de {@marketAvgReal} después de inflación, en periodos largos: al año, no al día, y sin garantía.")]
         ),
         tf("fake_investments", T("Checking whether a firm is registered takes only a few minutes.", "Revisar si una empresa está registrada toma solo unos minutos."), true, T("A quick search on the regulator's site can save you from losing everything.", "Una búsqueda rápida en el sitio del regulador te puede salvar de perderlo todo.")),
+        spot(
+          "fake_investments",
+          T("A stranger messages you. Tap the 3 red flags.", "Un desconocido te escribe. Toca las 3 señales de alerta."),
+          "offer",
+          T("Message from @wealth.coach.daily", "Mensaje de @wealth.coach.daily"),
+          [
+            T("Hey! I turned {$500|7500} into {$9000|135000} in a month with my trading group. ", "¡Hola! Convertí {$500|7500} en {$9000|135000} en un mes con mi grupo de trading. "),
+            tap(T("Guaranteed 20% a week", "20% semanal garantizado"), true),
+            T(". ", ". "),
+            tap(T("Only 3 spots left", "Solo quedan 3 lugares"), true),
+            T(", so ", ", así que "),
+            tap(T("send the fee with a gift card", "manda la cuota con una tarjeta de regalo"), true),
+            T(" today. ", " hoy. "),
+            tap(T("Here's my profile", "Aquí está mi perfil")),
+          ],
+          T("Guaranteed high returns, a rush, and payment by gift card are three classic scam signs. A real investment never asks for gift cards.", "Rendimientos altos garantizados, prisa y pago con tarjeta de regalo son tres señales clásicas de fraude. Una inversión real nunca pide tarjetas de regalo.")
+        ),
         act("goals.scam", T("Spot the red flags in this investment pitch.", "Encuentra las señales de alerta en esta oferta de inversión."), { set: "investment" }),
       ],
     },
@@ -118,6 +150,7 @@ export default {
           [null, T("Normal sales jobs pay you for selling to customers, not for signing up other sellers.", "Los trabajos de ventas normales te pagan por venderle a clientes, no por inscribir a otros vendedores."), T("A savings plan keeps your money yours. Here it flows up to others.", "Un plan de ahorro mantiene tu dinero como tuyo. Aquí se va hacia los de arriba.")]
         ),
         tf("pyramid_schemes", T("Most people who join pyramid schemes lose money.", "La mayoría de quienes entran a esquemas piramidales pierde dinero."), true, T("Only those near the top earn — paid by everyone below them.", "Solo ganan los de arriba, con el dinero de todos los de abajo.")),
+        number("pyramid_schemes", T("In a pyramid, each member must bring in 6 new people. Level 1 is 1 person, level 2 needs 6, level 3 needs 36. How many does level 4 need?", "En una pirámide, cada miembro debe traer a 6 personas nuevas. El nivel 1 es 1 persona, el nivel 2 necesita 6 y el nivel 3 necesita 36. ¿Cuántas necesita el nivel 4?"), { unit: "number", answer: 216 }, [T("Each level is 6 times the one before: 36 × 6 = 216.", "Cada nivel es 6 veces el anterior: 36 × 6 = 216."), T("By level 14 it would take more people than live on Earth, so most people join too late to earn anything.", "Para el nivel 14 harían falta más personas de las que viven en la Tierra, así que casi todos entran demasiado tarde para ganar algo.")]),
         act("goals.scam", T("Spot the red flags in this \"business opportunity.\"", "Encuentra las señales de alerta en esta \"oportunidad de negocio\"."), { set: "pyramid" }),
       ],
     },
@@ -136,6 +169,17 @@ export default {
           [null, T("However strong, one leaked password then opens everything.", "Por más fuerte que sea, una contraseña filtrada abre todo."), T("Plain notes aren't protected. A password manager is built for this.", "Las notas comunes no están protegidas. Un administrador de contraseñas está hecho para eso.")]
         ),
         tf("account_security", T("It's fine to share a login code with a friend if they ask nicely.", "Está bien compartir un código de acceso con un amigo si te lo pide con amabilidad."), false, T("Never share codes. The \"friend\" may be someone who took over their account.", "Nunca compartas códigos. El \"amigo\" puede ser alguien que se robó su cuenta.")),
+        match(
+          "account_security",
+          T("Match each lock to what it does.", "Une cada protección con lo que hace."),
+          [
+            [T("Two-step verification", "Verificación en dos pasos"), T("A second check besides your password", "Una segunda revisión además de tu contraseña")],
+            [T("Password manager", "Administrador de contraseñas"), T("Keeps a different strong password for every site", "Guarda una contraseña fuerte distinta para cada sitio")],
+            [T("Software updates", "Actualizaciones"), T("Fix security holes in your phone and apps", "Tapan huecos de seguridad en tu celular y tus apps")],
+            [T("Card freeze", "Bloqueo de tarjeta"), T("Stops new charges if your card goes missing", "Frena cargos nuevos si pierdes tu tarjeta")],
+          ],
+          T("Each one is small. Together, they stop most attacks.", "Cada una es pequeña. Juntas detienen la mayoría de los ataques.")
+        ),
         act("goals.scam", T("Which of these tips are risky?", "¿Cuáles de estos consejos son riesgosos?"), { set: "security" }),
       ],
     },

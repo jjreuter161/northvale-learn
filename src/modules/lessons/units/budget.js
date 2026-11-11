@@ -1,5 +1,5 @@
 // UNIT — Budgeting. Its lessons and the concepts they teach (format in helpers.js).
-import { T, card, choice, tf, act, concept } from "./helpers.js";
+import { T, card, choice, tf, act, concept, estimate, number, scenario, fit } from "./helpers.js";
 
 export default {
   id: "budget",
@@ -65,6 +65,7 @@ export default {
           [T("{$40|600} is 10%. With 50/30/20, saving is 20%.", "{$40|600} es el 10%. Con 50/30/20, el ahorro es el 20%."), null, T("{$200|3000} is 50% — that's the share for needs, not saving.", "{$200|3000} es el 50%: esa es la parte de necesidades, no del ahorro.")]
         ),
         tf("budgeting", T("A budget means you can never buy anything fun.", "Tener presupuesto significa que nunca puedes comprar nada divertido."), false, T("Fun money is part of the plan. A budget just makes sure fun doesn't eat your rent or your savings.", "El dinero para gustos es parte del plan. El presupuesto solo cuida que los gustos no se coman tus pagos ni tu ahorro.")),
+        number("budgeting", T("You get {$400|6000} a month and follow 50/30/20. How much goes to saving each month?", "Recibes {$400|6000} al mes y sigues el 50/30/20. ¿Cuánto va al ahorro cada mes?"), { unit: "money", answer: [80, 1200] }, [T("Saving is the 20%, which is 0.20.", "El ahorro es el 20%, o sea 0.20."), T("0.20 × {$400|6000} = {$80|1200} a month.", "0.20 × {$400|6000} = {$80|1200} al mes.")]),
         act("goals.budget", T("Split {$400|6000} a month your way. Try to save at least 10%.", "Reparte {$400|6000} al mes a tu manera. Intenta ahorrar al menos 10%."), {income: [400,6000]}),
       ],
     },
@@ -83,6 +84,16 @@ export default {
         ),
         card(T("Goals make it easier", "Las metas lo hacen más fácil"), T("Saying no to a want is easier when you're saying yes to a goal. \"I'm saving for a phone\" beats \"I'm not allowed to spend.\"", "Decirle que no a un gusto es más fácil cuando le dices que sí a una meta. \"Estoy ahorrando para un celular\" funciona mejor que \"no puedo gastar\".")),
         tf("needs_wants", T("The same thing can be a need for one person and a want for another.", "Una misma cosa puede ser necesidad para una persona y gusto para otra."), true, T("A car is a need if there's no other way to get to work — and a want if the bus works fine. Context matters.", "Un coche es necesidad si no hay otra forma de llegar al trabajo, y es gusto si el transporte público te sirve bien. Depende de tu situación.")),
+        scenario(
+          "needs_wants",
+          T("You have {$60|900} left until payday and still need groceries. A friend invites you to a {$40|600} concert tonight. What would you do?", "Te quedan {$60|900} hasta el día de pago y todavía necesitas comprar comida. Un amigo te invita a un concierto de {$40|600} hoy en la noche. ¿Qué harías?"),
+          [
+            fit(T("Buy groceries first, then go only if enough is left", "Comprar la comida primero e ir solo si alcanza"), "good", T("Needs first, and the fun still happens if the money's there.", "Primero las necesidades, y la diversión sigue en pie si alcanza.")),
+            fit(T("Skip it this time and suggest something free", "No ir esta vez y proponer un plan gratis"), "ok", T("Easy on your budget, and you still see your friend.", "Cuida tu presupuesto y aun así ves a tu amigo.")),
+            fit(T("Go, and figure out food later", "Ir y ver lo de la comida después"), "poor", T("The want eats the need. Food is the one you can't skip.", "El gusto se come la necesidad. La comida es la que no puedes saltarte.")),
+          ],
+          T("Needs get paid first; wants fit in the space that's left.", "Las necesidades se pagan primero; los gustos caben en lo que sobra.")
+        ),
         act("goals.create", T("Make your first goal: something you want, how much it costs, and when.", "Crea tu primera meta: algo que quieras, cuánto cuesta y para cuándo."), {name: {en: "New headphones",es: "Audífonos nuevos"},target: [300,5000],months: 6}),
       ],
     },
@@ -101,6 +112,7 @@ export default {
         ),
         card(T("Track for one week", "Anótalo una semana"), T("Write down everything you spend for 7 days. Most people are surprised. You can't fix a leak you can't see.", "Anota todo lo que gastes durante 7 días. Casi a todos les sorprende. No puedes tapar una fuga que no ves.")),
         tf("small_leaks", T("Subscriptions you forgot about are a common small leak.", "Las suscripciones que olvidaste son una fuga muy común."), true, T("Free trials turn into monthly charges. Check your app store subscriptions once in a while.", "Las pruebas gratis se vuelven cobros mensuales. Revisa de vez en cuando las suscripciones en tu tienda de apps.")),
+        estimate("small_leaks", T("A {$4|60} drink, five days a week. About how much is that in a year?", "Una bebida de {$4|60}, cinco días a la semana. ¿Cuánto es más o menos en un año?"), { unit: "money", min: [100, 1500], max: [3000, 45000], step: [20, 300], answer: [1040, 15600] }, T("{$4|60} × 5 days × 52 weeks is about {$1040|15600}. A little, many times.", "{$4|60} × 5 días × 52 semanas son unos {$1040|15600}. Poco, muchas veces.")),
         act("goals.leak", T("See what cutting one small leak does to your goal.", "Mira qué le pasa a tu meta si tapas una fuga pequeña."), {leak: [5,80],perWeek: 3}),
       ],
     },

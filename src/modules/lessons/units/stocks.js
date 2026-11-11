@@ -1,5 +1,5 @@
 // UNIT — Stocks. Its lessons and the concepts they teach (format in helpers.js).
-import { T, card, choice, tf, act, concept } from "./helpers.js";
+import { T, card, choice, tf, act, concept, order, estimate, match } from "./helpers.js";
 
 export default {
   id: "stocks",
@@ -65,6 +65,17 @@ export default {
           [T("Lending money to a company is a bond. A share is ownership.", "Prestarle dinero a una empresa es un bono. Una acción es propiedad."), null, T("Owning shares doesn't make you an employee.", "Tener acciones no te convierte en empleado.")]
         ),
         tf("what_stock", T("Stock prices can go down as well as up.", "El precio de una acción puede bajar, no solo subir."), true, T("Always. Owning stocks means riding the ups and downs.", "Siempre. Tener acciones significa aguantar las subidas y las bajadas.")),
+        match(
+          "what_stock",
+          T("Match each word to what it means.", "Une cada palabra con lo que significa."),
+          [
+            [T("Share", "Acción"), T("A tiny piece of a company", "Un pedacito de una empresa")],
+            [T("Dividend", "Dividendo"), T("Part of the profit paid to owners", "Parte de las ganancias que se paga a los dueños")],
+            [T("Stock exchange", "Bolsa de valores"), T("Where shares are bought and sold", "Donde se compran y venden acciones")],
+            [T("Ticker", "Clave de pizarra"), T("A stock's short code", "El código corto de una acción")],
+          ],
+          T("Own a share, and you own a sliver of the company and its future profits.", "Si tienes una acción, eres dueño de un pedacito de la empresa y de sus ganancias futuras.")
+        ),
         act("portfolio.watch", T("Find 2 companies you know and add them to your watchlist.", "Busca 2 empresas que conozcas y agrégalas a tu lista."), {count: 2}),
       ],
     },
@@ -83,6 +94,7 @@ export default {
           [null, T("Better-than-expected profits usually push the price up, not down.", "Ganancias mejores de lo esperado suelen subir el precio, no bajarlo."), T("Prices react to news like this all the time.", "Los precios reaccionan a noticias así todo el tiempo.")]
         ),
         tf("price_moves", T("If a stock went up last month, it will go up next month too.", "Si una acción subió el mes pasado, va a subir el próximo mes."), false, T("Past moves don't predict the next one. Anyone who says they know is guessing.", "Lo que pasó no predice lo que sigue. Quien diga que sabe, está adivinando.")),
+        order("price_moves", T("Put this in order: how a stock's price falls after news.", "Ordena esto: cómo baja el precio de una acción después de una noticia."), [T("The company earns less than people expected", "La empresa gana menos de lo que se esperaba"), T("Some owners decide to sell", "Algunos dueños deciden vender"), T("There are more sellers than buyers", "Hay más vendedores que compradores"), T("The price drops until buyers step in", "El precio baja hasta que llegan compradores")], T("Prices move with expectations: the gap between what people expected and what happened.", "Los precios se mueven con las expectativas: la diferencia entre lo que se esperaba y lo que pasó.")),
         act("portfolio.chart", T("Open a 1-year chart for any company. Find its highest and lowest point.", "Abre la gráfica de 1 año de cualquier empresa. Encuentra su punto más alto y el más bajo."), {}),
       ],
     },
@@ -101,6 +113,7 @@ export default {
           [T("Selling in a panic locks in the loss. Drops this size are common.", "Vender por pánico vuelve real la pérdida. Caídas de ese tamaño son comunes."), null, T("Borrowing to invest can multiply losses, and you still owe the loan.", "Pedir prestado para invertir puede multiplicar las pérdidas, y la deuda sigue ahí.")]
         ),
         tf("volatility", T("Only invest money you won't need for several years.", "Solo invierte dinero que no vas a necesitar en varios años."), true, T("That way a bad year doesn't force you to sell at a low price.", "Así un mal año no te obliga a vender a un precio bajo.")),
+        estimate("volatility", T("An investment drops 20%. How much does it then have to rise to get back to where it started?", "Una inversión baja 20%. ¿Cuánto tiene que subir después para volver a donde empezó?"), { unit: "percent", min: 0, max: 100, step: 1, answer: 25 }, T("{$100|1000} falls to {$80|800}. Getting back to {$100|1000} takes {$20|200} more, which is 25% of {$80|800}.", "{$100|1000} baja a {$80|800}. Volver a {$100|1000} requiere {$20|200} más, que es el 25% de {$80|800}.")),
         act("portfolio.chart", T("Look at a 1-year chart and ask the tutor to explain it.", "Mira una gráfica de 1 año y pídele al tutor que te la explique."), {explain: true}),
       ],
     },

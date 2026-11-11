@@ -1,5 +1,5 @@
 // UNIT — Risk & diversification. Its lessons and the concepts they teach (format in helpers.js).
-import { T, card, choice, tf, act, concept } from "./helpers.js";
+import { T, card, choice, tf, act, concept, order, number, scenario, fit } from "./helpers.js";
 
 export default {
   id: "risk",
@@ -65,6 +65,7 @@ export default {
           [T("Real investments can't promise 30% a month with no risk. That pitch is a classic scam.", "Ninguna inversión real puede prometer 30% al mes sin riesgo. Esa promesa es un fraude clásico."), null, T("Savings accounts pay a few percent a year, not 30% a month.", "Las cuentas de ahorro pagan unos cuantos puntos al año, no 30% al mes.")]
         ),
         tf("risk_reward", T("A higher possible return usually means higher risk.", "Una ganancia posible más alta normalmente significa más riesgo."), true, T("That's the trade-off at the heart of investing.", "Ese es el intercambio que está en el centro de invertir.")),
+        order("risk_reward", T("Order these from safest to riskiest.", "Ordena del más seguro al más riesgoso."), [T("An insured savings account", "Una cuenta de ahorro asegurada", { en: "A savings account protected by IPAB", es: "Una cuenta de ahorro protegida por el IPAB" }), T("Treasury bills", "Letras del Tesoro", { en: "CETES", es: "CETES" }), T("A fund of the whole stock market", "Un fondo de todo el mercado de acciones"), T("One company's stock", "La acción de una sola empresa"), T("A brand-new cryptocurrency", "Una criptomoneda recién creada")], T("More possible reward comes with more possible loss. Safe things grow slowly; risky ones can grow fast or vanish.", "Más ganancia posible viene con más pérdida posible. Lo seguro crece despacio; lo riesgoso puede crecer rápido o desaparecer.")),
         act("goals.invest", T("Compare the safe path and the stock-market path for a 5-year goal.", "Compara el camino seguro y el de la bolsa para una meta a 5 años."), {monthly: [100,1500],years: 5,compareSafe: true}),
       ],
     },
@@ -83,6 +84,16 @@ export default {
         ),
         card(T("Know what you own", "Conoce lo que tienes"), T("Owning five funds that all hold the same big companies isn't real variety. Check what's inside.", "Tener cinco fondos que tienen las mismas grandes empresas no es variedad de verdad. Revisa qué hay adentro.")),
         tf("diversification", T("Diversification can remove all risk.", "Diversificar puede eliminar todo el riesgo."), false, T("It lowers the risk of one investment ruining you, but the whole market can still fall.", "Reduce el riesgo de que una sola inversión te arruine, pero todo el mercado puede caer igual.")),
+        scenario(
+          "diversification",
+          T("A friend owns four stocks, all video game companies. What would spread their risk best?", "Un amigo tiene cuatro acciones, todas de empresas de videojuegos. ¿Qué repartiría mejor su riesgo?"),
+          [
+            fit(T("Moving part of it into a whole-market fund", "Pasar una parte a un fondo de todo el mercado"), "good", T("Hundreds of companies in many industries, so one bad year for games hurts less.", "Cientos de empresas de muchas industrias, así un mal año para los videojuegos duele menos.")),
+            fit(T("Adding a few companies from other industries", "Agregar algunas empresas de otras industrias"), "ok", T("A real improvement, though still a small basket.", "Mejora de verdad, aunque sigue siendo una canasta pequeña.")),
+            fit(T("Adding a fifth video game company", "Agregar una quinta empresa de videojuegos"), "poor", T("More companies, same risk: one bad year for games hits all five.", "Más empresas, el mismo riesgo: un mal año para los videojuegos les pega a las cinco.")),
+          ],
+          T("Diversifying means owning things that don't all fall for the same reason.", "Diversificar es tener cosas que no caen todas por la misma razón.")
+        ),
         act("portfolio.diversify", T("Get at least 3 different investments in your practice portfolio.", "Ten al menos 3 inversiones distintas en tu portafolio de práctica."), {min: 3}),
       ],
     },
@@ -101,6 +112,7 @@ export default {
           [T("Loving the product doesn't tell you if the stock's price is a good deal — or protect you if it falls.", "Que te encante el producto no te dice si el precio de la acción conviene, ni te protege si cae."), null]
         ),
         tf("stock_picking", T("In this app you're unlocking individual stocks. Real stock trading usually needs an adult's help until you're 18.", "En esta app desbloqueas acciones individuales. En la vida real, comprar acciones normalmente requiere ayuda de un adulto hasta que tengas 18."), true, T("In real life, under-18s usually invest through an account an adult opens for them (a custodial account).", "En la vida real, los menores de 18 normalmente invierten con una cuenta que abre un adulto por ellos.")),
+        number("stock_picking", T("You put {$1000|10000} into one stock. It falls 50%, then rises 50%. How much do you have now?", "Pones {$1000|10000} en una acción. Baja 50% y luego sube 50%. ¿Cuánto tienes ahora?"), { unit: "money", answer: [750, 7500] }, [T("After the fall: {$500|5000}.", "Después de la caída: {$500|5000}."), T("50% of {$500|5000} is {$250|2500}, so {$750|7500}. The rise is figured on a smaller amount.", "El 50% de {$500|5000} son {$250|2500}, así que {$750|7500}. La subida se calcula sobre una cantidad menor.")]),
         act("portfolio.buy", T("Stocks are unlocked! Practice: buy a small slice of one company — under 10% of your portfolio.", "¡Acciones desbloqueadas! Práctica: compra una parte pequeña de una empresa, menos del 10% de tu portafolio."), {type: "stock",maxShare: 0.1}),
       ],
     },

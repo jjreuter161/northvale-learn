@@ -1,5 +1,5 @@
 // UNIT — Your first paycheck. Its lessons and the concepts they teach (format in helpers.js).
-import { T, card, choice, tf, act, concept } from "./helpers.js";
+import { T, card, choice, tf, act, concept, match, number, spot, tap } from "./helpers.js";
 
 export default {
   id: "paycheck",
@@ -85,6 +85,7 @@ export default {
           [null, T("Part of gross pay never reaches you, so planning with it overspends.", "Una parte del bruto nunca te llega, así que planear con él te hace gastar de más."), T("Counting money you don't have yet is how budgets break.", "Contar dinero que todavía no tienes es como se rompen los presupuestos.")]
         ),
         tf("gross_net", T("Gross pay is usually bigger than net pay.", "El sueldo bruto suele ser mayor que el neto."), true, T("Deductions come out of gross to give you net.", "Los descuentos salen del bruto para dar el neto.")),
+        number("gross_net", T("Your job offer says {$15|80} an hour, 20 hours a week. What's your gross pay for one week?", "Tu oferta de trabajo dice {$15|80} la hora, 20 horas a la semana. ¿Cuál es tu sueldo bruto de una semana?"), { unit: "money", answer: [300, 1600] }, [T("Gross is before anything comes out: {$15|80} × 20 hours.", "El bruto es antes de que te descuenten nada: {$15|80} × 20 horas."), T("That's {$300|1600}. Your net pay, after taxes, will be less.", "Son {$300|1600}. Tu sueldo neto, después de impuestos, será menor.")]),
         act("goals.paycheck", T("Move the gross pay and see what you'd take home.", "Mueve el sueldo bruto y mira cuánto te llegaría."), { gross: [1600, 12000] }),
       ],
     },
@@ -109,6 +110,16 @@ export default {
           [null, T("It goes to the government program, not to your employer.", "Va al programa del gobierno, no a tu empleador.", { en: "It goes to IMSS and your AFORE, not to your employer.", es: "Va al IMSS y a tu AFORE, no a tu patrón." }), T("Payroll deductions are for taxes and benefits, not your bills.", "Los descuentos de nómina son para impuestos y prestaciones, no para tus cuentas.")]
         ),
         tf("payroll_deductions", T("Your employer pays part of these costs too, on top of what comes out of your pay.", "Tu empleador también paga parte de estos costos, además de lo que sale de tu sueldo."), true, T("Your share is only part of the total.", "Tu parte es solo una porción del total.")),
+        match(
+          "payroll_deductions",
+          T("Match what comes out of your pay to what it's for.", "Une cada descuento de tu sueldo con para qué es."),
+          [
+            [T("Income tax", "Impuesto sobre la renta", { en: "ISR", es: "ISR" }), T("A share of what you earn, for public services", "Una parte de lo que ganas, para servicios públicos")],
+            [T("Social Security", "Seguro Social", { en: "IMSS", es: "IMSS" }), T("Retirement and disability benefits later", "Pensión y apoyo por incapacidad más adelante", { en: "Health care, disability coverage and part of your AFORE", es: "Atención médica, incapacidades y parte de tu AFORE" })],
+            [T("Medicare", "Medicare", { en: "Employment subsidy", es: "Subsidio para el empleo" }), T("Health care when you're older", "Atención médica cuando seas mayor", { en: "Lowers the tax for people who earn less", es: "Baja el impuesto a quienes ganan menos" })],
+          ],
+          T("These come out before your pay arrives, so your net pay is smaller than your gross.", "Se descuentan antes de que llegue tu sueldo, por eso el neto es menor que el bruto.")
+        ),
         act("goals.paycheck", T("Change the example tax rate and watch take-home pay change.", "Cambia la tasa de impuesto de ejemplo y mira cómo cambia lo que te llega."), { gross: [2000, 10000] }),
       ],
     },
@@ -127,6 +138,19 @@ export default {
           [null, T("A refund, if any, comes after you file your taxes — not on a pay stub.", "Una devolución, si hay, llega después de declarar, no en el recibo de pago.", { en: "That's the \"deducciones\" part.", es: "Eso es la parte de deducciones." }), T("It's an amount, not a signature.", "Es un monto, no una firma.", { en: "It's a list of amounts, not notes.", es: "Es una lista de montos, no notas." })]
         ),
         tf("pay_stub", T("Your pay stub can be used as proof of income.", "Tu recibo de pago sirve como comprobante de ingresos."), true, T("Landlords and lenders often ask for recent pay stubs.", "Arrendadores y prestamistas suelen pedir recibos recientes.")),
+        spot(
+          "pay_stub",
+          T("You worked 36 hours at {$16|90} an hour. Tap the 2 lines on this pay stub that are wrong.", "Trabajaste 36 horas a {$16|90} la hora. Toca las 2 líneas de este recibo que están mal."),
+          "receipt",
+          T("Pay stub · Nov 1–14", "Recibo de pago · 1–14 de nov.", { en: "Payslip · Nov 1–15", es: "Recibo de nómina · 1–15 de nov." }),
+          [
+            tap(T("Hours worked: 32", "Horas trabajadas: 32"), true),
+            tap(T("Pay rate: {$15|80} an hour", "Pago por hora: {$15|80}"), true),
+            tap(T("Federal tax withheld: $38", "Impuesto federal retenido: $38", { en: "ISR withheld: $230", es: "ISR retenido: $230" })),
+            tap(T("Pay date: Nov 15", "Fecha de pago: 15 de nov.")),
+          ],
+          T("32 hours at {$15|80} is less than you earned. Check hours and rate on every stub: mistakes happen, and they get fixed when you ask.", "32 horas a {$15|80} es menos de lo que ganaste. Revisa horas y tarifa en cada recibo: los errores pasan y se corrigen si preguntas.")
+        ),
         act("goals.budget", T("Plan a month using a net pay of {$1400|8000}.", "Planea un mes con un sueldo neto de {$1400|8000}."), { income: [1400, 8000] }),
       ],
     },
@@ -145,6 +169,16 @@ export default {
           [null, T("Your employer may pay into your account, but the W-4 is about taxes.", "Tu empleador puede pagarte a tu cuenta, pero el W-4 es sobre impuestos.", { en: "Banks may ask for your RFC, but only the SAT issues it.", es: "Los bancos te lo pueden pedir, pero solo el SAT lo emite." }), T("That's the W-2, which you get at the end of the year.", "Ese es el W-2, que recibes al final del año.", { en: "Schools don't issue tax IDs.", es: "Las escuelas no emiten claves fiscales." })]
         ),
         tf("job_paperwork", T("You get a W-2 at the end of the year showing your pay and withholding.", "Al final del año recibes un W-2 con tu sueldo y lo que te retuvieron.", { en: "Your employer registers you with IMSS when you start a formal job.", es: "Tu patrón te da de alta en el IMSS cuando empiezas un trabajo formal." }), true, T("Employers must send it by the end of January.", "Los empleadores deben enviarlo a más tardar a fines de enero.", { en: "That registration gives you health care and starts your AFORE contributions.", es: "Ese registro te da atención médica y empieza las aportaciones a tu AFORE." })),
+        match(
+          "job_paperwork",
+          T("Match each first-job paper to what it's for.", "Une cada papel del primer trabajo con para qué sirve."),
+          [
+            [T("W-4", "W-4", { en: "RFC", es: "RFC" }), T("Sets how much tax is withheld from your pay", "Define cuánto impuesto te retienen", { en: "Your tax ID, from the SAT", es: "Tu clave para impuestos, del SAT" })],
+            [T("I-9", "I-9", { en: "NSS", es: "NSS" }), T("Shows you're allowed to work in the US", "Muestra que puedes trabajar en EE. UU.", { en: "Your IMSS number", es: "Tu número del IMSS" })],
+            [T("W-2", "W-2", { en: "Payslip", es: "Recibo de nómina" }), T("A yearly summary of your pay and taxes", "Un resumen anual de tu sueldo e impuestos", { en: "The record of each payday", es: "El comprobante de cada pago" })],
+          ],
+          T("Keep copies of all of them in one place. You'll need them again.", "Guarda copias de todos en un solo lugar. Los vas a volver a necesitar.")
+        ),
         act("goals.create", T("Make a goal for part of your first paychecks.", "Crea una meta para una parte de tus primeros sueldos."), { name: T("Savings from my first job", "Ahorro de mi primer trabajo"), target: [500, 6000], months: 6 }),
       ],
     },

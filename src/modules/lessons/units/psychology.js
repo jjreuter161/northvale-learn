@@ -1,5 +1,5 @@
 // UNIT — The psychology of money. Its lessons and the concepts they teach (format in helpers.js).
-import { T, card, choice, tf, act, concept } from "./helpers.js";
+import { T, card, choice, tf, act, concept, order, spot, tap, scenario, fit } from "./helpers.js";
 
 export default {
   id: "psychology",
@@ -79,6 +79,16 @@ export default {
           [null, T("That's the opposite — the rule adds a pause.", "Es lo contrario: la regla agrega una pausa."), T("It's about deciding before you buy, not returning after.", "Se trata de decidir antes de comprar, no de devolver después.")]
         ),
         tf("impulse_spending", T("Feeling stressed or bored can make impulse buys more likely.", "Sentirte estresado o aburrido puede hacer más probables las compras impulsivas."), true, T("Spending can feel like a quick fix for a mood.", "Gastar puede sentirse como un arreglo rápido para el ánimo.")),
+        scenario(
+          "impulse_spending",
+          T("Sneakers you love are {$90|1350}, “today only”. Your plan has {$40|600} for wants this week. What do you do?", "Unos tenis que te encantan cuestan {$90|1350}, “solo hoy”. Tu plan tiene {$40|600} para gustos esta semana. ¿Qué haces?"),
+          [
+            fit(T("Wait a day and see if you still want them", "Esperar un día y ver si todavía los quieres"), "good", T("A pause lets the rush fade. “Today only” sales come back more often than they say.", "Una pausa deja que pase el impulso. Las ofertas de “solo hoy” vuelven más seguido de lo que dicen.")),
+            fit(T("Buy them and skip wants for the next two weeks", "Comprarlos y no gastar en gustos las próximas dos semanas"), "ok", T("It fits the plan if you really stick to it.", "Cabe en el plan si de verdad lo cumples.")),
+            fit(T("Put them on a card and figure it out later", "Pagarlos con tarjeta y ver después"), "poor", T("Later usually means interest, and next week's plan already spent.", "Después suele significar intereses y el plan de la próxima semana ya gastado.")),
+          ],
+          T("Impulse buys are about the feeling of now. A pause gives the plan a chance.", "Las compras por impulso son por la emoción del momento. Una pausa le da una oportunidad al plan.")
+        ),
         act("goals.leak", T("See what one small impulse habit does to your goal.", "Mira qué le hace a tu meta un pequeño hábito impulsivo."), { leak: [8, 120], perWeek: 2 }),
       ],
     },
@@ -97,6 +107,23 @@ export default {
           [null, T("It says nothing about quality — only about urgency.", "No dice nada de la calidad, solo de la urgencia."), T("It's marketing, not a tax message.", "Es publicidad, no un aviso fiscal.")]
         ),
         tf("fomo", T("Social media shows a realistic picture of what people spend.", "Las redes sociales muestran una imagen realista de lo que la gente gasta."), false, T("You see the highlights, not the debts or the trade-offs.", "Ves lo mejor, no las deudas ni lo que sacrificaron.")),
+        spot(
+          "fomo",
+          T("This ad wants you to hurry. Tap the 2 pressure tactics.", "Este anuncio quiere que te apures. Toca las 2 tácticas de presión."),
+          "offer",
+          T("Ad · SneakerDrop", "Anuncio · SneakerDrop"),
+          [
+            T("The shoes everyone's wearing this season. ", "Los tenis que todos traen esta temporada. "),
+            tap(T("Only 2 left in your size!", "¡Solo quedan 2 en tu talla!"), true),
+            T(" · ", " · "),
+            tap(T("Sale ends in 09:59", "La oferta termina en 09:59"), true),
+            T(" · ", " · "),
+            tap(T("Free returns within 30 days", "Devolución gratis en 30 días")),
+            T(" · ", " · "),
+            tap(T("Size guide", "Guía de tallas")),
+          ],
+          T("Scarcity and a ticking clock are there to rush you. Free returns and a size guide are just useful information.", "La escasez y un reloj corriendo están para apresurarte. La devolución gratis y la guía de tallas son solo información útil.")
+        ),
         act("goals.scam", T("Find the pressure tactics in this ad.", "Encuentra las tácticas de presión en este anuncio."), { set: "fomo" }),
       ],
     },
@@ -115,6 +142,16 @@ export default {
           [null, T("Watching every move makes losses feel bigger and more frequent.", "Ver cada movimiento hace que las pérdidas se sientan más grandes y frecuentes."), T("Feelings are exactly what the bias distorts.", "Las emociones son justo lo que el sesgo distorsiona.")]
         ),
         tf("loss_aversion", T("Loss aversion can make people sell after a drop instead of sticking to their plan.", "La aversión a las pérdidas puede hacer que la gente venda después de una caída en vez de seguir su plan."), true, T("Escaping the feeling of loss can feel more urgent than the long-term goal.", "Escapar de la sensación de pérdida puede sentirse más urgente que la meta de largo plazo.")),
+        scenario(
+          "loss_aversion",
+          T("Your practice investment is down 15% this month. What do you do?", "Tu inversión de práctica bajó 15% este mes. ¿Qué haces?"),
+          [
+            fit(T("Stick to the plan you made before the drop", "Seguir el plan que hiciste antes de la caída"), "good", T("You decided calmly; a drop is exactly when that plan helps.", "Lo decidiste con calma; una caída es justo cuando ese plan ayuda.")),
+            fit(T("Check it less often for a while", "Revisarla menos seguido por un tiempo"), "ok", T("Fewer looks, less pain, and fewer rushed decisions.", "Menos vistazos, menos angustia y menos decisiones apresuradas.")),
+            fit(T("Sell everything so it stops hurting", "Vender todo para que deje de doler"), "poor", T("That turns a drop on paper into a real loss, often right before a recovery.", "Eso convierte una caída en papel en una pérdida real, a veces justo antes de una recuperación.")),
+          ],
+          T("Losses feel about twice as bad as gains feel good. Deciding ahead of time protects you from that feeling.", "Las pérdidas se sienten como el doble de mal de lo bien que se sienten las ganancias. Decidir con anticipación te protege de esa sensación.")
+        ),
         act("portfolio.chart", T("Read a real chart with ups and downs, and notice how the drops feel.", "Lee una gráfica real con subidas y bajadas, y nota cómo se sienten las caídas.")),
       ],
     },
@@ -133,6 +170,7 @@ export default {
           [null, T("By the time news reaches you, prices have usually moved.", "Cuando la noticia te llega, los precios casi siempre ya se movieron."), T("Waiting for perfect often means not starting — and losing years of compounding.", "Esperar lo perfecto suele significar no empezar, y perder años de interés compuesto.")]
         ),
         tf("consistency", T("Staying invested through ups and downs has historically mattered more than picking the perfect moment.", "Quedarse invertido en las subidas y bajadas históricamente ha importado más que elegir el momento perfecto."), true, T("History isn't a promise, but it's a strong pattern.", "La historia no es una promesa, pero es un patrón fuerte.")),
+        order("consistency", T("Put the steps of investing on a schedule in order.", "Ordena los pasos para invertir con calendario."), [T("Pick an amount you can keep up", "Elige una cantidad que puedas mantener"), T("Pick a day, like payday", "Elige un día, como el de pago"), T("Make it automatic", "Hazlo automático"), T("Check in a few times a year, not every day", "Revisa unas cuantas veces al año, no a diario")], T("Decide once, automate it, then let time do the work.", "Decide una vez, automatízalo y deja que el tiempo haga el trabajo.")),
         act("goals.invest", T("See where a steady monthly amount could go — in good years and bad.", "Mira a dónde podría llegar un monto mensual constante, en años buenos y malos."), { monthly: [50, 750], years: 10 }),
       ],
     },

@@ -45,7 +45,8 @@ assert.deepEqual(M.pickReview({ c: concepts.c }, day).ids, ["c"], "nothing due: 
 assert.equal(M.pickReview({}, day).ids.length, 0);
 assert.equal(M.nextDue({ c: concepts.c, a: concepts.a }), "2026-03-01");
 const pool = conceptPool("compound_interest");
-assert.equal(pool.lesson.length, 2);
+assert.equal(pool.lesson.length, 3);
+assert.ok(pool.lesson.some((q) => q.type === "estimate"), "the new kinds of question join reviews too");
 assert.equal(M.pickQuestion(pool, undefined), pool.easy, "new or weak: the easier question first");
 assert.equal(M.pickQuestion(pool, { box: 5, seen: 0 }), pool.challenge, "strong: the challenge");
 assert.ok(pool.lesson.includes(M.pickQuestion(pool, { box: 2, seen: 0 })), "in between: a lesson question");

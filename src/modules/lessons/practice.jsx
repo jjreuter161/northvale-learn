@@ -72,13 +72,14 @@ export function useConcepts() {
 
 // ---- a question and its feedback -----------------------------------------
 
-export function QuestionView({ t, locale, step, picked, setPicked, checked, label }) {
+// `bare`: just the options (the question types around it show the rest).
+export function QuestionView({ t, locale, step, picked, setPicked, checked, label, bare }) {
   const x = tx(locale);
   const opts = step.type === "tf" ? [{ v: true, label: t("lessons.true") }, { v: false, label: t("lessons.false") }] : step.options.map((o, i) => ({ v: i, label: x(o) }));
   return (
     <div>
-      <div style={{ fontSize: 14, fontWeight: 650, color: "var(--mid)", marginBottom: 8 }}>{label || t("lessons.question")}</div>
-      <h2 style={{ fontSize: 23, fontWeight: 700, margin: "0 0 20px", lineHeight: 1.3 }}>{x(step.q)}</h2>
+      {!bare && <div style={{ fontSize: 14, fontWeight: 650, color: "var(--mid)", marginBottom: 8 }}>{label || t("lessons.question")}</div>}
+      {!bare && <h2 style={{ fontSize: 23, fontWeight: 700, margin: "0 0 20px", lineHeight: 1.3 }}>{x(step.q)}</h2>}
       <div role="radiogroup" style={{ display: "flex", flexDirection: step.type === "tf" ? "row" : "column", gap: 10 }}>
         {opts.map((o, i) => {
           const sel = picked === o.v;
@@ -105,22 +106,28 @@ export function QuestionView({ t, locale, step, picked, setPicked, checked, labe
 }
 
 // Right: why. Wrong: why that choice is wrong, then the answer and why.
-// Amber, not red — a miss is part of learning.
-export function Feedback({ t, locale, step, picked, checked, note }) {
+// Amber, not red — a miss is part of learning. Other question types add
+// their own heading ("Close: within 15%") and detail (the right order…);
+// `why` can be a list of steps, one per line.
+export function Feedback({ t, locale, step, picked, checked, note, heading, extra }) {
   const x = tx(locale);
   const right = checked === "right";
   const miss = !right && step.type === "choice" && step.miss && step.miss[picked];
+  const why = Array.isArray(step.why) ? step.why : [step.why];
   return (
     <div className="nv-in" role="status" style={{ background: right ? "var(--rightSoft)" : "var(--warnSoft)", borderRadius: 14, padding: "14px 16px", marginBottom: 12 }}>
       <div style={{ fontWeight: 700, fontSize: 18, color: right ? "var(--right)" : "var(--warn)", display: "flex", alignItems: "center", gap: 8 }}>
         <Icon name={right ? "check" : "info"} size={22} stroke={right ? 3 : 2.2} />
-        {right ? t("lessons.correct") : t("lessons.wrong")}
+        {heading || (right ? t("lessons.correct") : t("lessons.wrong"))}
       </div>
       {miss && <p style={{ margin: "6px 0 0", fontSize: 16, lineHeight: 1.5, fontWeight: 600 }}>{x(miss)}</p>}
-      <p style={{ margin: "6px 0 0", fontSize: 16, lineHeight: 1.5 }}>
-        {!right && step.type === "choice" && `${t("lessons.answer_is", { answer: x(step.options[step.answer]) })} `}
-        {x(step.why)}
-      </p>
+      {extra && <div style={{ fontSize: 15, lineHeight: 1.5 }}>{extra}</div>}
+      {why.map((w, i) => (
+        <p key={i} style={{ margin: "6px 0 0", fontSize: 16, lineHeight: 1.5 }}>
+          {i === 0 && !right && step.type === "choice" && `${t("lessons.answer_is", { answer: x(step.options[step.answer]) })} `}
+          {x(w)}
+        </p>
+      ))}
       {note && <p style={{ margin: "6px 0 0", fontSize: 14, color: "var(--mid)" }}>{note}</p>}
     </div>
   );

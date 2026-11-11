@@ -1,5 +1,5 @@
 // UNIT — Insurance basics. Its lessons and the concepts they teach (format in helpers.js).
-import { T, card, choice, tf, act, concept } from "./helpers.js";
+import { T, card, choice, tf, act, concept, order, match, number, scenario, fit } from "./helpers.js";
 
 export default {
   id: "insurance",
@@ -85,6 +85,16 @@ export default {
           [null, T("It's the other way around: you pay the insurer.", "Es al revés: tú le pagas a la aseguradora."), T("Some insurers give discounts, but the premium itself is your payment.", "Algunas aseguradoras dan descuentos, pero la prima es tu pago.")]
         ),
         tf("insurance_basics", T("Insurance is mainly for costs that are rare but very large.", "El seguro es sobre todo para costos poco comunes pero muy grandes."), true, T("That's where sharing the risk helps most.", "Ahí es donde compartir el riesgo ayuda más.")),
+        scenario(
+          "insurance_basics",
+          T("Phone insurance costs {$12|180} a month with a {$100|1500} deductible. Your phone cost {$300|4500}, and you have {$500|7500} saved. What do you do?", "Un seguro para tu celular cuesta {$12|180} al mes con deducible de {$100|1500}. Tu celular costó {$300|4500} y tienes {$500|7500} ahorrados. ¿Qué haces?"),
+          [
+            fit(T("Skip it: your savings could replace the phone", "No contratarlo: tu ahorro podría reponer el celular"), "good", T("In two years you'd pay {$288|4320} in premiums for a {$300|4500} phone.", "En dos años pagarías {$288|4320} de primas por un celular de {$300|4500}.")),
+            fit(T("Buy it, because never worrying is worth it to you", "Contratarlo, porque no preocuparte vale la pena para ti"), "ok", T("Fair if a broken phone would really hurt; it just costs more on average.", "Es válido si un celular roto te afectaría mucho; solo cuesta más en promedio.")),
+            fit(T("Buy it and stop saving", "Contratarlo y dejar de ahorrar"), "poor", T("Then everything else that goes wrong has nothing to land on.", "Así, todo lo demás que salga mal no tiene con qué cubrirse.")),
+          ],
+          T("Insure what you couldn't afford to replace. Small losses are what savings are for.", "Asegura lo que no podrías reponer. Las pérdidas pequeñas son para el ahorro.")
+        ),
         act("goals.insurance", T("Compare a low-premium plan and a low-deductible plan.", "Compara un plan de prima baja con uno de deducible bajo.")),
       ],
     },
@@ -103,6 +113,7 @@ export default {
           [null, T("A high premium pays off mainly if you expect to use the coverage a lot.", "Una prima alta conviene sobre todo si esperas usar mucho la cobertura."), T("Skipping insurance leaves you exposed to the rare, huge cost — that's the one that matters.", "No tener seguro te deja expuesto al costo raro y enorme: justo el que importa.")]
         ),
         tf("premium_deductible", T("The deductible is what you pay before insurance starts paying.", "El deducible es lo que pagas antes de que el seguro empiece a pagar."), true, T("After that, insurance pays its share.", "Después de eso, el seguro paga su parte.")),
+        order("premium_deductible", T("The same policy with four deductibles. Order them from the lowest monthly premium to the highest.", "La misma póliza con cuatro deducibles. Ordénalos de la prima mensual más baja a la más alta."), [T("{$2000|30000} deductible", "Deducible de {$2000|30000}"), T("{$1000|15000} deductible", "Deducible de {$1000|15000}"), T("{$500|7500} deductible", "Deducible de {$500|7500}"), T("{$250|3750} deductible", "Deducible de {$250|3750}")], T("The more you agree to pay yourself when something happens, the less the insurer charges each month.", "Entre más aceptas pagar tú cuando pasa algo, menos te cobra la aseguradora cada mes.")),
         act("goals.insurance", T("Slide the yearly costs and find where the two plans cross.", "Mueve los gastos del año y encuentra dónde se cruzan los dos planes.")),
       ],
     },
@@ -127,6 +138,16 @@ export default {
           [null, T("Car insurance covers your car, not your apartment.", "El seguro de auto cubre tu auto, no tu departamento.", { en: "Life insurance is for your family if you die — not for road damage.", es: "El seguro de vida es para tu familia si falleces, no para daños en el camino." }), T("The landlord's policy usually covers only the building, not your things.", "La póliza del dueño normalmente cubre solo el edificio, no tus cosas.", { en: "Pet insurance isn't required anywhere for driving.", es: "El seguro de mascotas no se exige para manejar." })]
         ),
         tf("insurance_types", T("Health insurance helps with one of the biggest money risks there is.", "El seguro médico ayuda con uno de los mayores riesgos de dinero que hay."), true, T("A hospital stay can cost more than years of savings.", "Una hospitalización puede costar más que años de ahorro.")),
+        match(
+          "insurance_types",
+          T("Match each insurance to what it pays for.", "Une cada seguro con lo que paga."),
+          [
+            [T("Health insurance", "Seguro médico", { en: "Medical expenses insurance", es: "Seguro de gastos médicos" }), T("Doctor and hospital bills", "Consultas y cuentas del hospital")],
+            [T("Car liability insurance", "Seguro de auto de responsabilidad civil"), T("Damage you cause to other people and cars", "Daños que causas a otras personas y coches")],
+            [T("Renters insurance", "Seguro de inquilino", { en: "Home contents insurance", es: "Seguro de hogar (contenidos)" }), T("Your things at home, if stolen or damaged", "Tus cosas en casa, si las roban o se dañan")],
+          ],
+          T("Each covers one kind of big, unlikely loss.", "Cada uno cubre un tipo de pérdida grande y poco probable.")
+        ),
         act("goals.insurance", T("See how a big medical bill changes which plan costs less.", "Mira cómo una cuenta médica grande cambia qué plan cuesta menos.")),
       ],
     },
@@ -145,6 +166,7 @@ export default {
           [null, T("Below the deductible, the insurer doesn't pay.", "Por debajo del deducible, la aseguradora no paga."), T("Borrowing for a surprise turns it into debt with interest.", "Pedir prestado para un imprevisto lo convierte en deuda con intereses.")]
         ),
         tf("insurance_and_savings", T("With insurance, you don't need any savings at all.", "Con seguro, no necesitas nada de ahorro."), false, T("Deductibles and uncovered costs still need cash.", "Los deducibles y los gastos no cubiertos todavía necesitan efectivo.")),
+        number("insurance_and_savings", T("Your car insurance has a {$500|7500} deductible. A repair costs {$1800|27000}. How much do you pay?", "Tu seguro de auto tiene un deducible de {$500|7500}. Una reparación cuesta {$1800|27000}. ¿Cuánto pagas tú?"), { unit: "money", answer: [500, 7500] }, [T("You pay the deductible: {$500|7500}.", "Tú pagas el deducible: {$500|7500}."), T("Insurance pays the other {$1300|19500}. Your emergency fund is what covers the deductible.", "El seguro paga los otros {$1300|19500}. Tu fondo de emergencia es lo que cubre el deducible.")]),
         act("goals.create", T("Start (or check) an emergency fund goal.", "Empieza (o revisa) tu meta de fondo de emergencia."), { name: T("Emergency fund", "Fondo de emergencia"), target: [1000, 15000], months: 12, template: "emergency" }),
       ],
     },

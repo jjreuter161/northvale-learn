@@ -1,5 +1,6 @@
 // UNIT — Compound interest. Its lessons and the concepts they teach (format in helpers.js).
-import { T, card, choice, tf, act, concept } from "./helpers.js";
+import { T, card, choice, tf, act, concept, estimate, number, scenario, fit, fv, round } from "./helpers.js";
+import { fact } from "../../../core/facts.js";
 
 export default {
   id: "compound",
@@ -65,6 +66,12 @@ export default {
         ),
         card(T("Slow, then fast", "Lento, luego rápido"), T("At first compounding looks boring. Over many years the curve bends upward — most of the growth comes near the end.", "Al principio el interés compuesto parece aburrido. Con los años, la curva se dispara: la mayor parte del crecimiento llega al final.")),
         tf("compound_interest", T("Compounding works against you on debt, too.", "El interés compuesto también juega en tu contra con las deudas."), true, T("Unpaid interest on a card gets added to what you owe, and then that earns interest. Same math, wrong direction.", "Los intereses que no pagas de una tarjeta se suman a lo que debes, y eso genera más intereses. La misma cuenta, pero al revés.")),
+        estimate(
+          "compound_interest",
+          T("You put {$100|2000} a month into an investment for 10 years, earning an example {@indexExampleRate} a year. About how much do you end up with?", "Pones {$100|2000} al mes en una inversión durante 10 años, ganando un {@indexExampleRate} anual de ejemplo. ¿Con cuánto terminas, más o menos?"),
+          { unit: "money", min: [2000, 40000], max: [50000, 1000000], step: [500, 10000], answer: [round(fv(100, fact("indexExampleRate") / 100, 10), 100), round(fv(2000, fact("indexExampleRate") / 100, 10), 1000)], grow: { monthly: [100, 2000], rate: fact("indexExampleRate") / 100, years: 10 } },
+          T("You put in {$12000|240000}; the rest is growth you never paid in. Most of it comes in the later years, which is why time matters so much.", "Pusiste {$12000|240000}; lo demás es crecimiento que nunca pagaste. La mayor parte llega en los últimos años, por eso el tiempo importa tanto.")
+        ),
         act("goals.compare", T("Compare saving the same amount in cash vs. a savings account over 10 years.", "Compara ahorrar lo mismo en efectivo vs. en una cuenta de ahorro durante 10 años.", { en: "Compare saving the same amount in cash vs. CETES over 10 years.", es: "Compara ahorrar lo mismo en efectivo vs. en CETES durante 10 años." }), {show: ["cash","save"],years: 10}),
       ],
     },
@@ -83,6 +90,7 @@ export default {
         ),
         card(T("The Rule of 72", "La regla del 72"), T("Divide 72 by a yearly growth rate to estimate how many years it takes to double. At 6%: 72 ÷ 6 = about 12 years.", "Divide 72 entre la tasa de crecimiento anual para estimar en cuántos años se duplica tu dinero. Al 6%: 72 ÷ 6 = unos 12 años.")),
         tf("starting_early", T("At 8% a year, money doubles in about 9 years.", "Al 8% anual, el dinero se duplica en unos 9 años."), true, T("72 ÷ 8 = 9. A handy shortcut — not exact, but close.", "72 ÷ 8 = 9. Un atajo útil: no es exacto, pero se acerca.")),
+        number("starting_early", T("Rule of 72: at an example 8% a year, about how many years does money take to double?", "Regla del 72: con un 8% anual de ejemplo, ¿en cuántos años se duplica el dinero, más o menos?"), { unit: "years", answer: 9 }, [T("72 ÷ 8 = 9.", "72 ÷ 8 = 9."), T("About 9 years. At 6% it would take about 12.", "Unos 9 años. Al 6% tardaría unos 12.")]),
         act("goals.early", T("See the difference between starting at 16 and at 26.", "Mira la diferencia entre empezar a los 16 y a los 26."), {monthly: [50,750],ages: [16,26]}),
       ],
     },
@@ -101,6 +109,16 @@ export default {
           [T("A share is ownership in a company. A T-bill is a loan to the government.", "Una acción es ser dueño de una parte de una empresa. Un T-bill es un préstamo al gobierno.", { en: "A share is ownership in a company. CETES are a loan to the government.", es: "Una acción es ser dueño de una parte de una empresa. Los CETES son un préstamo al gobierno." }), null, T("It's not a card or a loan to you — you're the one lending.", "No es una tarjeta ni un préstamo para ti: tú eres quien presta.")]
         ),
         tf("safe_investments", T("Safe investments are a good place for money you'll need next year.", "Las inversiones seguras son buen lugar para el dinero que vas a necesitar el próximo año."), true, T("Short time + money you can't afford to lose = keep it safe.", "Poco tiempo + dinero que no puedes perder = mantenlo seguro.")),
+        scenario(
+          "safe_investments",
+          T("You'll need {$2000|30000} in 6 months for a car down payment. Where do you keep it until then?", "Vas a necesitar {$2000|30000} en 6 meses para el enganche de un coche. ¿Dónde lo guardas mientras?"),
+          [
+            fit(T("Treasury bills or a high-yield savings account", "Letras del Tesoro o una cuenta de ahorro con buen rendimiento", { en: "CETES or a savings account with a good return", es: "CETES o una cuenta de ahorro con buen rendimiento" }), "good", T("Safe, ready on time, and it earns a little.", "Seguro, listo a tiempo, y gana un poco.")),
+            fit(T("Your checking account", "Tu cuenta de cheques", { en: "Your debit account", es: "Tu cuenta de débito" }), "ok", T("Safe and easy, but it earns about nothing.", "Seguro y fácil, pero casi no gana nada.")),
+            fit(T("A stock index fund", "Un fondo indexado de acciones"), "poor", T("Great for long goals, but in 6 months it could be down right when you need it.", "Muy bueno para metas largas, pero en 6 meses podría estar abajo justo cuando lo necesites.")),
+          ],
+          T("Money with a near deadline belongs somewhere safe, even if it grows slowly.", "El dinero con fecha cercana va en algo seguro, aunque crezca poco.")
+        ),
         act("portfolio.buy", T("Practice: put {$1000|20000} of your pretend money into a safe investment.", "Práctica: pon {$1000|20000} de tu dinero de práctica en una inversión segura."), {type: "safe",amount: [1000,20000]}),
       ],
     },

@@ -18,7 +18,8 @@ import { practiceOpen, markIntro } from "../../core/Practice.jsx";
 import { UNITS, ALL_LESSONS, lessonById, lessonState, nextLesson, nextFor, unitDone, isQuestion, conceptPool, conceptsOfLesson, conceptsOfUnit, minutes } from "./content.js";
 import { conceptById } from "./concepts.js";
 import * as M from "./mastery.js";
-import { QuestionView, Feedback, ReviewCard, SessionDone, SkillsCard, Placement, conceptsNow, saveConcepts, reviewStatus, useConcepts } from "./practice.jsx";
+import { Question, QTYPES, startValue } from "./qtypes.jsx";
+import { Feedback, ReviewCard, SessionDone, SkillsCard, Placement, conceptsNow, saveConcepts, reviewStatus, useConcepts } from "./practice.jsx";
 
 const S = (en, es) => ({ en, es });
 addStrings({
@@ -345,8 +346,14 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
     const r = recordLesson({ id: lesson.id, perfect: mistakes === 0, mistakes });
     setResult({ ...r, unitJustDone: !wasUnitDone && unitDone(getState().progress, unit) });
   };
+  // The answer so far: what was picked, or the type's starting answer.
+  const value = step && isQuestion(step) && picked === null ? startValue(step, locale.region) : picked;
+  const Q = step && isQuestion(step) ? QTYPES[step.type] : null;
+  const canCheck = !!Q && !checked && Q.ready(step, value);
   const check = () => {
-    const right = picked === step.answer;
+    if (!canCheck) return;
+    const right = QTYPES[step.type].grade(step, value, locale.region);
+    if (picked === null) setPicked(value);
     setChecked(right ? "right" : "wrong");
     if (!step.retry && !step.extra) firsts.current.push({ c: step.c, right });
     if (right) return;
@@ -363,7 +370,7 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
   useEffect(() => {
     const k = (e) => {
       if (result || quit || !step) return;
-      if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+      if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA" || (e.target.closest && e.target.closest("[data-q]"))) return;
       if ((step.type === "choice" || step.type === "tf") && !checked && /^[1-4]$/.test(e.key)) {
         const n = Number(e.key) - 1;
         if (step.type === "tf" && n < 2) setPicked(n === 0);
@@ -371,7 +378,7 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
       }
       if (e.key === "Enter") {
         if (step.type === "card") advance();
-        else if ((step.type === "choice" || step.type === "tf") && picked !== null && !checked) check();
+        else if (canCheck) check();
         else if (checked) advance();
       }
     };
@@ -464,7 +471,6 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
   }
 
   const Widget = step.type === "action" ? actionWidget(step.kind) : null;
-  const canCheck = (step.type === "choice" || step.type === "tf") && picked !== null && !checked;
 
   return (
     <Overlay label={run.title}>
@@ -491,7 +497,7 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
             </button>}
           </div>
         )}
-        {isQuestion(step) && <QuestionView t={t} locale={locale} step={step} picked={picked} setPicked={setPicked} checked={checked} label={mode === "challenge" ? t("challenge.chip") : mode === "review" ? t("review.title") : null} />}
+        {isQuestion(step) && <Question t={t} locale={locale} step={step} value={value} setValue={setPicked} checked={checked} right={checked === "right"} submit={check} label={mode === "challenge" ? t("challenge.chip") : mode === "review" ? t("review.title") : null} />}
         {step.type === "action" && (
           <div>
             <div style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 750, color: "var(--onBrand)", background: "var(--brand)", borderRadius: 999, padding: "6px 12px", marginBottom: 12 }}>
@@ -504,13 +510,24 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
       </div>
 
       <div style={{ paddingTop: 14 }}>
-        {checked && <Feedback t={t} locale={locale} step={step} picked={picked} checked={checked} note={checked === "wrong" && !step.retry && mode !== "challenge" ? t("lessons.wrong.again") : null} />}
+        {checked && (
+          <Feedback
+            t={t}
+            locale={locale}
+            step={step}
+            picked={value}
+            checked={checked}
+            heading={Q.heading && Q.heading(step, value, locale.region, t, locale, checked === "right")}
+            extra={Q.Extra && <Q.Extra step={step} right={checked === "right"} t={t} locale={locale} />}
+            note={checked === "wrong" && !step.retry && mode !== "challenge" ? t("lessons.wrong.again") : null}
+          />
+        )}
         {step.type === "card" && (
           <Button full onClick={advance}>
             {t("common.continue")}
           </Button>
         )}
-        {(step.type === "choice" || step.type === "tf") &&
+        {isQuestion(step) &&
           (checked ? (
             <Button full onClick={advance}>
               {t("common.continue")}

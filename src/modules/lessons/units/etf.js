@@ -1,5 +1,5 @@
 // UNIT — ETFs & index funds. Its lessons and the concepts they teach (format in helpers.js).
-import { T, card, choice, tf, act, concept } from "./helpers.js";
+import { T, card, choice, tf, act, concept, match, number, scenario, fit } from "./helpers.js";
 
 export default {
   id: "etf",
@@ -65,6 +65,16 @@ export default {
           [T("That's a single stock. A fund holds many.", "Eso es una sola acción. Un fondo tiene muchas."), null, T("The S&P 500 is made of stocks of about 500 large US companies, not bonds.", "El S&P 500 está formado por acciones de unas 500 grandes empresas de EE. UU., no por bonos.")]
         ),
         tf("index_funds", T("ETFs trade on the stock market, like stocks.", "Los ETFs se compran y venden en la bolsa, como las acciones."), true, T("That's the \"exchange-traded\" part — you can buy and sell them any trading day.", "Esa es la parte de \"cotizado\": los puedes comprar y vender cualquier día hábil de la bolsa.")),
+        scenario(
+          "index_funds",
+          T("You want to start investing {$50|750} a month for the long run. Which fits a beginner best?", "Quieres empezar a invertir {$50|750} al mes a largo plazo. ¿Qué le conviene más a alguien que empieza?"),
+          [
+            fit(T("A fund that owns hundreds of companies", "Un fondo que tiene cientos de empresas"), "good", T("One purchase, a lot of companies, and one bad one barely matters.", "Una compra, muchas empresas, y si a una le va mal casi no se nota.")),
+            fit(T("Split it among three companies you like", "Repartirlo entre tres empresas que te gustan"), "ok", T("Better than one, but still a small basket.", "Mejor que una sola, pero sigue siendo una canasta pequeña.")),
+            fit(T("All of it in the one stock a friend says will double", "Todo en la acción que un amigo dice que se va a duplicar"), "poor", T("If that company stumbles, all your money stumbles with it.", "Si a esa empresa le va mal, a todo tu dinero también.")),
+          ],
+          T("A basket of companies spreads the risk so no single one can sink you.", "Una canasta de empresas reparte el riesgo para que ninguna sola te hunda.")
+        ),
         act("portfolio.buy", T("Practice: buy a broad index fund with your pretend money.", "Práctica: compra un fondo indexado amplio con tu dinero de práctica."), {type: "etf",amount: [2000,40000]}),
       ],
     },
@@ -83,6 +93,7 @@ export default {
           [null, T("With the same holdings, a higher fee just means less for you.", "Con las mismas inversiones, una comisión más alta solo significa menos para ti."), T("Fees come out every year, so over time they matter a lot.", "Las comisiones se cobran cada año, así que con el tiempo importan mucho.")]
         ),
         tf("index_funds", T("Most professional fund managers beat the index over long periods.", "La mayoría de los administradores profesionales le ganan al índice a largo plazo."), false, T("According to S&P's SPIVA reports, most actively managed funds have trailed their index over 10+ years, often because of higher fees. That's why index funds are popular.", "Según los reportes SPIVA de S&P, la mayoría de los fondos administrados activamente han quedado por debajo de su índice en periodos de 10 años o más, muchas veces por comisiones más altas. Por eso los fondos indexados son tan populares.")),
+        number("fees", T("You have {$10000|100000} in a fund that charges a 1% yearly fee. How much is the fee each year?", "Tienes {$10000|100000} en un fondo que cobra 1% de comisión anual. ¿Cuánto es la comisión cada año?"), { unit: "money", answer: [100, 1000] }, [T("1% of {$10000|100000} = {$100|1000} a year.", "El 1% de {$10000|100000} = {$100|1000} al año."), T("A 0.03% index fund would charge {$3|30}. Same market, and the fee comes out every single year.", "Un fondo indexado de 0.03% cobraría {$3|30}. El mismo mercado, y la comisión se cobra cada año.")]),
         act("portfolio.buy", T("Practice: add a different kind of fund — like international companies or bonds.", "Práctica: agrega otro tipo de fondo, como empresas internacionales o bonos."), {type: "etf",amount: [1000,20000],different: true}),
       ],
     },
@@ -101,6 +112,16 @@ export default {
           [null, T("Nothing forces you to skip. Lower prices just mean more shares for the same money.", "Nada te obliga a saltártelo. Precios más bajos solo significan más acciones por el mismo dinero."), T("Your money buys shares at the lower price — it's still invested, not lost.", "Tu dinero compra acciones al precio más bajo: sigue invertido, no se pierde.")]
         ),
         tf("dollar_cost_averaging", T("Investing a fixed amount every month means you never need to watch the news to decide when to buy.", "Invertir una cantidad fija cada mes significa que no necesitas ver las noticias para decidir cuándo comprar."), true, T("The schedule decides, not the headlines.", "Decide el calendario, no los titulares.")),
+        match(
+          "dollar_cost_averaging",
+          T("Match each way of investing to what it means.", "Une cada forma de invertir con lo que significa."),
+          [
+            [T("Dollar-cost averaging", "Promediar el costo"), T("The same amount on a schedule", "La misma cantidad con calendario")],
+            [T("Timing the market", "Adivinar el mercado"), T("Trying to guess the best day to buy", "Intentar adivinar el mejor día para comprar")],
+            [T("Lump sum", "Todo de una vez"), T("Investing all of it at once", "Invertir todo en un solo momento")],
+          ],
+          T("A steady habit takes the guessing, and the stress, out of it.", "Un hábito constante quita las adivinanzas, y el estrés.")
+        ),
         act("goals.invest", T("See where {$100|1500} a month in an index fund could be in 10 years — good years and bad.", "Mira dónde podrían estar {$100|1500} al mes en un fondo indexado en 10 años, con años buenos y malos."), {monthly: [100,1500],years: 10}),
       ],
     },

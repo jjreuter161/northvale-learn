@@ -1,5 +1,5 @@
 // UNIT — Saving. Its lessons and the concepts they teach (format in helpers.js).
-import { T, card, choice, tf, act, concept } from "./helpers.js";
+import { T, card, choice, tf, act, concept, order, match, number } from "./helpers.js";
 
 export default {
   id: "save",
@@ -65,6 +65,7 @@ export default {
           [T("A treat is spending, not saving. Here, \"yourself\" means future-you's savings.", "Darte un gusto es gastar, no ahorrar. Aquí, \"tú\" es tu yo del futuro y su ahorro."), null, T("Paying people back matters, but this idea is about savings coming out first.", "Pagar lo que debes importa, pero esta idea trata de que el ahorro salga primero.")]
         ),
         tf("pay_yourself_first", T("Saving a small amount every week is pointless.", "Ahorrar poquito cada semana no sirve de nada."), false, T("Small and steady wins. The habit matters more than the amount at first — and the amount can grow later.", "Poco y constante gana. Al principio importa más el hábito que la cantidad, y la cantidad puede crecer después.")),
+        order("pay_yourself_first", T("Payday. Put “pay yourself first” in order.", "Día de pago. Ordena “págate primero a ti”."), [T("Your pay lands in your account", "Tu sueldo llega a tu cuenta"), T("An automatic transfer moves your savings out", "Una transferencia automática aparta tu ahorro"), T("You pay for your needs", "Pagas tus necesidades"), T("You spend what's left on wants", "Gastas lo que queda en gustos")], T("Saving comes right after payday, before anything else gets a chance at it. Then needs, then wants.", "El ahorro va justo después del pago, antes de que otra cosa lo alcance. Luego las necesidades y luego los gustos.")),
         act("goals.create", T("Set a goal and pick how much you'll put aside each month.", "Pon una meta y elige cuánto vas a apartar cada mes."), {name: {en: "Savings goal",es: "Meta de ahorro"},target: [1000,15000],months: 12}),
       ],
     },
@@ -83,6 +84,7 @@ export default {
           [T("A concert is fun, but it's not a surprise you can't avoid. Save for it separately.", "Un concierto es divertido, pero no es un imprevisto inevitable. Ahorra para eso por separado."), null, T("A sale is a want with a deadline, not an emergency.", "Una oferta es un gusto con fecha límite, no una emergencia.")]
         ),
         tf("emergency_fund", T("Your emergency fund should be easy to reach quickly.", "Tu fondo de emergencia debe estar a la mano rápido."), true, T("Keep it somewhere safe that you can get to in a day or two — not invested in something that might be down when you need it.", "Guárdalo en un lugar seguro al que puedas acceder en uno o dos días, no invertido en algo que pueda ir a la baja justo cuando lo necesites.")),
+        number("emergency_fund", T("Your basic costs are {$500|7500} a month. A starter goal of 3 months of costs is how much?", "Tus gastos básicos son {$500|7500} al mes. Una meta inicial de 3 meses de gastos, ¿de cuánto es?"), { unit: "money", answer: [1500, 22500] }, [T("3 months × {$500|7500} a month.", "3 meses × {$500|7500} al mes."), T("That's {$1500|22500}. Building it a little at a time is normal.", "Son {$1500|22500}. Juntarlo poco a poco es lo normal.")]),
         act("goals.create", T("Start your emergency fund goal.", "Empieza tu meta de fondo de emergencia."), {name: {en: "Emergency fund",es: "Fondo de emergencia"},target: [500,8000],months: 10,template: "emergency"}),
       ],
     },
@@ -101,6 +103,17 @@ export default {
           [T("Fees are what you pay the bank. Interest on savings is the bank paying you.", "Las comisiones son lo que tú le pagas al banco. El interés del ahorro es el banco pagándote a ti."), null, T("Interest isn't a tax — though interest you earn can be taxed.", "El interés no es un impuesto, aunque el interés que ganas puede pagar impuestos.")]
         ),
         tf("savings_accounts", T("If you're under 18, you usually need an adult to open a bank account with you.", "Si eres menor de 18, normalmente necesitas a un adulto para abrir una cuenta contigo."), true, T("Most banks offer teen or youth accounts opened together with a parent or guardian.", "La mayoría de los bancos tienen cuentas para jóvenes que se abren junto con tu mamá, papá o tutor.")),
+        match(
+          "savings_accounts",
+          T("Match each place to what it does with your savings.", "Une cada lugar con lo que hace con tu ahorro."),
+          [
+            [T("Savings account", "Cuenta de ahorro"), T("Pays interest and keeps money apart from spending", "Paga intereses y separa el dinero del gasto")],
+            [T("Checking account", "Cuenta de cheques", { en: "Debit account", es: "Cuenta de débito" }), T("Made for everyday spending", "Hecha para el gasto diario")],
+            [T("Cash at home", "Efectivo en casa"), T("Earns nothing and can be lost or stolen", "No gana nada y se puede perder o robar")],
+            [T("FDIC insurance", "Seguro de la FDIC", { en: "IPAB protection", es: "Protección del IPAB" }), T("Protects deposits if the bank fails", "Protege tus depósitos si el banco quiebra")],
+          ],
+          T("A savings account keeps money safe, separate and slowly growing.", "Una cuenta de ahorro mantiene el dinero seguro, aparte y creciendo poco a poco.")
+        ),
         act("goals.compare", T("Compare keeping your goal money in cash vs. a savings account.", "Compara guardar el dinero de tu meta en efectivo vs. en una cuenta de ahorro.", { en: "Compare keeping your goal money in cash vs. CETES.", es: "Compara guardar el dinero de tu meta en efectivo vs. en CETES." }), {show: ["cash","save"]}),
       ],
     },

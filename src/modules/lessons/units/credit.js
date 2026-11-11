@@ -1,5 +1,6 @@
 // UNIT — Debt & credit. Its lessons and the concepts they teach (format in helpers.js).
-import { T, card, choice, tf, act, concept } from "./helpers.js";
+import { T, card, choice, tf, act, concept, estimate, number, scenario, fit } from "./helpers.js";
+import { fact } from "../../../core/facts.js";
 
 export default {
   id: "credit",
@@ -65,6 +66,7 @@ export default {
           [null, T("25% a year costs about three times as much interest as 8% on the same amount.", "Un 25% anual cuesta unas tres veces más intereses que un 8% por el mismo monto."), T("The rate is the price of the loan. Different rates, different costs.", "La tasa es el precio del préstamo. Tasas distintas, costos distintos.")]
         ),
         tf("borrowing_cost", T("Some debt can be useful, like a reasonable loan for school or a car you need for work.", "Algunas deudas pueden ser útiles, como un préstamo razonable para estudiar o un coche que necesitas para trabajar."), true, T("Debt is a tool. It's useful when it helps you earn more or get something you truly need — and risky when it pays for wants.", "La deuda es una herramienta. Sirve cuando te ayuda a ganar más o a tener algo que de verdad necesitas, y es riesgosa cuando paga gustos.")),
+        estimate("borrowing_cost", T("You borrow {$1000|10000} at {@cardAprTypical} a year and pay it all back after a year. About how much is the interest?", "Pides prestados {$1000|10000} a {@cardAprTypical} al año y lo pagas todo después de un año. ¿Cuánto son los intereses, más o menos?", { en: "You borrow $10,000 with a CAT of {@catTypical} and pay it all back after a year. About how much does it cost?", es: "Pides prestados $10,000 con un CAT de {@catTypical} y lo pagas todo después de un año. ¿Cuánto te cuesta, más o menos?" }), { unit: "money", min: [0, 0], max: [1000, 12000], step: [10, 100], answer: [fact("cardAprTypical") * 10, fact("catTypical") * 100] }, T("{@cardAprTypical} of {$1000|10000} is about {$200|4000}. Interest is the price of using money now.", "El {@cardAprTypical} de {$1000|10000} son unos {$200|4000}. Los intereses son el precio de usar dinero ahora.", { en: "{@catTypical} of $10,000 is about $4,000. Interest and fees are the price of using money now.", es: "El {@catTypical} de $10,000 son unos $4,000. Los intereses y comisiones son el precio de usar dinero ahora." })),
         act("goals.debt", T("See how long {$1000|15000} at 24% takes to pay off — and how paying more changes it.", "Mira cuánto tardas en pagar {$1000|15000} al 24% y cómo cambia si pagas más."), {balance: [1000,15000],apr: 24,payment: [50,750]}),
       ],
     },
@@ -83,6 +85,7 @@ export default {
           [T("The minimum avoids late fees, but interest keeps growing on the rest.", "El mínimo evita cargos por atraso, pero los intereses siguen creciendo sobre el resto."), null, T("That's how card debt starts. A card is a loan, not extra money.", "Así empiezan las deudas de tarjeta. Una tarjeta es un préstamo, no dinero extra.")]
         ),
         tf("credit_cards", T("A credit card is extra money the bank gives you.", "Una tarjeta de crédito es dinero extra que te regala el banco."), false, T("It's a loan. Every purchase is money you owe back.", "Es un préstamo. Cada compra es dinero que debes regresar.")),
+        number("credit_cards", T("You owe {$600|9000} on a card that charges 24% a year. About how much interest is added in one month if you pay nothing?", "Debes {$600|9000} en una tarjeta que cobra 24% al año. ¿Cuántos intereses se suman en un mes si no pagas nada?"), { unit: "money", answer: [12, 180] }, [T("24% a year ÷ 12 months = 2% a month.", "24% al año ÷ 12 meses = 2% al mes."), T("2% of {$600|9000} = {$12|180}, and next month it's charged on the bigger balance.", "El 2% de {$600|9000} = {$12|180}, y el mes siguiente se cobra sobre un saldo más grande.")]),
         act("goals.debt", T("Compare paying the minimum vs. paying double on a card balance.", "Compara pagar el mínimo vs. pagar el doble en el saldo de una tarjeta."), {balance: [800,12000],apr: 24,payment: [25,400],compareDouble: true}),
       ],
     },
@@ -101,6 +104,16 @@ export default {
           [T("Checking your own report doesn't hurt it. It's a good habit.", "Revisar tu propio reporte no lo afecta. Es un buen hábito."), null, T("Paying in full shows you handle credit well — it helps.", "Pagar el total muestra que manejas bien el crédito: te ayuda.")]
         ),
         tf("credit_history", T("You can build a good history by borrowing a little and always paying on time.", "Puedes construir buen historial pidiendo poco prestado y pagando siempre a tiempo."), true, T("Small, on-time payments build trust. That's how a first card or a student card works best.", "Pagos pequeños y a tiempo construyen confianza. Así funciona mejor una primera tarjeta.")),
+        scenario(
+          "credit_history",
+          T("You just got your first credit card. Which habit builds your credit best?", "Acabas de recibir tu primera tarjeta de crédito. ¿Qué hábito construye mejor tu historial?"),
+          [
+            fit(T("Use it for one small bill and pay the full balance on time every month", "Usarla para un gasto pequeño y pagar el total a tiempo cada mes"), "good", T("On-time payments matter most, and paying in full costs nothing.", "Los pagos puntuales son lo que más cuenta, y pagar el total no cuesta nada.")),
+            fit(T("Keep it in a drawer and almost never use it", "Guardarla en un cajón y casi nunca usarla"), "ok", T("Safe, but a card you never use builds little history.", "Es seguro, pero una tarjeta que no usas construye poco historial.")),
+            fit(T("Carry a balance from month to month to “show activity”", "Dejar saldo pendiente cada mes para “mostrar movimiento”"), "poor", T("A myth. Carrying a balance only adds interest; paying in full builds the same history.", "Es un mito. Dejar saldo solo suma intereses; pagar el total construye el mismo historial.")),
+          ],
+          T("Pay on time, keep balances low, and the history builds itself.", "Paga a tiempo, mantén saldos bajos y el historial se construye solo.")
+        ),
         act("goals.debt", T("See what paying {$100|1500} more each month does to a balance.", "Mira qué pasa con una deuda si pagas {$100|1500} más cada mes."), {balance: [2000,30000],apr: 22,payment: [80,1200],extra: [100,1500]}),
       ],
     },

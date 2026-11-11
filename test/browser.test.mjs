@@ -101,6 +101,20 @@ async function open(seed, { cookie } = {}) {
   return { page, top, button, clean, menu, shut, close: () => context.close() };
 }
 
+// Gives some answer to whatever question is showing (not necessarily the
+// right one): every kind of question has its own controls.
+async function answerAny(d) {
+  const q = (k) => d.locator(`[data-q="${k}"]`);
+  if (await q("order-item").count()) for (const b of await q("order-item").all()) await b.click();
+  else if (await q("match-left").count()) for (let i = 0; i < (await q("match-left").count()); i++) (await q("match-left").nth(i).click(), await q("match-right").nth(i).click());
+  else if (await q("number").count()) await q("number").fill("1");
+  else if (await q("spot-part").count()) for (const b of await q("spot-part").all()) await b.click();
+  else if (await q("estimate").count()) return; // (a guess is already set)
+  else await d.getByRole("radio").first().click();
+}
+// Sets a slider the way a person dragging it would (React hears "input").
+const slide = (el, v) => el.evaluate((e, v) => (Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set.call(e, String(v)), e.dispatchEvent(new Event("input", { bubbles: true }))), v);
+
 // Plays the open lesson, review or challenge: first option for each
 // question (a miss comes back once at the end), skips the "do it" step.
 // `untilAction` stops at the "do it" step instead.
@@ -113,7 +127,7 @@ async function play({ top, button }, { untilAction = false } = {}) {
       if (untilAction) return;
       await button(/^(Skip for now|Saltar por ahora)$/, d).click();
     } else if (names.includes("Check") || names.includes("Comprobar")) {
-      await d.getByRole("radio").first().click();
+      await answerAny(d);
       await button(/^(Check|Comprobar)$/, d).click();
     } else if (names.includes("Continue") || names.includes("Continuar")) await button(/^(Continue|Continuar)$/, d).click();
     else return;
@@ -269,6 +283,97 @@ try {
     }
     console.log("ok: the same in Spanish (Mexico): every screen");
     await app.close();
+  }
+
+  // --- the new kinds of question: each one answered right, one answered wrong, Spanish, and what a screen reader hears ---
+  {
+    const done = (ids) => Object.fromEntries(ids.map((id) => [id, { done: true, at: "2026-11-01", last: "2026-11-01", best: 0, times: 1 }]));
+    const app = await open(learner({ ageBand: "18-25" }, { lessons: done(["budget-1", "budget-2", "budget-3", "save-1", "save-2", "save-3"]), counters: { lessons: 6 } }));
+    const { page, top, button, clean } = app;
+    // Opens a lesson from the course (unfolding its unit), then plays up to the question with `data-q` = kind.
+    const reach = async (unit, title, kind) => {
+      const u = page.getByRole("button", { name: new RegExp(`^Unit ${unit} · `) });
+      if ((await u.getAttribute("aria-expanded")) === "false") await u.click();
+      await page.getByRole("button", { name: new RegExp(`^${esc(title)} — `) }).click();
+      for (let i = 0; i < 20 && !(await top().locator(`[data-q="${kind}"], [data-q="${kind}-item"], [data-q="${kind}-left"], [data-q="${kind}-part"]`).count()); i++) {
+        const names = await top().getByRole("button").evaluateAll((bs) => bs.map((b) => b.innerText.trim()));
+        if (names.includes("Check")) (await answerAny(top()), await button("Check", top()).click());
+        await button("Continue", top()).click();
+      }
+    };
+    const check = async (heading, why) => {
+      await button("Check", top()).click();
+      await top().getByRole("status").getByText(heading, { exact: true }).waitFor();
+      if (why) await top().getByRole("status").getByText(why, { exact: false }).waitFor();
+      await clean(`feedback: ${heading}`);
+      await button("Continue", top()).click();
+    };
+    const leave = async () => (await button("Close", top()).click(), await button("Leave", top()).click());
+
+    await reach(1, "What's a budget?", "number");
+    await top().locator('[data-q="number"]').fill("80");
+    await check("Correct", "0.20 × $400 = $80 a month.");
+    await leave();
+
+    await reach(1, "Needs vs. wants", "scenario");
+    await top().getByRole("radio", { name: /^1?\s*Buy groceries first/ }).click();
+    await check("A good fit", "Go, and figure out food later (here's the catch)");
+    await leave();
+
+    await reach(1, "Small leaks", "estimate");
+    await slide(top().locator('[data-q="estimate"]'), 1040);
+    await check("Spot on", "about $1,040");
+    await leave();
+
+    await reach(2, "Pay yourself first", "order");
+    for (const item of ["Your pay lands in your account", "An automatic transfer moves your savings out", "You pay for your needs"]) await top().getByRole("button", { name: new RegExp(`^${esc(item)}`) }).click();
+    assert.equal(await top().getByRole("button", { name: "You pay for your needs, position 3" }).count(), 1, "a screen reader hears each item's place");
+    await top().getByRole("button", { name: /^You spend what's left on wants/ }).click();
+    await check("Correct", "Then needs, then wants.");
+    await leave();
+
+    // A wrong order: amber, and the right order spelled out.
+    await reach(2, "Pay yourself first", "order");
+    for (const item of ["You spend what's left on wants", "You pay for your needs", "An automatic transfer moves your savings out", "Your pay lands in your account"]) await top().getByRole("button", { name: new RegExp(`^${esc(item)}`) }).click();
+    await check("Not quite", "The right order");
+    await leave();
+
+    await reach(2, "Where to keep savings", "match");
+    for (const [a, b] of [["Savings account", "Pays interest"], ["Checking account", "Made for everyday"], ["Cash at home", "Earns nothing"], ["FDIC insurance", "Protects deposits"]]) (await top().locator('[data-q="match-left"]', { hasText: a }).click(), await top().locator('[data-q="match-right"]', { hasText: b }).click());
+    await check("Correct", "slowly growing");
+    await leave();
+    await app.close();
+
+    // Spot the problem, in a scam text; then the same lesson in Spanish (Mexico).
+    const scam = await open(learner({ ageBand: "18-25" }, { startUnit: "scams" }));
+    const S2 = scam;
+    const u6 = S2.page.getByRole("button", { name: /^Phishing — / });
+    await u6.click();
+    for (let i = 0; i < 20 && !(await S2.top().locator('[data-q="spot-part"]').count()); i++) {
+      const names = await S2.top().getByRole("button").evaluateAll((bs) => bs.map((b) => b.innerText.trim()));
+      if (names.includes("Check")) (await answerAny(S2.top()), await S2.button("Check", S2.top()).click());
+      await S2.button("Continue", S2.top()).click();
+    }
+    await S2.top().getByRole("button", { name: "Verify within 1 hour" }).click();
+    await S2.top().getByRole("button", { name: "yourbank-secure-login.co" }).click();
+    await S2.button("Check", S2.top()).click();
+    await S2.top().getByRole("status").getByText("You found both", { exact: true }).waitFor();
+    await S2.clean("spot the problem");
+    await scam.close();
+
+    const es = await open({ ...learner({ ageBand: "18-25" }), settings: { lang: "es", region: "MX", look: "white", reduceMotion: true } });
+    await es.button("Empezar").click();
+    for (let i = 0; i < 20 && !(await es.top().locator('[data-q="number"]').count()); i++) {
+      const names = await es.top().getByRole("button").evaluateAll((bs) => bs.map((b) => b.innerText.trim()));
+      if (names.includes("Comprobar")) (await answerAny(es.top()), await es.button("Comprobar", es.top()).click());
+      await es.button("Continuar", es.top()).click();
+    }
+    await es.top().locator('[data-q="number"]').fill("1,200");
+    await es.button("Comprobar", es.top()).click();
+    await es.top().getByRole("status").getByText("0.20 × $6,000 = $1,200 al mes.").waitFor();
+    await es.clean("haz la cuenta (MX)");
+    await es.close();
+    console.log("ok: the new kinds of question (work it out, real-life choice, estimate, put in order, match, spot the problem): right and wrong answers, Spanish (Mexico), and screen-reader labels");
   }
 
   // --- one tap from Today to the first lesson (a learner who closed it) ---

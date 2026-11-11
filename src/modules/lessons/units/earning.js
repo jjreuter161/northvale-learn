@@ -1,5 +1,5 @@
 // UNIT — Earning more. Its lessons and the concepts they teach (format in helpers.js).
-import { T, card, choice, tf, act, concept } from "./helpers.js";
+import { T, card, choice, tf, act, concept, match, number, scenario, fit } from "./helpers.js";
 
 export default {
   id: "earning",
@@ -85,6 +85,7 @@ export default {
           [null, T("That leaves out the travel hour.", "Eso deja fuera la hora de traslado."), T("That's the whole payment, not per hour.", "Ese es el pago completo, no por hora.")]
         ),
         tf("side_hustles", T("Travel and setup time count when you work out what a job really pays.", "El traslado y la preparación cuentan al calcular lo que de verdad paga un trabajo."), true, T("They're hours you can't spend on anything else.", "Son horas que no puedes usar en otra cosa.")),
+        number("side_hustles", T("You charge {$15|200} to mow a lawn and do 4 a week for 10 weeks. How much do you earn?", "Cobras {$15|200} por cortar un pasto y haces 4 a la semana durante 10 semanas. ¿Cuánto ganas?", { en: "You charge $200 to wash a car and do 4 a week for 10 weeks. How much do you earn?", es: "Cobras $200 por lavar un coche y lavas 4 a la semana durante 10 semanas. ¿Cuánto ganas?" }), { unit: "money", answer: [600, 8000] }, [T("{$15|200} × 4 a week = {$60|800} a week.", "{$15|200} × 4 a la semana = {$60|800} a la semana."), T("× 10 weeks = {$600|8000}, before any costs like gas or supplies.", "× 10 semanas = {$600|8000}, antes de costos como gasolina o materiales.")]),
         act("goals.hustle", T("Try a side hustle: set your price, cost and hours.", "Prueba un ingreso extra: pon tu precio, costo y horas."), { price: [25, 400], cost: [0, 0], count: 4, hours: 2 }),
       ],
     },
@@ -109,6 +110,16 @@ export default {
           [null, T("Freelance income is taxed — it just isn't withheld for you.", "El ingreso independiente sí paga impuestos; solo que nadie los retiene por ti."), T("Timing depends on your agreement with each client.", "La frecuencia depende de lo que acuerdes con cada cliente.")]
         ),
         tf("freelancing", T("Agreeing on price and work in writing helps avoid problems with clients.", "Acordar el precio y el trabajo por escrito ayuda a evitar problemas con los clientes."), true, T("A short written agreement settles most disputes before they start.", "Un acuerdo corto por escrito resuelve casi todos los problemas antes de que empiecen.")),
+        scenario(
+          "freelancing",
+          T("A new client wants you to start their website now and pay “when it's done”. What do you do?", "Un cliente nuevo quiere que empieces su página web ya y te pague “cuando esté lista”. ¿Qué haces?"),
+          [
+            fit(T("Ask for half up front and a short written agreement", "Pedir la mitad por adelantado y un acuerdo corto por escrito"), "good", T("You're protected if they disappear, and you both know what “done” means.", "Estás protegido si desaparecen, y los dos saben qué significa “lista”.")),
+            fit(T("Start, but email them the price and dates first", "Empezar, pero mandarles antes por correo el precio y las fechas"), "ok", T("Something in writing helps, though you still carry all the risk.", "Algo por escrito ayuda, aunque todo el riesgo sigue siendo tuyo.")),
+            fit(T("Start right away with nothing in writing", "Empezar de inmediato sin nada por escrito"), "poor", T("If they never pay, you have nothing to point to.", "Si nunca pagan, no tienes nada con qué respaldarte.")),
+          ],
+          T("Agree on the price, the work and the dates before you start, and get part of it up front.", "Acuerden el precio, el trabajo y las fechas antes de empezar, y cobra una parte por adelantado.")
+        ),
         act("goals.hustle", T("Set a freelance rate and see the weekly profit — then think about the tax share.", "Pon una tarifa independiente y mira la ganancia semanal; luego piensa en la parte para impuestos."), { price: [40, 600], cost: [5, 60], count: 3, hours: 3 }),
       ],
     },
@@ -127,6 +138,7 @@ export default {
           [null, T("Below cost, every sale loses money.", "Por debajo del costo, cada venta pierde dinero."), T("Breaking even means working for free.", "Quedar tablas significa trabajar gratis.")]
         ),
         tf("pricing_profit", T("Selling more always means earning more.", "Vender más siempre significa ganar más."), false, T("If each sale costs more than its price, selling more loses more.", "Si cada venta cuesta más que su precio, vender más pierde más.")),
+        number("pricing_profit", T("Bracelets: materials cost {$2|30} each and you sell them for {$6|90}. You sell 25. What's your profit?", "Pulseras: los materiales cuestan {$2|30} cada una y las vendes en {$6|90}. Vendes 25. ¿Cuál es tu ganancia?"), { unit: "money", answer: [100, 1500] }, [T("Each one leaves {$6|90} − {$2|30} = {$4|60}.", "Cada una te deja {$6|90} − {$2|30} = {$4|60}."), T("× 25 = {$100|1500} in profit, before counting your time.", "× 25 = {$100|1500} de ganancia, sin contar tu tiempo.")]),
         act("goals.hustle", T("Change your price and costs until the profit per hour is worth your time.", "Cambia tu precio y costos hasta que la ganancia por hora valga tu tiempo."), { price: [12, 180], cost: [4, 60], count: 10, hours: 0.5 }),
       ],
     },
@@ -145,6 +157,17 @@ export default {
           [null, T("Any size is allowed — small is just less risky to start.", "Cualquier tamaño se permite; pequeño es solo menos riesgoso para empezar."), T("Small businesses pay taxes too, sometimes in simplified ways.", "Los negocios pequeños también pagan impuestos, a veces de forma simplificada.")]
         ),
         tf("small_business", T("Recording every sale and cost shows whether a business is really profitable.", "Registrar cada venta y costo muestra si un negocio de verdad gana."), true, T("Without records, it's guesswork.", "Sin registros, son puras adivinanzas.")),
+        match(
+          "small_business",
+          T("Match each habit to why it helps a small business.", "Une cada hábito con por qué le ayuda a un negocio pequeño."),
+          [
+            [T("A separate account", "Una cuenta aparte"), T("Keeps business money apart from yours", "Separa el dinero del negocio del tuyo")],
+            [T("A record of every sale and cost", "Un registro de cada venta y gasto"), T("Shows your real profit", "Muestra tu ganancia real")],
+            [T("A share set aside", "Una parte apartada"), T("Covers the taxes you'll owe", "Cubre los impuestos que vas a deber")],
+            [T("Asking early customers", "Preguntar a los primeros clientes"), T("Tells you what to change", "Te dice qué cambiar")],
+          ],
+          T("Small and organized beats big and messy.", "Pequeño y ordenado le gana a grande y desordenado.")
+        ),
         act("goals.create", T("Make a goal for a small starting fund for a business idea.", "Crea una meta para un pequeño fondo inicial para una idea de negocio."), { name: T("Business starter fund", "Fondo para mi negocio"), target: [300, 4500], months: 6 }),
       ],
     },

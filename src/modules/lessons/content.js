@@ -7,7 +7,11 @@ import { CONCEPTS, conceptById } from "./concepts.js";
 export { UNITS };
 export const ALL_LESSONS = UNITS.flatMap((u) => u.lessons.map((l, i) => ({ ...l, unit: u.id, index: i })));
 export const lessonById = (id) => ALL_LESSONS.find((l) => l.id === id) || null;
-export const isQuestion = (s) => s.type === "choice" || s.type === "tf";
+// Every kind of question (how each looks and is graded: qtypes.jsx).
+export const QUESTION_TYPES = ["choice", "tf", "order", "estimate", "match", "number", "spot", "scenario"];
+export const isQuestion = (s) => QUESTION_TYPES.includes(s.type);
+// All the text a learner reads in a step, for the time model.
+const stepTexts = (s) => [s.q, ...[].concat(s.why || []), ...(s.options || []).map((o) => (o && o.text) || o), ...(s.options || []).map((o) => o && o.why), ...(s.items || []), ...(s.pairs || []).flat(), ...(s.parts || []).map((p) => p.tap || p)].filter(Boolean);
 
 // How long a lesson takes, roughly: reading on a phone (~150 words a
 // minute), about 25 seconds per question with its feedback, and a minute
@@ -19,7 +23,7 @@ export function minutes(lesson) {
   let q = 0;
   for (const s of lesson.steps) {
     if (s.type === "card") w += words(s.title) + words(s.body);
-    if (isQuestion(s)) (q++, (w += words(s.q) + words(s.why) + (s.options || []).reduce((t, o) => t + words(o), 0)));
+    if (isQuestion(s)) (q++, (w += stepTexts(s).reduce((t, x) => t + words(x), 0)));
     if (s.type === "action") w += words(s.prompt);
   }
   return w / 150 + q * 0.4 + (lesson.steps.some((s) => s.type === "action") ? 1.5 : 0);
