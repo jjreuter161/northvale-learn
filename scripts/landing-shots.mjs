@@ -1,16 +1,16 @@
 // The landing page's pictures, taken from the real app (so they never
-// show anything the app doesn't do): Home with a goal, a lesson, the
-// practice portfolio and Money Missions, in English and Spanish, plus the
+// show anything the app doesn't do): Today, a lesson, the practice
+// portfolio, Money Missions and a goal, in English and Spanish, plus the
 // share-preview image for each page. Re-run after the app's look changes:
 //   npm run build && node scripts/landing-shots.mjs
-// Writes web/shots/{en,es}-{1..4}.jpg and web/og-{en,es}.jpg.
+// Writes web/shots/{en,es}-{1..5}.jpg and web/og-{en,es}.jpg.
 import { spawn } from "node:child_process";
 import { mkdtempSync, mkdirSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { chromium } from "playwright-core";
 import { newGoal } from "../src/modules/goals/plan.js";
-import { ALL_LESSONS } from "../src/modules/lessons/content.js";
+import { ALL_LESSONS, UNITS } from "../src/modules/lessons/content.js";
 
 const ROOT = join(import.meta.dirname, "..");
 const OUT = join(ROOT, "web/shots");
@@ -31,7 +31,7 @@ function learner(lang, region) {
   const lessons = Object.fromEntries(DONE.map((l, i) => [l.id, { done: true, at: day(i - 30), last: day(i - 30), best: 0, times: 1 }]));
   const goal = { ...newGoal({ id: "g1", templateId: "car", target: region === "MX" ? 60000 : 5000, months: 18, start: 0, path: "save", today: day(-30), region }), contributions: [{ date: day(-20), amount: region === "MX" ? 8000 : 700 }, { date: day(-5), amount: region === "MX" ? 5000 : 450 }] };
   const days = Object.fromEntries(Array.from({ length: 6 }, (_, i) => [day(i - 5), 25]));
-  return { version: 1, updatedAt: 1, profile: { onboarded: true, nickname: "Alex", ageBand: "18-25", avatar: 1, ageAsked: true, remindAsked: true }, settings: { lang, region, look: "white", reduceMotion: true, analytics: false }, progress: { xp: 290, days, streak: { count: 6, last: day(0), best: 6, frozen: [] }, freezes: 1, dailyGoal: 20, lessons, lessonDays: Object.keys(days), badges: { first_lesson: day(-14) }, counters: { lessons: DONE.length }, practiced: {}, startUnit: "budget", placed: [], seen: day(0) }, modules: { goals: { goals: [goal], checkIn: day(0) } } };
+  return { version: 1, updatedAt: 1, profile: { onboarded: true, nickname: "Alex", ageBand: "18-25", avatar: 1, ageAsked: true, remindAsked: true, seenIntros: { practice: day(-20), portfolio: day(-20), tools: day(-20), news: day(-20) } }, settings: { lang, region, look: "white", reduceMotion: true, analytics: false }, progress: { xp: 290, days, streak: { count: 6, last: day(0), best: 6, frozen: [] }, freezes: 1, dailyGoal: 20, lessons, lessonDays: Object.keys(days), badges: { first_lesson: day(-14) }, counters: { lessons: DONE.length }, practiced: {}, startUnit: "budget", placed: [], seen: day(0) }, modules: { goals: { goals: [goal], checkIn: day(0) }, feedback: { pending: [], survey: "very" } } };
 }
 
 const jpeg = (page, name) => page.screenshot({ path: join(OUT, name), type: "jpeg", quality: 72 });
@@ -43,15 +43,17 @@ try {
     page.setDefaultTimeout(8000);
     await page.goto(BASE);
     await page.addStyleTag({ content: "*,*::before,*::after{animation:none!important;transition:none!important}" });
-    const menu = async (name) => {
-      await page.getByRole("button", { name: /^(Menu|Menú)$/ }).click();
-      await page.getByRole("navigation").getByRole("button", { name, exact: true }).click();
+    // A tab, and a row on its page.
+    const menu = async (tab, row) => {
+      await page.getByRole("navigation").getByRole("button", { name: tab, exact: true }).click();
+      if (row) await page.getByRole("button", { name: new RegExp(`^${row}`) }).first().click();
       await page.waitForTimeout(300);
     };
+    const es = lang === "es";
     await page.waitForTimeout(4000); // achievement toasts come and go
     await jpeg(page, `${lang}-1.jpg`);
     // A lesson, at its first question with an answer picked.
-    await menu(lang === "es" ? "Aprender" : "Learn");
+    await page.getByRole("button", { name: new RegExp(`^(Unit|Unidad) ${UNITS.findIndex((u) => u.id === NEXT.unit) + 1} · `) }).click();
     await page.getByRole("button", { name: new RegExp(`^${NEXT.title[lang].replace(/[.*+?^${}()|[\]\\]/g, "\\$&")} — `) }).click();
     for (let i = 0; i < 10 && !(await page.getByRole("radio").count()); i++) await page.getByRole("dialog").getByRole("button", { name: /^(Continue|Continuar)$/ }).click();
     await page.waitForTimeout(300);
@@ -59,7 +61,7 @@ try {
     await page.getByRole("button", { name: /^(Close|Cerrar)$/ }).first().click();
     await page.getByRole("button", { name: /^(Leave|Salir)$/ }).click();
     // The practice portfolio, after a practice buy.
-    await menu(lang === "es" ? "Portafolio" : "Portfolio");
+    await menu(es ? "Práctica" : "Practice", es ? "Portafolio de práctica" : "Practice portfolio");
     await page.getByRole("button", { name: /^VOO/ }).first().click();
     await page.getByRole("dialog").getByRole("button", { name: "25%" }).click();
     await page.getByRole("dialog").getByRole("button", { name: /^(Buy|Comprar)$/ }).click();
@@ -68,9 +70,11 @@ try {
     await page.evaluate(() => window.scrollTo(0, 0));
     await page.waitForTimeout(4000);
     await jpeg(page, `${lang}-3.jpg`);
-    // Money Missions.
-    await menu(lang === "es" ? "Misiones" : "Missions");
+    // Money Missions, and the goal.
+    await menu(es ? "Práctica" : "Practice", es ? "Misiones de dinero" : "Money Missions");
     await jpeg(page, `${lang}-4.jpg`);
+    await menu(es ? "Metas" : "Goals");
+    await jpeg(page, `${lang}-5.jpg`);
     await ctx.close();
   }
 

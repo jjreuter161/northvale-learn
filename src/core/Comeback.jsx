@@ -68,7 +68,7 @@ export function OpenNotice({ t, locale, notice, onClose, go }) {
     const next = service("lessons", "nextFor")(service("goals", "recommendedUnits")() || []);
     const row = (label, value, sub) => (
       <div style={{ padding: "12px 0", borderTop: "1px solid var(--line)" }}>
-        <div style={{ fontSize: 12, fontWeight: 650, color: "var(--low)", letterSpacing: 0.4, textTransform: "uppercase" }}>{label}</div>
+        <div style={{ fontSize: 12, fontWeight: 650, color: "var(--low)" }}>{label}</div>
         <div style={{ fontWeight: 700, fontSize: 17, marginTop: 2 }}>{value}</div>
         {sub && <div style={{ fontSize: 14, color: "var(--mid)", marginTop: 2 }}>{sub}</div>}
       </div>

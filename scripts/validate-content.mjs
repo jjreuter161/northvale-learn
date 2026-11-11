@@ -133,9 +133,9 @@ export function validateContent() {
     last = i;
     if (concepts.get(c) !== unit) fail("placement", `${c} isn't a concept of ${unit}`);
   }
-  // Home and the lesson's end say how each unit helps your goal.
-  const goalsSrc = readFileSync(join(root, "src/modules/goals/index.jsx"), "utf8");
-  for (const u of UNITS) if (!goalsSrc.includes(`"link.${u.id}":`)) fail(`unit ${u.id}`, `no "link.${u.id}" sentence in goals/index.jsx`);
+  // Today and the lesson's end say why each unit matters, in one line.
+  const lessonsSrc = readFileSync(join(root, "src/modules/lessons/index.jsx"), "utf8");
+  for (const u of UNITS) if (!lessonsSrc.includes(`"why.${u.id}":`)) fail(`unit ${u.id}`, `no "why.${u.id}" line in lessons/index.jsx`);
   // Every piece of app text a screen asks for — t("key") — exists.
   const appSrc = sourceFiles(join(root, "src")).map((f) => readFileSync(f, "utf8")).join("\n");
   const keys = [...appSrc.matchAll(/^\s*"([\w.]+)":\s*(?:S\(|\{)/gm)].map((x) => x[1]);

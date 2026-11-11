@@ -45,13 +45,22 @@ export function update(fn, { touch = true } = {}) {
   state = touch ? { ...next, updatedAt: Date.now() } : next;
   listeners.forEach((l) => l());
   clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => {
-    try {
-      localStorage.setItem(KEY, JSON.stringify(state));
-    } catch {
-      // Private mode or full storage: the app still works for this visit.
-    }
-  }, 300);
+  saveTimer = setTimeout(save, 300);
+}
+function save() {
+  clearTimeout(saveTimer);
+  saveTimer = null;
+  try {
+    localStorage.setItem(KEY, JSON.stringify(state));
+  } catch {
+    // Private mode or full storage: the app still works for this visit.
+  }
+}
+// Closed, reloaded or sent to the background within that moment: save now,
+// so nothing just done (a finished lesson, a survey answer) is lost.
+if (typeof document !== "undefined") {
+  addEventListener("pagehide", () => saveTimer && save());
+  document.addEventListener("visibilitychange", () => document.visibilityState === "hidden" && saveTimer && save());
 }
 export function replaceState(next) {
   update(() => next, { touch: false });

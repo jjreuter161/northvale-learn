@@ -7,12 +7,16 @@ import { registerModule, service } from "../../core/registry.js";
 import { recordPractice } from "../../core/game.js";
 import { api } from "../../core/api.js";
 import { addStrings } from "../../core/i18n.js";
-import { Button, Card, Chip, Icon, Note, Title } from "../../core/ui.jsx";
+import { Button, Card, Chip, Icon, ListRow, Note, Title } from "../../core/ui.jsx";
+import { useAppState } from "../../core/store.js";
+import { useSeen, markIntro, lessonsDone } from "../../core/Practice.jsx";
 
 const S = (en, es) => ({ en, es });
 addStrings({
   "news.nav": S("News", "Noticias"),
   "news.title": S("News, explained", "Noticias explicadas"),
+  "news.row.sub": S("Real headlines in plain words", "Noticias reales en palabras sencillas"),
+  "news.row.locked": S("Opens after 5 lessons", "Se abre después de 5 lecciones"),
   "news.sub": S("Today's money headlines in plain words.", "Los titulares de dinero de hoy, en palabras sencillas."),
   "news.means": S("What this means", "Qué significa"),
   "news.terms": S("Words to know", "Palabras clave"),
@@ -55,7 +59,7 @@ function Story({ item, t, onRead, read }) {
       {item.headline && item.headline !== item.title && <p style={{ fontSize: 13, color: "var(--low)", margin: "-4px 0 10px", fontStyle: "italic" }}>“{item.title}”</p>}
       {item.summary && (
         <div style={{ background: "var(--brandSoft)", borderRadius: 14, padding: "12px 14px" }}>
-          <div style={{ fontSize: 13, fontWeight: 750, letterSpacing: 0.5, textTransform: "uppercase", marginBottom: 4 }}>{t("news.means")}</div>
+          <div style={{ fontSize: 13, fontWeight: 750, marginBottom: 4 }}>{t("news.means")}</div>
           <p style={{ margin: 0, fontSize: 16, lineHeight: 1.5 }}>{item.summary}</p>
         </div>
       )}
@@ -128,9 +132,19 @@ function ReadAction({ t, locale, onDone }) {
   return <Feed t={t} locale={locale} limit={2} onAnyRead={onDone} />;
 }
 
+// Its row on the Practice tab: after 5 lessons (a little vocabulary first),
+// or for anyone who has already read the news here.
+function PracticeRow({ t, go }) {
+  const p = useAppState((s) => s.progress);
+  const seen = useSeen("news");
+  const open = lessonsDone(p) >= 5 || (p.practiced.news || []).length > 0;
+  return <ListRow icon="news" title={t("news.title")} sub={open ? t("news.row.sub") : t("news.row.locked")} locked={!open} isNew={open && !seen && t("common.new")} onClick={() => (markIntro("news"), go("news"))} />;
+}
+
 registerModule({
   id: "news",
-  nav: { icon: "news", label: "news.nav", order: 4 },
+  nav: { tab: "practice", label: "news.nav" },
+  practice: { order: 4, Row: PracticeRow },
   Screen,
   actions: { "news.read": ReadAction },
 });

@@ -11,8 +11,8 @@ export const GLOSSARY = [
   G(["emergency fund", "fondo de emergencia"], T("Money saved only for surprises, so a bad day doesn't become debt.", "Dinero guardado solo para imprevistos, para que un mal día no se vuelva deuda."), T("Liquid, low-risk savings — commonly 3–6 months of essential expenses — held in an insured account or very short-term government debt so it's available when needed.", "Ahorro líquido y de bajo riesgo —comúnmente de 3 a 6 meses de gastos básicos— en una cuenta protegida o deuda gubernamental de muy corto plazo, para tenerlo disponible cuando se necesite.")),
   G(["interest", "interés", "intereses"], T("The price of borrowing money — or what you earn for lending it.", "El precio de pedir prestado, o lo que ganas por prestar."), T("Compensation for the time value of money and risk, quoted as a yearly rate. Borrowers pay it; savers and lenders receive it.", "Compensación por el valor del dinero en el tiempo y el riesgo, expresada como tasa anual. Quien pide prestado la paga; quien ahorra o presta la recibe.")),
   G(["compound interest", "compound", "compounding", "interés compuesto"], T("Earning interest on your interest, so money grows faster over time.", "Ganar intereses sobre tus intereses, así el dinero crece más rápido con el tiempo."), T("Growth where each period's return is added to the base: FV = PV × (1 + r)^n. Time (n) matters as much as the rate (r); the Rule of 72 estimates doubling time as 72 ÷ rate.", "Crecimiento en el que cada rendimiento se suma a la base: VF = VP × (1 + r)^n. El tiempo (n) importa tanto como la tasa (r); la regla del 72 estima el tiempo para duplicar como 72 ÷ tasa.")),
-  G(["apr"], T("The yearly cost of borrowing, as a percent.", "El costo anual de pedir prestado, en porcentaje."), T("Annual percentage rate: the yearly interest rate on a loan or card, including some fees. Card interest usually compounds daily, so the effective rate is a bit higher than the APR.", "Tasa anual (APR en EE. UU.): la tasa de interés anual de un préstamo o tarjeta, con algunas comisiones. En tarjetas el interés suele calcularse a diario, así que el costo efectivo es un poco mayor.")),
-  G(["cat", "costo anual total"], T("In Mexico, the total yearly cost of a loan — interest plus fees — so you can compare.", "En México, el costo total anual de un crédito —intereses más comisiones— para que puedas comparar."), T("Costo Anual Total: a standardized annual cost that includes interest, fees and other charges (before VAT), required by Banxico so credit products can be compared fairly.", "Costo Anual Total: un costo anual estandarizado que incluye intereses, comisiones y otros cargos (sin IVA), obligatorio por Banxico para comparar créditos de forma justa.")),
+  G(["apr", "card interest", "interest rate", "intereses tarjeta"], T("The yearly cost of borrowing, as a percent.", "El costo anual de pedir prestado, en porcentaje."), T("Annual percentage rate: the yearly interest rate on a loan or card, including some fees. Card interest usually compounds daily, so the effective rate is a bit higher than the APR.", "Tasa anual (APR en EE. UU.): la tasa de interés anual de un préstamo o tarjeta, con algunas comisiones. En tarjetas el interés suele calcularse a diario, así que el costo efectivo es un poco mayor.")),
+  G(["cat", "costo anual total", "intereses tarjeta", "tasa de interés"], T("In Mexico, the total yearly cost of a loan — interest plus fees — so you can compare.", "En México, el costo total anual de un crédito —intereses más comisiones— para que puedas comparar."), T("Costo Anual Total: a standardized annual cost that includes interest, fees and other charges (before VAT), required by Banxico so credit products can be compared fairly.", "Costo Anual Total: un costo anual estandarizado que incluye intereses, comisiones y otros cargos (sin IVA), obligatorio por Banxico para comparar créditos de forma justa.")),
   G(["credit card", "tarjeta de crédito"], T("A card that lets you borrow to buy now and pay later. Pay it all each month and it's usually free.", "Una tarjeta que te presta para comprar hoy y pagar después. Si pagas todo cada mes, normalmente no cuesta."), T("Revolving credit: purchases accrue interest only if the statement balance isn't paid in full by the due date. Minimum payments mostly cover interest, which stretches repayment for years.", "Crédito revolvente: las compras generan intereses solo si no pagas el total del estado de cuenta a tiempo. Los pagos mínimos cubren sobre todo intereses y alargan la deuda por años.")),
   G(["credit score", "puntaje", "score", "fico"], T("A number that shows lenders how you've handled borrowing.", "Un número que muestra a los prestamistas cómo has manejado tus deudas.", { en: "In Mexico, your credit history is kept by Buró de Crédito and Círculo de Crédito — and paying on time is what counts.", es: "En México, tu historial lo guardan Buró de Crédito y Círculo de Crédito, y lo que cuenta es pagar a tiempo." }), T("FICO scores (300–850) weigh payment history (~35%), amounts owed (~30%), length of history (~15%), new credit (~10%) and credit mix (~10%).", "Los puntajes FICO (300–850) pesan historial de pagos (~35%), montos que debes (~30%), antigüedad (~15%), crédito nuevo (~10%) y mezcla de créditos (~10%).", { en: "Mexico's credit bureaus record each account's payment behavior; lenders also use scores built on those records. You can request a free report once every 12 months.", es: "Las sociedades de información crediticia registran cómo pagas cada cuenta; los otorgantes también usan scores basados en ese historial. Puedes pedir un reporte gratis una vez cada 12 meses." })),
   G(["buró", "buro", "buró de crédito"], T("A company in Mexico that keeps your credit history. Being in it isn't bad — paying late is.", "Una empresa en México que guarda tu historial crediticio. Estar ahí no es malo; pagar tarde sí."), T("A sociedad de información crediticia regulated in Mexico; with Círculo de Crédito it records payment behavior that lenders consult. Negative records stay for a period set by law depending on the amount.", "Una sociedad de información crediticia regulada en México; junto con Círculo de Crédito registra cómo pagas y los otorgantes la consultan. Los registros negativos permanecen el tiempo que marca la ley según el monto.")),
@@ -68,14 +68,58 @@ const ONLY = { MX: ["cat", "buró", "ipc", "banxico", "cetes", "ipab", "afore", 
 const regionOf = (g) => Object.keys(ONLY).find((r) => ONLY[r].includes(g.keys[0])) || null;
 const forRegion = (region) => GLOSSARY.filter((g) => !regionOf(g) || regionOf(g) === region);
 
-// Finds the term a question (or a lesson card) is about: whole words,
-// longest match first, only terms for the learner's country.
-export function lookup(question, region = "US") {
-  const q = ` ${String(question).toLowerCase().replace(/[¿?¡!.,;:()"“”]/g, " ")} `;
+// MATCHING — the same question in different words still finds its term:
+// accents, punctuation and plurals don't matter ("¿Cómo cobran intereses
+// las tarjetas?" → CAT), filler words are ignored, and a term's words can
+// come in any order ("fund for an emergency"). Both languages always.
+const STOP = new Set(
+  "the and for with how what why when where which who this that these those its your our their you can could should would will about explain tell mean means meaning work works get make much many some any there here than then just like really thing things does did are was have has into from please give example "
+    .concat("los las unos unas del por para con sin son ser que como cuando donde cual cuales quien mis tus sus eso esto esta este estos estas hace hacen funciona funcionan significa explica explicame dime sobre muy mas pero cosa cosas tiene tengo puedo debo dame ejemplo")
+    .split(" ")
+);
+export const norm = (s) => String(s).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
+const stem = (w) => {
+  if (/\d/.test(w)) return w;
+  if (w.length > 3 && w.endsWith("s")) w = w.slice(0, -1);
+  if (w.length > 5 && w.endsWith("ing")) w = w.slice(0, -3);
+  if (w.length > 3 && w.endsWith("e")) w = w.slice(0, -1);
+  return w;
+};
+export const words = (s) => norm(s).split(" ").filter((w) => w && !STOP.has(w) && (w.length > 2 || /\d/.test(w))).map(stem);
+
+// Finds the term a question (or a lesson card) is about: the term with the
+// most words that all appear in the question, only terms for the learner's
+// country. `loose` (typed questions) also accepts one long shared word.
+export function lookup(question, region = "US", { loose = false } = {}) {
+  const q = new Set(words(question));
   let best = null;
   for (const g of forRegion(region))
-    for (const k of g.keys) if (q.includes(` ${k} `) && (!best || k.length > best.k.length)) best = { g, k };
-  return best ? best.g : null;
+    for (const k of g.keys) {
+      const kw = words(k);
+      if (kw.length && kw.every((w) => q.has(w)) && (!best || kw.length > best.n || (kw.length === best.n && k.length > best.k.length))) best = { g, k, n: kw.length };
+    }
+  if (best || !loose) return best ? best.g : null;
+  for (const g of forRegion(region)) if (g.keys.some((k) => words(k).some((w) => w.length >= 5 && q.has(w)))) return g;
+  return null;
+}
+
+// The lesson that covers a question best: its title, card titles and ideas
+// in both languages, weighted so rare words count more than common ones.
+let INDEX = null;
+const strings = (x) => (typeof x === "string" ? [x] : x && typeof x === "object" ? Object.values(x).flatMap(strings) : []);
+export function findLesson(question, lessons, conceptName) {
+  if (!INDEX) {
+    INDEX = lessons.map((l) => ({ l, w: new Set([l.title, ...l.steps.filter((s) => s.type === "card").map((s) => s.title), ...[...new Set(l.steps.map((s) => s.c).filter(Boolean))].map(conceptName)].flatMap(strings).flatMap(words)) }));
+    INDEX.df = new Map();
+    for (const { w } of INDEX) for (const x of w) INDEX.df.set(x, (INDEX.df.get(x) || 0) + 1);
+  }
+  const q = [...new Set(words(question))];
+  let best = null;
+  for (const e of INDEX) {
+    const score = q.reduce((n, w) => (e.w.has(w) ? n + Math.log(INDEX.length / INDEX.df.get(w)) : n), 0);
+    if (score >= 2.5 && (!best || score > best.score)) best = { l: e.l, score };
+  }
+  return best ? best.l : null;
 }
 
 // Words to offer as chips when the AI tutor isn't available.

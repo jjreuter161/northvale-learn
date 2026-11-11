@@ -340,7 +340,7 @@ export default function Settings({ t, locale, go }) {
           ["privacy", t("legal.privacy")],
           ["terms", t("legal.terms")],
         ].map(([doc, label], i) => (
-          <button key={doc} onClick={() => go("legal", { doc })} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", border: "none", borderTop: i ? "1px solid var(--line)" : "none", background: "transparent", color: "var(--ink)", padding: "14px 16px", fontSize: 15, fontWeight: 600, cursor: "pointer", minHeight: 52 }}>
+          <button key={doc} onClick={() => go("legal", { doc, from: "settings" })} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", border: "none", borderTop: i ? "1px solid var(--line)" : "none", background: "transparent", color: "var(--ink)", padding: "14px 16px", fontSize: 15, fontWeight: 600, cursor: "pointer", minHeight: 52 }}>
             {label}
             <span style={{ fontSize: 12, fontWeight: 600, color: "var(--mid)", background: "var(--surface2)", borderRadius: 6, padding: "3px 7px" }}>{t("legal.draft")}</span>
           </button>

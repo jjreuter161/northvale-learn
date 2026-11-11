@@ -1,8 +1,14 @@
 # Northvale Learn
 
-Set a goal, get a plan, and learn what it takes to reach it, five minutes a day. It's educational only: no real money, no real trades, no bank connections.
+Learn money by doing: three-minute lessons, a goal to learn for, and practice with pretend money. It's educational only: no real money, no real trades, no bank connections.
 
-- **Goals first.** Home is your goal dashboard.
+- **Four tabs, no menu.** A bottom tab bar that never changes shape: **Learn**, **Goals**, **Practice** and **Me**, with a labeled **Ask** button (the tutor) at the top right of every tab and in the lesson bar.
+  - **Learn** opens on **Today**: the next lesson as the one big button, one line on why it matters, and "Building toward: your car". Below it are small rows: review (when ideas are due), the streak, this week's mission and the Sunday check-in. There is at most one question for the learner at a time (the goal's amount and date after the first lesson, the age range, reminders). Under Today is the course: finished units fold to one row, the current unit is open with one Start button, and later units fold too.
+  - **Practice** is there from day one, with a clear preview until 3 lessons are done. Inside it, Money Missions, the practice portfolio (with "Your first safe investment"), the tools from your lessons (each after the lesson that uses it) and News explained (after 5 lessons) open over time, each with a "New" tag or a one-time introduction. Anything a learner already used stays open.
+  - **Me** has progress (streak, XP, this week), the weekly league (after 3 learning days), and rows for achievements, skills, inviting a friend (after 3 learning days), classes, Settings, feedback and the legal pages.
+  - **First run:** three screens to the first lesson: welcome, "What do you want to learn money skills for?", and "How do you want to start?" (from the beginning, or a 2-minute check), with which lessons come first and why.
+  - **The look:** white and light grey, one card style, navy only for the main button, progress, the active tab and links, and green only for a correct answer. Dark mode is charcoal with light-navy accents.
+- **Goals.** The Goals tab: what you're learning for.
   - Pick a goal (emergency fund, car, college, first investment, travel, paying off debt, or your own) with country-appropriate starting amounts. You get a dated monthly plan on a path: cash, savings account / CETES, or index fund.
   - Each goal shows what you've saved so far vs. the target, time left, and whether you're on track, behind or ahead of the plan.
   - Practice investments linked to a goal show on their own line ("with practice investments"), so you can see how investing could get you there sooner.
@@ -17,11 +23,11 @@ Set a goal, get a plan, and learn what it takes to reach it, five minutes a day.
   - A 2–3 minute **Review** brings back concepts you missed or haven't seen in a while, using spaced repetition. It counts toward the daily goal and the streak.
   - A wrong answer says why that choice is wrong, then gives the answer. In a lesson, a miss also brings another explanation and an easier question right away.
   - A perfect lesson unlocks a harder **Challenge** version.
-  - Me shows a skills overview.
-- **Money Missions.** Small real-life tasks that put a lesson to work: "Track everything you spend for 3 days", "Find the fees on a bank account", "Read a real pay stub", "Spot 3 ads that use FOMO", "Set aside any amount toward your goal". There are 31, one suggested each week on Home. They're picked for your country, age range (some are 18+, and some have a 13–17 version that involves a parent) and goal, and for what you studied this week. A finished lesson suggests its unit's mission. You do them on your own, mark them done and can add a short private note. They earn 20 XP the first time (weekly ones once a week) and three achievements, but don't count for the learning streak. No money moves and nothing is collected; usage stats count only that a mission was finished.
+  - Me → Skills shows a skills overview, and a review any time.
+- **Money Missions.** Small real-life tasks that put a lesson to work: "Track everything you spend for 3 days", "Find the fees on a bank account", "Read a real pay stub", "Spot 3 ads that use FOMO", "Set aside any amount toward your goal". There are 31, one suggested each week on the Practice tab (and a row on Today). They're picked for your country, age range (some are 18+, and some have a 13–17 version that involves a parent) and goal, and for what you studied this week. A finished lesson suggests its unit's mission. You do them on your own, mark them done and can add a short private note. They earn 20 XP the first time (weekly ones once a week) and three achievements, but don't count for the learning streak. No money moves and nothing is collected; usage stats count only that a mission was finished.
 - **First minutes.** Pick a reason, set your first goal (amount and date, prefilled for your country), optionally take a 2-minute placement check that skips units you already know, pick a daily time, and you're in the lesson that helps that goal most. Signing up is offered only after that lesson.
 - **Bringing people back.** Everything here is calm and opt-in:
-  - **Daily reminders** (notifications from the installed app). The learner picks the time; quiet hours (none 9 pm–8 am) are on by default; at most one a day, and only when something's waiting: a streak at risk, the Sunday check-in, a review, this week's mission or the next lesson. Offered once on Home after a second day of learning, and in Settings. Where a browser can't do it (an iPhone before "Add to Home Screen"), it says how, and the calendar reminder still works.
+  - **Daily reminders** (notifications from the installed app). The learner picks the time; quiet hours (none 9 pm–8 am) are on by default; at most one a day, and only when something's waiting: a streak at risk, the Sunday check-in, a review, this week's mission or the next lesson. Offered once on Today after a second day of learning, and in Settings. Where a browser can't do it (an iPhone before "Add to Home Screen"), it says how, and the calendar reminder still works.
   - **Welcome back.** After 3+ days away, a short catch-up (your goal, the next lesson, one button to restart) instead of a broken-streak message.
   - **Streak repair.** Once a month, a streak of 2+ days that ended can be brought back for free, within 7 days.
   - **Weekly email recap** (accounts, opt-in, once email is set up): Sunday evening, your goals, the week's lessons and the next step. It stops after 4 weeks without a lesson, and one link turns it off.
@@ -34,8 +40,8 @@ Set a goal, get a plan, and learn what it takes to reach it, five minutes a day.
   - The admin page shows invites (made, opened, joined, freezes earned), friend links, shares by kind, classes and students, and the feature switches.
 - **Habit.** XP, levels, a daily streak with automatic streak freezes, a daily XP target, achievements and a weekly league (real people only), kept quiet and in the background. The top bar shows only the streak; XP lives on Me. Achievements come from learning and from goal milestones, which never give XP (savings are self-reported). There's also a calendar reminder.
 - **Practice portfolio.** $10,000 (or $200,000 MXN) of pretend money. Safe investments, funds and single stocks unlock as you learn. Holdings linked to a goal are tagged with it. Prices are real and delayed with a market data key; otherwise they're samples, clearly labeled.
-- **Calculators.** Budget planner, debt payoff, starting early, investing range, retirement, paycheck and side hustle, on Home and as lesson steps.
-- **AI tutor.** It explains any term, chart or headline in Simple or Expert mode, always as education, and can relate answers to your goal (it sees the goal's kind and numbers, never the name you typed). Without AI, it answers from a built-in glossary.
+- **Calculators.** Budget planner, debt payoff, starting early, investing range, retirement, paycheck and side hustle, as lesson steps and in Practice → Tools from your lessons (each one after the lesson that uses it).
+- **AI tutor.** It explains any term, chart or headline in Simple or Expert mode, always as education, and can relate answers to your goal (it sees the goal's kind and numbers, never the name you typed). It remembers the conversation, so follow-ups work, and answers link the lesson that covers the topic. Without AI it says so up front ("offline mode, so it can only explain basic terms") and answers from a built-in glossary, matching the question even in other words, in English or Spanish.
 - **News, explained.** Real headlines, each with a plain-words "what this means".
 - **Languages and countries.** English and Spanish, for the United States and Mexico.
 - **Looks like a finance app.** Deep navy, one green accent for progress, neutral grays, Inter with a serif wordmark, tabular figures for money, short fades with no bounce. Light and Dark looks. Before/after screenshots are in [docs/design/](docs/design).
@@ -97,23 +103,25 @@ Everything works without keys. To turn on the AI tutor, real prices and reset em
 ## How it's built: a core plus modules
 
 ```
-src/core/       accounts and sync, profile, XP/streak engine (progress.js),
-                facts (facts.js), analytics, errors, settings, English/Spanish,
-                design system, legal pages, reminders, share cards
-                (share.jsx) and invite links (invites.jsx)
+src/core/       the shell (App.jsx: 4 tabs, header, Ask), accounts and sync,
+                profile, XP/streak engine (progress.js), facts (facts.js),
+                analytics, errors, settings, English/Spanish, design system
+                (ui.jsx), the Practice tab (Practice.jsx: its lock, the
+                one-time intros), Me, onboarding, legal pages, reminders,
+                share cards (share.jsx) and invite links (invites.jsx)
 src/modules/
-  lessons/      the path, the player (lessons, reviews, challenges), the
+  lessons/      Today and the course path, the player (lessons, reviews, challenges), the
                 course rules (content.js), one file per unit with its
                 lessons and concepts (units/), mastery and spaced review
                 (mastery.js), placement and the skills card (practice.jsx)
   portfolio/    practice portfolio, prices, its lesson actions
-  goals/        Home: goals, plans, milestones, check-in (plan.js = the
-                tested model), the calculators (tools.jsx), its lesson
-                actions and its onboarding step
+  goals/        the Goals tab: goals, plans, milestones, check-in (plan.js =
+                the tested model), the calculators (tools.jsx) and Practice →
+                Tools, its lesson actions and its onboarding step ("what for")
   missions/     Money Missions: the catalog (catalog.js), who they fit and
-                the weekly pick (pick.js = the tested rules), Home's card,
+                the weekly pick (pick.js = the tested rules), Practice's card,
                 the Missions screen and the card after a lesson
-  tutor/        AI tutor + offline glossary
+  tutor/        AI tutor ("Ask") + offline glossary and matching (glossary.js)
   news/         news, explained
   feedback/     "Send feedback" and the survey
   classroom/    classroom mode (behind a feature switch): joining with a

@@ -1,8 +1,10 @@
-// AI TUTOR — explains any term, chart or headline in plain words. Two
-// modes: Simple (explain like I'm new) and Expert (numbers and detail).
-// Always education, never personal advice. Opens from anywhere: the header,
-// "Explain more" in a lesson, "Explain this chart", a news story. Through
-// the server (signed in), streamed; otherwise the built-in glossary.
+// AI TUTOR ("Ask") — explains any term, chart or headline in plain words.
+// Two modes: Simple (explain like I'm new) and Expert (numbers and detail).
+// Always education, never personal advice. Opens from anywhere: the Ask
+// button on every tab and in the lesson bar, "Ask about this" on a lesson
+// card, "Explain this chart", a news story. Through the server (signed in),
+// streamed; otherwise offline mode, which says so up front and answers from
+// the glossary. Either way, answers link the lesson that covers the topic.
 import { useEffect, useRef, useState } from "react";
 import { registerModule, service } from "../../core/registry.js";
 import { useSlice, setSlice, getState } from "../../core/store.js";
@@ -13,9 +15,12 @@ import { stream } from "../../core/api.js";
 import { useSession } from "../../core/session.js";
 import { level } from "../../core/progress.js";
 import { Button, Chip, Icon, Note, Segmented, Sheet } from "../../core/ui.jsx";
-import { lookup, suggestedWords } from "./glossary.js";
+import { lookup, suggestedWords, findLesson } from "./glossary.js";
 import { sessionNow } from "../../core/session.js";
-import { UNITS, unitDone } from "../lessons/content.js";
+import { UNITS, ALL_LESSONS, unitDone, lessonState } from "../lessons/content.js";
+import { conceptById } from "../lessons/concepts.js";
+
+const lessonFor = (q) => findLesson(q, ALL_LESSONS, (id) => (conceptById(id) || {}).name);
 
 const S = (en, es) => ({ en, es });
 addStrings({
@@ -30,8 +35,17 @@ addStrings({
   "tutor.about": S("About: {what}", "Sobre: {what}"),
   "tutor.thinking": S("Thinking…", "Pensando…"),
   "tutor.new": S("New chat", "Nueva conversación"),
-  "tutor.offline": S("The AI tutor needs a free account (and this server's AI turned on). Until then, here's the quick version from Northvale's glossary:", "El tutor con IA necesita una cuenta gratis (y que este servidor tenga la IA activada). Mientras, aquí va la versión rápida del glosario de Northvale:"),
-  "tutor.offline.none": S("The AI tutor needs a free account (and this server's AI turned on). Meanwhile, tap a word below for a quick explanation.", "El tutor con IA necesita una cuenta gratis (y que este servidor tenga la IA activada). Mientras, toca una palabra para una explicación rápida."),
+  "tutor.offline.banner": S("The tutor is in offline mode, so it can only explain basic terms.", "El tutor está en modo sin conexión, así que solo puede explicar términos básicos."),
+  "tutor.offline.account": S("A free account turns on the full tutor, which answers any money question.", "Una cuenta gratis activa el tutor completo, que responde cualquier pregunta de dinero."),
+  "tutor.offline": S("From the glossary:", "Del glosario:"),
+  "tutor.offline.lesson": S("Offline, I can only explain basic terms, but this lesson covers your question:", "Sin conexión solo puedo explicar términos básicos, pero esta lección cubre tu pregunta:"),
+  "tutor.offline.none": S("I couldn't match that to a money term. Try a single word, like one of these:", "No encontré un término de dinero para eso. Prueba con una palabra, como alguna de estas:"),
+  "tutor.related": S("Related lesson: {unit} · {lesson}", "Lección relacionada: {unit} · {lesson}"),
+  "tutor.open": S("Open", "Abrir"),
+  "tutor.c.lesson": S("Explain “{title}” simply", "Explícame “{title}” de forma sencilla"),
+  "tutor.c.simpler": S("Explain this more simply", "Explícamelo más sencillo"),
+  "tutor.c.example": S("Give me an example", "Dame un ejemplo"),
+  "tutor.c.why": S("Why does this matter?", "¿Por qué importa esto?"),
   "tutor.signin": S("Create an account", "Crear cuenta"),
   "tutor.glossary": S("From the glossary", "Del glosario"),
   "tutor.words": S("Words I can explain right now", "Palabras que te puedo explicar ya"),
@@ -122,13 +136,14 @@ function Overlay({ t, locale, go }) {
     track("tutor_ask", { mode: slice.mode, ai: !!aiReady });
     const id = Date.now();
     const userMsg = { id: `u${id}`, role: "user", text: question, about: ctx ? ctx.context.slice(0, 120) : null };
+    const lesson = lessonFor(ctx ? `${question} ${ctx.context}` : question);
     if (!aiReady) {
-      const g = lookup(question, locale.region) || (ctx && lookup(`${ctx.question || ""} ${ctx.context || ""}`, locale.region));
+      const g = lookup(question, locale.region, { loose: true }) || (ctx && lookup(`${ctx.question || ""} ${ctx.context || ""}`, locale.region));
       const answer = g ? text(slice.mode === "expert" ? g.expert : g.simple, locale) : null;
-      save((s) => ({ ...s, messages: [...s.messages, userMsg, { id: `a${id}`, role: "assistant", offline: true, text: answer, glossary: !!g }].slice(-60) }));
+      save((s) => ({ ...s, messages: [...s.messages, userMsg, { id: `a${id}`, role: "assistant", offline: true, text: answer, glossary: !!g, lesson: lesson && lesson.id }].slice(-60) }));
       return;
     }
-    const reply = { id: `a${id}`, role: "assistant", text: "" };
+    const reply = { id: `a${id}`, role: "assistant", text: "", lesson: lesson && lesson.id };
     save((s) => ({ ...s, messages: [...s.messages, userMsg, reply].slice(-60) }));
     setBusy(true);
     const show = (patch) => save((s) => ({ ...s, messages: s.messages.map((m) => (m.id === reply.id ? { ...m, ...patch } : m)) }));
@@ -152,8 +167,30 @@ function Overlay({ t, locale, go }) {
     }
   };
 
-  const suggestions = ["tutor.s1", "tutor.s2", "tutor.s3", locale.region === "MX" ? "tutor.s4.MX" : "tutor.s4", locale.region === "MX" ? "tutor.s5.MX" : "tutor.s5"].map((k) => t(k));
+  // Suggestions for where the learner is: about a lesson card, the lesson
+  // they're on, then the usual starters. Offline: words it can explain.
+  const now = service("lessons", "current")();
+  const suggestions = about
+    ? [t("tutor.c.simpler"), t("tutor.c.example"), t("tutor.c.why")]
+    : [...(now ? [t("tutor.c.lesson", { title: text(now.title, locale) })] : []), ...["tutor.s1", "tutor.s2", locale.region === "MX" ? "tutor.s4.MX" : "tutor.s4"].map((k) => t(k))];
   const glossaryWords = suggestedWords(locale.lang, locale.region);
+  const last = slice.messages[slice.messages.length - 1];
+  const missed = last && last.offline && !last.text && !last.lesson;
+  const related = (id) => {
+    const l = ALL_LESSONS.find((x) => x.id === id);
+    if (!l) return null;
+    const u = UNITS.find((x) => x.id === l.unit);
+    const open = lessonState(getState().progress, id) !== "locked";
+    return (
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 10, paddingTop: 10, borderTop: "1px solid var(--line)" }}>
+        <Icon name="book" size={18} color="var(--mid)" />
+        <span style={{ flex: 1, fontSize: 14, color: "var(--mid)" }}>{t("tutor.related", { unit: text(u.title, locale), lesson: text(l.title, locale) })}</span>
+        <Button size="sm" kind="secondary" onClick={() => (setOpen(false), go("lessons", open ? { lesson: id } : {}))}>
+          {t("tutor.open")}
+        </Button>
+      </div>
+    );
+  };
 
   return (
     <Sheet open={open} onClose={() => setOpen(false)} title={t("tutor.title")} tall>
@@ -168,9 +205,22 @@ function Overlay({ t, locale, go }) {
         )}
       </div>
 
+      {!aiReady && (
+        <Note icon="info" style={{ marginBottom: 12 }}>
+          <strong style={{ display: "block" }}>{t("tutor.offline.banner")}</strong>
+          {!session.user && session.online && (
+            <>
+              <span style={{ display: "block", fontSize: 14, color: "var(--mid)", marginTop: 4 }}>{t("tutor.offline.account")}</span>
+              <Button size="sm" kind="secondary" style={{ marginTop: 10 }} onClick={() => (setOpen(false), go("settings"))}>
+                {t("tutor.signin")}
+              </Button>
+            </>
+          )}
+        </Note>
+      )}
       <div style={{ display: "flex", flexDirection: "column", gap: 10, minHeight: 200 }}>
         {slice.messages.length === 0 && (
-          <div style={{ background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 14, padding: 14, fontSize: 16, lineHeight: 1.5 }}>
+          <div style={{ background: "var(--surface)", borderRadius: 18, padding: 14, fontSize: 16, lineHeight: 1.5 }}>
             {t("tutor.hello")}
           </div>
         )}
@@ -181,29 +231,25 @@ function Overlay({ t, locale, go }) {
               <div style={{ background: "var(--brand)", color: "var(--onBrand)", borderRadius: "18px 18px 4px 18px", padding: "11px 14px", fontSize: 16, lineHeight: 1.45 }}>{m.text}</div>
             </div>
           ) : (
-            <div key={m.id} style={{ alignSelf: "flex-start", maxWidth: "94%", background: "var(--surface)", border: "1px solid var(--line)", borderRadius: "18px 18px 18px 4px", padding: "12px 14px", fontSize: 16, lineHeight: 1.5, color: m.error ? "var(--bad)" : "var(--ink)", overflowWrap: "anywhere" }}>
+            <div key={m.id} style={{ alignSelf: "flex-start", maxWidth: "94%", background: "var(--surface)", borderRadius: "18px 18px 18px 4px", padding: "12px 14px", fontSize: 16, lineHeight: 1.5, color: m.error ? "var(--bad)" : "var(--ink)", overflowWrap: "anywhere" }}>
               {m.offline ? (
                 <>
-                  <p style={{ margin: "0 0 8px", color: "var(--mid)", fontSize: 14 }}>{m.glossary ? t("tutor.offline") : t("tutor.offline.none")}</p>
-                  {m.text && <p style={{ margin: 0, fontWeight: 700 }}>{m.text}</p>}
-                  {!session.user && session.online && (
-                    <Button size="sm" kind="secondary" style={{ marginTop: 10 }} onClick={() => (setOpen(false), go("settings"))}>
-                      {t("tutor.signin")}
-                    </Button>
-                  )}
+                  <p style={{ margin: "0 0 8px", color: "var(--mid)", fontSize: 14 }}>{m.glossary ? t("tutor.offline") : m.lesson ? t("tutor.offline.lesson") : t("tutor.offline.none")}</p>
+                  {m.text && <p style={{ margin: 0, fontWeight: 650 }}>{m.text}</p>}
                 </>
               ) : m.text ? (
                 <Rich value={m.text} />
               ) : (
                 <span className="nv-pulse" style={{ color: "var(--low)" }}>{t("tutor.thinking")}</span>
               )}
+              {m.lesson && !m.error && (m.offline || m.text) && related(m.lesson)}
             </div>
           )
         )}
         <div ref={endRef} />
       </div>
 
-      {slice.messages.length === 0 && (
+      {(slice.messages.length === 0 || missed) && (
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8, margin: "14px 0 4px" }}>
           {(aiReady ? suggestions : glossaryWords).map((s) => (
             <Chip key={s} onClick={() => ask(s)} style={{ fontSize: 14 }}>
@@ -215,7 +261,7 @@ function Overlay({ t, locale, go }) {
 
       {about && (
         <Note icon="sparkles" style={{ marginTop: 12 }}>
-          <strong>{t("tutor.about", { what: about.question || "" })}</strong>
+          <strong>{t("tutor.about", { what: about.question || about.context })}</strong>
           <div style={{ fontSize: 13, color: "var(--mid)", marginTop: 4, maxHeight: 60, overflow: "hidden" }}>{about.context}</div>
         </Note>
       )}
@@ -238,19 +284,11 @@ function Overlay({ t, locale, go }) {
 
 registerModule({
   id: "tutor",
-  nav: { icon: "chat", label: "tutor.nav", order: 5 },
-  // The tutor is a sheet over any screen; its menu entry just opens it.
-  Screen: ({ go }) => {
-    useEffect(() => {
-      openFn && openFn({});
-      go("lessons");
-    }, []);
-    return null;
-  },
+  // A sheet over any screen, opened by the Ask button (no screen of its own).
   Overlay,
   services: {
     open: (x) => openFn && openFn(x),
-    // "Explain more" in a lesson: with the AI, ask about the card; without
+    // "Ask about this" in a lesson: with the AI, ask about the card; without
     // it, answer from the glossary when the card is about a known term
     // (and say there's nothing to explain otherwise — the button hides).
     canExplain: (text) => {

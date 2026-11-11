@@ -2,8 +2,10 @@
 //
 //   registerModule({
 //     id: "portfolio",              // its slice of the store is modules.portfolio
-//     nav: { icon, label, order },  // its place in the menu (optional)
+//     nav: { tab, label },          // which of the 4 tabs it lives under
+//                                   // (learn, goals, practice, me) and its title
 //     Screen,                       // its main screen (gets { go, locale, t })
+//     practice: { order, Entry },   // its row on the Practice tab (optional)
 //     actions: { "portfolio.buy": Widget },  // things a lesson can ask you to do
 //     facts: (state) => ({ holdings: 3 }),    // what badges may check
 //     services: { explain() {} },             // what other modules may call

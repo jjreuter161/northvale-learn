@@ -12,7 +12,7 @@ import { recordMission } from "../../core/game.js";
 import { track } from "../../core/analytics.js";
 import { addStrings, shortDate, text } from "../../core/i18n.js";
 import { dayKey } from "../../core/progress.js";
-import { Button, Card, Icon, Label, Note, Sheet, Title } from "../../core/ui.jsx";
+import { Button, Card, Icon, Label, ListRow, Note, Sheet, Title } from "../../core/ui.jsx";
 import { MISSIONS, missionById } from "./catalog.js";
 import { DEFAULTS, NOTE_MAX, thisWeek, another, start, drop, finish, finished, recommend, forUnit, weeksWithMissions } from "./pick.js";
 
@@ -20,6 +20,7 @@ const S = (en, es) => ({ en, es });
 addStrings({
   "mi.nav": S("Missions", "Misiones"),
   "mi.title": S("Money Missions", "Misiones de dinero"),
+  "mi.count": S("{n} small real-life tasks", "{n} pequeñas tareas de la vida real"),
   "mi.sub": S("Small real-life tasks that put what you learn to work. Nothing here moves real money: you do them on your own and mark them done.", "Pequeñas tareas de la vida real para poner en práctica lo que aprendes. Aquí no se mueve dinero real: las haces por tu cuenta y las marcas como hechas."),
   "mi.week": S("This week's mission", "Misión de la semana"),
   "mi.started": S("In progress · started {date}", "En curso · la empezaste el {date}"),
@@ -312,7 +313,7 @@ function TryCard({ t, locale, go, unit }) {
   if (!m) return null;
   return (
     <Card>
-      <div style={{ fontSize: 12, fontWeight: 650, color: "var(--low)", letterSpacing: 0.4, textTransform: "uppercase", marginBottom: 10 }}>{t("mi.try")}</div>
+      <div style={{ fontSize: 12, fontWeight: 650, color: "var(--low)", marginBottom: 10 }}>{t("mi.try")}</div>
       <Head t={t} locale={locale} m={m} />
       <Button full size="md" kind="secondary" style={{ marginTop: 12, border: "1px solid var(--line)" }} onClick={() => go("missions", { id: m.id })}>
         {t("mi.see")}
@@ -323,7 +324,13 @@ function TryCard({ t, locale, go, unit }) {
 
 registerModule({
   id: "missions",
-  nav: { icon: "flag", label: "mi.nav", order: 1.5 },
+  nav: { tab: "practice", label: "mi.nav" },
+  // On the Practice tab: this week's mission, and a row to all of them.
+  practice: {
+    order: 1,
+    Card: (ctx) => <WeekCard {...ctx} />,
+    Row: ({ t, go }) => <ListRow icon="flag" title={t("mi.title")} sub={t("mi.count", { n: MISSIONS.length })} onClick={() => go("missions")} />,
+  },
   Screen,
   // For achievements: missions finished, and in how many different weeks.
   facts: (state) => {

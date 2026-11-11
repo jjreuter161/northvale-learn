@@ -684,8 +684,8 @@ function Overlay(ctx) {
 
 registerModule({
   id: "classroom",
-  // In the menu for testers it's on for, and for students in a class.
-  nav: { icon: "users", label: "cls.nav", order: 1.8, show: ({ session }) => !!session.flags.classroom || memberships().length > 0 },
+  // Under Me, for testers it's on for and for students in a class.
+  nav: { tab: "me", label: "cls.nav", show: ({ session }) => !!session.flags.classroom || memberships().length > 0 },
   Screen,
   Overlay,
   services: {

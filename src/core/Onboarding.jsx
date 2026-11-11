@@ -1,45 +1,32 @@
-// FIRST RUN — a few taps, then straight into a lesson: why you're here,
-// any first-run step a module adds (Goals: the first goal, which picks the
-// first unit), and how much time a day (the daily goal). No account, no
-// age, no name first: the first lesson is the hook, and the account offer
-// comes after it (that's where the age check lives).
+// FIRST RUN — three screens, then straight into a lesson: welcome, the
+// steps modules add (Goals: what you want money skills for, which picks the
+// first unit; Lessons: how to start, with an optional 2-minute check). No
+// account, no age, no name first: the first lesson is the hook, and the
+// account offer comes after it (that's where the age check lives).
 import { useState } from "react";
 import { update } from "./store.js";
 import { LANGS, REGIONS } from "./i18n.js";
 import { Button, Wordmark, Icon } from "./ui.jsx";
 import { AccountForm } from "./Settings.jsx";
-import { START_UNITS } from "./progress.js";
 import { track } from "./analytics.js";
 import { allModules } from "./registry.js";
 
-const REASONS = [
-  ["save", "target"],
-  ["invest", "chart"],
-  ["debt", "card"],
-  ["curious", "sparkles"],
-];
-// Minutes a day → daily XP goal (a lesson is about 10 XP, ~4 minutes).
-const TIMES = [
-  [5, 10],
-  [10, 20],
-  [15, 30],
-];
+const ORDER = ["goals", "lessons"];
+const rank = (m) => (ORDER.includes(m.id) ? ORDER.indexOf(m.id) : ORDER.length);
 
 export default function Onboarding({ t, locale, onDone }) {
   const [step, setStep] = useState(0);
-  const [reason, setReason] = useState(null);
-  const [startUnit, setStartUnit] = useState(null);
+  const [reason, setReason] = useState("curious");
+  const [startUnit, setStartUnit] = useState("budget");
   const [signingIn, setSigningIn] = useState(false);
-  // Module steps, in menu order (Goals' first goal, then Lessons' placement).
   const extra = allModules()
     .filter((m) => m.Onboard)
-    .sort((a, b) => ((a.nav && a.nav.order) ?? 99) - ((b.nav && b.nav.order) ?? 99));
-  const steps = 2 + extra.length; // reason, module steps, time
+    .sort((a, b) => rank(a) - rank(b));
+  const steps = extra.length;
   const setSetting = (k, v) => update((s) => ({ ...s, settings: { ...s.settings, [k]: v } }));
-  const finish = (minutes, goal) => {
-    const start = startUnit || START_UNITS[reason] || START_UNITS.curious;
-    update((s) => ({ ...s, profile: { ...s.profile, onboarded: true, reason, minutes }, progress: { ...s.progress, dailyGoal: goal, startUnit: start } }));
-    track("onboarding", { reason, minutes });
+  const finish = (start) => {
+    update((s) => ({ ...s, profile: { ...s.profile, onboarded: true, reason }, progress: { ...s.progress, startUnit: start } }));
+    track("onboarding", { reason });
     onDone(start);
   };
 
@@ -55,8 +42,9 @@ export default function Onboarding({ t, locale, onDone }) {
           <Icon name="back" />
         </button>
         <div style={{ flex: 1, height: 6, borderRadius: 3, background: "var(--surface2)", overflow: "hidden" }}>
-          <div style={{ width: `${(step / (steps + 1)) * 100}%`, height: "100%", background: "var(--accent)", borderRadius: 3, transition: "width .4s" }} />
+          <div style={{ width: `${(step / steps) * 100}%`, height: "100%", background: "var(--accent)", borderRadius: 3, transition: "width .4s" }} />
         </div>
+        <span style={{ fontSize: 14, color: "var(--mid)", whiteSpace: "nowrap" }}>{t("onb.step", { n: step, total: steps })}</span>
       </div>
       <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: -0.5, margin: "0 0 8px", lineHeight: 1.2 }}>{title}</h1>
       {sub && <p style={{ fontSize: 16, color: "var(--mid)", margin: "0 0 22px", lineHeight: 1.45 }}>{sub}</p>}
@@ -92,10 +80,10 @@ export default function Onboarding({ t, locale, onDone }) {
     return (
       <div className="nv-in" style={{ maxWidth: 520, margin: "0 auto", minHeight: "100dvh", display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", padding: "calc(24px + env(safe-area-inset-top)) 22px calc(24px + env(safe-area-inset-bottom))" }}>
         <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: 10 }}>
-          <img src="/icon.svg" alt="" width={72} height={72} style={{ borderRadius: 18 }} />
           <Wordmark size={52} />
-          <div style={{ fontSize: 13, fontWeight: 650, letterSpacing: 2, color: "var(--low)" }}>LEARN</div>
-          <p style={{ fontSize: 18, fontWeight: 500, color: "var(--mid)", maxWidth: 320, lineHeight: 1.45, margin: "12px 0 0" }}>{t("onb.tagline")}</p>
+          <div style={{ fontSize: 13, fontWeight: 650, letterSpacing: 4, color: "var(--low)" }}>LEARN</div>
+          <h1 style={{ fontSize: 30, fontWeight: 750, letterSpacing: -0.6, lineHeight: 1.15, margin: "48px 0 0" }}>{t("onb.tagline")}</h1>
+          <p style={{ fontSize: 17, color: "var(--mid)", maxWidth: 340, lineHeight: 1.45, margin: "4px 0 0" }}>{t("onb.tagline.sub")}</p>
         </div>
         <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 10 }}>
           <Button full onClick={() => setStep(1)}>
@@ -117,39 +105,27 @@ export default function Onboarding({ t, locale, onDone }) {
               </button>
             ))}
           </div>
+          <p style={{ fontSize: 13, color: "var(--low)", margin: "6px 0 0", lineHeight: 1.45 }}>{t("disclaimer.short")}</p>
         </div>
       </div>
     );
 
-  if (step === 1)
-    return wrap(
-      <>
-        {top(t("onb.reason.title"), t("onb.reason.sub"))}
-        {REASONS.map(([k, icon]) => option(k, icon, t(`onb.reason.${k}`), t(`onb.reason.${k}.sub`), () => (setReason(k), setStep(2))))}
-      </>
-    );
-
-  const mod = extra[step - 2];
-  if (mod)
-    return wrap(
-      <mod.Onboard
-        t={t}
-        locale={locale}
-        reason={reason}
-        header={top}
-        onNext={(r = {}) => {
-          if (r.startUnit) setStartUnit(r.startUnit);
-          setStep(step + 1);
-        }}
-      />
-    );
-
+  const mod = extra[step - 1];
   return wrap(
-    <>
-      {top(t("onb.time.title"), t("onb.time.sub"))}
-      {TIMES.map(([min, goal]) => option(min, null, t("onb.time.min", { n: min }), t(`onb.time.${min}`), () => finish(min, goal)))}
-      <p style={{ fontSize: 13, color: "var(--low)", margin: "auto 2px 0", lineHeight: 1.45, paddingTop: 16 }}>{t("disclaimer.short")}</p>
-    </>
+    <mod.Onboard
+      t={t}
+      locale={locale}
+      header={top}
+      option={option}
+      startUnit={startUnit}
+      onNext={(r = {}) => {
+        const start = r.startUnit || startUnit;
+        if (r.startUnit) setStartUnit(r.startUnit);
+        if (r.reason) setReason(r.reason);
+        if (step < steps) setStep(step + 1);
+        else finish(start);
+      }}
+    />
   );
 }
 

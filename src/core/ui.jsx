@@ -4,64 +4,70 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
-// One navy for structure and actions, one restrained accent (emerald)
-// for progress, and quiet semantic colors only where they mean something
-// (amber = behind / streak, red = loss / error). Light and Dark (saved as
-// "white" / "navy").
+// Mostly white and light grey, dark-grey text, and navy used sparingly:
+// the main button, progress, the active tab, links and the brand. Green
+// (--right) is only for a correct answer in a lesson; amber only for "not
+// quite"; red only for a loss or an error. One card style: a light-grey
+// fill, no border, no shadow. Two looks: Light ("white") and a charcoal
+// Dark ("navy", the saved name from before).
 export const LOOKS = {
   white: {
-    "--bg": "#F6F7F9",
-    "--surface": "#FFFFFF",
-    "--surface2": "#EEF1F5",
-    "--ink": "#0B1626",
-    "--mid": "#4B5565",
-    "--low": "#8A93A3",
-    "--line": "#E3E7ED",
+    "--bg": "#FFFFFF",
+    "--surface": "#F4F5F7",
+    "--surface2": "#E8EBEF",
+    "--ink": "#1F2328",
+    "--mid": "#5B6573",
+    "--low": "#6E7886",
+    "--line": "#E4E7EB",
     "--brand": "#13315C",
     "--onBrand": "#FFFFFF",
-    "--brandSoft": "#E9EEF6",
-    "--accent": "#1E7A5F",
-    "--accentSoft": "#E6F2EE",
-    "--good": "#1E7A5F",
-    "--goodSoft": "#E6F2EE",
-    "--warn": "#A35A0B",
-    "--warnSoft": "#FBF0E2",
+    "--brandSoft": "#E8EDF5",
+    "--accent": "#13315C",
+    "--accentSoft": "#E8EDF5",
+    "--good": "#13315C",
+    "--goodSoft": "#E8EDF5",
+    "--right": "#1E7A5F",
+    "--rightSoft": "#E6F2EE",
+    "--warn": "#9A5B12",
+    "--warnSoft": "#FBF1E4",
     "--bad": "#B42318",
     "--badSoft": "#FBECEA",
-    "--flame": "#B7791F",
+    "--flame": "#13315C",
     "--gold": "#13315C",
-    "--sky": "#2B5CB3",
-    "--level1": "#BFDCD1",
-    "--level2": "#5FA68B",
-    "--level3": "#1E7A5F",
-    "--shadow": "0 1px 2px rgba(11,22,38,.04)",
+    "--sky": "#13315C",
+    "--level1": "#C9D4E6",
+    "--level2": "#6F89B3",
+    "--level3": "#13315C",
+    "--shadow": "none",
   },
   navy: {
-    "--bg": "#0A1628",
-    "--surface": "#0F2038",
-    "--surface2": "#16294A",
-    "--ink": "#F1F4F9",
-    "--mid": "#B8C3D6",
-    "--low": "#7D8CA6",
-    "--line": "#1F3354",
-    "--brand": "#E6EDF8",
-    "--onBrand": "#0A1628",
-    "--brandSoft": "#17305A",
-    "--accent": "#4DB892",
-    "--accentSoft": "#12322E",
-    "--good": "#4DB892",
-    "--goodSoft": "#12322E",
+    "--bg": "#0F1216",
+    "--surface": "#191D23",
+    "--surface2": "#252A32",
+    "--ink": "#E8EAED",
+    "--mid": "#A6AFBB",
+    "--low": "#8A94A1",
+    "--line": "#2A3038",
+    "--brand": "#9DB8E6",
+    "--onBrand": "#0F1216",
+    "--brandSoft": "#1D2A40",
+    "--accent": "#9DB8E6",
+    "--accentSoft": "#1D2A40",
+    "--good": "#9DB8E6",
+    "--goodSoft": "#1D2A40",
+    "--right": "#4DB892",
+    "--rightSoft": "#12302A",
     "--warn": "#E3A44A",
     "--warnSoft": "#33281A",
     "--bad": "#F07167",
     "--badSoft": "#3A1E26",
-    "--flame": "#E0A54A",
+    "--flame": "#9DB8E6",
     "--gold": "#C9D8F0",
-    "--sky": "#8DB4F2",
-    "--level1": "#2B5953",
-    "--level2": "#3F9A7D",
-    "--level3": "#86E0BE",
-    "--shadow": "0 1px 2px rgba(0,0,0,.3)",
+    "--sky": "#9DB8E6",
+    "--level1": "#2B3B57",
+    "--level2": "#56719E",
+    "--level3": "#9DB8E6",
+    "--shadow": "none",
   },
 };
 
@@ -74,10 +80,11 @@ export const SERIF = "'EB Garamond', Georgia, serif";
 export const GLOBAL_CSS = `
 *{box-sizing:border-box}
 html,body{margin:0;padding:0;background:var(--bg)}
+html{scroll-padding-top:calc(64px + env(safe-area-inset-top));scroll-padding-bottom:calc(84px + env(safe-area-inset-bottom))}
 body{font-family:${FONT};color:var(--ink);-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;font-feature-settings:'cv11','ss01';font-variant-numeric:tabular-nums}
 button{font-family:inherit}
 input,select,textarea{font-family:inherit;font-size:16px}
-:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
+:focus-visible{outline:3px solid #2B5CB3;outline-offset:2px}
 .nv-press{transition:transform .15s cubic-bezier(.2,.7,.2,1),filter .15s;-webkit-tap-highlight-color:transparent}
 .nv-press:active{transform:scale(.98);filter:brightness(.97)}
 .nv-in{animation:nvIn .2s ease-out both}
@@ -86,10 +93,10 @@ input,select,textarea{font-family:inherit;font-size:16px}
 @keyframes nvIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 @keyframes nvPulse{0%,100%{opacity:.35}50%{opacity:1}}
 @keyframes nvSheet{from{transform:translateY(100%)}to{transform:none}}
-@keyframes nvDrawer{from{transform:translateX(-100%)}to{transform:none}}
 @keyframes nvFade{from{opacity:0}to{opacity:1}}
 @media (prefers-reduced-motion: reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 .nv-reduce *{animation-duration:.01ms!important;transition-duration:.01ms!important}
+.nv-list>*+*{border-top:1px solid var(--line)}
 `;
 
 const PATHS = {
@@ -169,18 +176,18 @@ const BUTTON = {
   primary: { background: "var(--brand)", color: "var(--onBrand)" },
   good: { background: "var(--good)", color: "#fff" },
   bad: { background: "var(--bad)", color: "#fff" },
-  secondary: { background: "var(--surface)", color: "var(--ink)", border: "1px solid var(--line)" },
-  ghost: { background: "transparent", color: "var(--sky)", boxShadow: "none" },
+  secondary: { background: "var(--bg)", color: "var(--ink)", border: "1px solid var(--line)" },
+  ghost: { background: "transparent", color: "var(--brand)", boxShadow: "none" },
 };
 export function Button({ kind = "primary", size = "lg", full, disabled, onClick, children, style, type = "button", ...rest }) {
-  const pad = size === "lg" ? "15px 22px" : size === "md" ? "11px 18px" : "8px 14px";
+  const pad = size === "lg" ? "16px 22px" : size === "md" ? "11px 18px" : "8px 14px";
   return (
     <button
       type={type}
       className="nv-press"
       onClick={disabled ? undefined : onClick}
       disabled={disabled}
-      style={{ border: "none", borderRadius: 12, padding: pad, minHeight: size === "sm" ? 36 : 44, fontSize: size === "lg" ? 16 : 15, fontWeight: 650, letterSpacing: -0.1, cursor: disabled ? "default" : "pointer", width: full ? "100%" : undefined, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, opacity: disabled ? 0.45 : 1, ...BUTTON[kind], ...style }}
+      style={{ border: "none", borderRadius: 14, padding: pad, minHeight: size === "sm" ? 36 : size === "lg" ? 52 : 44, fontSize: size === "lg" ? 17 : 15, fontWeight: 700, letterSpacing: -0.1, cursor: disabled ? "default" : "pointer", width: full ? "100%" : undefined, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, opacity: disabled ? 0.45 : 1, ...BUTTON[kind], ...style }}
       {...rest}
     >
       {children}
@@ -191,13 +198,43 @@ export function Button({ kind = "primary", size = "lg", full, disabled, onClick,
 export function Card({ children, style, onClick, pad = 18, ...rest }) {
   const Tag = onClick ? "button" : "div";
   return (
-    <Tag className={onClick ? "nv-press" : undefined} onClick={onClick} style={{ display: "block", width: "100%", textAlign: "left", background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 14, padding: pad, boxShadow: "var(--shadow)", color: "var(--ink)", cursor: onClick ? "pointer" : undefined, ...style }} {...rest}>
+    <Tag className={onClick ? "nv-press" : undefined} onClick={onClick} style={{ display: "block", width: "100%", textAlign: "left", background: "var(--surface)", border: "none", borderRadius: 18, padding: pad, color: "var(--ink)", font: "inherit", cursor: onClick ? "pointer" : undefined, ...style }} {...rest}>
       {children}
     </Tag>
   );
 }
 
-export function Progress({ value, max = 1, color = "var(--good)", height = 12, label }) {
+// A list in one card, rows split by hairlines (the one list style).
+export const List = ({ children, style }) => (
+  <div className="nv-list" style={{ background: "var(--surface)", borderRadius: 18, overflow: "hidden", ...style }}>
+    {children}
+  </div>
+);
+// One row: an icon tile, a title, a line under it, and a chevron when it
+// opens something. Locked rows show a lock and can't be tapped; `isNew`
+// is the "New" tag's text (in the learner's language), shown once.
+export function ListRow({ icon, title, sub, onClick, right, locked, isNew, label }) {
+  const Tag = onClick && !locked ? "button" : "div";
+  return (
+    <Tag onClick={locked ? undefined : onClick} className={onClick && !locked ? "nv-press" : undefined} aria-label={label} style={{ display: "flex", alignItems: "center", gap: 12, width: "100%", textAlign: "left", border: "none", background: "transparent", color: "var(--ink)", padding: "13px 16px", minHeight: 60, font: "inherit", cursor: onClick && !locked ? "pointer" : "default" }}>
+      {icon && (
+        <span style={{ width: 36, height: 36, borderRadius: 10, background: "var(--bg)", color: locked ? "var(--low)" : "var(--ink)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+          <Icon name={locked ? "lock" : icon} size={19} />
+        </span>
+      )}
+      <span style={{ flex: 1, minWidth: 0 }}>
+        <span style={{ display: "flex", alignItems: "center", gap: 8, fontWeight: 650, fontSize: 16, color: locked ? "var(--mid)" : "var(--ink)" }}>
+          {title}
+          {isNew && <span style={{ fontSize: 12, fontWeight: 700, color: "var(--brand)", background: "var(--brandSoft)", borderRadius: 8, padding: "2px 7px" }}>{isNew}</span>}
+        </span>
+        {sub && <span style={{ display: "block", fontSize: 14, color: "var(--mid)", marginTop: 1, lineHeight: 1.4 }}>{sub}</span>}
+      </span>
+      {right !== undefined ? right : onClick && !locked ? <Icon name="next" size={18} color="var(--low)" /> : null}
+    </Tag>
+  );
+}
+
+export function Progress({ value, max = 1, color = "var(--accent)", height = 12, label }) {
   const pct = Math.max(0, Math.min(1, max ? value / max : 0)) * 100;
   return (
     <div role="progressbar" aria-label={label} aria-valuemin={0} aria-valuemax={max} aria-valuenow={Math.round(value)} style={{ height, borderRadius: height, background: "var(--surface2)", overflow: "hidden", flex: 1 }}>
@@ -206,7 +243,7 @@ export function Progress({ value, max = 1, color = "var(--good)", height = 12, l
   );
 }
 
-export function Ring({ value, max = 1, size = 56, stroke = 7, color = "var(--good)", children, label }) {
+export function Ring({ value, max = 1, size = 56, stroke = 7, color = "var(--accent)", children, label }) {
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
   const pct = Math.max(0, Math.min(1, max ? value / max : 0));
@@ -223,7 +260,7 @@ export function Ring({ value, max = 1, size = 56, stroke = 7, color = "var(--goo
 
 export function Chip({ active, onClick, children, style }) {
   return (
-    <button className="nv-press" onClick={onClick} aria-pressed={!!active} style={{ border: active ? "1px solid var(--brand)" : "1px solid var(--line)", background: active ? "var(--brandSoft)" : "var(--surface)", color: "var(--ink)", borderRadius: 999, padding: "8px 14px", minHeight: 40, fontSize: 15, fontWeight: 700, cursor: "pointer", ...style }}>
+    <button className="nv-press" onClick={onClick} aria-pressed={!!active} style={{ border: active ? "1px solid var(--brand)" : "1px solid transparent", background: active ? "var(--brandSoft)" : "var(--surface)", color: "var(--ink)", borderRadius: 999, padding: "8px 14px", minHeight: 40, fontSize: 15, fontWeight: 650, cursor: "pointer", ...style }}>
       {children}
     </button>
   );
@@ -231,9 +268,9 @@ export function Chip({ active, onClick, children, style }) {
 
 export function Segmented({ options, value, onChange, label }) {
   return (
-    <div role="radiogroup" aria-label={label} style={{ display: "flex", background: "var(--surface2)", borderRadius: 14, padding: 4, gap: 4 }}>
+    <div role="radiogroup" aria-label={label} style={{ display: "flex", background: "var(--surface)", borderRadius: 14, padding: 4, gap: 4 }}>
       {options.map((o) => (
-        <button key={o.value} role="radio" aria-checked={value === o.value} onClick={() => onChange(o.value)} style={{ flex: 1, border: "none", borderRadius: 11, padding: "9px 8px", minHeight: 40, fontSize: 14, fontWeight: 650, cursor: "pointer", background: value === o.value ? "var(--surface)" : "transparent", color: value === o.value ? "var(--ink)" : "var(--mid)", boxShadow: value === o.value ? "var(--shadow)" : "none" }}>
+        <button key={o.value} role="radio" aria-checked={value === o.value} onClick={() => onChange(o.value)} style={{ flex: 1, border: "none", borderRadius: 11, padding: "9px 8px", minHeight: 40, fontSize: 14, fontWeight: 650, cursor: "pointer", background: value === o.value ? "var(--bg)" : "transparent", color: value === o.value ? "var(--ink)" : "var(--mid)", boxShadow: value === o.value ? "0 1px 2px rgba(0,0,0,.08)" : "none" }}>
           {o.label}
         </button>
       ))}
@@ -243,8 +280,8 @@ export function Segmented({ options, value, onChange, label }) {
 
 export function Switch({ checked, onChange, label }) {
   return (
-    <button role="switch" aria-checked={!!checked} aria-label={label} onClick={() => onChange(!checked)} style={{ width: 52, height: 32, borderRadius: 16, border: "none", background: checked ? "var(--good)" : "var(--surface2)", position: "relative", cursor: "pointer", flexShrink: 0, transition: "background .2s" }}>
-      <span style={{ position: "absolute", top: 3, left: checked ? 23 : 3, width: 26, height: 26, borderRadius: 13, background: "#fff", boxShadow: "0 1px 4px rgba(0,0,0,.3)", transition: "left .2s" }} />
+    <button role="switch" aria-checked={!!checked} aria-label={label} onClick={() => onChange(!checked)} style={{ width: 52, height: 32, borderRadius: 16, border: "none", background: checked ? "var(--brand)" : "var(--surface2)", position: "relative", cursor: "pointer", flexShrink: 0, transition: "background .2s" }}>
+      <span style={{ position: "absolute", top: 3, left: checked ? 23 : 3, width: 26, height: 26, borderRadius: 13, background: checked ? "var(--onBrand)" : "#fff", boxShadow: "0 1px 4px rgba(0,0,0,.3)", transition: "left .2s" }} />
     </button>
   );
 }
@@ -253,7 +290,7 @@ export function Field({ label, hint, style, ...input }) {
   return (
     <label style={{ display: "block", marginBottom: 14 }}>
       {label && <span style={{ display: "block", fontSize: 14, fontWeight: 650, color: "var(--mid)", marginBottom: 6 }}>{label}</span>}
-      <input {...input} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 10, background: "var(--surface)", color: "var(--ink)", padding: "13px 14px", fontSize: 16, outline: "none", ...style }} />
+      <input {...input} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 12, background: "var(--bg)", color: "var(--ink)", padding: "13px 14px", fontSize: 16, outline: "none", ...style }} />
       {hint && <span style={{ display: "block", fontSize: 13, color: "var(--low)", marginTop: 5 }}>{hint}</span>}
     </label>
   );
@@ -306,14 +343,14 @@ export function Title({ children, sub, right }) {
   return (
     <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 12, margin: "4px 0 16px" }}>
       <div>
-        <h1 style={{ fontSize: 28, fontWeight: 700, letterSpacing: -0.6, margin: 0, lineHeight: 1.15 }}>{children}</h1>
+        <h1 style={{ fontSize: 30, fontWeight: 750, letterSpacing: -0.6, margin: 0, lineHeight: 1.15 }}>{children}</h1>
         {sub && <p style={{ fontSize: 15, color: "var(--mid)", margin: "6px 0 0", lineHeight: 1.4 }}>{sub}</p>}
       </div>
       {right}
     </div>
   );
 }
-export const Label = ({ children, style }) => <p style={{ fontSize: 13, fontWeight: 750, letterSpacing: 0.6, textTransform: "uppercase", color: "var(--low)", margin: "22px 0 10px", ...style }}>{children}</p>;
+export const Label = ({ children, style }) => <h2 style={{ fontSize: 18, fontWeight: 700, letterSpacing: -0.2, color: "var(--ink)", margin: "28px 0 10px", ...style }}>{children}</h2>;
 
 export function Wordmark({ size = 24 }) {
   return <span style={{ fontFamily: SERIF, fontWeight: 650, fontSize: size, letterSpacing: -0.3, lineHeight: 1 }}>Northvale</span>;
@@ -337,7 +374,7 @@ export function Toasts() {
   return (
     <div aria-live="polite" style={{ position: "fixed", top: "calc(10px + env(safe-area-inset-top))", left: 0, right: 0, zIndex: 80, display: "flex", flexDirection: "column", alignItems: "center", gap: 8, pointerEvents: "none" }}>
       {items.map((t) => (
-        <div key={t.id} className="nv-in" style={{ background: t.tone === "good" ? "var(--good)" : t.tone === "bad" ? "var(--bad)" : "var(--ink)", color: t.tone === "info" ? "var(--bg)" : "#fff", borderRadius: 999, padding: "10px 18px", fontWeight: 650, fontSize: 15, boxShadow: "var(--shadow)", maxWidth: "90vw" }}>
+        <div key={t.id} className="nv-in" style={{ background: t.tone === "good" ? "var(--brand)" : t.tone === "bad" ? "var(--bad)" : "var(--ink)", color: t.tone === "good" ? "var(--onBrand)" : t.tone === "info" ? "var(--bg)" : "#fff", borderRadius: 999, padding: "10px 18px", fontWeight: 650, fontSize: 15, boxShadow: "var(--shadow)", maxWidth: "90vw" }}>
           {t.message}
         </div>
       ))}

@@ -91,7 +91,7 @@ export function daniState(today) {
       practiced: { goal: [d(-21)], trade: [d(-5)] },
       seen: d(-1),
     },
-    { goals: { goals: [car, fund], checkIn: d(-2) }, portfolio: { pf }, missions: { active: null, log: [{ id: mission.id, day: d(-5), week: weekStart(d(-5)) }], pick: null } }
+    { goals: { goals: [car, fund], checkIn: d(-2) }, portfolio: { pf }, missions: { active: null, log: [{ id: mission.id, day: d(-5), week: weekStart(d(-5)) }], pick: null }, feedback: { pending: [], survey: "very" } }
   );
 }
 

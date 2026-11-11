@@ -1,13 +1,15 @@
-// ME — your level, streak, today's goal, this week, the weekly league, and
-// badges. The league is real people only: this week's group of signed-in
-// learners, your friends (through invite links), or your class — the
-// learner picks. With nobody else yet, it says so.
+// ME — your level, streak and this week; the weekly league (after 3
+// learning days); then rows for achievements, skills, inviting a friend,
+// classes, Settings, feedback and the legal pages. Each row opens its own
+// page (me with { section }). The league is real people only: this week's
+// group of signed-in learners, your friends (through invite links), or
+// your class — the learner picks. With nobody else yet, it says so.
 import { useEffect, useState } from "react";
 import { useAppState } from "./store.js";
 import { api } from "./api.js";
 import { level, xpOn, weekXp, weekStart, addDays, dayKey, BADGES, MAX_FREEZES } from "./progress.js";
-import { AVATARS, Card, Icon, Label, Progress, Ring, Title, Button, Segmented, toast } from "./ui.jsx";
-import { allModules, service } from "./registry.js";
+import { AVATARS, Card, Icon, Label, List, ListRow, Progress, Ring, Title, Button, Segmented, toast } from "./ui.jsx";
+import { allModules, getModule, service } from "./registry.js";
 import { setLeague as saveLeague } from "./session.js";
 import { InviteCard, FriendOffer } from "./invites.jsx";
 import { openShare } from "./share.jsx";
@@ -82,9 +84,34 @@ function League({ t, session, go }) {
   );
 }
 
-export default function Me({ t, locale, session, go }) {
+// Open after 3 learning days — or already, for anyone in a class or with
+// friends here (nothing anyone had disappears).
+export const leagueOpen = (progress, session) => (progress.lessonDays || []).length >= 3 || !!service("classroom", "inClass")() || !!(session.user && session.user.league && session.user.league !== "everyone");
+
+function Badges({ t, progress }) {
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(96px, 1fr))", gap: 10 }}>
+      {BADGES.map((b) => {
+        const got = progress.badges[b.id];
+        const Tile = got ? "button" : "div";
+        return (
+          <Tile key={b.id} title={t(`badge.${b.id}.how`)} {...(got ? { onClick: () => openShare({ kind: "badge", name: t(`badge.${b.id}`) }), "aria-label": `${t("share.button")}: ${t(`badge.${b.id}`)}`, className: "nv-press" } : {})} style={{ background: "var(--surface)", border: "none", borderRadius: 18, padding: "14px 8px", textAlign: "center", opacity: got ? 1 : 0.6, color: "var(--ink)", font: "inherit", cursor: got ? "pointer" : "default" }}>
+            <div style={{ width: 40, height: 40, margin: "0 auto", borderRadius: 20, background: got ? "var(--brandSoft)" : "var(--surface2)", color: got ? "var(--brand)" : "var(--low)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <Icon name={got ? b.icon : "lock"} size={18} color="currentColor" />
+            </div>
+            <div style={{ fontSize: 13, fontWeight: 650, marginTop: 6, lineHeight: 1.2 }}>{t(`badge.${b.id}`)}</div>
+            <div style={{ fontSize: 12, color: "var(--mid)", marginTop: 4, lineHeight: 1.3 }}>{got ? t("badge.got") : t(`badge.${b.id}.how`)}</div>
+          </Tile>
+        );
+      })}
+    </div>
+  );
+}
+
+export default function Me({ t, locale, session, go, route }) {
   const profile = useAppState((s) => s.profile);
   const progress = useAppState((s) => s.progress);
+  const section = route && route.params.section;
   const today = dayKey();
   const lv = level(progress.xp);
   const start = weekStart(today);
@@ -92,37 +119,46 @@ export default function Me({ t, locale, session, go }) {
   const maxDay = Math.max(progress.dailyGoal, ...week.map((d) => xpOn(progress, d)));
   const dayLetter = (d) => new Date(`${d}T12:00:00`).toLocaleDateString(t("locale.tag"), { weekday: "narrow" });
   const name = profile.nickname || t("me.learner");
+  const days = (progress.lessonDays || []).length;
+  const invited = !!(useAppState((s) => s.growth) || {}).invite;
+  const cards = allModules().filter((m) => m.MeCard);
+  const classes = getModule("classroom");
+  const showClasses = classes && classes.nav && classes.nav.show && classes.nav.show({ session });
+  const got = BADGES.filter((b) => progress.badges[b.id]).length;
+
+  if (section === "achievements") return <Badges t={t} progress={progress} />;
+  if (section === "skills")
+    return (
+      <div>
+        {cards.map((m) => (
+          <m.MeCard key={m.id} t={t} locale={locale} go={go} />
+        ))}
+      </div>
+    );
+  if (section === "invite") return <InviteCard t={t} session={session} />;
 
   return (
     <div>
-      <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 18 }}>
-        <span style={{ width: 56, height: 56, borderRadius: 28, background: AVATARS[profile.avatar] || AVATARS[0], color: "#fff", fontSize: 24, fontWeight: 650, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{name[0].toUpperCase()}</span>
-        <div style={{ minWidth: 0 }}>
-          <Title>{name}</Title>
+      <div style={{ display: "flex", alignItems: "center", gap: 14, margin: "4px 0 16px" }}>
+        <span style={{ width: 52, height: 52, borderRadius: 26, background: AVATARS[profile.avatar] || AVATARS[0], color: "#fff", fontSize: 22, fontWeight: 650, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{name[0].toUpperCase()}</span>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <h1 style={{ fontSize: 26, fontWeight: 750, letterSpacing: -0.5, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{name}</h1>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 6 }}>
+            <span style={{ fontSize: 14, fontWeight: 650, color: "var(--mid)", whiteSpace: "nowrap" }}>{t("me.level", { n: lv.level })}</span>
+            <Progress value={lv.into} max={lv.need} height={6} label={t("me.level", { n: lv.level })} />
+            <span style={{ fontSize: 13, color: "var(--mid)", whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums" }}>{lv.into}/{lv.need}</span>
+          </div>
         </div>
       </div>
 
-      <Card>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--brandSoft)", color: "var(--brand)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 18, fontVariantNumeric: "tabular-nums" }}>{lv.level}</div>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: 650 }}>{t("me.level", { n: lv.level })}</div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 6 }}>
-              <Progress value={lv.into} max={lv.need} color="var(--accent)" height={6} label={t("me.level", { n: lv.level })} />
-              <span style={{ fontSize: 13, fontWeight: 650, color: "var(--mid)", whiteSpace: "nowrap" }}>{lv.into}/{lv.need}</span>
-            </div>
-          </div>
-        </div>
-      </Card>
-
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, marginTop: 10 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
         {[
-          [<Icon key="f" name="flame" size={18} color="var(--mid)" />, progress.streak.count, t("me.streak")],
-          [<Icon key="b" name="bolt" size={18} color="var(--mid)" />, progress.xp, t("me.total_xp")],
-          [<Icon key="s" name="snow" size={18} color="var(--mid)" />, `${progress.freezes}/${MAX_FREEZES}`, t("me.freezes")],
+          ["flame", progress.streak.count, t("me.streak")],
+          ["bolt", progress.xp, t("me.total_xp")],
+          ["snow", `${progress.freezes}/${MAX_FREEZES}`, t("me.freezes")],
         ].map(([icon, value, label]) => (
           <Card key={label} pad={14}>
-            {icon}
+            <Icon name={icon} size={18} color="var(--mid)" />
             <div style={{ fontSize: 22, fontWeight: 700, marginTop: 6, fontVariantNumeric: "tabular-nums" }}>{value}</div>
             <div style={{ fontSize: 13, color: "var(--mid)", fontWeight: 500 }}>{label}</div>
           </Card>
@@ -132,7 +168,7 @@ export default function Me({ t, locale, session, go }) {
       <Label>{t("me.this_week")}</Label>
       <Card>
         <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 14 }}>
-          <Ring value={xpOn(progress, today)} max={progress.dailyGoal} size={56} stroke={5} color="var(--accent)" label={t("goal.aria", { xp: xpOn(progress, today), goal: progress.dailyGoal })}>
+          <Ring value={xpOn(progress, today)} max={progress.dailyGoal} size={56} stroke={5} label={t("goal.aria", { xp: xpOn(progress, today), goal: progress.dailyGoal })}>
             <span style={{ fontSize: 13, fontWeight: 650, fontVariantNumeric: "tabular-nums" }}>{Math.min(100, Math.round((xpOn(progress, today) / progress.dailyGoal) * 100))}%</span>
           </Ring>
           <div>
@@ -145,7 +181,7 @@ export default function Me({ t, locale, session, go }) {
             const xp = xpOn(progress, d);
             return (
               <div key={d} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4, height: "100%", justifyContent: "flex-end" }}>
-                <div title={`${xp} XP`} style={{ width: "100%", maxWidth: 28, height: `${Math.max(4, (xp / maxDay) * 70)}px`, borderRadius: 4, background: xp >= progress.dailyGoal ? "var(--accent)" : xp ? "var(--brand)" : "var(--surface2)", opacity: d > today ? 0.4 : 1 }} />
+                <div title={`${xp} XP`} style={{ width: "100%", maxWidth: 28, height: `${Math.max(4, (xp / maxDay) * 70)}px`, borderRadius: 4, background: xp ? "var(--accent)" : "var(--surface2)", opacity: d > today ? 0.4 : xp && xp < progress.dailyGoal ? 0.55 : 1 }} />
                 <span style={{ fontSize: 12, fontWeight: 650, color: d === today ? "var(--ink)" : "var(--low)" }}>{dayLetter(d)}</span>
               </div>
             );
@@ -153,35 +189,25 @@ export default function Me({ t, locale, session, go }) {
         </div>
       </Card>
 
-      {allModules()
-        .filter((m) => m.MeCard)
-        .map((m) => (
-          <m.MeCard key={m.id} t={t} locale={locale} go={go} />
-        ))}
-
-      <Label>{t("league.title")}</Label>
       <FriendOffer t={t} session={session} />
-      <League t={t} session={session} go={go} />
-      <div style={{ marginTop: 10 }}>
-        <InviteCard t={t} session={session} />
-      </div>
+      {leagueOpen(progress, session) && (
+        <>
+          <Label>{t("league.title")}</Label>
+          <League t={t} session={session} go={go} />
+        </>
+      )}
 
-      <Label>{t("me.badges")}</Label>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(96px, 1fr))", gap: 10 }}>
-        {BADGES.map((b) => {
-          const got = progress.badges[b.id];
-          const Tile = got ? "button" : "div";
-          return (
-            <Tile key={b.id} title={t(`badge.${b.id}.how`)} {...(got ? { onClick: () => openShare({ kind: "badge", name: t(`badge.${b.id}`) }), "aria-label": `${t("share.button")}: ${t(`badge.${b.id}`)}`, className: "nv-press" } : {})} style={{ background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 14, padding: "14px 8px", textAlign: "center", opacity: got ? 1 : 0.6, color: "var(--ink)", font: "inherit", cursor: got ? "pointer" : "default" }}>
-              <div style={{ width: 40, height: 40, margin: "0 auto", borderRadius: 20, background: got ? "var(--brandSoft)" : "var(--surface2)", color: got ? "var(--brand)" : "var(--low)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <Icon name={got ? b.icon : "lock"} size={18} color="currentColor" />
-              </div>
-              <div style={{ fontSize: 13, fontWeight: 650, marginTop: 6, lineHeight: 1.2 }}>{t(`badge.${b.id}`)}</div>
-              <div style={{ fontSize: 12, color: "var(--mid)", marginTop: 4, lineHeight: 1.3 }}>{got ? t("badge.got") : t(`badge.${b.id}.how`)}</div>
-            </Tile>
-          );
-        })}
-      </div>
+      <List style={{ marginTop: 24 }}>
+        <ListRow icon="trophy" title={t("me.section.achievements")} sub={t("me.badges.n", { n: got, total: BADGES.length })} onClick={() => go("me", { section: "achievements" })} />
+        {cards.length > 0 && <ListRow icon="target" title={t("me.section.skills")} sub={t("me.skills.sub")} onClick={() => go("me", { section: "skills" })} />}
+        {(days >= 3 || invited) && <ListRow icon="share" title={t("me.section.invite")} sub={t("me.invite.sub")} onClick={() => go("me", { section: "invite" })} />}
+        {showClasses && <ListRow icon="users" title={t(classes.nav.label)} onClick={() => go("classroom")} />}
+      </List>
+      <List style={{ marginTop: 12 }}>
+        <ListRow icon="settings" title={t("nav.settings")} onClick={() => go("settings")} />
+        <ListRow icon="chat" title={t("fb.title")} onClick={() => service("feedback", "open")({})} />
+        <ListRow icon="shield" title={t("me.legal")} onClick={() => go("legal", { doc: "privacy", from: "me" })} />
+      </List>
     </div>
   );
 }

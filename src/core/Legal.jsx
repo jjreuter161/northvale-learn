@@ -6,7 +6,6 @@ import termsEn from "../../docs/legal/terms.en.md";
 import termsEs from "../../docs/legal/terms.es.md";
 import teacherEn from "../../docs/legal/teacher.en.md";
 import teacherEs from "../../docs/legal/teacher.es.md";
-import { Button } from "./ui.jsx";
 
 const DOCS = { privacy: { en: privacyEn, es: privacyEs }, terms: { en: termsEn, es: termsEs }, teacher: { en: teacherEn, es: teacherEs } };
 
@@ -44,10 +43,7 @@ export default function Legal({ route, locale, go, t }) {
   const doc = DOCS[route.params.doc] || DOCS.privacy;
   return (
     <div>
-      <Button kind="ghost" size="sm" onClick={() => go(route.params.from || "settings")} style={{ paddingLeft: 0 }}>
-        ← {t(route.params.from ? "common.back" : "nav.settings")}
-      </Button>
-      <article style={{ marginTop: 8, fontSize: 15 }}>
+      <article style={{ fontSize: 15 }}>
         <Md text={doc[locale.lang] || doc.en} />
       </article>
     </div>

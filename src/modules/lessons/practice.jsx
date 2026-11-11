@@ -7,6 +7,7 @@ import { useSlice, setSlice, getState, useAppState, update } from "../../core/st
 import { addStrings, shortDate, text } from "../../core/i18n.js";
 import { dayKey } from "../../core/progress.js";
 import { track } from "../../core/analytics.js";
+import { service } from "../../core/registry.js";
 import { Button, Card, Icon, Label, Sheet } from "../../core/ui.jsx";
 import * as M from "./mastery.js";
 import { UNITS, conceptsOfLesson, conceptsOfUnit } from "./content.js";
@@ -34,12 +35,14 @@ addStrings({
   "level.learning": S("Learning", "Aprendiendo"),
   "level.solid": S("Solid", "Sólido"),
   "level.mastered": S("Mastered", "Dominado"),
-  "place.title": S("How much do you already know?", "¿Cuánto sabes ya?"),
-  "place.sub": S("If you know some basics, a 2-minute check lets you skip what you already know.", "Si ya sabes lo básico, una prueba de 2 minutos te deja saltar lo que ya sabes."),
-  "place.new": S("I'm new to this", "Apenas voy empezando"),
-  "place.new.sub": S("Start from the beginning", "Empezar desde el principio"),
-  "place.some": S("I already know some basics", "Ya sé algo de lo básico"),
-  "place.some.sub": S("Take a 2-minute check", "Hacer una prueba de 2 minutos"),
+  "place.title": S("How do you want to start?", "¿Cómo quieres empezar?"),
+  "place.sub": S("Lessons take about 3 minutes.", "Las lecciones duran unos 3 minutos."),
+  "place.new": S("From the beginning", "Desde el principio"),
+  "place.new.sub": S("{unit}, lesson 1: {title}", "{unit}, lección 1: {title}"),
+  "place.some": S("I know some basics", "Ya sé algo de lo básico"),
+  "place.some.sub": S("A 2-minute check skips what you know", "Una prueba de 2 minutos salta lo que ya sabes"),
+  "place.why": S("Why these lessons", "Por qué estas lecciones"),
+  "place.why.body": S("For your goal ({name}), these come first: {units}.", "Para tu meta ({name}), primero vienen: {units}."),
   "place.q": S("Question {n} of up to {total}", "Pregunta {n} de hasta {total}"),
   "place.q.sub": S("One question per unit. It stops at the first miss.", "Una pregunta por unidad. Se detiene en el primer error."),
   "place.result": S("You can skip {n} {n|unit|units}", "Puedes saltar {n} {n|unidad|unidades}"),
@@ -74,7 +77,7 @@ export function QuestionView({ t, locale, step, picked, setPicked, checked, labe
   const opts = step.type === "tf" ? [{ v: true, label: t("lessons.true") }, { v: false, label: t("lessons.false") }] : step.options.map((o, i) => ({ v: i, label: x(o) }));
   return (
     <div>
-      <div style={{ fontSize: 13, fontWeight: 650, letterSpacing: 0.6, color: "var(--mid)", textTransform: "uppercase", marginBottom: 8 }}>{label || t("lessons.question")}</div>
+      <div style={{ fontSize: 14, fontWeight: 650, color: "var(--mid)", marginBottom: 8 }}>{label || t("lessons.question")}</div>
       <h2 style={{ fontSize: 23, fontWeight: 700, margin: "0 0 20px", lineHeight: 1.3 }}>{x(step.q)}</h2>
       <div role="radiogroup" style={{ display: "flex", flexDirection: step.type === "tf" ? "row" : "column", gap: 10 }}>
         {opts.map((o, i) => {
@@ -89,7 +92,7 @@ export function QuestionView({ t, locale, step, picked, setPicked, checked, labe
               disabled={!!checked}
               onClick={() => setPicked(o.v)}
               className="nv-press"
-              style={{ flex: step.type === "tf" ? 1 : undefined, textAlign: "left", display: "flex", alignItems: "center", gap: 12, border: `1px solid ${isAnswer ? "var(--good)" : isWrongPick ? "var(--warn)" : sel ? "var(--brand)" : "var(--line)"}`, background: isAnswer ? "var(--goodSoft)" : isWrongPick ? "var(--warnSoft)" : sel ? "var(--brandSoft)" : "var(--surface)", color: "var(--ink)", borderRadius: 14, padding: "15px 16px", fontSize: 17, fontWeight: 650, cursor: checked ? "default" : "pointer", minHeight: 58 }}
+              style={{ flex: step.type === "tf" ? 1 : undefined, textAlign: "left", display: "flex", alignItems: "center", gap: 12, border: `2px solid ${isAnswer ? "var(--right)" : isWrongPick ? "var(--warn)" : sel ? "var(--brand)" : "transparent"}`, background: isAnswer ? "var(--rightSoft)" : isWrongPick ? "var(--warnSoft)" : sel ? "var(--brandSoft)" : "var(--surface)", color: "var(--ink)", borderRadius: 14, padding: "15px 16px", fontSize: 17, fontWeight: 650, cursor: checked ? "default" : "pointer", minHeight: 58 }}
             >
               <span style={{ width: 28, height: 28, borderRadius: 8, border: "1px solid var(--line)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 650, color: "var(--low)", flexShrink: 0 }}>{i + 1}</span>
               <span>{o.label}</span>
@@ -108,8 +111,8 @@ export function Feedback({ t, locale, step, picked, checked, note }) {
   const right = checked === "right";
   const miss = !right && step.type === "choice" && step.miss && step.miss[picked];
   return (
-    <div className="nv-in" role="status" style={{ background: right ? "var(--goodSoft)" : "var(--warnSoft)", borderRadius: 14, padding: "14px 16px", marginBottom: 12 }}>
-      <div style={{ fontWeight: 700, fontSize: 18, color: right ? "var(--good)" : "var(--warn)", display: "flex", alignItems: "center", gap: 8 }}>
+    <div className="nv-in" role="status" style={{ background: right ? "var(--rightSoft)" : "var(--warnSoft)", borderRadius: 14, padding: "14px 16px", marginBottom: 12 }}>
+      <div style={{ fontWeight: 700, fontSize: 18, color: right ? "var(--right)" : "var(--warn)", display: "flex", alignItems: "center", gap: 8 }}>
         <Icon name={right ? "check" : "info"} size={22} stroke={right ? 3 : 2.2} />
         {right ? t("lessons.correct") : t("lessons.wrong")}
       </div>
@@ -257,7 +260,7 @@ export function SkillsCard({ t, locale }) {
       <Sheet open={open} onClose={() => setOpen(false)} title={t("skills.title")} tall>
         {UNITS.map((u) => (
           <div key={u.id} style={{ marginBottom: 14 }}>
-            <div style={{ fontSize: 13, fontWeight: 650, color: "var(--low)", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 4 }}>{x(u.title)}</div>
+            <div style={{ fontSize: 13, fontWeight: 650, color: "var(--low)", marginBottom: 4 }}>{x(u.title)}</div>
             <Card pad="2px 16px">
               {conceptsOfUnit(u.id).map((c, i) => (
                 <div key={c} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 0", borderTop: i ? "1px solid var(--line)" : "none" }}>
@@ -277,13 +280,15 @@ export function SkillsCard({ t, locale }) {
 // ---- Placement (an onboarding step) ---------------------------------------
 
 const PLACEMENT_UNITS = PLACEMENT.map((c) => conceptById(c).unit);
-export function Placement({ t, locale, header, onNext }) {
+export function Placement({ t, locale, header, startUnit, onNext }) {
   const x = tx(locale);
   const [phase, setPhase] = useState("ask"); // ask | test | result
   const [results, setResults] = useState([]);
   const [picked, setPicked] = useState(null);
   const [checked, setChecked] = useState(null);
   const step = conceptById(PLACEMENT[results.length] || PLACEMENT[0]).challenge;
+  const first = UNITS.find((u) => u.id === startUnit) || UNITS[0];
+  const plan = service("goals", "startPlan")();
   const finish = (res) => {
     const units = M.placedUnits(PLACEMENT_UNITS, res);
     if (units.length) {
@@ -308,8 +313,14 @@ export function Placement({ t, locale, header, onNext }) {
     return (
       <>
         {header(t("place.title"), t("place.sub"))}
-        {option("new", t("place.new"), t("place.new.sub"), () => onNext({}))}
+        {option("new", t("place.new"), t("place.new.sub", { unit: x(first.title), title: x(first.lessons[0].title) }), () => onNext({}))}
         {option("some", t("place.some"), t("place.some.sub"), () => setPhase("test"))}
+        {plan && (
+          <Card style={{ marginTop: 12 }}>
+            <div style={{ fontWeight: 700, marginBottom: 4 }}>{t("place.why")}</div>
+            <p style={{ margin: 0, fontSize: 15, lineHeight: 1.5 }}>{t("place.why.body", { name: plan.name, units: new Intl.ListFormat(locale.lang, { type: "conjunction" }).format(plan.units.map((u) => x(UNITS.find((v) => v.id === u).title))) })}</p>
+          </Card>
+        )}
       </>
     );
   if (phase === "result") {

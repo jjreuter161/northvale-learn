@@ -1,8 +1,8 @@
-// THE SHELL — header (streak, today's goal, the tutor), the ☰ menu built
-// from whatever modules are registered, and the screen for the current
-// route. On phones the menu slides in (☰ or a swipe from the left edge);
-// on wide screens it sits beside the content.
-import { useEffect, useMemo, useRef, useState } from "react";
+// THE SHELL — a header (where you are, the streak, the Ask button), the
+// screen for the current route, and a bottom tab bar with 4 tabs: Learn
+// (opens on Today), Goals, Practice, Me. Every screen belongs to one tab
+// (a module says which in nav.tab); screens below a tab get a back button.
+import { useEffect, useMemo, useState } from "react";
 import { useAppState, update, on } from "./store.js";
 import { makeT } from "./i18n.js";
 import { allModules, getModule } from "./registry.js";
@@ -17,6 +17,7 @@ import { api } from "./api.js";
 import { dayKey, addDays, MAX_FREEZES, BADGES } from "./progress.js";
 import Onboarding from "./Onboarding.jsx";
 import Me from "./Me.jsx";
+import Practice from "./Practice.jsx";
 import Settings, { ResetPassword } from "./Settings.jsx";
 import Legal from "./Legal.jsx";
 import "./strings.js";
@@ -35,7 +36,16 @@ function useWide() {
   return wide;
 }
 
-const CORE_SCREENS = { me: Me, settings: Settings, legal: Legal };
+const CORE_SCREENS = { me: Me, settings: Settings, legal: Legal, practice: Practice };
+// The 4 tabs and the route each one opens.
+export const TABS = [
+  { id: "learn", route: "lessons", icon: "book", label: "lessons.nav" },
+  { id: "goals", route: "goals", icon: "target", label: "goals.nav" },
+  { id: "practice", route: "practice", icon: "compass", label: "nav.practice" },
+  { id: "me", route: "me", icon: "user", label: "nav.me" },
+];
+const CORE_TAB = { practice: "practice", me: "me", settings: "me", legal: "me" };
+const CORE_TITLE = { practice: "nav.practice", me: "nav.me", settings: "nav.settings", legal: "settings.legal" };
 
 export default function App() {
   const settings = useAppState((s) => s.settings);
@@ -44,10 +54,9 @@ export default function App() {
   const session = useSession();
   const locale = useMemo(() => ({ lang: settings.lang, region: settings.region }), [settings.lang, settings.region]);
   const t = useMemo(() => makeT(locale), [locale]);
-  const [route, setRoute] = useState({ id: "goals", params: {} });
-  const [menu, setMenu] = useState(false);
-  // A tap in the menu always opens that screen fresh (Home's overview,
-  // not the goal that was open).
+  const [route, setRoute] = useState({ id: "lessons", params: {} });
+  // A tap on a tab always opens it fresh (the goals list, not the goal
+  // that was open).
   const [visit, setVisit] = useState(0);
   const [streakOpen, setStreakOpen] = useState(false);
   const [notice, setNotice] = useState(null);
@@ -61,7 +70,6 @@ export default function App() {
   // Opened from a teacher's class link: that comes first, not "welcome back".
   const [classLink] = useState(() => new URLSearchParams(location.search).has("join"));
   const wide = useWide();
-  const swipe = useRef(null);
 
   // The look's colors live on the page root, so layers opened at the top of
   // the page (sheets, lessons) use them too.
@@ -122,7 +130,6 @@ export default function App() {
 
   const go = (id, params = {}) => {
     setRoute({ id, params });
-    setMenu(false);
     window.scrollTo(0, 0);
   };
 
@@ -162,103 +169,59 @@ export default function App() {
     );
   }
 
-  const nav = allModules()
-    .filter((m) => m.nav && (!m.nav.show || m.nav.show({ session })))
-    .sort((a, b) => a.nav.order - b.nav.order)
-    .map((m) => ({ id: m.id, icon: m.nav.icon, label: t(m.nav.label) }));
-  const coreNav = [
-    { id: "me", icon: "user", label: t("nav.me") },
-    { id: "settings", icon: "settings", label: t("nav.settings") },
-  ];
-  const titleOf = (id) => (nav.find((n) => n.id === id) || coreNav.find((n) => n.id === id) || { label: id === "legal" ? t("settings.legal") : "" }).label;
   const mod = getModule(route.id);
   const Screen = mod ? mod.Screen : CORE_SCREENS[route.id];
+  const tabOf = (id) => (getModule(id) && getModule(id).nav ? getModule(id).nav.tab : CORE_TAB[id]) || "learn";
+  const tab = TABS.find((x) => x.id === tabOf(route.id));
+  const isRoot = TABS.some((x) => x.route === route.id) && !(route.id === "me" && route.params.section);
+  const title = route.id === "lessons" ? null : route.id === "me" && route.params.section ? t(`me.section.${route.params.section}`) : t((mod && mod.nav && mod.nav.label) || CORE_TITLE[route.id] || tab.label);
   const today = dayKey();
   const ctx = { t, locale, go, route, session, wide };
-
-  const sidebar = (
-    <nav aria-label={t("nav.menu")} style={{ display: "flex", flexDirection: "column", height: "100%", padding: "18px 14px calc(18px + env(safe-area-inset-bottom))" }}>
-      <div style={{ padding: "4px 10px 18px" }}>
-        <Wordmark size={28} />
-        <div style={{ fontSize: 13, fontWeight: 650, color: "var(--low)", letterSpacing: 0.4, marginTop: 4 }}>LEARN</div>
-      </div>
-      {[...nav, null, ...coreNav].map((n, i) =>
-        n ? (
-          <button key={n.id} onClick={() => (setVisit((v) => v + 1), go(n.id))} aria-current={route.id === n.id ? "page" : undefined} className="nv-press" style={{ display: "flex", alignItems: "center", gap: 14, width: "100%", border: "none", borderRadius: 14, padding: "12px 12px", minHeight: 48, background: route.id === n.id ? "var(--brandSoft)" : "transparent", color: "var(--ink)", fontSize: 16, fontWeight: 650, cursor: "pointer", textAlign: "left" }}>
-            <Icon name={n.icon} size={22} />
-            {n.label}
-          </button>
-        ) : (
-          <div key={`sep${i}`} style={{ height: 1, background: "var(--line)", margin: "10px 8px" }} />
-        )
-      )}
-      <div style={{ flex: 1 }} />
-      <button onClick={() => (setMenu(false), getModule("feedback") && getModule("feedback").services.open({}))} className="nv-press" style={{ display: "flex", alignItems: "center", gap: 14, width: "100%", border: "none", borderRadius: 14, padding: "12px 12px", minHeight: 48, background: "transparent", color: "var(--mid)", fontSize: 15, fontWeight: 600, cursor: "pointer", textAlign: "left" }}>
-        <Icon name="chat" size={20} />
-        {t("fb.title")}
-      </button>
-      <p style={{ fontSize: 12, lineHeight: 1.45, color: "var(--low)", margin: "16px 10px 0" }}>{t("disclaimer.short")}</p>
-    </nav>
-  );
+  const openTab = (x) => (setVisit((v) => v + 1), go(x.route));
 
   const header = (
-    <header style={{ position: "sticky", top: 0, zIndex: 20, background: "var(--bg)", padding: "calc(8px + env(safe-area-inset-top)) 12px 8px", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid var(--line)" }}>
-      {!wide && (
-        <button onClick={() => setMenu(true)} aria-label={t("nav.menu")} style={iconBtn}>
-          <Icon name="menu" />
+    <header style={{ position: "sticky", top: 0, zIndex: 20, background: "var(--bg)", padding: "calc(8px + env(safe-area-inset-top)) 12px 6px 16px", display: "flex", alignItems: "center", gap: 6 }}>
+      {!isRoot && (
+        <button onClick={() => go(route.params.from || tab.route)} aria-label={t("common.back")} style={{ ...iconBtn, marginLeft: -10 }}>
+          <Icon name="back" />
         </button>
       )}
-      <div style={{ flex: 1, minWidth: 0, fontSize: 18, fontWeight: 750, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{route.id === "goals" && !wide ? <Wordmark size={24} /> : titleOf(route.id)}</div>
+      <div style={{ flex: 1, minWidth: 0, fontSize: 18, fontWeight: 700, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{title === null ? <Wordmark size={25} /> : title}</div>
       <button onClick={() => setStreakOpen(true)} aria-label={t("streak.aria", { n: progress.streak.count })} className="nv-press" style={{ ...chip, color: "var(--mid)" }}>
         <Icon name="flame" size={18} color={progress.streak.last === today ? "var(--flame)" : "var(--low)"} />
         <span style={{ fontWeight: 650, fontSize: 15, fontVariantNumeric: "tabular-nums" }}>{progress.streak.count}</span>
       </button>
       {getModule("tutor") && (
-        <button onClick={() => getModule("tutor").services.open({})} aria-label={t("nav.tutor")} style={iconBtn}>
-          <Icon name="chat" />
+        <button onClick={() => getModule("tutor").services.open({})} className="nv-press" style={{ display: "inline-flex", alignItems: "center", gap: 6, border: "none", background: "var(--surface)", color: "var(--ink)", borderRadius: 999, height: 38, padding: "0 14px", fontSize: 15, fontWeight: 650, cursor: "pointer", flexShrink: 0 }}>
+          <Icon name="chat" size={17} /> {t("nav.ask")}
         </button>
       )}
     </header>
   );
 
-  return (
-    <div
-      style={rootStyle}
-      className={settings.reduceMotion ? "nv-reduce" : undefined}
-      onTouchStart={(e) => {
-        const x = e.touches[0].clientX;
-        swipe.current = { x, y: e.touches[0].clientY };
-      }}
-      onTouchEnd={(e) => {
-        const s = swipe.current;
-        if (!s || wide) return;
-        const dx = e.changedTouches[0].clientX - s.x;
-        const dy = Math.abs(e.changedTouches[0].clientY - s.y);
-        if (s.x < 24 && dx > 60 && dy < 50) setMenu(true);
-        if (menu && dx < -60 && dy < 50) setMenu(false);
-      }}
-    >
-      <style>{GLOBAL_CSS}</style>
-      <div style={{ display: "flex", justifyContent: "center" }}>
-        {wide && <aside style={{ width: 260, flexShrink: 0, position: "sticky", top: 0, height: "100dvh", borderRight: "1px solid var(--line)" }}>{sidebar}</aside>}
-        <div style={{ flex: 1, minWidth: 0, maxWidth: wide ? 720 : 640 }}>
-          {header}
-          <main key={`${route.id}:${visit}`} className="nv-in" style={{ padding: "16px 16px calc(32px + env(safe-area-inset-bottom))" }}>
-            <Boundary t={t} screen={route.id}>{Screen ? <Screen {...ctx} /> : null}</Boundary>
-            <div style={{ textAlign: "center", marginTop: 36 }}>
-              <button onClick={() => getModule("feedback") && getModule("feedback").services.open({})} style={{ border: "none", background: "transparent", color: "var(--low)", fontSize: 14, fontWeight: 600, cursor: "pointer", padding: "10px 12px", minHeight: 44 }}>
-                {t("fb.title")}
-              </button>
-            </div>
-          </main>
-        </div>
+  const tabBar = (
+    <nav aria-label={t("nav.menu")} style={{ position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 30, background: "var(--bg)", borderTop: "1px solid var(--line)", paddingBottom: "env(safe-area-inset-bottom)" }}>
+      <div style={{ display: "flex", maxWidth: 640, margin: "0 auto" }}>
+        {TABS.map((x) => (
+          <button key={x.id} onClick={() => openTab(x)} aria-current={tab.id === x.id ? "page" : undefined} className="nv-press" style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 3, border: "none", background: "transparent", color: tab.id === x.id ? "var(--brand)" : "var(--low)", padding: "8px 4px 6px", minHeight: 58, fontSize: 12, fontWeight: 650, cursor: "pointer" }}>
+            <Icon name={x.icon} size={24} />
+            {t(x.label)}
+          </button>
+        ))}
       </div>
-      {!wide && menu && (
-        <div style={{ position: "fixed", inset: 0, zIndex: 50 }}>
-          <div onClick={() => setMenu(false)} style={{ position: "absolute", inset: 0, background: "rgba(5,12,25,.45)", animation: "nvFade .2s both" }} />
-          <aside style={{ position: "absolute", top: 0, bottom: 0, left: 0, width: "min(300px, 84vw)", background: "var(--bg)", paddingTop: "env(safe-area-inset-top)", animation: "nvDrawer .25s cubic-bezier(.2,.7,.2,1) both", overflowY: "auto" }}>{sidebar}</aside>
-        </div>
-      )}
+    </nav>
+  );
+
+  return (
+    <div style={rootStyle} className={settings.reduceMotion ? "nv-reduce" : undefined}>
+      <style>{GLOBAL_CSS}</style>
+      <div style={{ maxWidth: wide ? 720 : 640, margin: "0 auto" }}>
+        {header}
+        <main key={`${route.id}:${visit}`} className="nv-in" style={{ padding: "8px 16px calc(96px + env(safe-area-inset-bottom))" }}>
+          <Boundary t={t} screen={route.id}>{Screen ? <Screen {...ctx} /> : null}</Boundary>
+        </main>
+      </div>
+      {tabBar}
       {allModules()
         .filter((m) => m.Overlay)
         .map((m) => (

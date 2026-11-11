@@ -12,10 +12,10 @@ import { useSlice, setSlice, getState, useAppState } from "../../core/store.js";
 import { recordPractice, checkBadges } from "../../core/game.js";
 import { addStrings, makeT, money, shortDate, text } from "../../core/i18n.js";
 import { dayKey } from "../../core/progress.js";
-import { Button, Card, Field, Icon, Label, Legend, LineChart, Note, Segmented, Sheet, Slider, Title, toast } from "../../core/ui.jsx";
+import { Button, Card, Field, Icon, Label, Legend, LineChart, List, ListRow, Note, Segmented, Sheet, Slider, Title, toast } from "../../core/ui.jsx";
 import { openShare } from "../../core/share.jsx";
-import { AgeCard } from "../../core/Settings.jsx";
-import { ReminderCard } from "../../core/reminders.jsx";
+import { update } from "../../core/store.js";
+import { useSeen, markIntro } from "../../core/Practice.jsx";
 import { PATHS, exampleRates } from "./engine.js";
 import * as P from "./plan.js";
 import { DEFAULTS, amt, dur, pathLabel, PATH_COLORS, TOOLS, BudgetTool, LeakTool, CompareTool, DebtTool, EarlyTool, InvestTool, RetireTool } from "./tools.jsx";
@@ -26,13 +26,23 @@ const CALCULATORS = [...TOOLS, ["paycheck", "wallet", PaycheckTool], ["hustle", 
 
 const S = (en, es) => ({ en, es });
 addStrings({
-  "goals.nav": S("Home", "Inicio"),
+  "goals.nav": S("Goals", "Metas"),
   "goals.path.cash": S("Cash", "Efectivo"),
   "goals.path.save": S("Savings account", "Cuenta de ahorro"),
   "goals.path.save.MX": S("CETES", "CETES"),
   "goals.path.invest": S("Index fund", "Fondo indexado"),
   "goals.never": S("not within 50 years", "no en 50 años"),
-  "goals.tools": S("Calculators", "Calculadoras"),
+  "goals.tools": S("Tools from your lessons", "Herramientas de tus lecciones"),
+  "goals.sub": S("What you're learning for.", "Para qué estás aprendiendo."),
+  "tools.sub": S("Calculators from the lessons, to try your own numbers. Example rates, not advice.", "Calculadoras de las lecciones para probar tus propios números. Tasas de ejemplo, no asesoría."),
+  "tools.from": S("From “{lesson}”", "De “{lesson}”"),
+  "tools.after": S("Opens after the lesson “{lesson}”", "Se abre después de la lección “{lesson}”"),
+  "tools.row.sub": S("{n} of {total} open", "{n} de {total} abiertas"),
+  "tools.row.none": S("Each one opens after the lesson that uses it", "Cada una se abre después de la lección que la usa"),
+  "plan.ask.title": S("Make a plan for your goal?", "¿Hacemos un plan para tu meta?"),
+  "plan.ask.sub": S("Optional. Say how much and by when, and see what to set aside each month.", "Opcional. Di cuánto y para cuándo, y ve cuánto apartar cada mes."),
+  "plan.ask.yes": S("Make a plan", "Hacer un plan"),
+  "plan.ask.no": S("Not now", "Ahora no"),
   "goals.tool.budget": S("Budget planner", "Planeador de presupuesto"),
   "goals.tool.debt": S("Debt payoff", "Pagar una deuda"),
   "goals.tool.early": S("Starting early", "Empezar temprano"),
@@ -173,37 +183,16 @@ addStrings({
   "week.record": S("Yes, record it", "Sí, registrar"),
   "week.done": S("Not this week", "Esta semana no"),
 
-  // Lesson ↔ goal
-  "link.amounts": S("{saved} of {target}", "{saved} de {target}"),
-  "link.budget": S("A budget is where the {monthly} a month for this goal comes from: you decide it before you spend.", "Un presupuesto es de donde salen los {monthly} al mes para esta meta: lo decides antes de gastar."),
-  "link.save": S("Saving that's automatic and kept separate is how this goal grows month after month.", "Ahorrar de forma automática y por separado es como esta meta crece mes con mes."),
-  "link.credit": S("Interest on debt works against you. Avoiding it keeps more of your money for this goal.", "Los intereses de una deuda juegan en tu contra. Evitarlos deja más dinero para esta meta."),
-  "link.compound": S("Interest on interest means this goal needs a little less from you each month, the longer it has to grow.", "El interés sobre el interés hace que esta meta te pida un poco menos cada mes, entre más tiempo tenga para crecer."),
-  "link.stocks": S("Stocks can grow faster than savings but move up and down — which matters for when you'll need this money.", "Las acciones pueden crecer más que el ahorro, pero suben y bajan; eso importa según cuándo necesites este dinero."),
-  "link.etf": S("An index fund spreads money across many companies. It's one of the paths you can compare for this goal.", "Un fondo indexado reparte el dinero entre muchas empresas. Es uno de los caminos que puedes comparar para esta meta."),
-  "link.risk": S("The closer you are to needing this money, the less up-and-down it can safely take.", "Entre más cerca estés de necesitar este dinero, menos subidas y bajadas puede aguantar."),
-  "link.retire": S("Retirement shows compounding over decades. The same idea, on a shorter clock, works for this goal.", "El retiro muestra el interés compuesto a lo largo de décadas. La misma idea, en menos tiempo, sirve para esta meta."),
-  "link.banking": S("The right account keeps fees from eating into the {monthly} a month you set aside for this goal.", "La cuenta correcta evita que las comisiones se coman los {monthly} al mes que apartas para esta meta."),
-  "link.paycheck": S("Knowing your take-home pay tells you how much of it can go to this goal each month.", "Saber cuánto te llega de verdad te dice cuánto puede ir a esta meta cada mes."),
-  "link.scams": S("One scam can wipe out months of saving. Spotting them protects this goal.", "Una sola estafa puede borrar meses de ahorro. Detectarlas protege esta meta."),
-  "link.taxes": S("Taxes come out before you see your pay, so the plan for this goal starts from what's left.", "Los impuestos salen antes de que veas tu sueldo, así que el plan para esta meta parte de lo que queda."),
-  "link.insurance": S("Insurance and an emergency fund keep a surprise bill from draining what you've saved for this goal.", "Un seguro y un fondo de emergencia evitan que un gasto inesperado se lleve lo que ahorraste para esta meta."),
-  "link.psychology": S("Small impulse buys add up. Noticing them leaves more for the {monthly} a month this goal needs.", "Las compras por impulso se suman. Notarlas deja más para los {monthly} al mes que necesita esta meta."),
-  "link.crypto": S("The money for this goal has a deadline. Knowing how far risky bets can swing helps you keep it safe.", "El dinero de esta meta tiene fecha. Saber cuánto pueden moverse las apuestas riesgosas te ayuda a cuidarlo."),
-  "link.earning": S("Earning a little more is the other way to reach this goal sooner.", "Ganar un poco más es la otra forma de llegar antes a esta meta."),
-  "link.news": S("Rates in the news change what savings earn — and so the plan for this goal.", "Las tasas que salen en las noticias cambian lo que gana tu ahorro, y con eso el plan para esta meta."),
-
   // Lesson step: make a goal
   "create.have": S("You already have a goal. Check its plan, or add another.", "Ya tienes una meta. Revisa su plan o agrega otra."),
   "create.looks_right": S("This plan looks right", "Este plan me parece bien"),
   "create.another": S("Add another goal", "Agregar otra meta"),
 
   // Onboarding
-  "onb.goal.title": S("What are you working toward?", "¿Para qué estás trabajando?"),
-  "onb.goal.sub": S("Pick one to start. You can add more and change it any time.", "Elige una para empezar. Puedes agregar más y cambiarla cuando quieras."),
-  "onb.goal.skip": S("I'm not sure yet", "Todavía no sé"),
-  "onb.amount.title": S("How much, and by when?", "¿Cuánto y para cuándo?"),
-  "onb.amount.sub": S("A rough number is fine.", "Un número aproximado está bien."),
+  "onb.for.title": S("What do you want to learn money skills for?", "¿Para qué quieres aprender de dinero?"),
+  "onb.for.sub": S("It picks your first lessons. You can change it any time.", "Con esto elegimos tus primeras lecciones. Lo puedes cambiar cuando quieras."),
+  "onb.for.basics": S("Just understanding money", "Solo entender el dinero"),
+  "onb.for.basics.sub": S("Start with the basics", "Empezar con lo básico"),
 });
 
 // ---- data -----------------------------------------------------------------
@@ -537,41 +526,6 @@ function GoalCard({ t, locale, row, fx, big, onClick }) {
   );
 }
 
-function NextLessonCard({ t, locale, go, row }) {
-  const progress = useAppState((s) => s.progress);
-  const units = row ? P.unitsFor(row.g) : [];
-  const l = service("lessons", "nextFor")(units);
-  const review = service("lessons", "reviewStatus")();
-  if (l === undefined) return null;
-  if (!l) return <Note icon="check">{t("home.all_done")}</Note>;
-  const why = row && t(`link.${l.unit}`, { name: nameOf(row.g, t), monthly: fmtFor(locale, row.g)(row.g.monthly) });
-  return (
-    <Card>
-      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-        <span style={{ width: 40, height: 40, borderRadius: 10, background: "var(--surface2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-          <Icon name="book" size={20} />
-        </span>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 13, color: "var(--mid)" }}>{text(l.unitTitle, locale)}</div>
-          <div style={{ fontWeight: 650, fontSize: 16 }}>{text(l.title, locale)}</div>
-        </div>
-        <Button size="md" onClick={() => go("lessons", { lesson: l.id })}>
-          {t("home.start")}
-        </Button>
-      </div>
-      {why && <p style={{ fontSize: 14, color: "var(--mid)", lineHeight: 1.5, margin: "12px 0 0", paddingTop: 12, borderTop: "1px solid var(--line)" }}>{why}</p>}
-      <div style={{ display: "flex", alignItems: "center", gap: 16, marginTop: 12, fontSize: 13, color: "var(--low)", ...NUM }}>
-        <span style={{ flex: 1 }}>{t("home.streak", { n: progress.streak.count })}</span>
-        {review && review.due > 0 && (
-          <button onClick={() => go("lessons", { review: true })} className="nv-press" style={{ border: "none", background: "transparent", color: "var(--brand)", fontSize: 13, fontWeight: 650, cursor: "pointer", padding: "8px 0", minHeight: 36 }}>
-            {t("home.review", { n: Math.min(review.due, 5) })}
-          </button>
-        )}
-      </div>
-    </Card>
-  );
-}
-
 function CheckIn({ t, locale, rows, onRecord, onDone }) {
   const sunday = P.lastSunday(today());
   return (
@@ -609,9 +563,7 @@ function CheckIn({ t, locale, rows, onRecord, onDone }) {
 
 function Home({ t, locale, go, data, setOpen, sheets }) {
   const { slice, rows } = data;
-  const MissionCard = service("missions", "WeekCard");
-  const [tool, setTool] = useState(null);
-  const Tool = tool && CALCULATORS.find((x) => x[0] === tool)[2];
+  const goalFor = useAppState((s) => s.profile.goalFor);
   const lead = P.primaryGoal(rows.map((r) => r.g));
   const leadRow = lead && rows.find((r) => r.g.id === lead.id);
   const others = rows.filter((r) => r !== leadRow);
@@ -620,52 +572,99 @@ function Home({ t, locale, go, data, setOpen, sheets }) {
   const doneForWeek = () => save((s) => ({ ...s, checkIn: sunday }));
   return (
     <div>
+      <Title sub={t("goals.sub")}>{t("goals.nav")}</Title>
       {!leadRow ? (
         <>
-          <Title sub={t("home.empty.sub")}>{t("home.empty.title")}</Title>
-          <TemplateGrid t={t} onPick={(id) => sheets.newGoal(id)} />
-          <AgeCard t={t} />
-          <ReminderCard t={t} />
+          <Label style={{ marginTop: 4 }}>{t("home.empty.title")}</Label>
+          <p style={{ fontSize: 15, color: "var(--mid)", lineHeight: 1.45, margin: "-4px 0 14px" }}>{t("home.empty.sub")}</p>
+          <TemplateGrid t={t} onPick={(id) => sheets.newGoal(id)} highlight={goalFor} />
         </>
       ) : (
         <>
-          <Label style={{ marginTop: 4 }}>{t("home.your_goal")}</Label>
           <GoalCard t={t} locale={locale} row={leadRow} fx={data.holdings.fx} big onClick={() => setOpen(leadRow.g.id)} />
           {checkIn && (
             <div style={{ marginTop: 12 }}>
               <CheckIn t={t} locale={locale} rows={rows.filter((r) => r.g.status !== "paused")} onRecord={() => (doneForWeek(), sheets.record(lead.id))} onDone={doneForWeek} />
             </div>
           )}
-          <Label>{t("home.next_lesson")}</Label>
-          <NextLessonCard t={t} locale={locale} go={go} row={leadRow} />
-          <AgeCard t={t} />
-          <ReminderCard t={t} />
-          <MissionCard t={t} locale={locale} go={go} />
+          <Button full kind="secondary" style={{ marginTop: 12 }} onClick={() => sheets.record(lead.id)}>
+            <Icon name="plus" size={18} /> {t("goal.record")}
+          </Button>
           {others.length > 0 && <Label>{t("home.other_goals")}</Label>}
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {others.map((r) => (
               <GoalCard key={r.g.id} t={t} locale={locale} row={r} fx={data.holdings.fx} onClick={() => setOpen(r.g.id)} />
             ))}
           </div>
-          <Button full kind="secondary" style={{ marginTop: 12, border: "1px solid var(--line)" }} onClick={() => sheets.newGoal()}>
+          <Button full kind="ghost" style={{ marginTop: 10 }} onClick={() => sheets.newGoal()}>
             <Icon name="plus" size={18} /> {t("home.new_goal")}
           </Button>
         </>
       )}
-      <Label>{t("goals.tools")}</Label>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 10 }}>
-        {CALCULATORS.map(([id, icon]) => (
-          <Card key={id} onClick={() => setTool(id)} pad={14} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <Icon name={icon} size={20} color="var(--mid)" />
-            <span style={{ fontWeight: 650, fontSize: 15 }}>{t(`goals.tool.${id}`)}</span>
-          </Card>
+      <Note icon="shield" style={{ marginTop: 18 }}>{t("goals.disclaimer")}</Note>
+    </div>
+  );
+}
+
+// ---- Practice → Tools from your lessons -------------------------------------
+
+// Each calculator opens after the first lesson that uses it — or for anyone
+// who has already used the calculators (they were on Home before).
+function useTools() {
+  const progress = useAppState((s) => s.progress);
+  const used = (progress.counters.sim || 0) > 0;
+  return CALCULATORS.map(([id, icon, Tool]) => {
+    const lesson = service("lessons", "firstLessonWith")(`goals.${id}`);
+    return { id, icon, Tool, lesson, open: used || !lesson || service("lessons", "lessonDone")(lesson.id) };
+  });
+}
+function ToolsScreen({ t, locale }) {
+  const tools = useTools();
+  const [tool, setTool] = useState(null);
+  const Tool = tool && tools.find((x) => x.id === tool).Tool;
+  return (
+    <div>
+      <Title sub={t("tools.sub")}>{t("goals.tools")}</Title>
+      <List>
+        {tools.map(({ id, icon, lesson, open }) => (
+          <ListRow key={id} icon={icon} title={t(`goals.tool.${id}`)} sub={lesson ? t(open ? "tools.from" : "tools.after", { lesson: text(lesson.title, locale) }) : null} locked={!open} onClick={() => setTool(id)} />
         ))}
-      </div>
+      </List>
       <Note icon="shield" style={{ marginTop: 18 }}>{t("goals.disclaimer")}</Note>
       <Sheet open={!!tool} onClose={() => setTool(null)} title={tool ? t(`goals.tool.${tool}`) : ""} tall>
         {Tool && <Tool t={t} locale={locale} params={{}} />}
       </Sheet>
     </div>
+  );
+}
+function ToolsRow({ t, go }) {
+  const tools = useTools();
+  const seen = useSeen("tools");
+  const n = tools.filter((x) => x.open).length;
+  return <ListRow icon="pie" title={t("goals.tools")} sub={n ? t("tools.row.sub", { n, total: tools.length }) : t("tools.row.none")} locked={!n} isNew={n > 0 && !seen && t("common.new")} onClick={() => (markIntro("tools"), go("tools"))} />;
+}
+
+// Today, after the first lesson: the amount and date for the goal picked
+// in onboarding, as an optional question.
+function PlanPrompt({ t, go }) {
+  const id = useAppState((s) => s.profile.goalFor);
+  return (
+    <Card style={{ marginTop: 12 }}>
+      <div style={{ fontWeight: 750, fontSize: 17 }}>{t("plan.ask.title")}</div>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "10px 0 6px" }}>
+        <TemplateIcon id={id} size={32} />
+        <span style={{ fontWeight: 650 }}>{t(`tpl.${id}`)}</span>
+      </div>
+      <p style={{ fontSize: 14, color: "var(--mid)", lineHeight: 1.45, margin: "0 0 12px" }}>{t("plan.ask.sub")}</p>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+        <Button size="md" onClick={() => (markIntro("goalPlan"), go("goals", { newGoal: id }))}>
+          {t("plan.ask.yes")}
+        </Button>
+        <Button size="md" kind="secondary" onClick={() => markIntro("goalPlan")}>
+          {t("plan.ask.no")}
+        </Button>
+      </div>
+    </Card>
   );
 }
 
@@ -910,7 +909,7 @@ function GoalPage({ t, locale, go, row, data, onBack, sheets }) {
 function Screen({ t, locale, go, route }) {
   const data = useGoals(locale);
   const [open, setOpen] = useState(route.params.goal || null);
-  const [newGoal, setNewGoal] = useState(null); // null | { template }
+  const [newGoal, setNewGoal] = useState(route.params.newGoal ? { template: route.params.newGoal } : null); // null | { template }
   const [record, setRecord] = useState(route.params.record || null);
   const [milestone, setMilestone] = useState(null);
   useDailyBookkeeping(data.rows, data.holdings, setMilestone);
@@ -969,25 +968,22 @@ function CreateGoal({ params = {}, t, locale, onDone, done }) {
   );
 }
 
-// ---- first run: the first goal, right after "why you're here" -------------
+// ---- first run: what the learner wants money skills for -------------------
 
-const SUGGEST = { save: "emergency", invest: "invest", debt: "debt" };
-function Onboard({ t, locale, reason, header, onNext }) {
-  const [tpl, setTpl] = useState(null);
-  if (!tpl)
-    return (
-      <>
-        {header(t("onb.goal.title"), t("onb.goal.sub"))}
-        <TemplateGrid t={t} onPick={setTpl} highlight={SUGGEST[reason]} />
-        <Button full kind="ghost" style={{ marginTop: 10 }} onClick={() => onNext({})}>
-          {t("onb.goal.skip")}
-        </Button>
-      </>
-    );
+// The goal templates (not "something else"), or just the basics. It picks
+// the first unit and becomes Today's "Building toward" line; the amount and
+// date come later, as an optional question after the first lesson.
+const REASON = { emergency: "save", car: "save", college: "save", travel: "save", invest: "invest", debt: "debt", basics: "curious" };
+function Onboard({ t, header, option, onNext }) {
+  const pick = (id) => {
+    update((s) => ({ ...s, profile: { ...s.profile, goalFor: id } }));
+    onNext({ startUnit: id === "basics" ? "budget" : P.template(id).units[0], reason: REASON[id] });
+  };
   return (
     <>
-      {header(t("onb.amount.title"), t("onb.amount.sub"), () => setTpl(null))}
-      <GoalForm key={tpl} t={t} locale={locale} templateId={tpl} simple saveLabel={t("common.continue")} onSave={(f) => (createGoal(f, locale.region), onNext({ startUnit: P.template(tpl).units[0] }))} />
+      {header(t("onb.for.title"), t("onb.for.sub"))}
+      {P.TEMPLATES.filter((x) => x.id !== "custom").map((x) => option(x.id, x.icon, t(`tpl.${x.id}`), t(`tpl.${x.id}.sub`), () => pick(x.id)))}
+      {option("basics", "bulb", t("onb.for.basics"), t("onb.for.basics.sub"), () => pick("basics"))}
     </>
   );
 }
@@ -998,10 +994,15 @@ const leadNow = () => {
   const goals = goalsNow();
   return P.primaryGoal(goals);
 };
+// What the learner picked in onboarding, if it's a goal template.
+const goalForNow = () => {
+  const id = getState().profile.goalFor;
+  return id && id !== "basics" && P.TEMPLATES.some((x) => x.id === id) ? id : null;
+};
 
 registerModule({
   id: "goals",
-  nav: { icon: "home", label: "goals.nav", order: 0 },
+  nav: { tab: "goals", label: "goals.nav" },
   Screen,
   Onboard,
   actions: {
@@ -1029,21 +1030,36 @@ registerModule({
     return { goals: goals.length, milestone: Math.max(0, ...goals.flatMap((g) => Object.entries(g.milestones || {}).filter(([, d]) => d !== "start").map(([m]) => Number(m)))) };
   },
   services: {
-    // Units that help the leading goal most, in order (null: no goals).
+    // Units that help the leading goal most, in order — or the goal picked
+    // in onboarding (null: neither).
     recommendedUnits: () => {
       const g = leadNow();
-      return g ? P.unitsFor(g) : null;
+      const id = goalForNow();
+      return g ? P.unitsFor(g) : id ? P.template(id).units : null;
     },
-    // After a lesson: the leading goal, where it stands, and how this unit helps it.
-    lessonLink: (unitId) => {
+    // Today's "Building toward" line: the leading goal, else the one picked.
+    buildingToward: () => {
       const g = leadNow();
-      if (!g) return null;
-      const locale = locNow();
-      const t = makeT(locale);
-      const have = P.saved(g);
-      const fmt = fmtFor(locale, g);
-      return { name: nameOf(g, t), amounts: t("link.amounts", { saved: fmt(have), target: fmt(g.target) }), pct: P.percentOf(g, have), sentence: t(`link.${unitId}`, { name: nameOf(g, t), monthly: fmt(g.monthly) }) };
+      const id = goalForNow();
+      const t = makeT(locNow());
+      return g ? nameOf(g, t) : id ? t(`tpl.${id}`) : null;
     },
+    // Onboarding's "why these lessons": the goal picked and its first units.
+    startPlan: () => {
+      const id = goalForNow();
+      return id && { name: makeT(locNow())(`tpl.${id}`), units: P.template(id).units };
+    },
+    // Today: the Sunday check-in is due; the goal plan question is due.
+    checkInDue: () => {
+      const s = getState().modules.goals;
+      const goals = goalsNow().filter((g) => g.status !== "paused");
+      return goals.length > 0 && !!P.checkInDue(goals, s && s.checkIn, today());
+    },
+    planPromptDue: () => {
+      const s = getState();
+      return !!goalForNow() && (s.progress.counters.lessons || 0) >= 1 && !goalsNow().length && !(s.profile.seenIntros || {}).goalPlan;
+    },
+    PlanPrompt,
     // The goal a practice holding is linked to (for its tag in the portfolio).
     linkedGoalFor: (symbol) => {
       const g = goalsNow().find((x) => x.linked.includes(symbol));
@@ -1072,4 +1088,12 @@ registerModule({
         .slice(0, 5)
         .map((g) => ({ type: g.template, currency: g.currency, target: g.target, monthly: g.monthly, monthsLeft: P.monthsLeft(g, today()), percent: Math.round(P.percentOf(g, P.saved(g))), path: g.path, status: g.status })),
   },
+});
+
+// Practice → Tools from your lessons (its own screen, under Practice).
+registerModule({
+  id: "tools",
+  nav: { tab: "practice", label: "goals.tools" },
+  Screen: ToolsScreen,
+  practice: { order: 3, Row: ToolsRow },
 });

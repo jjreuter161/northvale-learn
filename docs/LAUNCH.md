@@ -142,7 +142,7 @@ The builder works in your Terminal, signed in to your Fly.io account. Your keys 
    - `/admin` opens with the token, the **classroom switch is off for everyone**, the AI is on with your cap, and price data is coming in;
    - the waitlist accepts a sign-up and the CSV downloads; under 13 is refused;
    - the data disk is mounted, and a snapshot appears the next day.
-6. **The AI safety check:** `node scripts/tutor-check.mjs --yes`. It asks the real tutor 10 everyday and tricky questions, checks the answers, and prints them for you to read. That includes no "buy this", flagging scams, safe handling of harmful questions, Spanish, and telling a 15-year-old to involve an adult. It costs about 1¢.
+6. **The AI safety check:** `node scripts/tutor-check.mjs --yes`. It asks the real tutor 20 everyday and tricky questions, checks the answers, and prints them for you to read. That includes no "buy this", flagging scams, safe handling of harmful and off-topic questions, money stress, follow-ups that need the previous answer (in English and Spanish), Expert depth, and telling a 15-year-old to involve an adult. It costs about 2¢.
 7. **Things only you can check, on your phone** (the builder walks you through them):
    - paste `/welcome` into a chat and see the preview card;
    - add the app to your Home Screen;

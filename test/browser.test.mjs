@@ -17,7 +17,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import assert from "node:assert/strict";
 import { chromium } from "playwright-core";
-import { ALL_LESSONS } from "../src/modules/lessons/content.js";
+import { ALL_LESSONS, UNITS } from "../src/modules/lessons/content.js";
 import { MISSIONS } from "../src/modules/missions/catalog.js";
 import { newGoal } from "../src/modules/goals/plan.js";
 import { weekStart } from "../src/core/progress.js";
@@ -44,7 +44,7 @@ const admin = (path, body) => post(path, body, { "X-Admin-Token": env.ADMIN_TOKE
 const account = (body) => fetch(`${BASE}api/auth/signup`, { method: "POST", headers: { "X-Northvale": "1", "Content-Type": "application/json" }, body: JSON.stringify({ password: "a long enough password", guardian: true, ...body }) }).then((r) => r.headers.get("set-cookie").split(";")[0]);
 const day = (n) => new Date(Date.now() + n * 864e5).toLocaleDateString("en-CA", { timeZone: "America/Mexico_City" });
 // A learner who's been through onboarding.
-const learner = (profile, progress = {}, modules = {}) => ({ version: 1, updatedAt: 1, profile: { onboarded: true, nickname: "", avatar: 0, ...profile }, settings: { lang: "en", region: "US", look: "white", reduceMotion: true }, progress: { xp: 0, days: {}, streak: { count: 0, last: null, best: 0, frozen: [] }, freezes: 1, dailyGoal: 20, lessons: {}, lessonDays: [], badges: {}, counters: {}, practiced: {}, startUnit: "budget", placed: [], ...progress }, modules });
+const learner = (profile, progress = {}, modules = {}) => ({ version: 1, updatedAt: 1, profile: { onboarded: true, nickname: "", avatar: 0, ...profile }, settings: { lang: "en", region: "US", look: "white", reduceMotion: true }, progress: { xp: 0, days: {}, streak: { count: 0, last: null, best: 0, frozen: [] }, freezes: 1, dailyGoal: 20, lessons: {}, lessonDays: [], badges: {}, counters: {}, practiced: {}, startUnit: "budget", placed: [], ...progress }, modules: { feedback: { pending: [], survey: "skipped" }, ...modules } });
 
 let browser;
 try {
@@ -80,9 +80,20 @@ async function open(seed, { cookie } = {}) {
     assert.deepEqual(text.match(BROKEN) || [], [], `${where}: broken text`);
     assert.deepEqual(errors, [], `${where}: console errors`);
   };
-  const menu = async (name) => {
-    await button(/^(Menu|Menú)$/).click();
-    await button(name, page.getByRole("navigation")).click();
+  // Goes to a place in the app through the tab bar (and a row on that
+  // tab's page, for the places inside one).
+  const menu = async (name, opts = {}) => {
+    if (name === "Tutor") return (await button(/^(Ask|Preguntar)$/).click(), true);
+    const [tab, row] = PLACES[name];
+    await button(tab, page.getByRole("navigation")).click();
+    // The one-time Practice introduction, the first time it opens.
+    await page.waitForTimeout(60);
+    if (await page.getByRole("dialog", { name: /^(New: Practice|Nuevo: Práctica)$/ }).count()) await page.keyboard.press("Escape");
+    if (!row) return true;
+    const go = page.getByRole("button", { name: new RegExp(`^${esc(row)}`) }).first();
+    if (opts.ifOpen && !(await go.count())) return false; // (still locked)
+    await go.click();
+    return true;
   };
   // The tutor opens as a sheet over the current screen.
   const shut = async () => (await page.getByRole("dialog").count()) && page.keyboard.press("Escape");
@@ -109,8 +120,23 @@ async function play({ top, button }, { untilAction = false } = {}) {
   throw new Error("the session never ended");
 }
 
+const esc = (x) => x.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+// Where each place is: a tab, and a row on its page.
+const PLACES = {
+  Learn: ["Learn"], Aprender: ["Aprender"], Goals: ["Goals"], Metas: ["Metas"], Practice: ["Practice"], Práctica: ["Práctica"], Me: ["Me"], Yo: ["Yo"],
+  Missions: ["Practice", "Money Missions"], Misiones: ["Práctica", "Misiones de dinero"],
+  Portfolio: ["Practice", "Practice portfolio"], Portafolio: ["Práctica", "Portafolio de práctica"],
+  News: ["Practice", "News, explained"], Noticias: ["Práctica", "Noticias explicadas"],
+  Tools: ["Practice", "Tools from your lessons"], Herramientas: ["Práctica", "Herramientas de tus lecciones"],
+  Achievements: ["Me", "Achievements"], Logros: ["Yo", "Logros"], Skills: ["Me", "Skills"], Habilidades: ["Yo", "Habilidades"],
+  Invite: ["Me", "Invite a friend"], Settings: ["Me", "Settings"], Ajustes: ["Yo", "Ajustes"], Classes: ["Me", "Classes"], Clases: ["Yo", "Clases"],
+};
 const CALCULATORS = ["Budget planner", "Debt payoff", "Starting early", "Investing range", "Retirement", "Paycheck", "Side hustle"];
-const SCREENS = ["Home", "Learn", "Missions", "Portfolio", "News", "Tutor", "Me", "Settings"];
+const SCREENS = ["Learn", "Goals", "Practice", "Missions", "Portfolio", "News", "Tools", "Tutor", "Me", "Achievements", "Skills", "Settings"];
+const PANTALLAS = ["Aprender", "Metas", "Práctica", "Misiones", "Portafolio", "Noticias", "Herramientas", "Tutor", "Yo", "Logros", "Habilidades", "Ajustes"];
+const lessonDays3 = () => [1, 2, 3].map((n) => new Date(Date.now() - n * 864e5).toLocaleDateString("en-CA", { timeZone: "America/Mexico_City" }));
+// The welcome screen, "what for" and "how to start" (from the beginning).
+const onboard = async ({ button }) => (await button("Get started").click(), await button(/^Car/).click(), await button(/^From the beginning/).click());
 
 try {
   // --- a new learner ---
@@ -119,29 +145,67 @@ try {
     const { page, top, button, clean, menu, shut } = app;
     await clean("welcome");
     await button("Get started").click();
-    await button(/^Save for something/).click();
+    await page.getByRole("heading", { name: "What do you want to learn money skills for?" }).waitFor();
+    await clean("what for");
     await button(/^Car/).click();
-    await clean("first goal");
-    await button("Continue").click();
-    await button(/^I'm new to this/).click();
-    await button(/^10 minutes a day/).click();
+    await page.getByText(/^For your goal \(Car\), these come first: Budgeting, Saving/).waitFor();
+    await button(/^From the beginning\s*Budgeting, lesson 1: What's a budget\?/).waitFor();
+    await clean("how to start");
+    await button(/^From the beginning/).click();
     await page.getByRole("dialog", { name: "What's a budget?" }).waitFor();
-    console.log("ok: onboarding (reason, first goal, placement, daily time) opens the first lesson");
+    console.log("ok: onboarding in 3 screens (welcome, what for, how to start) opens the first lesson");
 
     await play(app);
     await top().getByText("Lesson complete").waitFor();
     await top().getByText(/\+1[05] XP/).waitFor();
     await clean("lesson complete");
     await button("Done", top()).click();
-    await page.getByText("YOUR GOAL", { exact: false }).first().waitFor();
-    await clean("home");
-    console.log("ok: a full lesson, start to finish, then Home");
+    await page.getByRole("heading", { name: "Today" }).waitFor();
+    await page.getByText("Building toward: Car").first().waitFor();
+    await page.getByText("Lesson 2 of 3", { exact: false }).waitFor();
+    await clean("today");
+    console.log("ok: a full lesson, start to finish, then Today (the next lesson, and what it's building toward)");
+
+    // The goal's amount and date: asked after the first lesson, and optional.
+    await page.getByText("Make a plan for your goal?").waitFor();
+    await button("Make a plan").click();
+    await button("Create goal", top()).click();
+    await page.getByText(/^Set aside \$[\d,]+ a month in a savings account to reach/).waitFor();
+    await clean("the car goal");
+    await menu("Learn");
+    assert.equal(await page.getByText("Make a plan for your goal?").count(), 0, "asked only once");
+    console.log("ok: the goal plan, asked after the first lesson (optional), from the goal picked in onboarding");
 
     await page.getByText("How old are you?").waitFor();
     await button("18–25").click();
     await page.getByText("How old are you?").waitFor({ state: "detached" });
     await page.waitForFunction(() => JSON.parse(localStorage.getItem("northvale-learn-v1")).profile.ageBand === "18-25");
     console.log("ok: asked once for an age range (after the first lesson)");
+
+    // Practice: there from day one, a preview until 3 lessons.
+    await menu("Practice");
+    await page.getByText("Opens after 3 lessons").waitFor();
+    await page.getByText("Practice investing with $10,000 of pretend money", { exact: false }).waitFor();
+    await page.getByText("1 of 3 lessons").first().waitFor();
+    await clean("practice, before it opens");
+    await button("Continue learning").click();
+    for (let i = 0; i < 2; i++) {
+      await button("Continue").click(); // Today's one big button
+      await page.getByRole("dialog", { name: ALL_LESSONS[i + 1].title.en }).waitFor();
+      await play(app);
+      await button("Done", top()).click();
+    }
+    // After the third lesson: the one-question survey, once back from the lesson.
+    await page.getByRole("dialog", { name: "Quick question" }).waitFor({ timeout: 10000 });
+    await page.keyboard.press("Escape");
+    await page.waitForFunction(() => (JSON.parse(localStorage.getItem("northvale-learn-v1")).modules.feedback || {}).survey === "skipped");
+    await button("Practice", page.getByRole("navigation")).click();
+    await page.getByRole("dialog", { name: "New: Practice" }).waitFor();
+    await clean("practice intro");
+    await button("Take a look", top()).click();
+    await page.getByText("Opens with the lesson “Your first safe investment”").waitFor();
+    await page.getByText("Opens after 5 lessons").waitFor();
+    console.log("ok: Practice opens after 3 lessons, with a one-time introduction; inside, the portfolio and News wait for their lessons");
 
     await button("Start mission").click();
     await button("Mark done").click();
@@ -152,56 +216,164 @@ try {
     await page.keyboard.press("Escape");
     console.log("ok: a Money Mission, marked done with a note (+20 XP)");
 
+    await menu("Goals");
     await button("New goal").click();
     await button(/^Travel/, top()).click();
     await button("Create goal", top()).click();
     await page.getByText("Set aside $124 a month in a savings account to reach $1,500").waitFor();
     await clean("new goal");
-    await menu("Home");
     console.log("ok: a second goal, and its plan");
 
-    for (const name of CALCULATORS) {
-      await button(name).click();
-      await top().getByText(name).first().waitFor();
-      await clean(`calculator: ${name}`);
-      await page.keyboard.press("Escape");
-    }
-    console.log(`ok: all ${CALCULATORS.length} calculators open with real text`);
+    // Tools: each one after the lesson that uses it.
+    await menu("Tools");
+    await button(/^Budget planner/).click();
+    await top().getByText("Budget planner").first().waitFor();
+    await clean("calculator: Budget planner");
+    await page.keyboard.press("Escape");
+    await page.getByText(/^Retirement\s*Opens after the lesson “/).waitFor();
+    assert.equal(await page.getByRole("button", { name: /^Retirement/ }).count(), 0, "a tool before its lesson doesn't open");
+    console.log("ok: Practice → Tools: open after their lesson, locked (and saying which lesson) before it");
 
-    await menu("Learn");
+    await menu("Skills");
     await button(/^(Review|Practice anyway)$/).click();
     await play(app);
     await top().getByText("Review complete").waitFor();
     await clean("review complete");
     await button("Done", top()).click();
-    console.log("ok: a review");
+    console.log("ok: a review (Me → Skills)");
 
     for (const name of SCREENS) {
-      await menu(name);
+      if (!(await menu(name, { ifOpen: true }))) continue;
       await page.waitForTimeout(150);
       await clean(`screen: ${name}`);
       await shut();
     }
     console.log(`ok: all ${SCREENS.length} main screens, no raw text or console errors (English, US)`);
 
-    // Spanish, Mexico: the same screens and calculators.
+    // Spanish, Mexico: the same screens.
     await page.getByRole("radio", { name: "Español" }).click();
     await page.getByRole("radio", { name: /México/ }).click();
-    for (const name of ["Inicio", "Aprender", "Misiones", "Portafolio", "Noticias", "Tutor", "Yo", "Ajustes"]) {
-      await menu(name);
+    for (const name of PANTALLAS) {
+      if (!(await menu(name, { ifOpen: true }))) continue;
       await page.waitForTimeout(150);
       await clean(`pantalla: ${name}`);
       await shut();
     }
-    await menu("Inicio");
-    const calcs = await page.getByRole("button").evaluateAll((bs) => bs.map((b) => b.innerText.trim()));
+    console.log("ok: the same in Spanish (Mexico): every screen");
+    await app.close();
+  }
+
+  // --- one tap from Today to the first lesson (a learner who closed it) ---
+  {
+    const app = await open(learner({}, { startUnit: "budget" }));
+    const { page, button, clean } = app;
+    await page.getByRole("heading", { name: "Today" }).waitFor();
+    await clean("today, before any lesson");
+    await button("Start").click();
+    await page.getByRole("dialog", { name: "What's a budget?" }).waitFor();
+    console.log("ok: one tap from Today to the first lesson");
+    await app.close();
+  }
+
+  // --- the lesson-3 survey can't be lost: missed (app closed first), it shows on the next open; answered, never again ---
+  {
+    const app = await open(learner({ ageBand: "18-25" }, { counters: { lessons: 3 } }, { feedback: { pending: [], survey: null } }));
+    const { page, top, button, clean } = app;
+    await page.getByRole("dialog", { name: "Quick question" }).waitFor({ timeout: 10000 });
+    await clean("the survey");
+    await top().getByRole("radio", { name: "Very disappointed" }).click();
+    await top().getByRole("textbox").fill("It explains things clearly.");
+    const sent = page.waitForRequest((r) => r.url().endsWith("/api/survey") && r.method() === "POST");
+    await button("Send", top()).click();
+    assert.equal(JSON.parse((await sent).postData()).answer, "very");
+    await page.reload();
+    await page.waitForTimeout(3500);
+    assert.equal(await page.getByRole("dialog", { name: "Quick question" }).count(), 0, "answered surveys don't come back");
+    console.log("ok: the lesson-3 survey shows even if its moment was missed (on the next open), sends the answer, and never comes back");
+    await app.close();
+  }
+
+  // --- the tab bar and the header never cover what's scrolled into view ---
+  {
+    const app = await open(learner({ ageBand: "18-25" }, { lessonDays: lessonDays3(), counters: { lessons: 3 } }));
+    const { page, menu } = app;
+    for (const name of ["Learn", "Goals", "Me", "Settings"]) {
+      await menu(name);
+      await page.waitForTimeout(150);
+      // Each control, focused from the keyboard (which scrolls it into view), must sit fully between the header and the tab bar.
+      const covered = await page.evaluate(async () => {
+        const out = [];
+        for (const el of document.querySelectorAll("main button:not([disabled]), main input, main select, main textarea, main a[href]")) {
+          if (!el.checkVisibility({ visibilityProperty: true })) continue; // (e.g. inside a closed <details>)
+          el.focus();
+          await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+          const r = el.getBoundingClientRect();
+          const top = document.querySelector("header").getBoundingClientRect().bottom;
+          const bottom = document.querySelector("nav").getBoundingClientRect().top;
+          if (r.height <= bottom - top && (r.top < top - 1 || r.bottom > bottom + 1)) out.push((el.getAttribute("aria-label") || el.innerText || el.tagName).slice(0, 40));
+        }
+        return out;
+      });
+      assert.deepEqual(covered, [], `${name}: covered by the tab bar or header after scrolling to it`);
+    }
+    // And a tap near the bottom of a long page reaches its control, not the tab bar.
+    await page.getByRole("radio", { name: "Español" }).click();
+    await page.getByRole("radio", { name: /México/ }).click({ timeout: 2000 });
+    console.log("ok: the tab bar and the header never cover a control that's scrolled into view (keyboard focus and taps)");
+    await app.close();
+  }
+
+  // --- a learner from before the tabs, who used the calculators on Home ---
+  {
+    const app = await open(learner({ ageBand: "18-25" }, { counters: { sim: 2, trade: 1 }, practiced: { news: ["2026-11-01"] } }));
+    const { page, top, button, clean, menu } = app;
+    await menu("Practice");
+    assert.equal(await page.getByText("Opens after 3 lessons").count(), 0, "Practice is open for someone who already used it");
+    for (const name of ["Portfolio", "News"]) (await menu(name), await page.waitForTimeout(150), await clean(`screen: ${name} (used before)`));
+    await menu("Tools");
+    for (const name of CALCULATORS) {
+      await button(new RegExp(`^${esc(name)}`)).click();
+      await top().getByText(name).first().waitFor();
+      await clean(`calculator: ${name}`);
+      await page.keyboard.press("Escape");
+    }
+    await menu("Settings");
+    await page.getByRole("radio", { name: "Español" }).click();
+    await page.getByRole("radio", { name: /México/ }).click();
+    await menu("Herramientas");
     for (const name of ["Planeador de presupuesto", "Pagar una deuda", "Empezar temprano", "Rango de inversión", "Retiro", "Sueldo neto", "Ingreso extra"]) {
-      assert.ok(calcs.includes(name), `calculadora: ${name}`);
-      await button(name).click();
+      await button(new RegExp(`^${esc(name)}`)).click();
       await clean(`calculadora: ${name}`);
       await page.keyboard.press("Escape");
     }
-    console.log("ok: the same in Spanish (Mexico): every screen and calculator");
+    for (const name of ["Portafolio", "Noticias"]) (await menu(name), await page.waitForTimeout(150), await clean(`pantalla: ${name} (usada antes)`));
+    console.log(`ok: someone who used Practice before keeps it open: the portfolio, News and all ${CALCULATORS.length} calculators, in English and Spanish`);
+    await app.close();
+  }
+
+  // --- the tutor in offline mode (no AI here): says so up front, and matches other wording ---
+  {
+    const app = await open(learner({ ageBand: "18-25" }));
+    const { page, top, button, clean, menu } = app;
+    await menu("Tutor");
+    await top().getByText("The tutor is in offline mode, so it can only explain basic terms.").waitFor();
+    await clean("tutor, offline");
+    for (const [q, answer] of [
+      ["how do cards charge interest??", "The yearly cost of borrowing, as a percent."],
+      ["what is a fund for an emergency", "Money saved only for surprises, so a bad day doesn't become debt."],
+      ["how do i make a budget", "A plan for where your money goes before you spend it."],
+    ]) {
+      await top().getByRole("textbox").fill(q);
+      await page.keyboard.press("Enter");
+      await top().getByText(answer).waitFor();
+    }
+    await top().getByText("Related lesson: Saving · Emergency fund").waitFor();
+    await top().getByText("Related lesson: Budgeting · What's a budget?").waitFor();
+    await clean("tutor, offline answers");
+    await top().getByRole("button", { name: "Open" }).last().click();
+    await page.getByRole("dialog", { name: "What's a budget?" }).waitFor();
+    console.log("ok: offline Ask says so before you ask, matches different wording, and links the lesson");
+    await page.keyboard.press("Escape");
     await app.close();
   }
 
@@ -210,7 +382,7 @@ try {
     const day = (n) => new Date(Date.now() + n * 864e5).toLocaleDateString("en-CA", { timeZone: "America/Mexico_City" });
     const lessonDays = [day(-8), day(-7), day(-6), day(-5)];
     const lessons = Object.fromEntries(ALL_LESSONS.slice(0, 4).map((l, i) => [l.id, { done: true, at: lessonDays[i], last: lessonDays[i], best: 0, times: 1 }]));
-    const seed = { version: 1, updatedAt: 1, profile: { onboarded: true, nickname: "Dani", ageBand: "18-25", avatar: 0 }, settings: { lang: "en", region: "US", look: "white", reduceMotion: true }, progress: { xp: 60, days: Object.fromEntries(lessonDays.map((d) => [d, 15])), streak: { count: 4, last: day(-5), best: 4, frozen: [] }, freezes: 0, dailyGoal: 20, lessons, lessonDays, badges: {}, counters: { lessons: 4 }, practiced: {}, startUnit: "budget", placed: [], seen: day(-5) }, modules: {} };
+    const seed = { version: 1, updatedAt: 1, profile: { onboarded: true, nickname: "Dani", ageBand: "18-25", avatar: 0 }, settings: { lang: "en", region: "US", look: "white", reduceMotion: true }, progress: { xp: 60, days: Object.fromEntries(lessonDays.map((d) => [d, 15])), streak: { count: 4, last: day(-5), best: 4, frozen: [] }, freezes: 0, dailyGoal: 20, lessons, lessonDays, badges: {}, counters: { lessons: 4 }, practiced: {}, startUnit: "budget", placed: [], seen: day(-5) }, modules: { feedback: { pending: [], survey: "skipped" } } };
     const app = await open(seed);
     const { page, top, button, clean, menu } = app;
     await page.getByRole("dialog", { name: "Welcome back, Dani" }).waitFor();
@@ -399,7 +571,7 @@ try {
     const ada = await account({ email: "ada@example.test", nickname: "Ada", ageBand: "26+" });
     await Promise.all([sync(tia, 30), sync(tom, 50), sync(ada, 80)]);
     for (const [cookie, nickname, ageBand, sees, never] of [[tia, "Tia", "13-17", "Tom", "Ada"], [ada, "Ada", "26+", "Ada (you)", "Tom"]]) {
-      const app = await open(learner({ ageBand, nickname }), { cookie });
+      const app = await open(learner({ ageBand, nickname }, { lessonDays: lessonDays3() }), { cookie });
       await app.menu("Me");
       await app.page.getByText(sees, { exact: true }).waitFor();
       assert.equal(await app.page.getByText(never, { exact: true }).count(), 0, `${nickname} doesn't see ${never}`);
@@ -407,7 +579,11 @@ try {
       await app.clean(`league (${ageBand})`);
       await app.close();
     }
-    console.log("ok: the everyone league keeps 13–17 and 18+ apart");
+    const fresh = await open(learner({ ageBand: "18-25", nickname: "Neo" }), { cookie: tia });
+    await fresh.menu("Me");
+    assert.equal(await fresh.page.getByText("Weekly league", { exact: true }).count(), 0, "no league before 3 learning days");
+    await fresh.close();
+    console.log("ok: the everyone league keeps 13–17 and 18+ apart (and appears after 3 learning days)");
   }
 
   // --- signing in on a new device keeps the account's progress ---
@@ -418,12 +594,7 @@ try {
     // A fresh phone: onboarding and a first lesson (so this copy is newer), then sign in.
     const app = await open();
     const { page, button, menu } = app;
-    await button("Get started").click();
-    await button(/^Save for something/).click();
-    await button(/^Car/).click();
-    await button("Continue").click();
-    await button(/^I'm new to this/).click();
-    await button(/^10 minutes a day/).click();
+    await onboard(app);
     await play(app);
     await button("Done", app.top()).click();
     await menu("Settings");
@@ -432,7 +603,7 @@ try {
     await page.getByLabel("Password", { exact: true }).fill("a long enough password");
     await button("Sign in").click();
     await page.waitForFunction(() => JSON.parse(localStorage.getItem("northvale-learn-v1")).progress.xp === 300);
-    await menu("Home");
+    await menu("Goals");
     await page.getByText("Kim's trip").first().waitFor();
     console.log("ok: signing in on a fresh device keeps the account's progress (the device's newer, emptier copy doesn't overwrite it)");
     await app.close();
@@ -442,6 +613,7 @@ try {
   for (const ageBand of ["18-25", "13-17"]) {
     const app = await open(learner({ ageBand }, {}, { goals: { goals: [newGoal({ id: "g1", templateId: "car", name: "Secret Car Fund", target: 5000, start: 1234, months: 24, today: day(-10) })] } }));
     const { page, top, button, clean } = app;
+    await app.menu("Goals");
     await page.getByText("Secret Car Fund").first().click();
     await button("Share").click();
     const img = top().getByRole("img");
@@ -464,18 +636,13 @@ try {
 
   // --- an invite link: a streak freeze each when the friend finishes a first lesson ---
   {
-    const inviter = await open(learner({ ageBand: "18-25", nickname: "Leo" }, { counters: { lessons: 3 }, freezes: 1 }));
-    await inviter.menu("Me");
+    const inviter = await open(learner({ ageBand: "18-25", nickname: "Leo" }, { counters: { lessons: 3 }, freezes: 1, lessonDays: lessonDays3() }));
+    await inviter.menu("Invite");
     await inviter.button("Get my link").click();
     const link = await inviter.page.getByText(/\?invite=/).innerText();
     const friend = await open();
     await friend.page.goto(link);
-    await friend.button("Get started").click();
-    await friend.button(/^Save for something/).click();
-    await friend.button(/^Car/).click();
-    await friend.button("Continue").click();
-    await friend.button(/^I'm new to this/).click();
-    await friend.button(/^10 minutes a day/).click();
+    await onboard(friend);
     await play(friend);
     await friend.page.getByText("You and the friend who invited you each got a streak freeze.").waitFor();
     await friend.close();
@@ -504,7 +671,11 @@ try {
     await page.goto(BASE + L.path);
     // Every picture loads (scrolling past the lazy ones), nothing from other sites, clean text.
     await page.evaluate(async () => {
-      for (const img of document.images) (img.scrollIntoView({ block: "center", inline: "center" }), await new Promise((r) => setTimeout(r, 50)));
+      for (const img of document.images) {
+        img.scrollIntoView({ block: "center", inline: "center" });
+        // (stay on each one until it has loaded, or 4 seconds)
+        await new Promise((r) => (img.complete && img.naturalWidth ? r() : (img.addEventListener("load", r, { once: true }), img.addEventListener("error", r, { once: true }), setTimeout(r, 4000))));
+      }
     });
     await page.waitForFunction(() => [...document.images].every((i) => i.complete && i.naturalWidth > 0));
     const text = await page.evaluate(() => document.body.innerText);
@@ -572,7 +743,9 @@ try {
     for (const l of ALL_LESSONS) for (const s of l.steps) if (s.type === "action" && !firsts.has(s.kind)) firsts.set(s.kind, l);
     await menu("Learn");
     for (const [kind, lesson] of firsts) {
-      await page.getByRole("button", { name: new RegExp(`^${lesson.title.en.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")} — `) }).click();
+      const unit = page.getByRole("button", { name: new RegExp(`^Unit ${UNITS.findIndex((u) => u.id === lesson.unit) + 1} · `) });
+      if ((await unit.getAttribute("aria-expanded")) === "false") await unit.click();
+      await page.getByRole("button", { name: new RegExp(`^${esc(lesson.title.en)} — `) }).click();
       await play(app, { untilAction: true });
       await clean(`tool ${kind} (${lesson.id})`);
       await button("Close", top()).click();

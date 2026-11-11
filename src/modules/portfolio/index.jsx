@@ -9,7 +9,8 @@ import { useSlice, setSlice, useAppState, getState } from "../../core/store.js";
 import { recordPractice, checkBadges } from "../../core/game.js";
 import { addStrings, money, percent, text, shortDate } from "../../core/i18n.js";
 import { dayKey } from "../../core/progress.js";
-import { Button, Card, Chip, Icon, Label, LineChart, Note, Sheet, Title, toast } from "../../core/ui.jsx";
+import { Button, Card, Chip, Icon, Label, LineChart, ListRow, Note, Sheet, Title, toast } from "../../core/ui.jsx";
+import { useSeen, markIntro } from "../../core/Practice.jsx";
 import { ASSETS, TYPES, UNLOCKS, assetBySymbol, assetsFor } from "./assets.js";
 import { newPortfolio, priceIn, buy, sell, valuation, snapshot, unlocked, MIN_TRADE } from "./engine.js";
 import { useQuotes, useHistory } from "./market.js";
@@ -21,6 +22,9 @@ addStrings({
   "pf.sample_badge": S("Sample price", "Precio de ejemplo"),
   "pf.delayed_badge": S("Delayed", "Con retraso"),
   "pf.title": S("Practice portfolio", "Portafolio de práctica"),
+  "pf.row.sub": S("Invest pretend money and watch what happens", "Invierte dinero de práctica y ve qué pasa"),
+  "pf.row.own": S("You own {n} practice {n|investment|investments}", "Tienes {n} {n|inversión|inversiones} de práctica"),
+  "pf.row.locked": S("Opens with the lesson “{lesson}”", "Se abre con la lección “{lesson}”"),
   "pf.total": S("Total value", "Valor total"),
   "pf.since_start": S("since you started", "desde que empezaste"),
   "pf.cash": S("Cash to invest", "Efectivo para invertir"),
@@ -651,9 +655,31 @@ function ReviewAction({ params, t, locale, onDone, done }) {
   );
 }
 
+// Its row on the Practice tab: open with the lesson that teaches the first
+// investment (or for anyone who already has one).
+function PracticeRow({ t, locale, go }) {
+  const progress = useAppState((s) => s.progress);
+  const pf = useAppState((s) => s.modules.portfolio && s.modules.portfolio.pf);
+  const seen = useSeen("portfolio");
+  const n = pf ? Object.keys(pf.holdings).length : 0;
+  const open = unlocked(progress, "safe") || n > 0 || !!(pf && pf.trades.length) || (progress.counters.trade || 0) > 0;
+  const lesson = lessonById(UNLOCKS.safe);
+  return (
+    <ListRow
+      icon="chart"
+      title={t("pf.title")}
+      sub={!open ? t("pf.row.locked", { lesson: text(lesson.title, locale) }) : n ? t("pf.row.own", { n }) : t("pf.row.sub")}
+      locked={!open}
+      isNew={open && !seen && t("common.new")}
+      onClick={() => (markIntro("portfolio"), go("portfolio"))}
+    />
+  );
+}
+
 registerModule({
   id: "portfolio",
-  nav: { icon: "chart", label: "pf.nav", order: 2 },
+  nav: { tab: "practice", label: "pf.nav" },
+  practice: { order: 2, Row: PracticeRow },
   Screen,
   actions: {
     "portfolio.buy": BuyAction,

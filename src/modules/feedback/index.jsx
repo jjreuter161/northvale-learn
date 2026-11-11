@@ -4,7 +4,7 @@
 // server can't be reached, it waits on the device and goes next time.
 import { useEffect, useState } from "react";
 import { registerModule } from "../../core/registry.js";
-import { useSlice, setSlice, getState, on } from "../../core/store.js";
+import { useSlice, setSlice, getState, useAppState } from "../../core/store.js";
 import { addStrings } from "../../core/i18n.js";
 import { api } from "../../core/api.js";
 import { installId, track } from "../../core/analytics.js";
@@ -71,17 +71,20 @@ function Overlay({ t, locale, route }) {
     setSlice("feedback", (s) => ({ ...s, pending: [] }), DEFAULTS);
     pending.forEach((p) => sendOrKeep(p.path, p.body).catch(() => {}));
   }, []);
-  // The survey, once, after the 3rd finished lesson (a moment after the
-  // celebration, so it doesn't cover it).
-  useEffect(
-    () =>
-      on("lesson.completed", () => {
-        const p = getState().progress;
-        const s = getState().modules.feedback || {};
-        if ((p.counters.lessons || 0) >= 3 && !s.survey) setTimeout(() => setSurvey(true), 1800);
-      }),
-    []
-  );
+  // The survey, once, after the 3rd finished lesson. It's due from what's
+  // saved (not a one-off timer), so it can't be lost: it waits until no
+  // lesson or other window is open, and if the app closes first, it shows
+  // the next time the app opens.
+  const due = useAppState((s) => (s.progress.counters.lessons || 0) >= 3 && !(s.modules.feedback || {}).survey);
+  useEffect(() => {
+    if (!due || survey) return;
+    const id = setInterval(() => {
+      if (document.querySelector('[role="dialog"]')) return;
+      clearInterval(id);
+      setSurvey(true);
+    }, 1500);
+    return () => clearInterval(id);
+  }, [due, survey]);
 
   const sendFeedback = async () => {
     const body = { installId: installId(), kind, text: msg.trim(), context: open.context, screen: route.id, lang: locale.lang, region: locale.region };
