@@ -126,16 +126,15 @@ export default function Me({ t, locale, session, go, route }) {
   const showClasses = classes && classes.nav && classes.nav.show && classes.nav.show({ session });
   const got = BADGES.filter((b) => progress.badges[b.id]).length;
 
-  if (section === "achievements") return <Badges t={t} progress={progress} />;
-  if (section === "skills")
+  if (section)
     return (
       <div>
-        {cards.map((m) => (
-          <m.MeCard key={m.id} t={t} locale={locale} go={go} />
-        ))}
+        <Title>{t(`me.section.${section}`)}</Title>
+        {section === "achievements" && <Badges t={t} progress={progress} />}
+        {section === "skills" && cards.map((m) => <m.MeCard key={m.id} t={t} locale={locale} go={go} />)}
+        {section === "invite" && <InviteCard t={t} session={session} />}
       </div>
     );
-  if (section === "invite") return <InviteCard t={t} session={session} />;
 
   return (
     <div>

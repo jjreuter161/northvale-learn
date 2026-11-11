@@ -37,6 +37,12 @@ Found and fixed during the pass: "For Car, these come first" now reads "For your
 2. **The lesson-3 survey could be lost.** It was a one-off 1.8-second timer after the third lesson; closing or reloading the app in that moment meant it never showed (until a later lesson). It's now worked out from saved progress: it waits until no lesson or other window is open, and if the app closes first, it shows the next time the app opens. Answered (or dismissed), it never comes back. People who passed lesson 3 without seeing it will now see it once. Tests cover both cases, and that the answer is sent.
 3. **Closing the app right after doing something could lose it.** The app saved to the device 0.3 seconds after each change, so a lesson finished (or a survey answered) just before closing the app could be lost. It now also saves the moment the app is closed or sent to the background. The survey test found this.
 
+## Before launch: three small follow-ups (2026-11-10)
+
+- **Today for long-time learners:** the lesson stays on top, with **at most 2 small rows** under it. The most useful come first: a due review, the Sunday check-in, this week's mission, the streak. The rest is a tap away: the streak in the top bar, the check-in on Goals, the mission on Practice. The reminder offer shows only when no review or check-in is waiting.
+- **No repeated titles:** on a tab the top bar shows the wordmark; deeper in, it shows a back button named for where it goes ("‹ Practice"). The page's own title appears once.
+- **The streak row is a real button:** it opens the streak details (the same as the flame in the top bar).
+
 ## Tests
 
 - `npm test`: 98 checks, all passing (90 before).

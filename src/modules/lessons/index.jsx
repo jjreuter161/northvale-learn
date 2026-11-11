@@ -123,10 +123,12 @@ const todayLine = (locale) => {
   return d[0].toUpperCase() + d.slice(1);
 };
 
-// TODAY — the next lesson as the one big button, why it matters, and a few
-// small rows: review, streak, this week's mission, the Sunday check-in, and
-// at most one question for the learner (goal plan, age, reminders).
-function Today({ t, locale, go }) {
+// TODAY — the next lesson as the one big button, why it matters, and at
+// most 2 small rows (most useful first: review, the Sunday check-in, this
+// week's mission, the streak), then at most one question for the learner
+// (goal plan, age, reminders). Nothing is lost when a row doesn't fit: the
+// streak is in the top bar, the check-in on Goals, the mission on Practice.
+function Today({ t, locale, go, openStreak }) {
   const progress = useAppState((s) => s.progress);
   useAppState((s) => s.modules.goals); // the "Building toward" line and check-in
   useAppState((s) => s.modules.missions);
@@ -169,17 +171,22 @@ function Today({ t, locale, go }) {
         )}
       </Card>
       <List style={{ marginTop: 12 }}>
-        {due > 0 && <ListRow icon="refresh" title={t("review.title")} sub={t("today.review.sub", { n: Math.min(due, M.REVIEW_SIZE) })} onClick={() => go("lessons", { review: true })} />}
-        <ListRow icon="flame" title={progress.streak.count ? t("lessons.streak", { n: progress.streak.count }) : t("today.streak.none")} sub={doneToday ? t("today.streak.done") : progress.streak.count ? t("today.streak.keep") : t("today.streak.start")} />
-        {mission && <ListRow icon="flag" title={t("today.mission")} sub={mission.title} onClick={() => go("practice")} />}
-        {checkIn && <ListRow icon="calendar" title={t("today.checkin")} sub={t("today.checkin.sub")} onClick={() => go("goals")} />}
+        {[
+          due > 0 && <ListRow key="review" icon="refresh" title={t("review.title")} sub={t("today.review.sub", { n: Math.min(due, M.REVIEW_SIZE) })} onClick={() => go("lessons", { review: true })} />,
+          checkIn && <ListRow key="checkin" icon="calendar" title={t("today.checkin")} sub={t("today.checkin.sub")} onClick={() => go("goals")} />,
+          mission && <ListRow key="mission" icon="flag" title={t("today.mission")} sub={mission.title} onClick={() => go("practice")} />,
+          <ListRow key="streak" icon="flame" title={progress.streak.count ? t("lessons.streak", { n: progress.streak.count }) : t("today.streak.none")} sub={doneToday ? t("today.streak.done") : progress.streak.count ? t("today.streak.keep") : t("today.streak.start")} onClick={openStreak} />,
+        ]
+          .filter(Boolean)
+          .slice(0, 2)}
       </List>
       {planDue ? (
         <PlanPrompt t={t} go={go} />
       ) : (
         <>
           <AgeCard t={t} />
-          <ReminderCard t={t} />
+          {/* The reminder offer only when nothing else needs doing today. */}
+          {!due && !checkIn && <ReminderCard t={t} />}
         </>
       )}
     </div>

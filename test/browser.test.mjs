@@ -20,7 +20,8 @@ import { chromium } from "playwright-core";
 import { ALL_LESSONS, UNITS } from "../src/modules/lessons/content.js";
 import { MISSIONS } from "../src/modules/missions/catalog.js";
 import { newGoal } from "../src/modules/goals/plan.js";
-import { weekStart } from "../src/core/progress.js";
+import { weekStart, dayKey } from "../src/core/progress.js";
+import { daniState } from "../scripts/seed-demo.mjs";
 
 const ROOT = join(import.meta.dirname, "..");
 
@@ -134,6 +135,11 @@ const PLACES = {
 const CALCULATORS = ["Budget planner", "Debt payoff", "Starting early", "Investing range", "Retirement", "Paycheck", "Side hustle"];
 const SCREENS = ["Learn", "Goals", "Practice", "Missions", "Portfolio", "News", "Tools", "Tutor", "Me", "Achievements", "Skills", "Settings"];
 const PANTALLAS = ["Aprender", "Metas", "Práctica", "Misiones", "Portafolio", "Noticias", "Herramientas", "Tutor", "Yo", "Logros", "Habilidades", "Ajustes"];
+// The top bar never repeats the page's own title.
+const noRepeatedTitle = async (page, where) => {
+  const [bar, h1] = await page.evaluate(() => [document.querySelector("header").innerText, (document.querySelector("main h1") || {}).innerText || ""]);
+  assert.ok(!h1 || !bar.includes(h1.trim()), `${where}: the top bar repeats the title "${h1}"`);
+};
 const lessonDays3 = () => [1, 2, 3].map((n) => new Date(Date.now() - n * 864e5).toLocaleDateString("en-CA", { timeZone: "America/Mexico_City" }));
 // The welcome screen, "what for" and "how to start" (from the beginning).
 const onboard = async ({ button }) => (await button("Get started").click(), await button(/^Car/).click(), await button(/^From the beginning/).click());
@@ -246,6 +252,7 @@ try {
       if (!(await menu(name, { ifOpen: true }))) continue;
       await page.waitForTimeout(150);
       await clean(`screen: ${name}`);
+      await noRepeatedTitle(page, name);
       await shut();
     }
     console.log(`ok: all ${SCREENS.length} main screens, no raw text or console errors (English, US)`);
@@ -257,6 +264,7 @@ try {
       if (!(await menu(name, { ifOpen: true }))) continue;
       await page.waitForTimeout(150);
       await clean(`pantalla: ${name}`);
+      await noRepeatedTitle(page, name);
       await shut();
     }
     console.log("ok: the same in Spanish (Mexico): every screen");
@@ -272,6 +280,36 @@ try {
     await button("Start").click();
     await page.getByRole("dialog", { name: "What's a budget?" }).waitFor();
     console.log("ok: one tap from Today to the first lesson");
+    await app.close();
+  }
+
+  // --- Today for a long-time learner: the lesson on top, at most 2 small rows, no reminder offer competing ---
+  {
+    const app = await open({ ...daniState(dayKey()), updatedAt: 1 });
+    const { page, clean } = app;
+    await page.getByRole("heading", { name: "Today" }).waitFor();
+    const order = await page.evaluate(() => {
+      const main = document.querySelector("main");
+      const lesson = [...main.querySelectorAll("button")].find((b) => b.innerText.trim() === "Continue");
+      const list = main.querySelector(".nv-list");
+      return { rows: list.children.length, lessonFirst: !!(lesson.compareDocumentPosition(list) & Node.DOCUMENT_POSITION_FOLLOWING), review: list.innerText.includes("Review") };
+    });
+    assert.ok(order.lessonFirst, "the lesson button comes first");
+    assert.ok(order.rows <= 2, `at most 2 small rows (saw ${order.rows})`);
+    assert.ok(order.review, "a due review is one of them");
+    assert.equal(await page.getByText("Want a daily reminder?").count(), 0, "no reminder offer while something else needs doing");
+    await clean("today, three weeks in");
+    console.log("ok: Today for a long-time learner: the lesson first, at most 2 small rows, no competing reminder offer");
+    await app.close();
+  }
+
+  // --- the streak row opens the streak details ---
+  {
+    const app = await open(learner({ ageBand: "18-25" }, { streak: { count: 2, last: lessonDays3()[0], best: 2, frozen: [] } }));
+    const { page, top } = app;
+    await page.getByRole("button", { name: /^2-day streak/ }).click();
+    await top().getByText("Your streak").first().waitFor();
+    console.log("ok: the streak row on Today opens the streak details");
     await app.close();
   }
 

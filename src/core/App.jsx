@@ -174,19 +174,22 @@ export default function App() {
   const tabOf = (id) => (getModule(id) && getModule(id).nav ? getModule(id).nav.tab : CORE_TAB[id]) || "learn";
   const tab = TABS.find((x) => x.id === tabOf(route.id));
   const isRoot = TABS.some((x) => x.route === route.id) && !(route.id === "me" && route.params.section);
-  const title = route.id === "lessons" ? null : route.id === "me" && route.params.section ? t(`me.section.${route.params.section}`) : t((mod && mod.nav && mod.nav.label) || CORE_TITLE[route.id] || tab.label);
+  // The header never repeats the page's own title: on a tab it shows the
+  // wordmark; deeper in, a back button named for where it goes.
+  const from = route.params.from;
+  const back = from ? (getModule(from) && getModule(from).nav ? getModule(from).nav.label : CORE_TITLE[from]) : tab.label;
   const today = dayKey();
-  const ctx = { t, locale, go, route, session, wide };
+  const ctx = { t, locale, go, route, session, wide, openStreak: () => setStreakOpen(true) };
   const openTab = (x) => (setVisit((v) => v + 1), go(x.route));
 
   const header = (
     <header style={{ position: "sticky", top: 0, zIndex: 20, background: "var(--bg)", padding: "calc(8px + env(safe-area-inset-top)) 12px 6px 16px", display: "flex", alignItems: "center", gap: 6 }}>
       {!isRoot && (
-        <button onClick={() => go(route.params.from || tab.route)} aria-label={t("common.back")} style={{ ...iconBtn, marginLeft: -10 }}>
-          <Icon name="back" />
+        <button onClick={() => go(from || tab.route)} aria-label={`${t("common.back")}: ${t(back)}`} className="nv-press" style={{ ...iconBtn, width: "auto", gap: 2, padding: "0 10px 0 2px", marginLeft: -8, fontSize: 16, fontWeight: 650, minWidth: 0 }}>
+          <Icon name="back" /> <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t(back)}</span>
         </button>
       )}
-      <div style={{ flex: 1, minWidth: 0, fontSize: 18, fontWeight: 700, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{title === null ? <Wordmark size={25} /> : title}</div>
+      <div style={{ flex: 1, minWidth: 0 }}>{isRoot && <Wordmark size={25} />}</div>
       <button onClick={() => setStreakOpen(true)} aria-label={t("streak.aria", { n: progress.streak.count })} className="nv-press" style={{ ...chip, color: "var(--mid)" }}>
         <Icon name="flame" size={18} color={progress.streak.last === today ? "var(--flame)" : "var(--low)"} />
         <span style={{ fontWeight: 650, fontSize: 15, fontVariantNumeric: "tabular-nums" }}>{progress.streak.count}</span>
