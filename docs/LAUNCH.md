@@ -16,6 +16,7 @@ Everything for launch day, in order.
 | Gmail for the app | free | a parent or guardian, or you with their OK |
 | Twelve Data (real delayed prices) | free plan; optional | anyone |
 | A web address | none needed: the app gets `https://<name>.fly.dev` | — |
+| Your own domain (optional) | about **$10–15 a year** for `northvalelearn.com`. Fly.io sets up the HTTPS certificate; check fly.io's pricing page for its current cost before adding it. | a parent or guardian (18+) |
 
 Nothing else costs money. Nothing is charged automatically beyond Fly.io's small monthly bill and the AI credit you choose to buy.
 
@@ -56,6 +57,14 @@ At **twelvedata.com**, sign up and copy the API key. Without it, the practice po
    ```
 
 2. **The app's name** becomes its address: `https://northvale-learn.fly.dev`. If you want another name, tell the builder now, because it has to match in a few files.
+
+### 4b. Your own domain (optional)
+
+If you'd like testers to see `northvalelearn.com` instead of `northvale-learn.fly.dev`:
+1. The adult buys `northvalelearn.com` at any registrar (Cloudflare, Porkbun, Namecheap, GoDaddy…). Keep the login handy: at deploy time you'll add two or three DNS records there, and the builder will tell you exactly which.
+2. Tell the builder you have it.
+
+**Decide before inviting testers.** Each phone keeps a tester's progress under the address they first used. A tester without an account who moves to a new address later would start over, and everyone would have to sign in again. Skipping this is fine: the `fly.dev` address works the same.
 
 ### 5. Fill in `.env`
 
@@ -133,6 +142,13 @@ The builder works in your Terminal, signed in to your Fly.io account. Your keys 
    - `fly volumes create northvale_data --size 1 --region dfw`. That's 1 GB, with daily snapshots kept 14 days.
 3. **Hand the settings to Fly as secrets**, straight from `.env`: `fly secrets import`. They're encrypted on Fly and never in the code or the logs.
 4. **Deploy:** `fly deploy`.
+   - **Optional, if you bought a domain (step 4b): your own address with HTTPS.**
+     1. `fly certs add northvalelearn.com` and `fly certs add www.northvalelearn.com`. Fly sets up HTTPS certificates for both (see the costs table).
+     2. `fly ips list` (or `fly certs setup northvalelearn.com`) shows the DNS records. You add them at the registrar: an **A** record and an **AAAA** record for `northvalelearn.com` with the app's IPv4 and IPv6 addresses, and a **CNAME** record for `www` pointing to `northvale-learn.fly.dev`.
+     3. `fly certs check northvalelearn.com` until it says the certificate is issued (minutes, sometimes up to an hour).
+     4. The builder adds both names to `ALLOWED_HOSTS` in `fly.toml`: `"northvale-learn.fly.dev,northvalelearn.com,www.northvalelearn.com"`. Without this, the server refuses the new address ("Unknown host").
+     5. `fly secrets set PUBLIC_URL=https://northvalelearn.com`, so emails, share previews and invite links use the new address. Then `fly deploy` again.
+     6. The live checks below run on `https://northvalelearn.com`. The `fly.dev` address keeps working too.
 5. **Live checks**, each one reported back as passed or failed:
    - the health check `/healthz`;
    - the landing pages `/welcome` and `/bienvenida`;

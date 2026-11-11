@@ -6,7 +6,7 @@
 import { useState } from "react";
 import { update } from "./store.js";
 import { LANGS, REGIONS } from "./i18n.js";
-import { Button, Wordmark, Icon } from "./ui.jsx";
+import { Button, Mark, Wordmark, Icon } from "./ui.jsx";
 import { AccountForm } from "./Settings.jsx";
 import { track } from "./analytics.js";
 import { allModules } from "./registry.js";
@@ -80,8 +80,10 @@ export default function Onboarding({ t, locale, onDone }) {
     return (
       <div className="nv-in" style={{ maxWidth: 520, margin: "0 auto", minHeight: "100dvh", display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", padding: "calc(24px + env(safe-area-inset-top)) 22px calc(24px + env(safe-area-inset-bottom))" }}>
         <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: 10 }}>
+          <Mark size={72} />
           <Wordmark size={52} />
           <div style={{ fontSize: 13, fontWeight: 650, letterSpacing: 4, color: "var(--low)" }}>LEARN</div>
+          <div style={{ fontSize: 15, color: "var(--mid)", marginTop: 2 }}>{t("brand.tagline")}</div>
           <h1 style={{ fontSize: 30, fontWeight: 750, letterSpacing: -0.6, lineHeight: 1.15, margin: "48px 0 0" }}>{t("onb.tagline")}</h1>
           <p style={{ fontSize: 17, color: "var(--mid)", maxWidth: 340, lineHeight: 1.45, margin: "4px 0 0" }}>{t("onb.tagline.sub")}</p>
         </div>

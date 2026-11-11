@@ -205,6 +205,7 @@ export default function Me({ t, locale, session, go, route }) {
       <List style={{ marginTop: 12 }}>
         <ListRow icon="settings" title={t("nav.settings")} onClick={() => go("settings")} />
         <ListRow icon="chat" title={t("fb.title")} onClick={() => service("feedback", "open")({})} />
+        <ListRow icon="star" title={t("me.promise")} onClick={() => go("legal", { doc: "promise", from: "me" })} />
         <ListRow icon="shield" title={t("me.legal")} onClick={() => go("legal", { doc: "privacy", from: "me" })} />
       </List>
     </div>

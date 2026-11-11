@@ -52,7 +52,8 @@ addStrings({
   "streak.cta": S("Start a lesson", "Empezar una lección"),
   "badge.earned": S("Achievement: {name}", "Logro: {name}"),
 
-  "onb.tagline": S("Learn money by doing.", "Aprende de dinero haciendo."),
+  "brand.tagline": S("Find your open water", "Rumbo a mar abierto"),
+  "onb.tagline": S("Learn money by doing.", "Aprende de dinero practicando."),
   "onb.tagline.sub": S("Three-minute lessons, a goal to learn for, and practice with pretend money.", "Lecciones de tres minutos, una meta para aprender y dinero de práctica para probar."),
   "onb.step": S("{n} of {total}", "{n} de {total}"),
   "onb.start": S("Get started", "Empezar"),
@@ -177,6 +178,7 @@ addStrings({
   "me.skills.sub": S("What you know well, and what to refresh", "Lo que ya dominas y lo que conviene repasar"),
   "me.invite.sub": S("Learn with a friend, with a private link", "Aprende con alguien, con un enlace privado"),
   "me.legal": S("Privacy & terms", "Privacidad y términos"),
+  "me.promise": S("Our promise", "Nuestra promesa"),
 
   "league.title": S("Weekly league", "Liga semanal"),
   "league.join": S("Join the weekly league", "Únete a la liga semanal"),
