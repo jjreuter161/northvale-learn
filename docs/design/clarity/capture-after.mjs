@@ -2,7 +2,7 @@
 // capture-before.mjs (a new learner's first minutes, and Dani three weeks
 // in), in the rebuilt app on a phone screen — English (US), plus a few in
 // Spanish (Mexico) and dark mode.
-//   npm run build && node docs/design/clarity/capture-after.mjs
+//   npm run build && node docs/design/clarity/capture-after.mjs [folder]
 import { spawn } from "node:child_process";
 import { mkdtempSync, mkdirSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -12,7 +12,7 @@ import { daniState } from "../../../scripts/seed-demo.mjs";
 import { dayKey } from "../../../src/core/progress.js";
 
 const ROOT = join(import.meta.dirname, "../../..");
-const OUT = join(import.meta.dirname, "after");
+const OUT = process.argv[2] || join(import.meta.dirname, "after");
 mkdirSync(OUT, { recursive: true });
 const port = 20000 + Math.floor(Math.random() * 20000);
 const env = { ...process.env, NORTHVALE_DOTENV: "0", PORT: String(port), NORTHVALE_DATA: mkdtempSync(join(tmpdir(), "nvl-after-")), ANTHROPIC_API_KEY: "", TWELVEDATA_API_KEY: "", SMTP_USER: "", SMTP_PASS: "", NEWS_FEEDS: JSON.stringify({ US: [], MX: [] }) };

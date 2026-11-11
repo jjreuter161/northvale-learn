@@ -56,7 +56,7 @@ function wrap(ctx, text, width) {
   }
   return lines;
 }
-// A 1080×1080 PNG: navy, the wordmark, the line, a green rule, the fine print.
+// A 1080×1080 PNG: navy, the wordmark in cream, the line, a sand rule, the fine print.
 async function draw([big, sub], footer) {
   await document.fonts.ready.catch(() => {});
   const c = document.createElement("canvas");
@@ -64,7 +64,7 @@ async function draw([big, sub], footer) {
   const x = c.getContext("2d");
   x.fillStyle = "#13315C";
   x.fillRect(0, 0, 1080, 1080);
-  x.fillStyle = "#FFFFFF";
+  x.fillStyle = "#F7F2E8";
   x.textBaseline = "alphabetic";
   x.font = `650 76px ${SERIF}`;
   x.fillText("Northvale", 96, 170);
@@ -76,9 +76,9 @@ async function draw([big, sub], footer) {
   const lines = wrap(x, big, 888).slice(0, 4);
   let y = 560 - (lines.length - 1) * 58;
   for (const l of lines) (x.fillText(l, 96, y), (y += 116));
-  x.fillStyle = "#4DB892";
+  x.fillStyle = "#E3CFA4";
   x.fillRect(96, y - 70, 120, 10);
-  x.fillStyle = "#FFFFFF";
+  x.fillStyle = "#F7F2E8";
   x.font = `500 46px ${FONT}`;
   x.globalAlpha = 0.9;
   for (const l of wrap(x, sub, 888).slice(0, 3)) (x.fillText(l, 96, y + 10), (y += 60));
