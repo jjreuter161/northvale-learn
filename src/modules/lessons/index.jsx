@@ -37,6 +37,7 @@ addStrings({
   "lessons.streak_today": S("Today's lesson is done. Your streak is safe.", "La lección de hoy está hecha. Tu racha está a salvo."),
   "lessons.streak_keep": S("Do one lesson to keep your {n}-day streak.", "Haz una lección para mantener tu racha de {n} {n|día|días}."),
   "lessons.streak_start": S("Do one lesson to start a streak.", "Haz una lección para empezar una racha."),
+  "lessons.course_done": S("You finished the whole course. Open water ahead.", "Terminaste todo el curso. Hay mar abierto por delante."),
   "lessons.all_done": S("You've finished every lesson. Review any of them, or keep working on your goals.", "Terminaste todas las lecciones. Repasa las que quieras o sigue avanzando en tus metas."),
   "lessons.quit.title": S("Leave this lesson?", "¿Salir de esta lección?"),
   "lessons.quit.body": S("You'll lose your progress in this lesson.", "Vas a perder tu avance en esta lección."),
@@ -163,7 +164,10 @@ function Today({ t, locale, go, openStreak }) {
             </Button>
           </>
         ) : (
-          <div style={{ fontSize: 17, fontWeight: 600, lineHeight: 1.45 }}>{t("lessons.all_done")}</div>
+          <>
+            <div style={{ fontSize: 22, fontWeight: 750, letterSpacing: -0.3, lineHeight: 1.25, color: "var(--head)" }}>{t("lessons.course_done")}</div>
+            <p style={{ fontSize: 15, lineHeight: 1.5, color: "var(--mid)", margin: "8px 0 0" }}>{t("lessons.all_done")}</p>
+          </>
         )}
         {toward && (
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 14, fontSize: 14, color: "var(--mid)" }}>
@@ -343,8 +347,10 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
     saveConcepts((c) => M.applySession(c, firsts.current, dayKey()));
     if (mode !== "lesson") return setResult(recordReview({ kind: mode, mistakes }));
     const wasUnitDone = unitDone(getState().progress, unit);
+    const allDone = () => UNITS.every((u) => unitDone(getState().progress, u));
+    const wasAllDone = allDone();
     const r = recordLesson({ id: lesson.id, perfect: mistakes === 0, mistakes });
-    setResult({ ...r, unitJustDone: !wasUnitDone && unitDone(getState().progress, unit) });
+    setResult({ ...r, unitJustDone: !wasUnitDone && unitDone(getState().progress, unit), courseJustDone: !wasAllDone && allDone() });
   };
   // The answer so far: what was picked, or the type's starting answer.
   const value = step && isQuestion(step) && picked === null ? startValue(step, locale.region) : picked;
@@ -413,6 +419,7 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
             <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: -0.4, margin: 0 }}>{t("lessons.complete")}</h1>
             <p style={{ color: "var(--mid)", margin: "6px 0 0" }}>{tx(lesson.title)}</p>
             <p style={{ fontSize: 14, color: "var(--mid)", margin: "10px 0 0" }}>{facts.join("  ·  ")}</p>
+            {result.courseJustDone && <p style={{ fontSize: 19, fontWeight: 700, color: "var(--head)", margin: "16px 0 0", lineHeight: 1.35 }}>{t("lessons.course_done")}</p>}
           </div>
           <Card>
             <p style={{ fontSize: 16, lineHeight: 1.5, margin: 0 }}>{t(`why.${lesson.unit}`)}</p>

@@ -359,8 +359,29 @@ export function Title({ children, sub, right }) {
 }
 export const Label = ({ children, style }) => <h2 style={{ fontSize: 18, fontWeight: 700, letterSpacing: -0.2, color: "var(--ink)", margin: "28px 0 10px", ...style }}>{children}</h2>;
 
-export function Wordmark({ size = 24 }) {
-  return <span style={{ fontFamily: SERIF, fontWeight: 650, fontSize: size, letterSpacing: -0.3, lineHeight: 1, color: "var(--head)" }}>Northvale</span>;
+// THE LOGO — a sail under the north star (docs/design/brand), in one
+// color. web/icon.svg, the landing pages and share cards draw the same paths.
+export const MARK_PATHS = ["M50 4L53 13L62 16L53 19L50 28L47 19L38 16L47 13Z", "M46 32V74H20Z", "M52 42V74H74Z", "M14 80H86L76 92H24Z"];
+export function Mark({ size = 24, color = "var(--head)" }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 100 100" aria-hidden="true" style={{ display: "block", flexShrink: 0 }}>
+      {MARK_PATHS.map((d) => (
+        <path key={d} d={d} fill={color} />
+      ))}
+    </svg>
+  );
+}
+// The name in the brand serif; with `mark`, the logo before it.
+export function Wordmark({ size = 24, mark }) {
+  const word = <span style={{ fontFamily: SERIF, fontWeight: 650, fontSize: size, letterSpacing: -0.3, lineHeight: 1, color: "var(--head)" }}>Northvale</span>;
+  return mark ? (
+    <span style={{ display: "inline-flex", alignItems: "center", gap: Math.round(size * 0.28) }}>
+      <Mark size={Math.round(size * 1.15)} />
+      {word}
+    </span>
+  ) : (
+    word
+  );
 }
 
 // TOASTS — short notes at the top ("+5 XP", "Saved"). Anyone can call toast().

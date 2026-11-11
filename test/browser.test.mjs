@@ -164,6 +164,7 @@ try {
     const app = await open();
     const { page, top, button, clean, menu, shut } = app;
     await clean("welcome");
+    await page.getByText("Find your open water", { exact: true }).waitFor();
     await button("Get started").click();
     await page.getByRole("heading", { name: "What do you want to learn money skills for?" }).waitFor();
     await clean("what for");
@@ -416,6 +417,26 @@ try {
     await top().getByText("Your streak").first().waitFor();
     console.log("ok: the streak row on Today opens the streak details");
     await app.close();
+  }
+
+  // --- the brand: "Our promise" from Me and by link (Spanish), the Spanish tagline on the welcome screen ---
+  {
+    const app = await open(learner({ ageBand: "18-25" }));
+    await app.menu("Me");
+    await app.button(/^Our promise/).click();
+    await app.page.getByRole("heading", { name: "Our promise", exact: true }).waitFor();
+    await app.page.getByText("Nobody pays us to recommend anything.", { exact: false }).waitFor();
+    await app.clean("our promise");
+    await app.page.goto(`${BASE}?legal=promise&lang=es`);
+    await app.page.getByRole("heading", { name: "Nuestra promesa", exact: true }).waitFor();
+    await app.page.getByText("Rumbo a mar abierto.", { exact: false }).waitFor();
+    await app.clean("nuestra promesa");
+    await app.close();
+    const es = await open({ ...learner({}), profile: { onboarded: false, nickname: "", avatar: 0 }, settings: { lang: "es", region: "MX", look: "white", reduceMotion: true } });
+    await es.page.getByText("Rumbo a mar abierto", { exact: true }).waitFor();
+    await es.clean("bienvenida");
+    await es.close();
+    console.log("ok: the brand: “Our promise” (English, and Spanish by link), the tagline on the welcome screen in Spanish");
   }
 
   // --- the lesson-3 survey can't be lost: missed (app closed first), it shows on the next open; answered, never again ---
@@ -798,8 +819,8 @@ try {
 
   // --- the landing page and its waitlist, in English and Spanish ---
   const LANDING = [
-    { path: "welcome", lang: "en", country: "US", labels: ["Email", "Country", "I'm a…", "Age range"], join: "Join the waitlist", young: "Northvale Learn is for ages 13 and up, so we can't add you to the list.", teen: "Please check with a parent or guardian before you join the list.", guardian: "A parent or guardian says it's OK.", guardianErr: "Check with a parent or guardian first, then tick the box.", done: "You're on the list.", leaveNow: "Changed your mind? Take me off the list", leaveLink: "Take me off the list", left: "You're off the list.", teacher: "Join as a teacher", privacy: "privacy policy", heading: "Privacy Policy" },
-    { path: "bienvenida", lang: "es", country: "MX", labels: ["Correo", "País", "Soy…", "Edad"], join: "Unirme a la lista de espera", young: "Northvale Learn es para mayores de 13 años, así que no podemos agregarte a la lista.", teen: "Antes de unirte a la lista, pregúntale a tu mamá, papá o tutor.", guardian: "Mi mamá, papá o tutor está de acuerdo.", guardianErr: "Primero pregúntale a tu mamá, papá o tutor y luego marca la casilla.", done: "Ya estás en la lista.", leaveNow: "¿Cambiaste de opinión? Sácame de la lista", leaveLink: "Sácame de la lista", left: "Ya saliste de la lista.", teacher: "Unirme como docente", privacy: "aviso de privacidad", heading: "Aviso de privacidad" },
+    { path: "welcome", lang: "en", country: "US", tagline: "Find your open water.", story: "Find your open water", promise: "Our promise", labels: ["Email", "Country", "I'm a…", "Age range"], join: "Join the waitlist", young: "Northvale Learn is for ages 13 and up, so we can't add you to the list.", teen: "Please check with a parent or guardian before you join the list.", guardian: "A parent or guardian says it's OK.", guardianErr: "Check with a parent or guardian first, then tick the box.", done: "You're on the list.", leaveNow: "Changed your mind? Take me off the list", leaveLink: "Take me off the list", left: "You're off the list.", teacher: "Join as a teacher", privacy: "privacy policy", heading: "Privacy Policy" },
+    { path: "bienvenida", lang: "es", country: "MX", tagline: "Rumbo a mar abierto.", story: "Rumbo a mar abierto", promise: "Nuestra promesa", labels: ["Correo", "País", "Soy…", "Edad"], join: "Unirme a la lista de espera", young: "Northvale Learn es para mayores de 13 años, así que no podemos agregarte a la lista.", teen: "Antes de unirte a la lista, pregúntale a tu mamá, papá o tutor.", guardian: "Mi mamá, papá o tutor está de acuerdo.", guardianErr: "Primero pregúntale a tu mamá, papá o tutor y luego marca la casilla.", done: "Ya estás en la lista.", leaveNow: "¿Cambiaste de opinión? Sácame de la lista", leaveLink: "Sácame de la lista", left: "Ya saliste de la lista.", teacher: "Unirme como docente", privacy: "aviso de privacidad", heading: "Aviso de privacidad" },
   ];
   for (const L of LANDING) {
     const context = await browser.newContext({ viewport: { width: 390, height: 800 }, locale: L.lang === "es" ? "es-MX" : "en-US", serviceWorkers: "block", reducedMotion: "reduce" });
@@ -825,6 +846,10 @@ try {
     assert.deepEqual(text.match(BROKEN) || [], [], `${L.path}: broken text`);
     assert.ok(!text.includes("{{"), `${L.path}: an unfilled address`);
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, `${L.path}: no sideways scrolling on a phone`);
+    assert.equal(await page.locator("header .mark svg.logo").count(), 1, `${L.path}: the logo in the header`);
+    await page.getByText(L.tagline, { exact: true }).waitFor();
+    await page.getByRole("heading", { name: L.story, exact: true }).waitFor();
+    assert.ok((await page.getByRole("link", { name: L.promise }).count()) >= 1, `${L.path}: a link to ${L.promise}`);
     const [email, country, role, age] = L.labels.map((x) => page.getByLabel(x, { exact: false }).first());
     // Under 13: no sign-up.
     await age.selectOption("under13");
@@ -871,6 +896,8 @@ try {
     const seed = { version: 1, updatedAt: 1, profile: { onboarded: true, nickname: "", ageBand: "18-25", avatar: 0 }, settings: { lang: "en", region: "US", look: "white", reduceMotion: true }, progress: { xp: 600, days: {}, streak: { count: 0, last: null, best: 0, frozen: [] }, freezes: 1, dailyGoal: 20, lessons, lessonDays: [], badges: {}, counters: {}, practiced: {}, startUnit: "budget", placed: [] }, modules: {} };
     const app = await open(seed);
     const { page, top, button, clean, menu, shut } = app;
+    await page.getByText("You finished the whole course. Open water ahead.").waitFor();
+    console.log("ok: finishing the whole course: “Open water ahead.”");
 
     await menu("Portfolio");
     await button(/^VOO/).click();

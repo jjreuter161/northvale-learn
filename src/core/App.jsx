@@ -65,7 +65,7 @@ export default function App() {
   // the landing page's links — the same files the app shows.
   const [legalPage] = useState(() => {
     const q = new URLSearchParams(location.search);
-    return ["privacy", "terms", "teacher"].includes(q.get("legal")) ? { doc: q.get("legal"), lang: ["en", "es"].includes(q.get("lang")) ? q.get("lang") : settings.lang } : null;
+    return ["privacy", "terms", "teacher", "promise"].includes(q.get("legal")) ? { doc: q.get("legal"), lang: ["en", "es"].includes(q.get("lang")) ? q.get("lang") : settings.lang } : null;
   });
   // Opened from a teacher's class link: that comes first, not "welcome back".
   const [classLink] = useState(() => new URLSearchParams(location.search).has("join"));
@@ -189,7 +189,7 @@ export default function App() {
           <Icon name="back" /> <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t(back)}</span>
         </button>
       )}
-      <div style={{ flex: 1, minWidth: 0 }}>{isRoot && <Wordmark size={25} />}</div>
+      <div style={{ flex: 1, minWidth: 0 }}>{isRoot && <Wordmark size={25} mark />}</div>
       <button onClick={() => setStreakOpen(true)} aria-label={t("streak.aria", { n: progress.streak.count })} className="nv-press" style={{ ...chip, color: "var(--mid)" }}>
         <Icon name="flame" size={18} color={progress.streak.last === today ? "var(--flame)" : "var(--low)"} />
         <span style={{ fontWeight: 650, fontSize: 15, fontVariantNumeric: "tabular-nums" }}>{progress.streak.count}</span>

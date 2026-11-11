@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { useAppState } from "./store.js";
 import { addStrings } from "./i18n.js";
 import { track } from "./analytics.js";
-import { FONT, SERIF, Button, Note, Sheet, Switch } from "./ui.jsx";
+import { FONT, SERIF, MARK_PATHS, Button, Note, Sheet, Switch } from "./ui.jsx";
 import { inviteUrl } from "./invites.jsx";
 
 const S = (en, es) => ({ en, es });
@@ -56,7 +56,7 @@ function wrap(ctx, text, width) {
   }
   return lines;
 }
-// A 1080×1080 PNG: navy, the wordmark in cream, the line, a sand rule, the fine print.
+// A 1080×1080 PNG: navy, the logo and wordmark in cream, the line, a sand rule, the fine print.
 async function draw([big, sub], footer) {
   await document.fonts.ready.catch(() => {});
   const c = document.createElement("canvas");
@@ -66,11 +66,16 @@ async function draw([big, sub], footer) {
   x.fillRect(0, 0, 1080, 1080);
   x.fillStyle = "#F7F2E8";
   x.textBaseline = "alphabetic";
+  x.save();
+  x.translate(92, 104);
+  x.scale(0.86, 0.86);
+  for (const d of MARK_PATHS) x.fill(new Path2D(d));
+  x.restore();
   x.font = `650 76px ${SERIF}`;
-  x.fillText("Northvale", 96, 170);
+  x.fillText("Northvale", 196, 170);
   x.font = `650 30px ${FONT}`;
   x.globalAlpha = 0.7;
-  x.fillText("L E A R N", 100, 222);
+  x.fillText("L E A R N", 200, 222);
   x.globalAlpha = 1;
   x.font = `700 104px ${FONT}`;
   const lines = wrap(x, big, 888).slice(0, 4);

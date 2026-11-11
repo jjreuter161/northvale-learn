@@ -6,8 +6,10 @@ import termsEn from "../../docs/legal/terms.en.md";
 import termsEs from "../../docs/legal/terms.es.md";
 import teacherEn from "../../docs/legal/teacher.en.md";
 import teacherEs from "../../docs/legal/teacher.es.md";
+import promiseEn from "../../docs/legal/promise.en.md";
+import promiseEs from "../../docs/legal/promise.es.md";
 
-const DOCS = { privacy: { en: privacyEn, es: privacyEs }, terms: { en: termsEn, es: termsEs }, teacher: { en: teacherEn, es: teacherEs } };
+const DOCS = { privacy: { en: privacyEn, es: privacyEs }, terms: { en: termsEn, es: termsEs }, teacher: { en: teacherEn, es: teacherEs }, promise: { en: promiseEn, es: promiseEs } };
 
 // Just enough Markdown for these pages: headings, lists, **bold**.
 function Md({ text }) {

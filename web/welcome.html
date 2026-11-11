@@ -37,6 +37,9 @@
       header { position: sticky; top: 0; z-index: 5; background: rgba(247, 242, 232, .94); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line) }
       header .wrap { display: flex; align-items: center; gap: 12px; min-height: 60px; padding-top: env(safe-area-inset-top) }
       .mark { font-family: "EB Garamond", Georgia, serif; font-weight: 650; font-size: 26px; letter-spacing: -.3px; color: var(--ink); text-decoration: none; line-height: 1 }
+      .mark { display: inline-flex; align-items: center; gap: 8px }
+      .mark .logo { width: 1.15em; height: 1.15em; fill: var(--head); flex-shrink: 0 }
+      .tagline { font-family: "EB Garamond", Georgia, serif; font-weight: 650; font-size: clamp(22px, 4.5vw, 28px); color: var(--head); margin: -4px 0 14px }
       .mark small { font-family: Inter, sans-serif; font-size: 11px; font-weight: 650; letter-spacing: 2.5px; color: var(--low); margin-left: 6px; vertical-align: 3px }
       .grow { flex: 1 }
       .lang { font-size: 15px; font-weight: 600; text-decoration: none; padding: 10px 6px }
@@ -98,7 +101,7 @@
   <body>
     <header>
       <div class="wrap">
-        <a class="mark" href="/welcome">Northvale<small>LEARN</small></a>
+        <a class="mark" href="/welcome"><svg class="logo" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 4L53 13L62 16L53 19L50 28L47 19L38 16L47 13Z"/><path d="M46 32V74H20Z"/><path d="M52 42V74H74Z"/><path d="M14 80H86L76 92H24Z"/></svg>Northvale<small>LEARN</small></a>
         <span class="grow"></span>
         <a class="lang" href="/bienvenida" hreflang="es" lang="es">Español</a>
         <a class="btn small" href="#join">Join the beta</a>
@@ -110,6 +113,7 @@
         <div>
           <span class="pill">Free beta · US and Mexico</span>
           <h1>Learn money by doing.</h1>
+          <p class="tagline">Find your open water.</p>
           <p class="lead">Northvale Learn is an app for ages 13 and up. Set a goal, learn what it takes in three-minute lessons, and practice with pretend money — in English or Spanish.</p>
           <div class="ctas">
             <a class="btn" href="#join">Join the beta</a>
@@ -171,7 +175,15 @@
         </div>
       </section>
 
-      <section class="band" id="teachers" aria-labelledby="teach">
+      <section class="band" aria-labelledby="story">
+        <div class="wrap">
+          <h2 id="story">Find your open water</h2>
+          <p class="lead" style="max-width: 640px">Out on open water, you choose where you go. Nobody else sets your course, and that's about as free as a person gets. But you can't sail far until your money is under control: knowing where it goes, keeping some of it, and making it grow. That's what Northvale is for. Find your open water.</p>
+          <p style="max-width: 640px"><a href="/?legal=promise&amp;lang=en">Our promise</a>: no ads, we never sell your data, and nobody pays us to recommend anything.</p>
+        </div>
+      </section>
+
+      <section id="teachers" aria-labelledby="teach">
         <div class="wrap">
           <h2 id="teach">For teachers and clubs</h2>
           <p class="lead" style="margin-bottom: 14px">Classroom mode is coming soon. We're testing it with a few teachers now.</p>
@@ -185,7 +197,7 @@
         </div>
       </section>
 
-      <section id="join" aria-labelledby="joinh">
+      <section class="band" id="join" aria-labelledby="joinh">
         <div class="wrap">
           <h2 id="joinh">Join the beta</h2>
           <p class="lead">Leave your email and we'll write when there's a spot for you. We'll use it only to tell you about the beta.</p>
@@ -253,10 +265,11 @@
 
     <footer>
       <div class="wrap">
-        <a class="mark" href="/welcome" style="font-size: 22px">Northvale<small>LEARN</small></a>
+        <a class="mark" href="/welcome" style="font-size: 22px"><svg class="logo" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 4L53 13L62 16L53 19L50 28L47 19L38 16L47 13Z"/><path d="M46 32V74H20Z"/><path d="M52 42V74H74Z"/><path d="M14 80H86L76 92H24Z"/></svg>Northvale<small>LEARN</small></a>
         <p style="margin: 12px 0 0; max-width: 46em">Educational only — not financial advice. All money in Northvale Learn is pretend, and nothing in it is a recommendation to buy or sell anything. Talk with a trusted adult or a licensed professional before real money decisions.</p>
         <nav aria-label="More">
           <a href="/?legal=privacy&amp;lang=en">Privacy policy</a>
+          <a href="/?legal=promise&amp;lang=en">Our promise</a>
           <a href="/?legal=terms&amp;lang=en">Terms of use</a>
           <a href="/bienvenida" hreflang="es" lang="es">Español</a>
           <a href="/">Open the app</a>
