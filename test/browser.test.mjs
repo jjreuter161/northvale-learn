@@ -468,7 +468,7 @@ try {
     await page.getByRole("button", { name: /^Your money week/ }).click();
     await top().getByText("You learned").waitFor();
     await top().getByText(/^For next week$/).waitFor();
-    await top().getByText(/^Car: \$[\d,]+ → \$[\d,]+$/).waitFor();
+    await top().getByText(/^Car: \$[\d,]+ so far$/).waitFor(); // no check-ins yet, so no "from → to"
     await clean("your money week");
     await button("Not this week", top()).click();
     await page.waitForFunction(() => !!JSON.parse(localStorage.getItem("northvale-learn-v1")).modules.goals.checkIn);

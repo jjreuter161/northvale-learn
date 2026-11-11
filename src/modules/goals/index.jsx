@@ -49,6 +49,7 @@ addStrings({
   "mw.best": S("Your best so far", "Tu mejor racha hasta ahora"),
   "mw.going": S("Still going", "Sigue en pie"),
   "mw.goal.sub": S("{pct}% of the way there", "{pct}% del camino"),
+  "mw.goal.same": S("{name}: {saved} so far", "{name}: {saved} por ahora"),
   "mw.next": S("For next week", "Para la próxima semana"),
   "mw.next.body": S("Next up: “{lesson}”, in {unit}. {why}", "Sigue: “{lesson}”, de {unit}. {why}"),
   "rc.title": S("The real cost", "El costo real"),
@@ -1071,7 +1072,7 @@ function WeekStory({ t, locale, go, onClose }) {
         {line("book", t("mw.learned"), learned.length ? t("mw.learned.n", { n: learned.length, unit: text(top.title, locale) }) : t("mw.learned.none"))}
         {solid.length > 0 && line("star", t("mw.solid"), solid.slice(0, 2).map((x) => text(x, locale)).join(" · "))}
         {progress.streak.count > 0 && line("flame", t("mw.streak", { n: progress.streak.count }), progress.streak.count >= progress.streak.best ? t("mw.best") : t("mw.going"))}
-        {row && line(P.template(row.g.template).icon, `${nameOf(row.g, t)}: ${fmt(row.saved - change)} → ${fmt(row.saved)}`, t("mw.goal.sub", { pct: Math.floor(row.pct) }))}
+        {row && line(P.template(row.g.template).icon, change ? `${nameOf(row.g, t)}: ${fmt(row.saved - change)} → ${fmt(row.saved)}` : t("mw.goal.same", { name: nameOf(row.g, t), saved: fmt(row.saved) }), t("mw.goal.sub", { pct: Math.floor(row.pct) }))}
       </List>
       {next && nextUnit && (
         <Card style={{ marginTop: 12, background: "var(--brandSoft)" }}>

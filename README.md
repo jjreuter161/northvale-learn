@@ -1,6 +1,6 @@
 # Northvale Learn
 
-Learn money by doing: three-minute lessons, a goal to learn for, and practice with pretend money. It's educational only: no real money, no real trades, no bank connections.
+Learn money by doing: four-minute lessons, a goal to learn for, and practice with pretend money. It's educational only: no real money, no real trades, no bank connections.
 
 - **Four tabs, no menu.** A bottom tab bar that never changes shape: **Learn**, **Goals**, **Practice** and **Me**, with a labeled **Ask** button (the tutor) at the top right of every tab and in the lesson bar.
   - **Learn** opens on **Today**: the next lesson as the one big button, one line on why it matters, and "Building toward: your car". Below it are small rows: review (when ideas are due), the streak, this week's mission and the Sunday check-in. There is at most one question for the learner at a time (the goal's amount and date after the first lesson, the age range, reminders). Under Today is the course: finished units fold to one row, the current unit is open with one Start button, and later units fold too.

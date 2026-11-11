@@ -20,7 +20,7 @@ addStrings({
   "back.goal": S("Your goal", "Tu meta"),
   "back.next": S("Next lesson", "Siguiente lección"),
   "back.start": S("Ease back in: {title}", "Retoma con: {title}"),
-  "back.minutes": S("{unit} · about 3 minutes", "{unit} · unos 3 minutos"),
+  "back.minutes": S("{unit} · about 4 minutes", "{unit} · unos 4 minutos"),
   "back.review": S("Review what you learned", "Repasa lo que aprendiste"),
   "back.later": S("Not now", "Ahora no"),
   "repair.offer": S("Your {n}-day streak ended. You have one free repair a month: bring it back now, and keep going from there.", "Tu racha de {n} {n|día|días} terminó. Tienes una reparación gratis al mes: recupérala ahora y sigue desde ahí."),

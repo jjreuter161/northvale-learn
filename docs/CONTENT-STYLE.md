@@ -36,7 +36,7 @@ People aged 15–25, many of them earning for the first time, in the US and Mexi
   - Instead: "That didn't go through. Check your connection and try again. Nothing you did was lost."
 - **Finishes are calm.** A number, one sentence, the next step. No confetti words ("Amazing!!", "Crushing it").
 - **Reminders invite; they never guilt-trip.** No "you'll lose", no countdowns, no exclamation marks.
-  - "Your 12-day streak is still on. One 3-minute lesson keeps it that way."
+  - "Your 12-day streak is still on. One short lesson keeps it that way."
 - **Buttons are verbs that say what happens:** "Start mission", "Make a plan", "Leave", not "OK" or "Submit".
 - **Texts the tests check word for word stay put.** Change them only together with the test.
 

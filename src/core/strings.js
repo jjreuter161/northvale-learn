@@ -54,7 +54,7 @@ addStrings({
 
   "brand.tagline": S("Find your open water", "Rumbo a mar abierto"),
   "onb.tagline": S("Learn money by doing.", "Aprende de dinero practicando."),
-  "onb.tagline.sub": S("Three-minute lessons, a goal to learn for, and practice with pretend money.", "Lecciones de tres minutos, una meta para aprender y dinero de práctica para probar."),
+  "onb.tagline.sub": S("Four-minute lessons, a goal to learn for, and practice with pretend money.", "Lecciones de cuatro minutos, una meta para aprender y dinero de práctica para probar."),
   "onb.step": S("{n} of {total}", "{n} de {total}"),
   "onb.start": S("Get started", "Empezar"),
   "onb.have_account": S("I already have an account", "Ya tengo cuenta"),

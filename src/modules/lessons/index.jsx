@@ -57,7 +57,7 @@ addStrings({
   "lessons.course_done": S("You finished the whole course. Open water ahead.", "Terminaste todo el curso. Hay mar abierto por delante."),
   "lessons.all_done": S("Reviews keep it fresh, and your goals are waiting.", "Los repasos lo mantienen fresco, y tus metas te esperan."),
   "lessons.quit.title": S("Leave now?", "¿Salir ahora?"),
-  "lessons.quit.body": S("This lesson starts over next time. It's only 3 minutes.", "La lección empieza de nuevo la próxima vez. Son solo 3 minutos."),
+  "lessons.quit.body": S("This lesson starts over next time. It's only about 4 minutes.", "La lección empieza de nuevo la próxima vez. Son solo unos 4 minutos."),
   "lessons.quit.yes": S("Leave", "Salir"),
   "lessons.quit.no": S("Keep going", "Seguir"),
   "lessons.true": S("True", "Verdadero"),
@@ -108,7 +108,7 @@ addStrings({
   "myth.is.myth": S("it's a myth", "es un mito"),
   "myth.is.fact": S("it's a fact", "es realidad"),
   "myth.right": S("Right: {it}.", "Correcto: {it}."),
-  "myth.wrong": S("Not quite: {it}.", "Casi: {it}."),
+  "myth.wrong": S("Not quite: {it}.", "No del todo: {it}."),
   "myth.after": S("+2 XP · another one tomorrow", "+2 XP · mañana hay otro"),
   "myth.done": S("Today's myth: answered · another one tomorrow", "El mito de hoy: respondido · mañana hay otro"),
 

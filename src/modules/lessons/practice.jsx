@@ -36,7 +36,7 @@ addStrings({
   "level.solid": S("Solid", "Sólido"),
   "level.mastered": S("Mastered", "Dominado"),
   "place.title": S("How do you want to start?", "¿Cómo quieres empezar?"),
-  "place.sub": S("Lessons take about 3 minutes.", "Las lecciones duran unos 3 minutos."),
+  "place.sub": S("Lessons take about 4 minutes.", "Las lecciones duran unos 4 minutos."),
   "place.new": S("From the beginning", "Desde el principio"),
   "place.new.sub": S("{unit}, lesson 1: {title}", "{unit}, lección 1: {title}"),
   "place.some": S("I know some basics", "Ya sé algo de lo básico"),

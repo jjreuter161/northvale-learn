@@ -95,29 +95,29 @@ const WORDS = {
     title: "Northvale Learn",
     streak: (s, today) =>
       turn(today, [
-        (n) => `Your ${n}-day streak is still on. One 3-minute lesson keeps it that way.`,
-        (n) => `${n} days in a row. Today's lesson takes about 3 minutes.`,
+        (n) => `Your ${n}-day streak is still on. One short lesson keeps it that way.`,
+        (n) => `${n} days in a row. Today's lesson takes about 4 minutes.`,
         (n) => `Your streak would like a word: one short lesson keeps it at ${n} days.`,
         (n) => `Still time today: one short lesson keeps your ${n}-day streak going.`,
       ])(s.streak.count),
     checkin: () => "It's Sunday check-in: a minute to record what you set aside this week.",
     review: () => "A quick review is ready: about 2 minutes on what you learned before.",
     mission: (s) => (s.mission.started ? `Still on your mission, "${s.mission.title}"? Mark it done when you've finished.` : `This week's mission: ${s.mission.title}.`),
-    next: (s) => `Next up: ${s.next}. About 3 minutes.`,
+    next: (s) => `Next up: ${s.next}. About 4 minutes.`,
   },
   es: {
     title: "Northvale Learn",
     streak: (s, today) =>
       turn(today, [
-        (n) => `Tu racha de ${n} días sigue en pie. Una lección de 3 minutos la mantiene.`,
-        (n) => `${n} días seguidos. La lección de hoy toma unos 3 minutos.`,
+        (n) => `Tu racha de ${n} días sigue en pie. Una lección corta la mantiene.`,
+        (n) => `${n} días seguidos. La lección de hoy toma unos 4 minutos.`,
         (n) => `Tu racha quiere decirte algo: una lección corta la mantiene en ${n} días.`,
         (n) => `Todavía hay tiempo hoy: una lección corta mantiene tu racha de ${n} días.`,
       ])(s.streak.count),
     checkin: () => "Es domingo de revisión: un minuto para anotar lo que apartaste esta semana.",
     review: () => "Hay un repaso listo: unos 2 minutos sobre lo que ya aprendiste.",
     mission: (s) => (s.mission.started ? `¿Sigues con tu misión, "${s.mission.title}"? Márcala como hecha cuando termines.` : `La misión de esta semana: ${s.mission.title}.`),
-    next: (s) => `Sigue: ${s.next}. Unos 3 minutos.`,
+    next: (s) => `Sigue: ${s.next}. Unos 4 minutos.`,
   },
 };
 export function pick(s, today, lang = "en") {
