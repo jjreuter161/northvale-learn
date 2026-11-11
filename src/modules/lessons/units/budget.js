@@ -53,6 +53,7 @@ export default {
     {
       id: "budget-1",
       title: T("What's a budget?", "¿Qué es un presupuesto?"),
+      life: T("This week, write down three things your money will go to before it arrives.", "Esta semana, anota tres cosas a las que irá tu dinero antes de recibirlo."),
       steps: [
         card(T("A plan for your money", "Un plan para tu dinero"), T("A budget is just a plan: before you spend, you decide where your money goes. It's not about saying no to everything — it's about saying yes to what matters most to you.", "Un presupuesto es solo un plan: antes de gastar, decides a dónde va tu dinero. No se trata de decir que no a todo, sino de decir que sí a lo que más te importa.")),
         card(T("The 50/30/20 idea", "La idea 50/30/20"), T("A simple starting point: about 50% for needs (things you must pay), 30% for wants (fun stuff), and 20% for saving. It's a guide, not a law — adjust it to your life.", "Un punto de partida sencillo: más o menos 50% para necesidades (lo que sí o sí debes pagar), 30% para gustos y 20% para ahorrar. Es una guía, no una ley: ajústala a tu vida.")),
@@ -65,6 +66,7 @@ export default {
     {
       id: "budget-2",
       title: T("Needs vs. wants", "Necesidades vs. gustos"),
+      life: T("Before your next purchase, ask: what happens if I skip it?", "Antes de tu próxima compra, pregúntate: ¿qué pasa si no lo compro?"),
       steps: [
         card(T("Need or want?", "¿Necesidad o gusto?"), T("Needs keep your life running: food, a way to get to school or work, your phone bill if you need it. Wants make life fun: new sneakers, games, eating out. Both are fine — just know which is which.", "Las necesidades mantienen tu vida en marcha: comida, cómo llegar a la escuela o al trabajo, tu plan de celular si lo necesitas. Los gustos hacen la vida divertida: tenis nuevos, videojuegos, comer fuera. Las dos cosas están bien; solo identifica cuál es cuál.")),
         choice(
@@ -93,6 +95,7 @@ export default {
     {
       id: "budget-3",
       title: T("Small leaks", "Gastos hormiga"),
+      life: T("Find one small thing you buy often and multiply it by 52.", "Busca una cosa pequeña que compres seguido y multiplícala por 52."),
       steps: [
         card(T("Tiny costs add up", "Lo pequeño suma"), T("Small, frequent buys — snacks, delivery fees, in-game coins — feel like nothing. But {$5|80} a few times a week becomes hundreds a year.", "Las compras pequeñas y frecuentes —botanas, envíos, monedas en juegos— parecen nada. Pero {$5|80} unas veces por semana se vuelven cientos al año.", { en: "In Mexico they're called \"gastos hormiga\" — ant expenses: tiny, but there are a lot of them. {$5|80} a few times a week becomes thousands of pesos a year.", es: "En México les decimos gastos hormiga: pequeñitos, pero son muchos. {$5|80} unas veces por semana se vuelven miles de pesos al año." })),
         choice(

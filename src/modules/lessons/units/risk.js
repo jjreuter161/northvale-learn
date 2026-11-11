@@ -53,6 +53,7 @@ export default {
     {
       id: "risk-1",
       title: T("Risk and reward", "Riesgo y recompensa"),
+      life: T("Match money to time: safe for soon, invested for years away.", "Ajusta el dinero al tiempo: seguro para lo cercano, invertido para lo que está a años."),
       steps: [
         card(T("No free lunch", "Nadie regala nada"), T("Investments that can grow more can also drop more. Safe ones (like T-bills) barely move; stocks can jump or fall a lot. Higher possible reward comes with higher risk.", "Las inversiones que pueden crecer más también pueden caer más. Las seguras (como los T-bills) casi no se mueven; las acciones pueden subir o bajar mucho. Más recompensa posible viene con más riesgo.", { en: "Investments that can grow more can also drop more. Safe ones (like CETES) barely move; stocks can jump or fall a lot. Higher possible reward comes with higher risk.", es: "Las inversiones que pueden crecer más también pueden caer más. Las seguras (como los CETES) casi no se mueven; las acciones pueden subir o bajar mucho. Más recompensa posible viene con más riesgo." })),
         card(T("Time changes risk", "El tiempo cambia el riesgo"), T("Over one year, stocks can lose a lot. Over 20 years, they've historically done much better than cash — but there are no guarantees.", "En un año, las acciones pueden perder mucho. En 20 años, históricamente les ha ido mucho mejor que al efectivo, pero no hay garantías.")),
@@ -72,6 +73,7 @@ export default {
     {
       id: "risk-2",
       title: T("Don't put all your eggs in one basket", "No pongas todos los huevos en una canasta"),
+      life: T("If you own investments, count how many companies and industries they cover.", "Si tienes inversiones, cuenta cuántas empresas y sectores abarcan."),
       steps: [
         card(T("Diversification", "Diversificación"), T("Spreading money across many different investments means one bad one can't sink you. Different kinds — companies, countries, bonds — tend to have bad years at different times.", "Repartir tu dinero en muchas inversiones distintas hace que una mala no te hunda. Los distintos tipos —empresas, países, bonos— suelen tener años malos en momentos diferentes.")),
         order("diversification", T("Order these from least to most diversified.", "Ordena del menos al más diversificado."), [T("All in one company you love", "Todo en una empresa que te encanta"), T("Three tech companies", "Tres empresas de tecnología"), T("A fund of the whole stock market", "Un fondo de todo el mercado de acciones"), T("A whole-market fund + an international fund + a bond fund", "Un fondo de todo el mercado + uno internacional + uno de bonos")], T("More companies, more industries, more countries and more kinds of investment each spread the risk further.", "Más empresas, más sectores, más países y más tipos de inversión reparten cada vez más el riesgo.")),
@@ -93,6 +95,7 @@ export default {
     {
       id: "risk-3",
       title: T("Picking stocks is hard", "Escoger acciones es difícil"),
+      life: T("If you buy single stocks, keep them a small slice of what you invest.", "Si compras acciones sueltas, que sean una parte pequeña de lo que inviertes."),
       steps: [
         card(T("Why it's hard", "Por qué es difícil"), T("When you buy a single stock, someone is selling it to you — often a professional with more information. Even experts pick losers all the time.", "Cuando compras una acción, alguien te la está vendiendo, muchas veces un profesional con más información. Hasta los expertos escogen perdedoras todo el tiempo.")),
         card(T("Keep it small", "Que sea poquito"), T("If you want to own a few companies for fun or to learn, many people keep it to a small slice — like 5–10% — and keep the rest in broad funds.", "Si quieres tener algunas empresas para aprender o por gusto, mucha gente lo limita a una parte pequeña —como 5 a 10%— y deja el resto en fondos amplios.")),

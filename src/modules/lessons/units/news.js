@@ -53,6 +53,7 @@ export default {
     {
       id: "news-1",
       title: T("Headlines decoded", "Titulares sin misterio"),
+      life: T("Read one market headline this week and say it in plain words.", "Lee un titular de la bolsa esta semana y dilo con palabras sencillas."),
       steps: [
         card(T("The words you'll see", "Las palabras que vas a ver"), T("A \"bull market\" is a long stretch of rising prices; a \"bear market\" is a drop of 20% or more. A \"rally\" is a quick rise; a \"sell-off\" is a quick fall.", "Un \"mercado alcista\" (bull market) es una racha larga de precios al alza; un \"mercado bajista\" (bear market) es una caída de 20% o más. Un \"rally\" es una subida rápida; un \"sell-off\", una caída rápida.")),
         card(T("Indexes are the scoreboard", "Los índices son el marcador"), T("When the news says \"the market,\" it usually means an index like the S&P 500 or the Dow.", "Cuando las noticias dicen \"el mercado\", casi siempre hablan de un índice como el S&P 500 o el Dow.", { en: "In Mexico, \"the market\" usually means the S&P/BMV IPC — the main index of the Mexican Stock Exchange.", es: "En México, \"la bolsa\" casi siempre se refiere al S&P/BMV IPC, el índice principal de la Bolsa Mexicana de Valores." })),
@@ -82,6 +83,7 @@ export default {
     {
       id: "news-2",
       title: T("Rates and inflation", "Tasas e inflación"),
+      life: T("Check whether your savings earn more than inflation.", "Revisa si tu ahorro gana más que la inflación."),
       steps: [
         card(T("Inflation", "Inflación"), T("Inflation means prices rise over time, so each dollar buys a bit less. The US central bank aims for about {@fedInflationTarget} a year.", "La inflación significa que los precios suben con el tiempo, así que cada peso compra un poco menos. El banco central de EE. UU. busca alrededor de {@fedInflationTarget} al año.", { en: "Inflation means prices rise over time, so each peso buys a bit less. Mexico's central bank, Banxico, aims for about {@banxicoInflationTarget} a year.", es: "La inflación significa que los precios suben con el tiempo, así que cada peso compra un poco menos. Banxico, el banco central de México, busca alrededor de {@banxicoInflationTarget} al año." })),
         card(T("Why rates matter", "Por qué importan las tasas"), T("To fight high inflation, the Federal Reserve (the Fed) raises interest rates. Loans get pricier and savings pay more. When it cuts rates, the opposite happens.", "Para frenar la inflación alta, la Reserva Federal (la Fed) sube las tasas de interés. Los préstamos se encarecen y el ahorro paga más. Cuando las baja, pasa lo contrario.", { en: "To fight high inflation, Banxico raises its interest rate. Loans get pricier and CETES pay more. When it cuts rates, the opposite happens.", es: "Para frenar la inflación alta, Banxico sube su tasa de interés. Los préstamos se encarecen y los CETES pagan más. Cuando la baja, pasa lo contrario." })),
@@ -94,6 +96,7 @@ export default {
     {
       id: "news-3",
       title: T("Don't trade on headlines", "No inviertas por titulares"),
+      life: T("Next time a scary headline appears, read past the headline before doing anything.", "La próxima vez que veas un titular alarmante, lee más allá del titular antes de hacer nada."),
       steps: [
         card(T("News is already in the price", "La noticia ya está en el precio"), T("By the time you read a headline, millions of people and computers have already acted on it. Trading on news is a race you're late to.", "Para cuando lees un titular, millones de personas y computadoras ya actuaron. Invertir por noticias es una carrera a la que llegas tarde.")),
         card(T("Use news to learn, not to react", "Usa las noticias para aprender, no para reaccionar"), T("Good questions: What does this mean for my long-term plan? Does it change why I own this? Usually the answer is: nothing to do.", "Buenas preguntas: ¿qué significa esto para mi plan a largo plazo? ¿Cambia la razón por la que tengo esta inversión? Casi siempre la respuesta es: no hay que hacer nada.")),

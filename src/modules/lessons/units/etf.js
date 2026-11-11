@@ -53,6 +53,7 @@ export default {
     {
       id: "etf-1",
       title: T("A basket of companies", "Una canasta de empresas"),
+      life: T("Look up how many companies one index fund holds.", "Busca cuántas empresas tiene un fondo indexado."),
       steps: [
         card(T("Buy many at once", "Compra muchas a la vez"), T("An ETF (exchange-traded fund) is a basket of many investments you can buy as one. One share of an S&P 500 fund gives you a small piece of 500 big US companies.", "Un ETF (fondo cotizado) es una canasta con muchas inversiones que compras como una sola. Una parte de un fondo del S&P 500 te da un pedacito de 500 grandes empresas de Estados Unidos.", { en: "An ETF (exchange-traded fund) is a basket of many investments you can buy as one. NAFTRAC, for example, holds the biggest companies on the Mexican Stock Exchange, and from Mexico you can also buy US funds through the SIC (Sistema Internacional de Cotizaciones).", es: "Un ETF (fondo cotizado) es una canasta con muchas inversiones que compras como una sola. El NAFTRAC, por ejemplo, tiene a las empresas más grandes de la Bolsa Mexicana, y desde México también puedes comprar fondos de Estados Unidos a través del SIC (Sistema Internacional de Cotizaciones)." })),
         card(T("Why it helps", "Por qué ayuda"), T("If one company in the basket has a terrible year, it's just a small part of what you own. The others can make up for it.", "Si a una empresa de la canasta le va muy mal, es solo una parte pequeña de lo que tienes. Las demás pueden compensarlo.")),
@@ -74,6 +75,7 @@ export default {
     {
       id: "etf-2",
       title: T("Index funds and fees", "Fondos indexados y comisiones"),
+      life: T("For any fund you hear about, find its yearly fee. Lower is better.", "De cualquier fondo del que oigas, busca su comisión anual. Entre más baja, mejor."),
       steps: [
         card(T("Follow the whole market", "Seguir a todo el mercado"), T("An index fund doesn't try to pick winners. It just buys everything in an index (like the S&P 500) and follows it. Because it's simple, it's usually cheap.", "Un fondo indexado no intenta escoger ganadores. Solo compra todo lo que hay en un índice (como el S&P 500) y lo sigue. Como es sencillo, suele ser barato.", { en: "An index fund doesn't try to pick winners. It just buys everything in an index (like Mexico's S&P/BMV IPC or the US S&P 500) and follows it. Because it's simple, it's usually cheap.", es: "Un fondo indexado no intenta escoger ganadores. Solo compra todo lo que hay en un índice (como el S&P/BMV IPC de México o el S&P 500 de EE. UU.) y lo sigue. Como es sencillo, suele ser barato." })),
         card(T("Fees eat returns", "Las comisiones se comen tus ganancias"), T("Funds charge a yearly fee called the expense ratio. 0.05% vs. 1% sounds tiny, but over 30 years the cheaper fund can leave you thousands more.", "Los fondos cobran una comisión anual (en inglés, expense ratio). 0.05% contra 1% parece poco, pero en 30 años el fondo más barato puede dejarte miles más.")),
@@ -93,6 +95,7 @@ export default {
     {
       id: "etf-3",
       title: T("A little every month", "Un poco cada mes"),
+      life: T("Choose a monthly amount you could keep up for years, even a small one.", "Elige una cantidad al mes que puedas mantener por años, aunque sea pequeña."),
       steps: [
         card(T("Dollar-cost averaging", "Invertir de a poco"), T("Investing the same amount every month — no matter what prices do — is called dollar-cost averaging. When prices are low, your money buys more shares.", "Invertir la misma cantidad cada mes, sin importar lo que hagan los precios, se llama promediar el costo (en inglés, dollar-cost averaging). Cuando los precios están bajos, tu dinero compra más.")),
         card(T("No need to time it", "No necesitas adivinar el momento"), T("Nobody can reliably guess the best day to buy. A steady habit removes the guessing — and the stress.", "Nadie puede adivinar de forma confiable el mejor día para comprar. Un hábito constante quita las adivinanzas y el estrés.")),

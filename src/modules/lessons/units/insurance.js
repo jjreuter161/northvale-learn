@@ -73,6 +73,7 @@ export default {
     {
       id: "insurance-1",
       title: T("What insurance does", "Para qué sirve un seguro"),
+      life: T("Ask an adult what insurance your family has and what it covers.", "Pregúntale a un adulto qué seguros tiene tu familia y qué cubren."),
       steps: [
         card(T("Sharing the risk", "Compartir el riesgo"), T("Most people won't crash a car or need surgery this year — but some will, and it can cost a fortune. Insurance spreads that cost across everyone who pays in.", "La mayoría de la gente no va a chocar ni a necesitar una cirugía este año, pero algunas personas sí, y puede costar una fortuna. El seguro reparte ese costo entre todos los que pagan.")),
         card(T("When it makes sense", "Cuándo tiene sentido"), T("Insure what you couldn't afford to replace or pay for. Small, predictable costs are usually cheaper to cover from your budget.", "Asegura lo que no podrías reponer o pagar tú. Los costos chicos y previsibles suele salir más barato cubrirlos con tu presupuesto.")),
@@ -101,6 +102,7 @@ export default {
     {
       id: "insurance-2",
       title: T("Premiums and deductibles", "Prima y deducible"),
+      life: T("When you compare policies, compare the deductible as well as the monthly price.", "Cuando compares pólizas, compara el deducible además del precio mensual."),
       steps: [
         card(T("The trade-off", "El intercambio"), T("Low premium, high deductible: cheaper every month, more to pay if something happens. High premium, low deductible: pricier every month, less to pay when you use it. Which costs less depends on how much you end up needing it.", "Prima baja y deducible alto: más barato cada mes, más que pagar si algo pasa. Prima alta y deducible bajo: más caro cada mes, menos que pagar cuando lo usas. Cuál sale más barato depende de cuánto lo termines usando.")),
         card(T("Reading a policy", "Leer una póliza"), T("Look for the premium, the deductible, what's covered and what isn't, and any coinsurance (the share you still pay after the deductible). The exclusions matter as much as the price.", "Busca la prima, el deducible, qué cubre y qué no, y el coaseguro (la parte que todavía pagas después del deducible). Las exclusiones importan tanto como el precio.")),
@@ -120,6 +122,7 @@ export default {
     {
       id: "insurance-3",
       title: T("Health, car and renters", "Salud, auto y hogar"),
+      life: T("If you rent or drive, find out which insurance you're required to have.", "Si rentas o manejas, averigua qué seguro estás obligado a tener."),
       steps: [
         card(
           T("Health", "Salud"),
@@ -154,6 +157,7 @@ export default {
     {
       id: "insurance-4",
       title: T("Emergency fund + insurance", "Fondo de emergencia + seguro"),
+      life: T("Make your emergency fund at least as big as your highest deductible.", "Haz que tu fondo de emergencia sea por lo menos del tamaño de tu deducible más alto."),
       steps: [
         card(T("Small shocks, big shocks", "Golpes chicos, golpes grandes"), T("Your emergency fund handles the small and medium surprises: a deductible, a repair, a few weeks without pay. Insurance handles the rare, huge ones. You need both.", "Tu fondo de emergencia se encarga de los imprevistos chicos y medianos: un deducible, una reparación, unas semanas sin sueldo. El seguro se encarga de los raros y enormes. Necesitas los dos.")),
         card(T("They make each other cheaper", "Se abaratan entre sí"), T("Savings let you pick a higher deductible and a lower premium. Insurance means your savings don't get wiped out by one bad event.", "El ahorro te deja elegir un deducible más alto y una prima más baja. El seguro hace que un solo mal evento no se acabe tu ahorro.")),

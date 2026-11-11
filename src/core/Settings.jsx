@@ -11,6 +11,7 @@ import { api } from "./api.js";
 import { ReminderSettings, turnOff as remindersOff } from "./reminders.jsx";
 import { forgetInvite } from "./invites.jsx";
 import { service } from "./registry.js";
+import { canVibrate } from "./feel.js";
 
 
 const setSetting = (k, v) => update((s) => ({ ...s, settings: { ...s.settings, [k]: v } }));
@@ -318,6 +319,8 @@ export default function Settings({ t, locale, go }) {
       <Card>
         <Segmented label={t("settings.look")} value={settings.look} onChange={(v) => setSetting("look", v)} options={[{ value: "white", label: t("look.white") }, { value: "navy", label: t("look.navy") }]} />
         {row(t("settings.motion"), t("settings.motion.sub"), <Switch label={t("settings.motion")} checked={settings.reduceMotion} onChange={(v) => setSetting("reduceMotion", v)} />)}
+        {row(t("settings.sound"), t("settings.sound.sub"), <Switch label={t("settings.sound")} checked={!!settings.sound} onChange={(v) => setSetting("sound", v)} />)}
+        {canVibrate() && row(t("settings.vibrate"), t("settings.vibrate.sub"), <Switch label={t("settings.vibrate")} checked={settings.vibrate !== false} onChange={(v) => setSetting("vibrate", v)} />)}
       </Card>
 
       <Label>{t("settings.privacy")}</Label>

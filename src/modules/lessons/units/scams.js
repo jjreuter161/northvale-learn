@@ -67,6 +67,7 @@ export default {
     {
       id: "scams-1",
       title: T("Phishing", "Phishing"),
+      life: T("If a message asks you to log in, open the company's app yourself instead of tapping the link.", "Si un mensaje te pide entrar a tu cuenta, abre tú la app de la empresa en lugar de tocar el enlace."),
       steps: [
         card(T("It looks official", "Parece oficial"), T("Phishing messages copy logos, names and the tone of real companies. They arrive by text, email, social media or phone calls, and they all want the same thing: to get you to tap, log in or share something.", "Los mensajes de phishing copian logos, nombres y el tono de empresas reales. Llegan por mensaje, correo, redes sociales o llamada, y todos quieren lo mismo: que toques, entres o compartas algo.")),
         card(T("Slow down, go direct", "Ve despacio y ve directo"), T("Urgency is the trick. Don't use links or numbers from the message. Open the company's app, or type its address yourself, and check there.", "La urgencia es el truco. No uses enlaces ni números del mensaje. Abre la app de la empresa o escribe tú la dirección, y revisa ahí.")),
@@ -100,6 +101,7 @@ export default {
     {
       id: "scams-2",
       title: T("Fake investments", "Inversiones falsas"),
+      life: T("When an investment promises a lot, look it up on FINRA BrokerCheck first.", "Cuando una inversión promete mucho, búscala primero en FINRA BrokerCheck.", { en: "When an investment promises a lot, check it with CONDUSEF first.", es: "Cuando una inversión promete mucho, revísala primero con la CONDUSEF." }),
       steps: [
         card(T("The pitch", "La promesa"), T("\"Guaranteed\" returns, \"risk-free\", \"only a few spots left\", screenshots of big profits. Fake investments often start with a friendly stranger online and end with a request to send money — usually as crypto or a transfer to a person.", "Rendimientos \"garantizados\", \"sin riesgo\", \"quedan pocos lugares\", capturas de ganancias enormes. Las inversiones falsas suelen empezar con un desconocido amable en internet y terminar pidiendo que mandes dinero, casi siempre en cripto o por transferencia a una persona.")),
         card(
@@ -131,6 +133,7 @@ export default {
     {
       id: "scams-3",
       title: T("Pyramid schemes", "Esquemas piramidales"),
+      life: T("If you'd be paid mostly for recruiting people, walk away.", "Si te pagarían sobre todo por reclutar personas, aléjate."),
       steps: [
         card(T("Follow the money", "Sigue el dinero"), T("Ask one question: where does the money come from? If it comes from customers buying something they want, it's a business. If it comes mainly from new members paying to join, it's a pyramid.", "Hazte una pregunta: ¿de dónde sale el dinero? Si sale de clientes que compran algo que quieren, es un negocio. Si sale sobre todo de miembros nuevos que pagan por entrar, es una pirámide.")),
         card(T("The math doesn't work", "Las cuentas no dan"), T("If each person must recruit six, the 13th level alone would need more people than live on Earth. Long before that, recruiting stalls — and the people who joined last lose their money.", "Si cada persona debe reclutar a seis, solo el nivel 13 necesitaría más gente de la que vive en la Tierra. Mucho antes, el reclutamiento se frena, y quienes entraron al final pierden su dinero.")),
@@ -150,6 +153,7 @@ export default {
     {
       id: "scams-4",
       title: T("Protect your accounts", "Protege tus cuentas"),
+      life: T("Turn on two-step verification for your email today. It protects everything else.", "Activa hoy la verificación en dos pasos en tu correo. Protege todo lo demás."),
       steps: [
         card(T("Locks that work", "Candados que sí funcionan"), T("Different passwords for important accounts, two-step verification turned on, and the phone's own lock screen. These three stop most account takeovers.", "Contraseñas distintas para las cuentas importantes, verificación en dos pasos activada y el bloqueo de pantalla del teléfono. Estos tres frenan la mayoría de los robos de cuenta.")),
         card(T("If something goes wrong", "Si algo sale mal"), T("See a charge you don't recognize? Lock the card in your bank's app and call the bank right away. Banks have rules for disputes, and the faster you report, the more you're protected.", "¿Ves un cargo que no reconoces? Bloquea la tarjeta en la app del banco y llama de inmediato. Los bancos tienen reglas para aclaraciones, y entre más rápido reportes, más protegido estás.", { en: "See a charge you don't recognize? Lock the card in your bank's app, call the bank right away and file a clarification (\"aclaración\"). If it isn't resolved, you can go to CONDUSEF.", es: "¿Ves un cargo que no reconoces? Bloquea la tarjeta en la app del banco, llama de inmediato y presenta una aclaración. Si no se resuelve, puedes acudir a la CONDUSEF." })),

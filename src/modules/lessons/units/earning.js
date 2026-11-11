@@ -73,6 +73,7 @@ export default {
     {
       id: "earning-1",
       title: T("Side hustles", "Ingresos extra"),
+      life: T("Write down three things people around you would pay for that you could do.", "Anota tres cosas por las que la gente a tu alrededor pagaría y que tú podrías hacer."),
       steps: [
         card(T("Ideas that work for teens", "Ideas que funcionan para jóvenes"), T("Tutoring younger students, pet or plant sitting, yard work, editing photos or videos, reselling things you no longer use, making crafts. Check age rules for any platform you use.", "Dar clases a alumnos más chicos, cuidar mascotas o plantas, jardinería, editar fotos o videos, revender cosas que ya no usas, hacer manualidades. Revisa las reglas de edad de cualquier plataforma que uses.")),
         card(T("Time is money — really", "El tiempo es dinero, de verdad"), T("Count all the hours: travel, messages, setup. A job that pays {$30|450} but takes 3 hours pays {$10|150} an hour.", "Cuenta todas las horas: traslados, mensajes, preparación. Un trabajo que paga {$30|450} pero toma 3 horas paga {$10|150} la hora.")),
@@ -92,6 +93,7 @@ export default {
     {
       id: "earning-2",
       title: T("Freelancing basics", "Trabajar por tu cuenta"),
+      life: T("For your next paid job, agree on the price, the work and the dates in writing first.", "Para tu próximo trabajo pagado, acuerden por escrito el precio, el trabajo y las fechas."),
       steps: [
         card(
           T("No one withholds for you", "Nadie retiene por ti"),
@@ -119,6 +121,7 @@ export default {
     {
       id: "earning-3",
       title: T("Pricing and profit", "Precio y ganancia"),
+      life: T("Before setting a price, add up what each one costs you, including your time.", "Antes de poner un precio, suma lo que te cuesta cada uno, incluido tu tiempo."),
       steps: [
         card(T("Start from your costs", "Empieza por tus costos"), T("Add up what each sale costs you — materials, packaging, shipping, platform fees. Your price has to cover that, plus pay you for your time.", "Suma lo que te cuesta cada venta: materiales, empaque, envío, comisiones de la plataforma. Tu precio debe cubrir eso y además pagarte tu tiempo.")),
         card(T("Then check the market", "Luego revisa el mercado"), T("See what similar things sell for. If your costs are higher than market prices, change the product, lower your costs or find a different customer.", "Mira a cuánto se venden cosas parecidas. Si tus costos son mayores que los precios del mercado, cambia el producto, baja tus costos o busca otro cliente.")),
@@ -138,6 +141,7 @@ export default {
     {
       id: "earning-4",
       title: T("Starting small", "Empezar en pequeño"),
+      life: T("Keep a simple list of every sale and cost, starting with the next one.", "Lleva una lista sencilla de cada venta y cada gasto, empezando por el siguiente."),
       steps: [
         card(T("Small on purpose", "Pequeño a propósito"), T("Start with what you can do now, with little money. Ask early customers what they'd pay for and what they'd change. Grow only what's working.", "Empieza con lo que puedes hacer ahora, con poco dinero. Pregúntales a tus primeros clientes por qué pagarían y qué cambiarían. Haz crecer solo lo que funciona.")),
         card(T("Keep it organized", "Mantenlo en orden"), T("A separate account (or at least a separate list) for business money, a record of every sale and cost, and a share set aside for taxes. Under 18, you may need an adult to open accounts or sign agreements.", "Una cuenta aparte (o por lo menos una lista aparte) para el dinero del negocio, un registro de cada venta y costo, y una parte apartada para impuestos. Si eres menor de 18, quizá necesites a un adulto para abrir cuentas o firmar acuerdos.")),

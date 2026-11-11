@@ -67,6 +67,7 @@ export default {
     {
       id: "psychology-1",
       title: T("Impulse spending", "Compras impulsivas"),
+      life: T("For anything over {$30|500} you didn't plan, wait a day before buying.", "Para cualquier compra de más de {$30|500} que no planeaste, espera un día."),
       steps: [
         card(T("Why we buy on impulse", "Por qué compramos por impulso"), T("Stress, boredom, a sale or a perfect ad can trigger a buy that feels great for a minute. Apps make it easy: saved cards, one-tap checkout, endless feeds.", "El estrés, el aburrimiento, una oferta o un anuncio perfecto pueden provocar una compra que se siente genial un minuto. Las apps lo facilitan: tarjetas guardadas, pagar con un toque, feeds sin fin.")),
         card(T("Add a pause", "Agrega una pausa"), T("Try the 24-hour rule, a wishlist instead of a cart, or a monthly \"fun money\" amount. When it's gone, the wishlist waits until next month.", "Prueba la regla de 24 horas, una lista de deseos en lugar de un carrito, o un monto mensual de \"dinero para gustos\". Cuando se acaba, la lista espera al siguiente mes.")),
@@ -95,6 +96,7 @@ export default {
     {
       id: "psychology-2",
       title: T("FOMO", "FOMO: miedo a quedarte fuera"),
+      life: T("When an ad says “today only”, close it and see if you still want it tomorrow.", "Cuando un anuncio diga “solo hoy”, ciérralo y fíjate si mañana todavía lo quieres."),
       steps: [
         card(T("Everyone else seems to have it", "Parece que todos lo tienen"), T("Social media shows highlights: new phones, trips, wins. It can make normal spending feel like falling behind. Remember that you see what people post, not their bills.", "Las redes muestran lo mejor de cada quien: celulares nuevos, viajes, logros. Eso puede hacer que gastar normal se sienta como quedarse atrás. Recuerda que ves lo que la gente publica, no sus cuentas por pagar.")),
         card(T("Spot the tactics", "Detecta las tácticas"), T("Countdowns, \"only 2 left\", \"everyone's buying\", limited drops. They're designed to speed you up. When you notice one, slow down on purpose.", "Cuentas regresivas, \"solo quedan 2\", \"todos lo están comprando\", lanzamientos limitados. Están hechas para apresurarte. Cuando notes una, ve más despacio a propósito.")),
@@ -123,6 +125,7 @@ export default {
     {
       id: "psychology-3",
       title: T("Loss aversion", "Aversión a las pérdidas"),
+      life: T("Write down now what you'll do if your investments drop 20%.", "Escribe ahora qué harás si tus inversiones bajan 20%."),
       steps: [
         card(T("Why drops feel so bad", "Por qué las caídas se sienten tan mal"), T("Studies of decision-making find that losses hit us about twice as hard as equal gains. It's human — and it makes people sell at the worst moments.", "Los estudios sobre cómo decidimos encuentran que las pérdidas nos pegan como el doble que las ganancias del mismo tamaño. Es humano, y hace que la gente venda en los peores momentos.")),
         card(T("Decide before you feel it", "Decide antes de sentirlo"), T("Write your plan when things are calm: what you're investing for, for how long, and what you'll do in a drop. Then follow the plan, not the feeling.", "Escribe tu plan cuando todo esté tranquilo: para qué inviertes, por cuánto tiempo y qué harás en una caída. Luego sigue el plan, no la emoción.")),
@@ -151,6 +154,7 @@ export default {
     {
       id: "psychology-4",
       title: T("Consistency beats timing", "La constancia le gana al timing"),
+      life: T("Pick an amount and a day each month, and make it automatic.", "Elige una cantidad y un día cada mes, y hazlo automático."),
       steps: [
         card(T("Nobody knows the best day", "Nadie sabe cuál es el mejor día"), T("Trying to sell before drops and buy before rises sounds smart. In practice, almost no one does it reliably — and the best and worst days tend to come close together.", "Intentar vender antes de las caídas y comprar antes de las subidas suena inteligente. En la práctica, casi nadie lo logra de forma constante, y los mejores y peores días suelen llegar muy juntos.")),
         card(T("Same amount, same schedule", "Mismo monto, mismo calendario"), T("Investing a set amount on a schedule takes the guessing out. Over long periods, staying invested has mattered more than picking the moment — though nothing is guaranteed.", "Invertir un monto fijo con un calendario quita las adivinanzas. En periodos largos, quedarse invertido ha importado más que elegir el momento, aunque nada está garantizado.")),

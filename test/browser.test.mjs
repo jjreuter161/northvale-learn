@@ -118,9 +118,10 @@ const slide = (el, v) => el.evaluate((e, v) => (Object.getOwnPropertyDescriptor(
 // Plays the open lesson, review or challenge: first option for each
 // question (a miss comes back once at the end), skips the "do it" step.
 // `untilAction` stops at the "do it" step instead.
-async function play({ top, button }, { untilAction = false } = {}) {
+async function play({ top, button }, { untilAction = false, untilMoment = false } = {}) {
   for (let i = 0; i < 80; i++) {
     const d = top();
+    if (untilMoment && (await d.locator("[data-moment]").count())) return;
     const names = await d.getByRole("button").evaluateAll((bs) => bs.map((b) => b.getAttribute("aria-label") || b.innerText.trim()));
     if (process.env.DEBUG) console.log(i, JSON.stringify(names));
     if (names.includes("Skip for now") || names.includes("Saltar por ahora")) {
@@ -178,7 +179,10 @@ try {
 
     await play(app);
     await top().getByText("Lesson complete").waitFor();
-    await top().getByText(/\+1[05] XP/).waitFor();
+    await top().getByText(/^\+1[05]$/).waitFor();
+    await top().getByText(/^1[05] of 20 XP today · 1-day streak$/).waitFor();
+    await top().getByText("In real life").waitFor();
+    await top().getByText("This week, write down three things your money will go to before it arrives.").waitFor();
     await clean("lesson complete");
     await button("Done", top()).click();
     await page.getByRole("heading", { name: "Today" }).waitFor();
@@ -213,7 +217,16 @@ try {
     for (let i = 0; i < 2; i++) {
       await button("Continue").click(); // Today's one big button
       await page.getByRole("dialog", { name: ALL_LESSONS[i + 1].title.en }).waitFor();
-      await play(app);
+      await play(app, { untilMoment: i === 1 });
+      if (i === 1) {
+        // The first unit done: one calm full-screen moment, with a share option.
+        await top().getByText("Unit 1 of 17 · complete").waitFor();
+        await top().getByRole("heading", { name: "Budgeting" }).waitFor();
+        await button("Share", top()).waitFor();
+        await clean("unit moment");
+        await button("Continue", top()).click();
+        await top().getByText("Lesson complete").waitFor();
+      }
       await button("Done", top()).click();
     }
     // After the third lesson: the one-question survey, once back from the lesson.
@@ -406,6 +419,30 @@ try {
     assert.equal(await page.getByText("Want a daily reminder?").count(), 0, "no reminder offer while something else needs doing");
     await clean("today, three weeks in");
     console.log("ok: Today for a long-time learner: the lesson first, at most 2 small rows, no competing reminder offer");
+    await app.close();
+  }
+
+  // --- a 7-day streak: its moment, then the finish; sound and touch settings ---
+  {
+    const d = (n) => new Date(Date.now() - n * 864e5).toLocaleDateString("en-CA", { timeZone: "America/Mexico_City" });
+    const days = [6, 5, 4, 3, 2, 1].map(d);
+    const app = await open(learner({ ageBand: "18-25" }, { streak: { count: 6, last: d(1), best: 6, frozen: [] }, lessonDays: days, days: Object.fromEntries(days.map((x) => [x, 10])) }));
+    const { page, top, button, clean, menu } = app;
+    await button("Start").click();
+    await play(app, { untilMoment: true });
+    await top().getByRole("heading", { name: "A week, every day." }).waitFor();
+    await top().getByText("Seven days in a row. This is about where habits start.").waitFor();
+    await clean("7-day moment");
+    await button("Continue", top()).click();
+    await top().getByText(/· 7-day streak$/).waitFor();
+    await button("Done", top()).click();
+    await menu("Settings");
+    const sound = page.getByRole("switch", { name: "Sounds" });
+    assert.equal(await sound.getAttribute("aria-checked"), "false", "sounds are off by default");
+    assert.equal(await page.getByRole("switch", { name: "Vibration" }).getAttribute("aria-checked"), "true", "vibration is on by default where it works");
+    await sound.click();
+    await page.waitForFunction(() => JSON.parse(localStorage.getItem("northvale-learn-v1")).settings.sound === true);
+    console.log("ok: a 7-day streak gets its moment (then the finish screen); sounds off and vibration on by default, both in Settings");
     await app.close();
   }
 
@@ -882,7 +919,7 @@ try {
     await page.getByRole("link", { name: L.teacher }).click();
     assert.equal(await role.inputValue(), "teacher");
     await page.getByRole("link", { name: L.privacy }).first().click();
-    await page.getByRole("heading", { name: L.heading }).waitFor();
+    await page.getByRole("heading", { name: L.heading }).waitFor({ timeout: 10000 }); // (the app loads first; slower when the machine is busy)
     assert.deepEqual(errors, [], `${L.path}: console errors`);
     assert.deepEqual(outside, [], `${L.path}: requests to other sites`);
     await context.close();

@@ -144,7 +144,11 @@ addStrings({
   "look.white": S("Light", "Claro"),
   "look.navy": S("Dark", "Oscuro"),
   "settings.motion": S("Reduce motion", "Reducir movimiento"),
-  "settings.motion.sub": S("Fewer animations and no confetti.", "Menos animaciones y sin confeti."),
+  "settings.motion.sub": S("No animations, anywhere.", "Sin animaciones, en ninguna parte."),
+  "settings.sound": S("Sounds", "Sonidos"),
+  "settings.sound.sub": S("A soft tone for right answers and finishes.", "Un tono suave al acertar y al terminar."),
+  "settings.vibrate": S("Vibration", "Vibración"),
+  "settings.vibrate.sub": S("A light tap on right answers. (iPhones don't allow it for web apps.)", "Un toque ligero al acertar. (Los iPhone no lo permiten en apps web.)"),
   "settings.privacy": S("Privacy", "Privacidad"),
   "privacy.body": S(
     "Your progress is saved on this device. With an account, it's also saved on the Northvale Learn server so you can use other devices. We ask for a nickname (not your real name) and an age range — never your birthday, address or bank details. Questions you ask the AI tutor are sent to Anthropic's AI to be answered; the server doesn't keep them. No ads, no trackers, nothing sold.",

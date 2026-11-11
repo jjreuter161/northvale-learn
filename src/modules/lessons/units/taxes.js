@@ -73,6 +73,7 @@ export default {
     {
       id: "taxes-1",
       title: T("What taxes are for", "Para qué sirven los impuestos"),
+      life: T("Next time you shop, check whether the price on the tag includes tax.", "La próxima vez que compres, fíjate si el precio de la etiqueta incluye el impuesto.", { en: "Next time you shop, find the IVA on your receipt.", es: "La próxima vez que compres, busca el IVA en tu ticket." }),
       steps: [
         card(T("What you get for them", "Lo que recibes a cambio"), T("Public schools, roads, emergency services, parks, public health. Taxes are how a country pays for what everyone uses together.", "Escuelas públicas, caminos, servicios de emergencia, parques, salud pública. Los impuestos son la forma en que un país paga lo que todos usamos juntos.")),
         card(T("Three you'll meet", "Tres que vas a conocer"), T("Income tax (on what you earn), payroll taxes (Social Security and Medicare), and sales tax on what you buy — usually added at the register, at rates that vary by state.", "El impuesto sobre la renta (sobre lo que ganas), los impuestos de nómina (Social Security y Medicare) y el sales tax sobre lo que compras, que normalmente se suma en la caja y cambia según el estado.", { en: "ISR (income tax, on what you earn), IMSS contributions on your salary, and IVA on what you buy — {@ivaRate} in most of the country, already included in shelf prices.", es: "El ISR (impuesto sobre lo que ganas), las cuotas del IMSS sobre tu salario y el IVA sobre lo que compras: {@ivaRate} en casi todo el país, ya incluido en los precios." })),
@@ -101,6 +102,7 @@ export default {
     {
       id: "taxes-2",
       title: T("How tax brackets work", "Cómo funcionan los tramos"),
+      life: T("When someone says a raise “puts you in a higher bracket”, remember: only the part above the line pays more.", "Cuando alguien diga que un aumento “te sube de tramo”, recuerda: solo la parte de arriba paga más."),
       steps: [
         card(T("A myth to drop", "Un mito que hay que soltar"), T("\"If I earn more, I'll move into a higher bracket and take home less.\" Not true. Higher rates apply only to the income inside the higher bracket.", "\"Si gano más, paso a un tramo más alto y me queda menos.\" No es cierto. Las tasas más altas solo se aplican al ingreso dentro de ese tramo.")),
         card(T("Marginal vs. effective", "Marginal vs. efectiva"), T("Your marginal rate is the rate on your last dollar. Your effective rate is your total tax divided by your income — always lower than your top rate.", "Tu tasa marginal es la tasa de tu último peso. Tu tasa efectiva es tu impuesto total entre tu ingreso, y siempre es menor que tu tasa más alta.")),
@@ -120,6 +122,7 @@ export default {
     {
       id: "taxes-3",
       title: T("Filing your taxes", "Tu declaración de impuestos"),
+      life: T("If tax was withheld from a job, file to get back anything extra.", "Si te retuvieron impuestos en un trabajo, presenta la declaración para recuperar lo que pagaste de más.", { en: "If your tax return shows a refund (saldo a favor), file it to get the money back.", es: "Si tu declaración muestra saldo a favor, preséntala para recuperar el dinero." }),
       steps: [
         card(
           T("Once a year", "Una vez al año"),
@@ -151,6 +154,7 @@ export default {
     {
       id: "taxes-4",
       title: T("Your tax ID", "Tu identificación fiscal"),
+      life: T("Keep your Social Security card at home, not in your wallet, and never post a photo of it.", "Guarda tu tarjeta de Seguro Social en casa, no en la cartera, y nunca publiques una foto de ella.", { en: "Keep your RFC and SAT password private, and never send them by message.", es: "Mantén en privado tu RFC y tu contraseña del SAT, y nunca los mandes por mensaje." }),
       steps: [
         card(T("Your number", "Tu número"), T("Your Social Security number is your tax ID in the US. Employers, banks and the IRS use it. People who need to pay US taxes but can't get a Social Security number use an ITIN from the IRS instead.", "Tu número de Seguro Social es tu identificación fiscal en EE. UU. Lo usan empleadores, bancos y el IRS. Quien tiene que pagar impuestos en EE. UU. pero no puede obtener un número de Seguro Social usa un ITIN del IRS.", { en: "Your RFC is your taxpayer ID — the SAT issues it for free with your CURP. You'll need it for a formal job, to issue invoices (facturas) if you work on your own, and to file a return.", es: "Tu RFC es tu clave de contribuyente: el SAT lo da gratis con tu CURP. Lo vas a necesitar para un trabajo formal, para emitir facturas si trabajas por tu cuenta y para declarar." })),
         card(T("Guard it", "Cuídalo"), T("With your SSN, a thief can open credit in your name. Don't carry the card, don't post it, and give it only when it's truly required.", "Con tu SSN, un ladrón puede sacar créditos a tu nombre. No traigas la tarjeta, no la publiques y dala solo cuando de verdad te la pidan por ley.", { en: "Your e.firma (electronic signature) and SAT password let someone act in your name. Keep them private, and be wary of anyone offering to do SAT procedures for you for a fee.", es: "Tu e.firma y tu contraseña del SAT permiten actuar a tu nombre. Mantenlas en privado y desconfía de quien te ofrezca hacer trámites del SAT por un pago." })),

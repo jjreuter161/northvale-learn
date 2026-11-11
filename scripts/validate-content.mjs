@@ -153,6 +153,7 @@ export function validateContent() {
       if (seenLessons.has(l.id)) fail(at, "duplicate lesson id");
       seenLessons.add(l.id);
       text(l.title, `${at} title`);
+      text(l.life, `${at} "In real life" line`);
       const steps = l.steps || [];
       const qs = steps.filter(isQuestion);
       if (!steps.some((s) => s.type === "card")) fail(at, "needs at least one card");

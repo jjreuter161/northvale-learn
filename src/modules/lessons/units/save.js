@@ -53,6 +53,7 @@ export default {
     {
       id: "save-1",
       title: T("Pay yourself first", "Págate a ti primero"),
+      life: T("Next payday, move your savings first, before anything else gets a chance at it.", "El próximo día de pago, aparta tu ahorro primero, antes de que otra cosa lo alcance."),
       steps: [
         card(T("Save first, spend the rest", "Primero ahorra, luego gasta"), T("Most people save what's left at the end of the month — which is usually nothing. Flip it: the moment money comes in, move your savings out first. Then spend what's left.", "Mucha gente ahorra lo que sobra a fin de mes, que casi siempre es nada. Voltéalo: en cuanto te llegue dinero, aparta primero tu ahorro. Luego gasta lo que queda.")),
         card(T("Make it automatic", "Hazlo automático"), T("An automatic transfer on payday means you don't have to remember — or resist. Even a small amount builds the habit.", "Una transferencia automática el día de pago hace que no tengas que acordarte ni aguantarte las ganas. Aunque sea poco, construyes el hábito.")),
@@ -72,6 +73,7 @@ export default {
     {
       id: "save-2",
       title: T("Emergency fund", "Fondo de emergencia"),
+      life: T("Pick a first emergency-fund target, even {$100|1500}, and give it its own place.", "Elige una primera meta para tu fondo de emergencia, aunque sea de {$100|1500}, y dale su propio lugar."),
       steps: [
         card(T("Money for surprises", "Dinero para imprevistos"), T("Phones break. Bikes get flat tires. An emergency fund is money you keep just for surprises, so a bad day doesn't turn into debt.", "Los celulares se rompen. Las bicis se ponchan. Un fondo de emergencia es dinero que guardas solo para imprevistos, para que un mal día no se convierta en deuda.")),
         card(T("How much?", "¿Cuánto?"), T("When you're starting out, aim for a small cushion like {$500|8000}. Once you have bills of your own, the usual goal is 3 to 6 months of expenses.", "Cuando vas empezando, apunta a un colchón pequeño, como {$500|8000}. Cuando ya tengas tus propios gastos fijos, la meta típica es de 3 a 6 meses de gastos.")),
@@ -93,6 +95,7 @@ export default {
     {
       id: "save-3",
       title: T("Where to keep savings", "Dónde guardar tu ahorro"),
+      life: T("Find out whether your savings are in an insured account, and what it pays.", "Averigua si tu ahorro está en una cuenta asegurada y cuánto paga.", { en: "Find out whether your savings are protected by IPAB, and what they earn.", es: "Averigua si tu ahorro está protegido por el IPAB y cuánto gana." }),
       steps: [
         card(T("Not under the mattress", "No debajo del colchón"), T("Cash at home can be lost or stolen and earns nothing. A savings account at a bank or credit union keeps it safe — and pays you a little interest.", "El efectivo en casa se puede perder o te lo pueden robar, y no gana nada. Una cuenta de ahorro en un banco o credit union lo mantiene seguro y te paga un poco de intereses.", { en: "Cash at home can be lost or stolen and earns nothing. A savings account at a bank keeps it safe — and some pay you a little interest.", es: "El efectivo en casa se puede perder o te lo pueden robar, y no gana nada. Una cuenta de ahorro en un banco lo mantiene seguro, y algunas te pagan un poco de intereses." })),
         card(T("Protected by law", "Protegido por ley"), T("In the US, money in a bank is insured by the FDIC (credit unions: NCUA) up to {@fdicLimit} per person, per bank. If the bank fails, you still get it back.", "En Estados Unidos, el dinero en un banco está asegurado por la FDIC (en credit unions, la NCUA) hasta {@fdicLimit} por persona, por banco. Si el banco quiebra, igual recuperas tu dinero.", { en: "In Mexico, bank deposits are protected by the IPAB up to {@ipabLimitUdis} UDIs (over {@ipabLimitPesosMillions} million pesos) per person, per bank. If the bank fails, you still get it back.", es: "En México, el dinero en el banco está protegido por el IPAB hasta {@ipabLimitUdis} UDIS (más de {@ipabLimitPesosMillions} millones de pesos) por persona, por banco. Si el banco quiebra, igual recuperas tu dinero." })),

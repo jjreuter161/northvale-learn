@@ -73,6 +73,7 @@ export default {
     {
       id: "paycheck-1",
       title: T("Gross vs. net", "Bruto vs. neto"),
+      life: T("Plan your next month from net pay, the money that actually arrives.", "Planea tu próximo mes con el sueldo neto, el dinero que de verdad llega."),
       steps: [
         card(T("The number on the offer", "El número de la oferta"), T("When a job says \"{$15|60} an hour\" or \"{$2000|9000} a month\", that's gross pay: before anything is taken out. It's the starting point, not what you'll get.", "Cuando un trabajo dice \"{$15|60} la hora\" o \"{$2000|9000} al mes\", eso es el sueldo bruto: antes de cualquier descuento. Es el punto de partida, no lo que vas a recibir.")),
         card(T("The number in your account", "El número en tu cuenta"), T("Net pay is what arrives after taxes and deductions. Build your budget on net pay — that's the money you actually have.", "El sueldo neto es lo que llega después de impuestos y descuentos. Arma tu presupuesto con el neto: es el dinero que de verdad tienes.")),
@@ -85,6 +86,7 @@ export default {
     {
       id: "paycheck-2",
       title: T("What comes out of your pay", "Lo que se descuenta de tu sueldo"),
+      life: T("On your next pay stub, find each thing withheld and what it's for.", "En tu próximo recibo, encuentra cada descuento y para qué es."),
       steps: [
         card(
           T("Taxes, withheld for you", "Impuestos, retenidos por ti"),
@@ -119,6 +121,7 @@ export default {
     {
       id: "paycheck-3",
       title: T("Reading a pay stub", "Cómo leer tu recibo de nómina"),
+      life: T("Check the hours and rate on every pay stub. Mistakes happen, and they get fixed when you ask.", "Revisa las horas y la tarifa de cada recibo. Hay errores, y se corrigen cuando preguntas."),
       steps: [
         card(T("What's on it", "Qué trae"), T("Your pay stub lists hours and pay rate, gross pay, each deduction, and net pay — for this period and year to date. Keep it, or at least check it, every time you're paid.", "Tu recibo de pago muestra horas y tarifa, sueldo bruto, cada descuento y el neto, del periodo y del año. Guárdalo, o por lo menos revísalo, cada vez que te paguen.", { en: "Your payslip lists your \"percepciones\" (salary, overtime, bonuses), \"deducciones\" (ISR, IMSS) and net pay. It's an official electronic invoice (CFDI) — you can also find it on the SAT's website.", es: "Tu recibo de nómina muestra tus percepciones (sueldo, horas extra, bonos), tus deducciones (ISR, IMSS) y el neto. Es una factura electrónica oficial (CFDI): también lo puedes encontrar en el portal del SAT." })),
         card(T("Why check it", "Por qué revisarlo"), T("Mistakes happen: missing hours, the wrong rate, a deduction you didn't sign up for. Comparing your stub with your own record of hours is the easiest way to catch them.", "Los errores pasan: horas que faltan, una tarifa equivocada, un descuento que no pediste. Comparar tu recibo con tu propio registro de horas es la forma más fácil de detectarlos.")),
@@ -150,6 +153,7 @@ export default {
     {
       id: "paycheck-4",
       title: T("Paperwork for your first job", "Trámites para tu primer trabajo"),
+      life: T("Make one folder, paper or digital, for your work papers and pay stubs.", "Haz una carpeta, en papel o digital, para tus papeles de trabajo y tus recibos."),
       steps: [
         card(T("Day-one forms", "Los formularios del primer día"), T("Expect a W-4 (sets your federal tax withholding), an I-9 (proves you can work in the US) and a request for your Social Security number. In many states there's a state withholding form too. Under 18, some states also require a work permit.", "Prepárate para el W-4 (fija la retención de impuesto federal), el I-9 (prueba que puedes trabajar en EE. UU.) y que te pidan tu número de Seguro Social. En muchos estados también hay un formulario estatal. Si eres menor de 18, algunos estados piden además un permiso de trabajo.", { en: "Expect to give your RFC (from the SAT, free online with your CURP), your CURP and your NSS (IMSS number, also online). Your employer registers you with IMSS. Under 18, the law sets extra rules on hours and type of work.", es: "Prepárate para dar tu RFC (del SAT, gratis en línea con tu CURP), tu CURP y tu NSS (número del IMSS, también en línea). Tu patrón te da de alta en el IMSS. Si eres menor de 18, la ley pone reglas adicionales sobre horario y tipo de trabajo." })),
         card(T("Keep copies", "Guarda copias"), T("Keep your W-2 and pay stubs in one place. You'll need them to file your taxes and to prove income later.", "Guarda tu W-2 y tus recibos en un solo lugar. Los vas a necesitar para declarar impuestos y para comprobar ingresos más adelante.", { en: "Keep your payslips and your RFC and NSS details in one place. You'll need them if you file a tax return and to prove income later.", es: "Guarda tus recibos de nómina y tus datos de RFC y NSS en un solo lugar. Los vas a necesitar si presentas una declaración y para comprobar ingresos más adelante." })),

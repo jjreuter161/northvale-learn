@@ -39,8 +39,12 @@ const fri = "2026-10-30"; // a Friday
 const sun = "2026-11-01";
 const base = { lessonDay: "2026-10-28", streak: { count: 5, last: "2026-10-29" }, reviewDue: "2026-10-29", goals: 1, checkIn: null, mission: { title: "Track everything you spend for 3 days", started: null }, missionWeek: null, next: "Needs vs. wants" };
 assert.equal(push.pick(base, fri).kind, "streak");
-assert.match(push.pick(base, fri).body, /5-day streak/);
-assert.match(push.pick(base, fri, "es").body, /racha de 5 días/);
+// The streak line names the streak, rotates by date, and never guilt-trips.
+const lines = ["2026-10-29", "2026-10-30", "2026-10-31", "2026-11-01"].map((d) => push.pick({ ...base, lessonDay: "2026-10-27", streak: { count: 5, last: (d === "2026-10-29" ? "2026-10-28" : d === "2026-10-30" ? "2026-10-29" : d === "2026-10-31" ? "2026-10-30" : "2026-10-31") } }, d));
+for (const l of lines) (assert.equal(l.kind, l.kind === "checkin" ? "checkin" : "streak"), l.kind === "streak" && assert.match(l.body, /\b5\b/));
+assert.ok(new Set(lines.filter((l) => l.kind === "streak").map((l) => l.body)).size >= 3, "the streak line changes from day to day");
+for (const l of lines) assert.ok(!/lose|lost|don't break|!/i.test(l.body), `no guilt: ${l.body}`);
+assert.match(push.pick(base, fri, "es").body, /\b5 días\b/);
 assert.equal(push.pick({ ...base, streak: { count: 0 } }, sun).kind, "checkin", "Sunday: the check-in");
 assert.equal(push.pick({ ...base, streak: { count: 0 }, goals: 0 }, sun).kind, "review");
 assert.equal(push.pick({ ...base, streak: { count: 0 }, reviewDue: null }, fri).kind, "mission", "Thursday–Saturday: this week's mission");

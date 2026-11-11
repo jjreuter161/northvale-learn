@@ -53,6 +53,7 @@ export default {
     {
       id: "stocks-1",
       title: T("What's a stock?", "¿Qué es una acción?"),
+      life: T("Pick a company you use every day and look up its stock's ticker.", "Elige una empresa que uses todos los días y busca la clave de su acción."),
       steps: [
         card(T("Owning a tiny piece", "Ser dueño de un pedacito"), T("A stock (or share) is a tiny piece of a company. If you own a share of a company that makes sneakers, you own a sliver of every pair they sell.", "Una acción es un pedacito de una empresa. Si tienes una acción de una empresa que hace tenis, eres dueño de una parte diminuta de cada par que venden.")),
         card(T("Why companies sell shares", "Por qué las empresas venden acciones"), T("Companies sell shares to raise money to grow. Investors buy them hoping the company grows and the shares become worth more.", "Las empresas venden acciones para conseguir dinero y crecer. Los inversionistas las compran esperando que la empresa crezca y sus acciones valgan más.")),
@@ -82,6 +83,7 @@ export default {
     {
       id: "stocks-2",
       title: T("Why prices move", "Por qué se mueven los precios"),
+      life: T("Next time a stock jumps or drops, find out what people had expected.", "La próxima vez que una acción suba o baje mucho, averigua qué se esperaba."),
       steps: [
         card(T("Buyers and sellers", "Compradores y vendedores"), T("A stock's price is whatever buyers will pay and sellers will accept right now. Good news can bring more buyers; bad news, more sellers.", "El precio de una acción es lo que los compradores están dispuestos a pagar y los vendedores a aceptar en ese momento. Las buenas noticias atraen compradores; las malas, vendedores.")),
         card(T("Short term vs. long term", "Corto vs. largo plazo"), T("Day to day, prices bounce around for lots of reasons, some random. Over many years, they tend to follow how much the company actually earns.", "De un día a otro, los precios suben y bajan por muchas razones, algunas al azar. A lo largo de muchos años, tienden a seguir cuánto gana de verdad la empresa.")),
@@ -101,6 +103,7 @@ export default {
     {
       id: "stocks-3",
       title: T("Ups and downs are normal", "Las subidas y bajadas son normales"),
+      life: T("Only invest money you won't need for several years.", "Invierte solo dinero que no vayas a necesitar en varios años."),
       steps: [
         card(T("Volatility", "Volatilidad"), T("Volatility is how much a price swings. Single companies can drop 30% or more in a year — even great ones.", "La volatilidad es cuánto se mueve un precio. Una sola empresa puede caer 30% o más en un año, incluso las buenas.")),
         card(T("Don't panic-sell", "No vendas por pánico"), T("Selling when prices drop locks in the loss. People who stay calm and hold good investments for years usually do better than those who jump in and out.", "Vender cuando los precios caen hace que la pérdida se vuelva real. Quienes mantienen la calma y conservan buenas inversiones por años suelen irles mejor que a quienes entran y salen.")),

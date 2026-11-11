@@ -15,6 +15,7 @@ import { Button, Card, Icon, Layer, List, ListRow, Progress, Ring, Sheet, toast 
 import { AgeCard } from "../../core/Settings.jsx";
 import { ReminderCard } from "../../core/reminders.jsx";
 import { practiceOpen, markIntro } from "../../core/Practice.jsx";
+import { feel, reducedMotion } from "../../core/feel.js";
 import { UNITS, ALL_LESSONS, lessonById, lessonState, nextLesson, nextFor, unitDone, isQuestion, conceptPool, conceptsOfLesson, conceptsOfUnit, minutes } from "./content.js";
 import { conceptById } from "./concepts.js";
 import * as M from "./mastery.js";
@@ -37,6 +38,21 @@ addStrings({
   "lessons.streak_today": S("Today's lesson is done. Your streak is safe.", "La lección de hoy está hecha. Tu racha está a salvo."),
   "lessons.streak_keep": S("Do one lesson to keep your {n}-day streak.", "Haz una lección para mantener tu racha de {n} {n|día|días}."),
   "lessons.streak_start": S("Do one lesson to start a streak.", "Haz una lección para empezar una racha."),
+  // The finish screen and its moments
+  "finish.today": S("{xp} of {goal} XP today · {n}-day streak", "{xp} de {goal} XP hoy · racha de {n} {n|día|días}"),
+  "finish.life": S("In real life", "En la vida real"),
+  "finish.solid": S("Now solid: {name}", "Ya lo tienes firme: {name}"),
+  "finish.mastered": S("Mastered: {name}", "Dominado: {name}"),
+  "moment.streak.7": S("A week, every day.", "Una semana, todos los días."),
+  "moment.streak.7.sub": S("Seven days in a row. This is about where habits start.", "Siete días seguidos. Más o menos aquí empiezan los hábitos."),
+  "moment.streak.30": S("Thirty days in a row.", "Treinta días seguidos."),
+  "moment.streak.30.sub": S("A month of showing up, a few minutes at a time. That's a habit now.", "Un mes de constancia, unos minutos a la vez. Eso ya es un hábito."),
+  "moment.streak.100": S("A hundred days.", "Cien días."),
+  "moment.streak.100.sub": S("Most people never stick with anything this long. You did.", "Casi nadie mantiene algo tanto tiempo. Tú sí."),
+  "moment.unit.eyebrow": S("Unit {n} of {total} · complete", "Unidad {n} de {total} · completa"),
+  "moment.unit.sub": S("You covered {lessons}.", "Viste {lessons}."),
+  "moment.lessons": S("{n} {n|lesson|lessons}", "{n} {n|lección|lecciones}"),
+  "moment.solid": S("{n} {n|idea|ideas} solid", "{n} {n|idea firme|ideas firmes}"),
   "lessons.course_done": S("You finished the whole course. Open water ahead.", "Terminaste todo el curso. Hay mar abierto por delante."),
   "lessons.all_done": S("You've finished every lesson. Review any of them, or keep working on your goals.", "Terminaste todas las lecciones. Repasa las que quieras o sigue avanzando en tus metas."),
   "lessons.quit.title": S("Leave this lesson?", "¿Salir de esta lección?"),
@@ -313,6 +329,92 @@ function Learn(ctx) {
   );
 }
 
+// MOMENTS — a 7, 30 or 100-day streak, or a finished unit, gets one calm
+// full-screen moment with a share option (the share card has no names or
+// amounts). At most one per session; a second becomes a line on the
+// finish screen (it's already there: the unit line, the streak).
+const STREAKS = [7, 30, 100];
+let momentShown = false;
+function Moment({ t, locale, result, unit, onDone }) {
+  const tx = useLocaleText(locale);
+  const n = result.streak;
+  const streak = result.moment === "streak";
+  const known = conceptsNow();
+  const solid = streak ? 0 : conceptsOfUnit(unit.id).filter((c) => ["solid", "mastered"].includes(M.levelOf(known[c]))).length;
+  const list = (items) => new Intl.ListFormat(locale.lang, { type: "conjunction" }).format(items);
+  return (
+    <>
+      <div data-moment={result.moment} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", gap: 6, padding: "24px 6px" }}>
+        {streak ? (
+          <>
+            <div style={{ width: 168, height: 168, borderRadius: 84, border: "3px solid var(--brand)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: n >= 100 ? 64 : 80, fontWeight: 750, letterSpacing: -3, color: "var(--brand)", fontVariantNumeric: "tabular-nums" }}>{n}</div>
+            {n === 7 && (
+              <div aria-hidden style={{ display: "flex", gap: 8, marginTop: 18 }}>
+                {Array.from({ length: 7 }, (_, i) => (
+                  <span key={i} style={{ width: 10, height: 10, borderRadius: 5, background: "var(--brand)" }} />
+                ))}
+              </div>
+            )}
+            <h1 style={{ fontSize: 30, fontWeight: 750, letterSpacing: -0.6, margin: "24px 0 4px" }}>{t(`moment.streak.${n}`)}</h1>
+            <p style={{ fontSize: 17, color: "var(--mid)", lineHeight: 1.5, margin: 0, maxWidth: 340 }}>{t(`moment.streak.${n}.sub`)}</p>
+          </>
+        ) : (
+          <>
+            <span style={{ width: 84, height: 84, borderRadius: 24, background: "var(--brandSoft)", color: "var(--brand)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <Icon name={unit.icon} size={42} />
+            </span>
+            <div style={{ fontSize: 14, fontWeight: 600, color: "var(--low)", marginTop: 22 }}>{t("moment.unit.eyebrow", { n: UNITS.indexOf(unit) + 1, total: UNITS.length })}</div>
+            <h1 style={{ fontSize: 30, fontWeight: 750, letterSpacing: -0.6, margin: "4px 0 6px" }}>{tx(unit.title)}</h1>
+            <p style={{ fontSize: 16, color: "var(--mid)", lineHeight: 1.5, margin: 0, maxWidth: 360 }}>{t("moment.unit.sub", { lessons: list(unit.lessons.map((l) => `“${tx(l.title)}”`)) })}</p>
+            <div style={{ display: "flex", gap: 28, marginTop: 20, fontSize: 15, color: "var(--mid)" }}>
+              <span>{t("moment.lessons", { n: unit.lessons.length })}</span>
+              {solid > 0 && <span>{t("moment.solid", { n: solid })}</span>}
+            </div>
+          </>
+        )}
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        <Button full kind="secondary" onClick={() => openShare(streak ? { kind: "streak", n } : { kind: "unit", title: tx(unit.title) })}>
+          <Icon name="share" size={18} /> {t("share.button")}
+        </Button>
+        <Button full onClick={onDone}>
+          {t("common.continue")}
+        </Button>
+      </div>
+    </>
+  );
+}
+
+// The finish: the day's ring fills and the XP counts up (instantly with
+// "reduce motion"), then the streak and the day's total.
+function FinishRing({ t, before, after, goal, gained, streak }) {
+  const still = reducedMotion();
+  const [shown, setShown] = useState(still ? after : before);
+  const [n, setN] = useState(still ? gained : 0);
+  useEffect(() => {
+    if (still) return undefined;
+    const start = performance.now();
+    let raf = requestAnimationFrame(function step(now) {
+      const p = Math.min(1, (now - start) / 650);
+      setN(Math.round(gained * p));
+      if (p < 1) raf = requestAnimationFrame(step);
+    });
+    const id = setTimeout(() => setShown(after), 30);
+    return () => (cancelAnimationFrame(raf), clearTimeout(id));
+  }, []);
+  return (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+      <Ring value={Math.min(shown, goal)} max={goal} size={136} stroke={8} label={t("finish.today", { xp: after, goal, n: streak })}>
+        <div style={{ textAlign: "center", lineHeight: 1 }}>
+          <div style={{ fontSize: 34, fontWeight: 750, letterSpacing: -0.8, fontVariantNumeric: "tabular-nums" }}>+{n}</div>
+          <div style={{ fontSize: 13, color: "var(--mid)", marginTop: 4 }}>XP</div>
+        </div>
+      </Ring>
+      <p style={{ fontSize: 14, color: "var(--mid)", margin: "10px 0 0" }}>{t("finish.today", { xp: after, goal, n: streak })}</p>
+    </div>
+  );
+}
+
 // THE PLAYER — one step at a time, for a lesson, a review or a challenge.
 // A miss shows why that answer is wrong; in a lesson it also brings an
 // extra card and an easier question on that concept right away, and the
@@ -331,6 +433,7 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
   const [actionDone, setActionDone] = useState(false);
   const [result, setResult] = useState(null);
   const [quit, setQuit] = useState(false);
+  const [momentDone, setMomentDone] = useState(false);
   const step = queue[at];
   const unit = UNITS.find((u) => u.id === lesson.unit);
   const total = queue.length;
@@ -344,13 +447,23 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
     setChecked(null);
     setActionDone(false);
     if (at + 1 < queue.length) return setAt(at + 1);
+    const before = conceptsNow();
     saveConcepts((c) => M.applySession(c, firsts.current, dayKey()));
+    feel("finish");
     if (mode !== "lesson") return setResult(recordReview({ kind: mode, mistakes }));
+    // Ideas that moved up to solid or mastered in this lesson (a quiet line).
+    const after = conceptsNow();
+    const rank = (r) => M.LEVELS.indexOf(M.levelOf(r));
+    const levelUps = [...new Set(firsts.current.map((a) => a.c).filter(Boolean))].filter((c) => rank(after[c]) > rank(before[c]) && rank(after[c]) >= 2).map((c) => ({ c, level: M.levelOf(after[c]) }));
+    const xpBefore = xpOn(getState().progress, dayKey());
     const wasUnitDone = unitDone(getState().progress, unit);
     const allDone = () => UNITS.every((u) => unitDone(getState().progress, u));
     const wasAllDone = allDone();
     const r = recordLesson({ id: lesson.id, perfect: mistakes === 0, mistakes });
-    setResult({ ...r, unitJustDone: !wasUnitDone && unitDone(getState().progress, unit), courseJustDone: !wasAllDone && allDone() });
+    const unitJustDone = !wasUnitDone && unitDone(getState().progress, unit);
+    const moment = momentShown ? null : unitJustDone ? "unit" : r.streakUp && STREAKS.includes(r.streak) ? "streak" : null;
+    if (moment) momentShown = true;
+    setResult({ ...r, unitJustDone, courseJustDone: !wasAllDone && allDone(), levelUps, moment, xpBefore, xpAfter: xpOn(getState().progress, dayKey()) });
   };
   // The answer so far: what was picked, or the type's starting answer.
   const value = step && isQuestion(step) && picked === null ? startValue(step, locale.region) : picked;
@@ -359,6 +472,7 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
   const check = () => {
     if (!canCheck) return;
     const right = QTYPES[step.type].grade(step, value, locale.region);
+    if (right) feel("right");
     if (picked === null) setPicked(value);
     setChecked(right ? "right" : "wrong");
     if (!step.retry && !step.extra) firsts.current.push({ c: step.c, right });
@@ -398,37 +512,43 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
         <SessionDone t={t} locale={locale} mode={mode} result={result} answers={firsts.current} onDone={onExit} />
       </Overlay>
     );
+  if (result && result.moment && !momentDone)
+    return (
+      <Overlay label={run.title}>
+        <Moment t={t} locale={locale} result={result} unit={unit} onDone={() => setMomentDone(true)} />
+      </Overlay>
+    );
   if (result) {
     const progress = getState().progress;
     const nl = nextFor(progress, service("goals", "recommendedUnits")() || []);
     const toward = service("goals", "buildingToward")();
     const TryCard = service("missions", "TryCard");
-    const facts = [
-      t("lessons.xp", { n: result.gained }),
-      t("lessons.streak", { n: result.streak }),
-      ...(result.goalJustMet ? [t("lessons.goal_met")] : []),
-      ...(mistakes === 0 ? [t("lessons.perfect")] : []),
-    ];
+    const facts = [...(result.goalJustMet ? [t("lessons.goal_met")] : []), ...(mistakes === 0 ? [t("lessons.perfect")] : [])];
     return (
       <Overlay label={run.title}>
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", gap: 18, paddingBottom: 18 }}>
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", gap: 16, paddingBottom: 18 }}>
+          <FinishRing t={t} before={result.xpBefore} after={result.xpAfter} goal={progress.dailyGoal} gained={result.gained} streak={result.streak} />
           <div style={{ textAlign: "center" }}>
-            <div style={{ width: 56, height: 56, borderRadius: 28, margin: "0 auto 14px", background: "var(--accentSoft)", color: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <Icon name="check" size={28} stroke={2.4} />
-            </div>
-            <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: -0.4, margin: 0 }}>{t("lessons.complete")}</h1>
-            <p style={{ color: "var(--mid)", margin: "6px 0 0" }}>{tx(lesson.title)}</p>
-            <p style={{ fontSize: 14, color: "var(--mid)", margin: "10px 0 0" }}>{facts.join("  ·  ")}</p>
+            <h1 style={{ fontSize: 28, fontWeight: 750, letterSpacing: -0.5, margin: 0 }}>{t("lessons.complete")}</h1>
+            <p style={{ color: "var(--mid)", margin: "4px 0 0", fontSize: 16 }}>{tx(lesson.title)}</p>
+            {facts.length > 0 && <p style={{ fontSize: 14, color: "var(--mid)", margin: "8px 0 0" }}>{facts.join("  ·  ")}</p>}
             {result.courseJustDone && <p style={{ fontSize: 19, fontWeight: 700, color: "var(--head)", margin: "16px 0 0", lineHeight: 1.35 }}>{t("lessons.course_done")}</p>}
           </div>
           <Card>
-            <p style={{ fontSize: 16, lineHeight: 1.5, margin: 0 }}>{t(`why.${lesson.unit}`)}</p>
+            <div style={{ fontSize: 14, fontWeight: 650, color: "var(--mid)", marginBottom: 4 }}>{t("finish.life")}</div>
+            <p style={{ fontSize: 16, lineHeight: 1.5, margin: 0 }}>{tx(lesson.life)}</p>
             {toward && (
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 10, fontSize: 14, color: "var(--mid)" }}>
                 <Icon name="target" size={16} /> {t("today.toward", { name: toward })}
               </div>
             )}
           </Card>
+          {result.levelUps.length > 0 && (
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 14, color: "var(--mid)", textAlign: "center" }}>
+              <Icon name="star" size={16} color="var(--brand)" />
+              <span>{result.levelUps.map((x) => t(x.level === "mastered" ? "finish.mastered" : "finish.solid", { name: tx(conceptById(x.c).name) })).join("  ·  ")}</span>
+            </div>
+          )}
           {practiceOpen(progress) && <TryCard t={t} locale={locale} go={go} unit={lesson.unit} />}
           {(result.unitJustDone || result.freezeEarned || result.badges.length > 0) && (
             <div style={{ fontSize: 14, color: "var(--mid)", lineHeight: 1.6, textAlign: "center" }}>

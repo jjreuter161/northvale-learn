@@ -54,6 +54,7 @@ export default {
     {
       id: "compound-1",
       title: T("Interest on interest", "Intereses sobre intereses"),
+      life: T("Leave your savings' interest in the account instead of spending it.", "Deja los intereses de tu ahorro en la cuenta en lugar de gastarlos."),
       steps: [
         card(T("Money that grows itself", "Dinero que crece solo"), T("Earn 5% on {$100|1000} and you have {$105|1050}. Next year you earn 5% on {$105|1050}, not just on {$100|1000}. Your interest starts earning interest. That's compounding.", "Si ganas 5% sobre {$100|1000}, tienes {$105|1050}. Al año siguiente ganas 5% sobre {$105|1050}, no solo sobre {$100|1000}. Tus intereses empiezan a ganar intereses. Eso es el interés compuesto.")),
         number("compound_interest", T("{$100|1000} grows 10% a year. How much is there after 2 years?", "{$100|1000} crece 10% al año. ¿Cuánto hay después de 2 años?"), { unit: "money", answer: [121, 1210] }, [T("Year 1: {$100|1000} + 10% = {$110|1100}.", "Año 1: {$100|1000} + 10% = {$110|1100}."), T("Year 2: {$110|1100} + 10% = {$121|1210}. That extra {$1|10} is interest on interest.", "Año 2: {$110|1100} + 10% = {$121|1210}. Ese {$1|10} extra es interés sobre interés.")]),
@@ -71,6 +72,7 @@ export default {
     {
       id: "compound-2",
       title: T("Time is your superpower", "El tiempo es tu superpoder"),
+      life: T("Start a small monthly amount now. Raising it later is easy; getting the years back isn't.", "Empieza ya con una cantidad pequeña al mes. Subirla después es fácil; recuperar los años, no."),
       steps: [
         card(T("Starting early beats starting big", "Empezar temprano le gana a empezar con mucho"), T("At about {@indexExampleRate} a year, someone who starts investing at 16 can end up with more than someone who invests twice as much each month starting at 26 — just because their money had more years to compound.", "Con alrededor de {@indexExampleRate} al año, alguien que empieza a invertir a los 16 puede terminar con más que alguien que invierte el doble cada mes pero empieza a los 26, solo porque su dinero tuvo más años para crecer.")),
         choice(
@@ -90,6 +92,7 @@ export default {
     {
       id: "compound-3",
       title: T("Your first safe investment", "Tu primera inversión segura"),
+      life: T("Money you'll need within a year or two goes somewhere safe, even if it grows slowly.", "El dinero que vas a necesitar en uno o dos años va en algo seguro, aunque crezca despacio."),
       steps: [
         card(T("Lending to the government", "Prestarle al gobierno"), T("Treasury bills (T-bills) are short loans to the US government. You lend money for a few weeks or months and get it back with interest. They're considered one of the safest places for money.", "Los Treasury bills (T-bills) son préstamos cortos al gobierno de Estados Unidos. Prestas dinero por unas semanas o meses y te lo regresan con intereses. Se consideran de los lugares más seguros para el dinero.", { en: "CETES are short loans to the Mexican government. You lend money for 28 days (or longer) and get it back with interest. You can buy them at cetesdirecto.com starting at {@cetesMinimum} — with an adult's help if you're under 18.", es: "Los CETES son préstamos cortos al gobierno de México. Prestas dinero por 28 días (o más) y te lo regresan con intereses. Puedes comprarlos en cetesdirecto.com desde {@cetesMinimum}; si eres menor de edad, con ayuda de un adulto." })),
         card(T("Safe ≠ big growth", "Seguro ≠ mucho crecimiento"), T("Safe investments grow slowly. They're great for money you'll need soon, like an emergency fund or a goal in a year or two.", "Las inversiones seguras crecen despacio. Son ideales para dinero que vas a necesitar pronto, como tu fondo de emergencia o una meta en uno o dos años.")),
