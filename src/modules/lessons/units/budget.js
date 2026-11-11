@@ -1,5 +1,5 @@
 // UNIT — Budgeting. Its lessons and the concepts they teach (format in helpers.js).
-import { T, card, choice, tf, act, concept, estimate, number, scenario, fit } from "./helpers.js";
+import { T, card, choice, tf, act, concept, estimate, number, scenario, fit, match } from "./helpers.js";
 
 export default {
   id: "budget",
@@ -56,14 +56,7 @@ export default {
       steps: [
         card(T("A plan for your money", "Un plan para tu dinero"), T("A budget is just a plan: before you spend, you decide where your money goes. It's not about saying no to everything — it's about saying yes to what matters most to you.", "Un presupuesto es solo un plan: antes de gastar, decides a dónde va tu dinero. No se trata de decir que no a todo, sino de decir que sí a lo que más te importa.")),
         card(T("The 50/30/20 idea", "La idea 50/30/20"), T("A simple starting point: about 50% for needs (things you must pay), 30% for wants (fun stuff), and 20% for saving. It's a guide, not a law — adjust it to your life.", "Un punto de partida sencillo: más o menos 50% para necesidades (lo que sí o sí debes pagar), 30% para gustos y 20% para ahorrar. Es una guía, no una ley: ajústala a tu vida.")),
-        choice(
-          "budgeting",
-          T("You get {$400|6000} a month. With 50/30/20, how much goes to saving?", "Recibes {$400|6000} al mes. Con 50/30/20, ¿cuánto va al ahorro?"),
-          [T("{$40|600}", "{$40|600}"), T("{$80|1200}", "{$80|1200}"), T("{$200|3000}", "{$200|3000}")],
-          1,
-          T("20% of {$400|6000} is {$80|1200}. Saving first means future-you gets paid too.", "El 20% de {$400|6000} es {$80|1200}. Ahorrar primero significa que tu yo del futuro también cobra."),
-          [T("{$40|600} is 10%. With 50/30/20, saving is 20%.", "{$40|600} es el 10%. Con 50/30/20, el ahorro es el 20%."), null, T("{$200|3000} is 50% — that's the share for needs, not saving.", "{$200|3000} es el 50%: esa es la parte de necesidades, no del ahorro.")]
-        ),
+        match("budgeting", T("Match each part of 50/30/20 to an example.", "Une cada parte del 50/30/20 con un ejemplo."), [[T("50% needs", "50% necesidades"), T("Rent, groceries, the bus to work", "Renta, comida, el camión al trabajo")], [T("30% wants", "30% gustos"), T("Streaming, eating out, a new game", "Streaming, comer fuera, un juego nuevo")], [T("20% saving", "20% ahorro"), T("An emergency fund and your goals", "Un fondo de emergencia y tus metas")]], T("It's a guide, not a law: adjust the split to your life.", "Es una guía, no una ley: ajusta la repartición a tu vida.")),
         tf("budgeting", T("A budget means you can never buy anything fun.", "Tener presupuesto significa que nunca puedes comprar nada divertido."), false, T("Fun money is part of the plan. A budget just makes sure fun doesn't eat your rent or your savings.", "El dinero para gustos es parte del plan. El presupuesto solo cuida que los gustos no se coman tus pagos ni tu ahorro.")),
         number("budgeting", T("You get {$400|6000} a month and follow 50/30/20. How much goes to saving each month?", "Recibes {$400|6000} al mes y sigues el 50/30/20. ¿Cuánto va al ahorro cada mes?"), { unit: "money", answer: [80, 1200] }, [T("Saving is the 20%, which is 0.20.", "El ahorro es el 20%, o sea 0.20."), T("0.20 × {$400|6000} = {$80|1200} a month.", "0.20 × {$400|6000} = {$80|1200} al mes.")]),
         act("goals.budget", T("Split {$400|6000} a month your way. Try to save at least 10%.", "Reparte {$400|6000} al mes a tu manera. Intenta ahorrar al menos 10%."), {income: [400,6000]}),

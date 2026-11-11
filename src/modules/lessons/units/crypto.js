@@ -87,7 +87,7 @@ export default {
             [T("Blockchain", "Blockchain"), T("A shared record of every transfer", "Un registro compartido de cada transferencia")],
             [T("Exchange", "Exchange (casa de cambio de cripto)"), T("A company where you buy and sell crypto", "Una empresa donde compras y vendes cripto")],
             [T("Seed phrase", "Frase semilla"), T("Secret words that control a wallet: never share them", "Palabras secretas que controlan una cartera: nunca las compartas")],
-            [T("Central bank", "Banco central"), T("Issues dollars and pesos, not crypto", "Emite dólares y pesos, no cripto")],
+            [T("Wallet", "Cartera (wallet)"), T("An app or device that holds your crypto keys", "Una app o dispositivo que guarda tus llaves de cripto")],
           ],
           T("Crypto isn't issued by a central bank, and on an exchange it isn't covered by deposit insurance.", "Las criptomonedas no las emite un banco central, y en un exchange no las cubre el seguro de depósitos.")
         ),
@@ -109,7 +109,7 @@ export default {
           [null, T("A 50% rise on {$50|500} only reaches {$75|750}.", "Subir 50% sobre {$50|500} solo llega a {$75|750}."), T("A 25% rise on {$50|500} reaches about {$63|625}.", "Subir 25% sobre {$50|500} llega a unos {$63|625}.")]
         ),
         tf("crypto_volatility", T("Most cryptocurrencies have company profits behind their price, like stocks.", "La mayoría de las criptomonedas tiene ganancias de una empresa detrás de su precio, como las acciones."), false, T("Most don't — which is part of why prices swing so much.", "La mayoría no, y eso es parte de por qué los precios se mueven tanto.")),
-        estimate("crypto_volatility", T("A coin drops 50%. How much does it then have to rise to get back to where it started?", "Una moneda baja 50%. ¿Cuánto tiene que subir después para volver a donde empezó?"), { unit: "percent", min: 0, max: 300, step: 5, answer: 100, tol: 0.1 }, T("{$100|1000} falls to {$50|500}. Doubling, a 100% rise, only gets you back to {$100|1000}.", "{$100|1000} baja a {$50|500}. Duplicarse, subir 100%, solo te regresa a {$100|1000}.")),
+        estimate("crypto_volatility", T("A coin drops 80%. How much does it then have to rise to get back to where it started?", "Una moneda baja 80%. ¿Cuánto tiene que subir después para volver a donde empezó?"), { unit: "percent", min: 0, max: 1000, step: 10, answer: 400 }, T("{$100|1000} falls to {$20|200}. Getting back to {$100|1000} means growing five times over: a 400% rise.", "{$100|1000} baja a {$20|200}. Volver a {$100|1000} significa crecer cinco veces: subir 400%.")),
         act("goals.swing", T("Run a few made-up years and compare the biggest drops.", "Corre unos cuantos años inventados y compara las mayores caídas.")),
       ],
     },

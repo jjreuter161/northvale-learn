@@ -115,7 +115,7 @@ export default {
           T("Match what comes out of your pay to what it's for.", "Une cada descuento de tu sueldo con para qué es."),
           [
             [T("Income tax", "Impuesto sobre la renta", { en: "ISR", es: "ISR" }), T("A share of what you earn, for public services", "Una parte de lo que ganas, para servicios públicos")],
-            [T("Social Security", "Seguro Social", { en: "IMSS", es: "IMSS" }), T("Retirement and disability benefits later", "Pensión y apoyo por incapacidad más adelante", { en: "Health care, disability coverage and part of your AFORE", es: "Atención médica, incapacidades y parte de tu AFORE" })],
+            [T("State income tax", "Impuesto estatal", { en: "IMSS", es: "IMSS" }), T("In most states, a share of what you earn", "En la mayoría de los estados, una parte de lo que ganas", { en: "Health care, disability coverage and part of your AFORE", es: "Atención médica, incapacidades y parte de tu AFORE" })],
             [T("Medicare", "Medicare", { en: "Employment subsidy", es: "Subsidio para el empleo" }), T("Health care when you're older", "Atención médica cuando seas mayor", { en: "Lowers the tax for people who earn less", es: "Baja el impuesto a quienes ganan menos" })],
           ],
           T("These come out before your pay arrives, so your net pay is smaller than your gross.", "Se descuentan antes de que llegue tu sueldo, por eso el neto es menor que el bruto.")
@@ -173,7 +173,7 @@ export default {
           "job_paperwork",
           T("Match each first-job paper to what it's for.", "Une cada papel del primer trabajo con para qué sirve."),
           [
-            [T("W-4", "W-4", { en: "RFC", es: "RFC" }), T("Sets how much tax is withheld from your pay", "Define cuánto impuesto te retienen", { en: "Your tax ID, from the SAT", es: "Tu clave para impuestos, del SAT" })],
+            [T("Direct deposit form", "Formulario de depósito directo", { en: "RFC", es: "RFC" }), T("Tells your employer where to send your pay", "Le dice a tu empleador a dónde mandar tu sueldo", { en: "Your tax ID, from the SAT", es: "Tu clave para impuestos, del SAT" })],
             [T("I-9", "I-9", { en: "NSS", es: "NSS" }), T("Shows you're allowed to work in the US", "Muestra que puedes trabajar en EE. UU.", { en: "Your IMSS number", es: "Tu número del IMSS" })],
             [T("W-2", "W-2", { en: "Payslip", es: "Recibo de nómina" }), T("A yearly summary of your pay and taxes", "Un resumen anual de tu sueldo e impuestos", { en: "The record of each payday", es: "El comprobante de cada pago" })],
           ],

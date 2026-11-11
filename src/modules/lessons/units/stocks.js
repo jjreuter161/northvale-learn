@@ -69,7 +69,7 @@ export default {
           "what_stock",
           T("Match each word to what it means.", "Une cada palabra con lo que significa."),
           [
-            [T("Share", "Acción"), T("A tiny piece of a company", "Un pedacito de una empresa")],
+            [T("Bond", "Bono"), T("A loan to a company or government", "Un préstamo a una empresa o gobierno")],
             [T("Dividend", "Dividendo"), T("Part of the profit paid to owners", "Parte de las ganancias que se paga a los dueños")],
             [T("Stock exchange", "Bolsa de valores"), T("Where shares are bought and sold", "Donde se compran y venden acciones")],
             [T("Ticker", "Clave de pizarra"), T("A stock's short code", "El código corto de una acción")],

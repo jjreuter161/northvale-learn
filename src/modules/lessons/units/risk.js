@@ -74,14 +74,7 @@ export default {
       title: T("Don't put all your eggs in one basket", "No pongas todos los huevos en una canasta"),
       steps: [
         card(T("Diversification", "Diversificación"), T("Spreading money across many different investments means one bad one can't sink you. Different kinds — companies, countries, bonds — tend to have bad years at different times.", "Repartir tu dinero en muchas inversiones distintas hace que una mala no te hunda. Los distintos tipos —empresas, países, bonos— suelen tener años malos en momentos diferentes.")),
-        choice(
-          "diversification",
-          T("Which portfolio is most diversified?", "¿Cuál portafolio está más diversificado?"),
-          [T("All in one company you love", "Todo en una empresa que te encanta"), T("A total-market fund + an international fund + a bond fund", "Un fondo de todo el mercado + uno internacional + uno de bonos"), T("Three tech companies", "Tres empresas de tecnología")],
-          1,
-          T("Different kinds of investments, many companies, more than one country.", "Distintos tipos de inversión, muchas empresas, más de un país."),
-          [T("One company is the opposite of diversified.", "Una sola empresa es lo contrario de diversificar."), null, T("Three companies in the same industry tend to rise and fall together.", "Tres empresas del mismo sector suelen subir y bajar juntas.")]
-        ),
+        order("diversification", T("Order these from least to most diversified.", "Ordena del menos al más diversificado."), [T("All in one company you love", "Todo en una empresa que te encanta"), T("Three tech companies", "Tres empresas de tecnología"), T("A fund of the whole stock market", "Un fondo de todo el mercado de acciones"), T("A whole-market fund + an international fund + a bond fund", "Un fondo de todo el mercado + uno internacional + uno de bonos")], T("More companies, more industries, more countries and more kinds of investment each spread the risk further.", "Más empresas, más sectores, más países y más tipos de inversión reparten cada vez más el riesgo.")),
         card(T("Know what you own", "Conoce lo que tienes"), T("Owning five funds that all hold the same big companies isn't real variety. Check what's inside.", "Tener cinco fondos que tienen las mismas grandes empresas no es variedad de verdad. Revisa qué hay adentro.")),
         tf("diversification", T("Diversification can remove all risk.", "Diversificar puede eliminar todo el riesgo."), false, T("It lowers the risk of one investment ruining you, but the whole market can still fall.", "Reduce el riesgo de que una sola inversión te arruine, pero todo el mercado puede caer igual.")),
         scenario(

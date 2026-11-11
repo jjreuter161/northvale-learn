@@ -1,5 +1,5 @@
 // UNIT — Banking for real. Its lessons and the concepts they teach (format in helpers.js).
-import { T, card, choice, tf, act, concept, match, spot, tap, scenario, fit } from "./helpers.js";
+import { T, card, choice, tf, act, concept, match, spot, tap, scenario, fit, number } from "./helpers.js";
 
 export default {
   id: "banking",
@@ -98,14 +98,7 @@ export default {
       steps: [
         card(T("Where fees hide", "Dónde se esconden las comisiones"), T("Monthly maintenance fees, other banks' ATMs, overdrafts, paper statements, replacing a lost card. Each looks small. Together, they can cost more than your savings earn.", "Comisiones mensuales, cajeros de otros bancos, sobregiros, estados de cuenta en papel, reponer una tarjeta perdida. Cada una parece pequeña. Juntas, pueden costar más de lo que gana tu ahorro.", { en: "Monthly fees for going under a minimum balance, other banks' ATMs, replacing a card, some transfers. Each looks small. Together, they can cost more than your savings earn.", es: "Comisiones mensuales por bajar del saldo mínimo, cajeros de otros bancos, reponer una tarjeta, algunas transferencias. Cada una parece pequeña. Juntas, pueden costar más de lo que gana tu ahorro." })),
         card(T("Most fees can be avoided", "Casi todas se pueden evitar"), T("Pick an account without a monthly fee, use your bank's own ATMs, and turn on low-balance alerts. If you're charged a fee by mistake, ask the bank to remove it — they often do.", "Elige una cuenta sin comisión mensual, usa los cajeros de tu banco y activa alertas de saldo bajo. Si te cobran una comisión por error, pide que la quiten; muchas veces lo hacen.", { en: "Pick an account without a monthly fee, use your bank's own ATMs, and turn on balance alerts. If you're charged something you don't recognize, you can file a complaint with the bank and with CONDUSEF.", es: "Elige una cuenta sin comisión mensual, usa los cajeros de tu banco y activa alertas de saldo. Si te cobran algo que no reconoces, puedes reclamar al banco y a la CONDUSEF." })),
-        choice(
-          "bank_fees",
-          T("You take out cash at another bank's ATM twice a week and pay {$3|30} each time. About how much is that a year?", "Sacas efectivo en cajeros de otro banco dos veces por semana y pagas {$3|30} cada vez. ¿Cuánto es al año, más o menos?"),
-          [T("{$312|3120}", "{$312|3120}"), T("{$36|360}", "{$36|360}"), T("{$6|60}", "{$6|60}")],
-          0,
-          T("{$3|30} × 2 × 52 weeks = {$312|3120}. Using your own bank's ATMs would cost nothing.", "{$3|30} × 2 × 52 semanas = {$312|3120}. Usar los cajeros de tu banco no costaría nada."),
-          [null, T("That's once a month for a year. Twice a week is much more often.", "Eso sería una vez al mes durante un año. Dos veces por semana es mucho más seguido."), T("That's one week. Multiply by 52 weeks.", "Eso es una semana. Multiplica por 52 semanas.")]
-        ),
+        number("bank_fees", T("You take out cash at another bank's ATM twice a week and pay {$3|30} each time. How much is that in a year?", "Sacas efectivo en cajeros de otro banco dos veces por semana y pagas {$3|30} cada vez. ¿Cuánto es al año?"), { unit: "money", answer: [312, 3120] }, [T("{$3|30} × 2 = {$6|60} a week.", "{$3|30} × 2 = {$6|60} a la semana."), T("× 52 weeks = {$312|3120} a year. Your own bank's ATMs would cost nothing.", "× 52 semanas = {$312|3120} al año. Los cajeros de tu banco no costarían nada.")]),
         tf("bank_fees", T("A bank's fees are a secret until you're charged.", "Las comisiones de un banco son secretas hasta que te cobran."), false, T("Banks must publish their fees. Read the fee schedule before you open an account.", "Los bancos deben publicar sus comisiones. Lee la lista antes de abrir una cuenta.")),
         spot(
           "bank_fees",
@@ -171,7 +164,7 @@ export default {
           T("Match each word to what it means.", "Une cada palabra con lo que significa."),
           [
             [T("Debit card", "Tarjeta de débito"), T("Spends money already in your account", "Gasta dinero que ya está en tu cuenta")],
-            [T("Credit card", "Tarjeta de crédito"), T("Borrows money you pay back later", "Pide prestado dinero que pagas después")],
+            [T("Statement balance", "Saldo del estado de cuenta"), T("What you owe for the month", "Lo que debes del mes")],
             [T("Credit limit", "Límite de crédito"), T("The most you can borrow on the card", "Lo máximo que te prestan con la tarjeta")],
             [T("Paying in full", "Pagar el total"), T("Avoids interest on a credit card", "Evita intereses en una tarjeta de crédito")],
           ],

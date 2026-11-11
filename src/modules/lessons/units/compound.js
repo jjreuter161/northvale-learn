@@ -56,14 +56,7 @@ export default {
       title: T("Interest on interest", "Intereses sobre intereses"),
       steps: [
         card(T("Money that grows itself", "Dinero que crece solo"), T("Earn 5% on {$100|1000} and you have {$105|1050}. Next year you earn 5% on {$105|1050}, not just on {$100|1000}. Your interest starts earning interest. That's compounding.", "Si ganas 5% sobre {$100|1000}, tienes {$105|1050}. Al año siguiente ganas 5% sobre {$105|1050}, no solo sobre {$100|1000}. Tus intereses empiezan a ganar intereses. Eso es el interés compuesto.")),
-        choice(
-          "compound_interest",
-          T("{$100|1000} grows 10% a year. After 2 years, how much?", "{$100|1000} crece 10% al año. Después de 2 años, ¿cuánto hay?"),
-          [T("{$120|1200}", "{$120|1200}"), T("{$121|1210}", "{$121|1210}"), T("{$110|1100}", "{$110|1100}")],
-          1,
-          T("Year 1: {$110|1100}. Year 2: 10% of {$110|1100} is {$11|110} more, so {$121|1210}. That extra {$1|10} is interest on interest.", "Año 1: {$110|1100}. Año 2: el 10% de {$110|1100} son {$11|110} más, así que {$121|1210}. Ese {$1|10} extra es interés sobre interés."),
-          [T("That's simple interest — 10% of the original, twice. In year two you also earn on year one's interest.", "Eso es interés simple: 10% del monto original, dos veces. El segundo año también ganas sobre los intereses del primero."), null, T("That's after one year. Year two adds another 10% on top.", "Eso es después de un año. El segundo año suma otro 10% encima.")]
-        ),
+        number("compound_interest", T("{$100|1000} grows 10% a year. How much is there after 2 years?", "{$100|1000} crece 10% al año. ¿Cuánto hay después de 2 años?"), { unit: "money", answer: [121, 1210] }, [T("Year 1: {$100|1000} + 10% = {$110|1100}.", "Año 1: {$100|1000} + 10% = {$110|1100}."), T("Year 2: {$110|1100} + 10% = {$121|1210}. That extra {$1|10} is interest on interest.", "Año 2: {$110|1100} + 10% = {$121|1210}. Ese {$1|10} extra es interés sobre interés.")]),
         card(T("Slow, then fast", "Lento, luego rápido"), T("At first compounding looks boring. Over many years the curve bends upward — most of the growth comes near the end.", "Al principio el interés compuesto parece aburrido. Con los años, la curva se dispara: la mayor parte del crecimiento llega al final.")),
         tf("compound_interest", T("Compounding works against you on debt, too.", "El interés compuesto también juega en tu contra con las deudas."), true, T("Unpaid interest on a card gets added to what you owe, and then that earns interest. Same math, wrong direction.", "Los intereses que no pagas de una tarjeta se suman a lo que debes, y eso genera más intereses. La misma cuenta, pero al revés.")),
         estimate(

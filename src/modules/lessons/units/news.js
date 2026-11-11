@@ -70,7 +70,7 @@ export default {
           T("Match each headline word to what it means.", "Une cada palabra de los titulares con lo que significa."),
           [
             [T("Bull market", "Mercado alcista"), T("Prices rising for a long stretch", "Precios subiendo por mucho tiempo")],
-            [T("Bear market", "Mercado bajista"), T("Prices down 20% or more from a peak", "Precios 20% o más abajo de un máximo")],
+            [T("Correction", "Corrección"), T("Prices down about 10% from a high", "Precios cerca de 10% abajo de un máximo")],
             [T("Index", "Índice"), T("A scoreboard for a group of stocks", "Un marcador para un grupo de acciones")],
             [T("Recession", "Recesión"), T("The economy shrinking for a while", "La economía achicándose por un tiempo")],
           ],

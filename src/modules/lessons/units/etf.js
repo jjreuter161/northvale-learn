@@ -103,14 +103,7 @@ export default {
       steps: [
         card(T("Dollar-cost averaging", "Invertir de a poco"), T("Investing the same amount every month — no matter what prices do — is called dollar-cost averaging. When prices are low, your money buys more shares.", "Invertir la misma cantidad cada mes, sin importar lo que hagan los precios, se llama promediar el costo (en inglés, dollar-cost averaging). Cuando los precios están bajos, tu dinero compra más.")),
         card(T("No need to time it", "No necesitas adivinar el momento"), T("Nobody can reliably guess the best day to buy. A steady habit removes the guessing — and the stress.", "Nadie puede adivinar de forma confiable el mejor día para comprar. Un hábito constante quita las adivinanzas y el estrés.")),
-        choice(
-          "dollar_cost_averaging",
-          T("You invest {$100|1500} every month. Prices fall this month. What happens?", "Inviertes {$100|1500} cada mes. Este mes bajan los precios. ¿Qué pasa?"),
-          [T("Your {$100|1500} buys more shares", "Tus {$100|1500} compran más"), T("You must skip this month", "Debes saltarte este mes"), T("You lose your {$100|1500}", "Pierdes tus {$100|1500}")],
-          0,
-          T("Lower price, more shares for the same money. That's the quiet upside of a down month.", "Precio más bajo, más partes por el mismo dinero. Esa es la ventaja escondida de un mes malo."),
-          [null, T("Nothing forces you to skip. Lower prices just mean more shares for the same money.", "Nada te obliga a saltártelo. Precios más bajos solo significan más acciones por el mismo dinero."), T("Your money buys shares at the lower price — it's still invested, not lost.", "Tu dinero compra acciones al precio más bajo: sigue invertido, no se pierde.")]
-        ),
+        number("dollar_cost_averaging", T("You invest {$100|1500} every month. Shares usually cost {$20|300}, but this month they fall to {$10|150}. How many shares does your {$100|1500} buy?", "Inviertes {$100|1500} cada mes. Las acciones suelen costar {$20|300}, pero este mes bajan a {$10|150}. ¿Cuántas compras con tus {$100|1500}?"), { unit: "number", answer: 10 }, [T("{$100|1500} ÷ {$10|150} = 10 shares.", "{$100|1500} ÷ {$10|150} = 10 acciones."), T("At the usual price it buys 5. A down month quietly gets you more for the same money.", "Al precio de siempre compras 5. Un mes malo te da más por el mismo dinero.")]),
         tf("dollar_cost_averaging", T("Investing a fixed amount every month means you never need to watch the news to decide when to buy.", "Invertir una cantidad fija cada mes significa que no necesitas ver las noticias para decidir cuándo comprar."), true, T("The schedule decides, not the headlines.", "Decide el calendario, no los titulares.")),
         match(
           "dollar_cost_averaging",
