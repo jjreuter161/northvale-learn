@@ -45,7 +45,7 @@ addStrings({
   "lessons.true": S("True", "Verdadero"),
   "lessons.false": S("False", "Falso"),
   "lessons.correct": S("Correct", "Correcto"),
-  "lessons.wrong": S("Not quite", "Casi"),
+  "lessons.wrong": S("Not quite", "No del todo"),
   "lessons.wrong.again": S("You'll see this one again at the end.", "Esta la vas a ver otra vez al final."),
   "lessons.do_it": S("Practice", "Práctica"),
   "lessons.done_it": S("Done", "Hecho"),
