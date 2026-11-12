@@ -82,20 +82,20 @@ try {
     await page.getByRole("heading", { name: /^(Your course|Tu curso)$/ }).scrollIntoViewIfNeeded();
     await page.evaluate(() => window.scrollBy(0, -70));
     await shot(page, `${p}03-learn-map`);
-    if (!dark && lang === "en") {
+    if (lang === "en") {
       await page.getByRole("button", { name: /^Unit 2 · / }).click();
-      await shot(page, "03b-island-opened");
+      await shot(page, `${p}03b-island-opened`);
       await page.evaluate(() => window.scrollTo(0, 0));
       await page.getByRole("button", { name: /^(Continue|Continuar)$/ }).first().click();
       await page.waitForTimeout(400);
-      await shot(page, "04-lesson");
+      await shot(page, `${p}04-lesson`);
       await play(page);
       await page.waitForTimeout(900);
-      await shot(page, "06-lesson-complete");
+      await shot(page, `${p}06-lesson-complete`);
       await page.getByRole("dialog").last().getByRole("button", { name: "Done", exact: true }).click();
       await page.locator(".nv-glide").scrollIntoViewIfNeeded();
       await page.evaluate(() => window.scrollBy(0, 160));
-      await shot(page, "07-boat-moved-on");
+      await shot(page, `${p}07-boat-moved-on`);
     }
     await tab(page, lang === "es" ? "Metas" : "Goals");
     await shot(page, `${p}08-goals`);
@@ -103,9 +103,9 @@ try {
     await shot(page, `${p}09-practice`);
     await tab(page, lang === "es" ? "Yo" : "Me");
     await shot(page, `${p}10-me`);
-    if (!dark && lang === "en") {
+    if (lang === "en") {
       await page.getByRole("button", { name: /^Achievements/ }).click();
-      await shot(page, "11-achievements");
+      await shot(page, `${p}11-achievements`);
     }
     await ctx.close();
   }
