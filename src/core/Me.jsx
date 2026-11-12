@@ -95,12 +95,13 @@ function Badges({ t, progress }) {
         const got = progress.badges[b.id];
         const Tile = got ? "button" : "div";
         return (
-          <Tile key={b.id} title={t(`badge.${b.id}.how`)} {...(got ? { onClick: () => openShare({ kind: "badge", name: t(`badge.${b.id}`) }), "aria-label": `${t("share.button")}: ${t(`badge.${b.id}`)}`, className: "nv-press" } : {})} style={{ background: "var(--surface)", border: "none", borderRadius: 24, boxShadow: "var(--lift)", padding: "14px 8px", textAlign: "center", color: "var(--ink)", font: "inherit", cursor: got ? "pointer" : "default" }}>
+          <Tile key={b.id} title={t(`badge.${b.id}.how`)} {...(got ? { onClick: () => openShare({ kind: "badge", name: t(`badge.${b.id}`) }), className: "nv-press" } : {})} style={{ background: "var(--surface)", border: "none", borderRadius: 24, boxShadow: "var(--lift)", padding: "14px 8px", textAlign: "center", color: "var(--ink)", font: "inherit", cursor: got ? "pointer" : "default" }}>
             <div style={{ display: "flex", justifyContent: "center" }}>
               <Badge id={b.id} size={64} locked={!got} />
             </div>
             <div style={{ fontSize: 13, fontWeight: 650, marginTop: 6, lineHeight: 1.2 }}>{t(`badge.${b.id}`)}</div>
             <div style={{ fontSize: 12, color: "var(--mid)", marginTop: 4, lineHeight: 1.3 }}>{got ? t("badge.got") : t(`badge.${b.id}.how`)}</div>
+            {got && <span className="nv-sr"> · {t("share.button")}</span>}
           </Tile>
         );
       })}
@@ -150,7 +151,7 @@ export default function Me({ t, locale, session, go, route }) {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(86px, 1fr))", gap: 10 }}>
         {[
           ["streak", progress.streak.count, t("me.streak")],
           ["bolt", progress.xp, t("me.total_xp")],

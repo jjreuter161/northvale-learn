@@ -291,7 +291,7 @@ export default function Settings({ t, locale, go }) {
             t={t}
             calendar={
               <>
-                <div style={{ display: "flex", alignItems: "flex-end", gap: 10 }}>
+                <div style={{ display: "flex", alignItems: "flex-end", gap: 10, flexWrap: "wrap" }}>
                   <label style={{ flex: 1 }}>
                     <span style={{ display: "block", fontWeight: 650, marginBottom: 6 }}>{t("settings.reminder")}</span>
                     <input type="time" value={time} onChange={(e) => setTime(e.target.value)} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 14, padding: "11px 12px", background: "var(--surface)", color: "var(--ink)" }} />
@@ -430,7 +430,7 @@ function LookPicker({ t, value, onChange }) {
     </span>
   );
   return (
-    <div role="radiogroup" aria-label={t("settings.look")} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 6 }}>
+    <div role="radiogroup" aria-label={t("settings.look")} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 10, marginBottom: 6 }}>
       {["white", "navy", "auto"].map((k) => {
         const on = value === k;
         return (

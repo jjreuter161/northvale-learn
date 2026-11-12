@@ -345,7 +345,7 @@ try {
 
     await reach(2, "Pay yourself first", "order");
     for (const item of ["Your pay lands in your account", "An automatic transfer moves your savings out", "You pay for your needs"]) await top().getByRole("button", { name: new RegExp(`^${esc(item)}`) }).click();
-    assert.equal(await top().getByRole("button", { name: "You pay for your needs, position 3" }).count(), 1, "a screen reader hears each item's place");
+    assert.equal(await top().getByRole("button", { name: "Position 3: You pay for your needs" }).count(), 1, "a screen reader hears each item's place");
     await top().getByRole("button", { name: /^You spend what's left on wants/ }).click();
     await check("Correct", "Then needs, then wants.");
     await leave();

@@ -16,7 +16,7 @@ const S = (en, es) => ({ en, es });
 addStrings({
   "q.order": S("Put in order", "Ordena"),
   "q.order.hint": S("Tap them in order. Tap a numbered one to undo from there.", "Tócalos en orden. Toca uno numerado para deshacer desde ahí."),
-  "q.order.pos": S("position {n}", "lugar {n}"),
+  "q.order.pos": S("Position {n}", "Lugar {n}"),
   "q.order.right": S("The right order", "El orden correcto"),
   "q.estimate": S("Estimate", "Calcula a ojo"),
   "q.estimate.hint": S("Slide to your best guess.", "Desliza hasta tu mejor cálculo."),
@@ -87,8 +87,8 @@ function OrderView({ step, value, setValue, checked, t, locale }) {
           const pos = value.indexOf(i);
           const state = checked ? (pos === i ? "right" : "wrong") : pos >= 0 ? "on" : null;
           return (
-            <button key={i} data-q="order-item" disabled={!!checked} aria-pressed={pos >= 0} aria-label={`${x(step.items[i])}${pos >= 0 ? `, ${t("q.order.pos", { n: pos + 1 })}` : ""}`} onClick={() => setValue(pos >= 0 ? value.slice(0, pos) : [...value, i])} className="nv-press" style={{ ...btn, ...tone(state), cursor: checked ? "default" : "pointer" }}>
-              <Badge n={pos >= 0 ? pos + 1 : null} on={pos >= 0} />
+            <button key={i} data-q="order-item" disabled={!!checked} aria-pressed={pos >= 0} aria-label={`${pos >= 0 ? `${t("q.order.pos", { n: pos + 1 })}: ` : ""}${x(step.items[i])}`} onClick={() => setValue(pos >= 0 ? value.slice(0, pos) : [...value, i])} className="nv-press" style={{ ...btn, ...tone(state), cursor: checked ? "default" : "pointer" }}>
+              <Badge n={pos >= 0 ? pos + 1 : null} on={pos >= 0} />{" "}
               <span style={{ flex: 1 }}>{x(step.items[i])}</span>
               {checked && <Mark right={pos === i} />}
             </button>

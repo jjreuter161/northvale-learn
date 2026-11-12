@@ -197,8 +197,8 @@ export default function App() {
         <span style={{ fontWeight: 650, fontSize: 15, fontVariantNumeric: "tabular-nums" }}>{progress.streak.count}</span>
       </button>
       {getModule("tutor") && (
-        <button onClick={() => getModule("tutor").services.open({})} className="nv-press" style={{ display: "inline-flex", alignItems: "center", gap: 6, border: "none", background: "var(--surface)", color: "var(--ink)", borderRadius: 999, height: 38, padding: "0 14px", fontSize: 15, fontWeight: 650, cursor: "pointer", flexShrink: 0 }}>
-          <Icon name="chat" size={17} /> {t("nav.ask")}
+        <button onClick={() => getModule("tutor").services.open({})} aria-label={t("nav.ask")} className="nv-press" style={{ display: "inline-flex", alignItems: "center", gap: 6, border: "none", background: "var(--surface)", color: "var(--ink)", borderRadius: 999, height: 38, padding: "0 14px", fontSize: 15, fontWeight: 650, cursor: "pointer", flexShrink: 0 }}>
+          <Icon name="chat" size={17} /> <span className="nv-word">{t("nav.ask")}</span>
         </button>
       )}
     </header>
@@ -208,8 +208,8 @@ export default function App() {
     <nav aria-label={t("nav.menu")} style={{ position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 30, background: "var(--bg)", borderTop: "1px solid var(--line)", paddingBottom: "env(safe-area-inset-bottom)" }}>
       <div style={{ display: "flex", maxWidth: 640, margin: "0 auto" }}>
         {TABS.map((x) => (
-          <button key={x.id} onClick={() => openTab(x)} aria-current={tab.id === x.id ? "page" : undefined} className="nv-press" style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 3, border: "none", background: "transparent", color: tab.id === x.id ? "var(--brand)" : "var(--low)", padding: "8px 4px 6px", minHeight: 58, fontSize: 12, fontWeight: 650, cursor: "pointer" }}>
-            <span style={{ width: 60, height: 32, borderRadius: 999, display: "flex", alignItems: "center", justifyContent: "center", background: tab.id === x.id ? "var(--brandSoft)" : "transparent", transition: "background .2s" }}>
+          <button key={x.id} onClick={() => openTab(x)} aria-current={tab.id === x.id ? "page" : undefined} className="nv-press" style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 3, border: "none", background: "transparent", color: tab.id === x.id ? "var(--brand)" : "var(--low)", padding: "8px 2px 6px", minHeight: 58, fontSize: 12, lineHeight: 1.15, fontWeight: 650, cursor: "pointer", textAlign: "center", hyphens: "auto", overflowWrap: "anywhere" }}>
+            <span style={{ width: "100%", maxWidth: 60, height: 32, borderRadius: 999, display: "flex", alignItems: "center", justifyContent: "center", background: tab.id === x.id ? "var(--brandSoft)" : "transparent", transition: "background .2s" }}>
               <Icon name={x.icon} size={23} />
             </span>
             {t(x.label)}

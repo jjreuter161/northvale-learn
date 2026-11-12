@@ -169,6 +169,8 @@ h1,h2{color:var(--head)}
 @media (prefers-reduced-motion: reduce){.nv-beam,.nv-water{animation:none!important}}
 .nv-reduce .nv-beam,.nv-reduce .nv-water{animation:none!important}
 .nv-list>*+*{border-top:1px solid var(--line)}
+@media (max-width:280px){.nv-word{display:none}}
+.nv-sr{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 `;
 
 const PATHS = {
@@ -261,7 +263,7 @@ export function Button({ kind = "primary", size = "lg", full, disabled, onClick,
       className="nv-press nv-btn"
       onClick={disabled ? undefined : onClick}
       disabled={disabled}
-      style={{ border: "none", borderRadius: size === "lg" ? 18 : 15, padding: pad, minHeight: size === "sm" ? 36 : size === "lg" ? 52 : 44, fontSize: size === "lg" ? 17 : 15, fontWeight: 700, letterSpacing: -0.1, cursor: disabled ? "default" : "pointer", width: full ? "100%" : undefined, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, opacity: disabled ? 0.45 : 1, ...BUTTON[kind], ...style }}
+      style={{ border: "none", borderRadius: size === "lg" ? 18 : 15, padding: pad, minHeight: size === "sm" ? 36 : size === "lg" ? 52 : 44, fontSize: size === "lg" ? 17 : 15, fontWeight: 700, letterSpacing: -0.1, cursor: disabled ? "default" : "pointer", width: full ? "100%" : undefined, maxWidth: "100%", textAlign: "center", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, opacity: disabled ? 0.45 : 1, ...BUTTON[kind], ...style }}
       {...rest}
     >
       {children}
@@ -344,7 +346,7 @@ export function Segmented({ options, value, onChange, label }) {
   return (
     <div role="radiogroup" aria-label={label} style={{ display: "flex", background: "var(--surface)", borderRadius: 14, padding: 4, gap: 4 }}>
       {options.map((o) => (
-        <button key={o.value} role="radio" aria-checked={value === o.value} onClick={() => onChange(o.value)} style={{ flex: 1, border: "none", borderRadius: 11, padding: "9px 8px", minHeight: 40, fontSize: 14, fontWeight: 650, cursor: "pointer", background: value === o.value ? "var(--bg)" : "transparent", color: value === o.value ? "var(--ink)" : "var(--mid)", boxShadow: value === o.value ? "0 1px 2px rgba(0,0,0,.08)" : "none" }}>
+        <button key={o.value} role="radio" aria-checked={value === o.value} onClick={() => onChange(o.value)} style={{ flex: 1, minWidth: 0, overflowWrap: "anywhere", border: "none", borderRadius: 11, padding: "9px 8px", minHeight: 40, fontSize: 14, fontWeight: 650, cursor: "pointer", background: value === o.value ? "var(--bg)" : "transparent", color: value === o.value ? "var(--ink)" : "var(--mid)", boxShadow: value === o.value ? "0 1px 2px rgba(0,0,0,.08)" : "none" }}>
           {o.label}
         </button>
       ))}
@@ -371,8 +373,20 @@ export function Field({ label, hint, style, ...input }) {
 }
 
 // Full-screen layers (sheets, the lesson player) render at the top of the
-// page, so nothing they're opened from can clip or cover them.
-export const Layer = ({ children }) => createPortal(children, document.body);
+// page, so nothing they're opened from can clip or cover them. While one
+// is open, the app behind it is inert: screen readers and the keyboard
+// stay in the layer.
+let layers = 0;
+export function Layer({ children }) {
+  useEffect(() => {
+    const root = document.getElementById("root");
+    if (root) root.inert = ++layers > 0;
+    return () => {
+      if (root) root.inert = --layers > 0;
+    };
+  }, []);
+  return createPortal(children, document.body);
+}
 
 // A bottom sheet. Escape or the backdrop closes it.
 export function Sheet({ open, onClose, title, children, tall }) {
@@ -457,7 +471,7 @@ export function Mark({ size = 24, color = "var(--head)", fill = 1, play }) {
 }
 // The name in the brand serif; with `mark`, the logo before it.
 export function Wordmark({ size = 24, mark, fill, play }) {
-  const word = <span style={{ fontFamily: SERIF, fontWeight: 650, fontSize: size, letterSpacing: -0.3, lineHeight: 1, color: "var(--head)" }}>Northvale</span>;
+  const word = <span className={mark ? "nv-word" : undefined} style={{ fontFamily: SERIF, fontWeight: 650, fontSize: size, letterSpacing: -0.3, lineHeight: 1, color: "var(--head)" }}>Northvale</span>;
   return mark ? (
     <span style={{ display: "inline-flex", alignItems: "center", gap: Math.round(size * 0.28) }}>
       <Mark size={Math.round(size * 1.15)} fill={fill} play={play} />
@@ -530,14 +544,16 @@ export function Toasts() {
     toastListeners.add(l);
     return () => toastListeners.delete(l);
   }, []);
-  return (
+  // Outside the app's root, so they're still heard while a lesson or sheet is open.
+  return createPortal(
     <div aria-live="polite" style={{ position: "fixed", top: "calc(10px + env(safe-area-inset-top))", left: 0, right: 0, zIndex: 80, display: "flex", flexDirection: "column", alignItems: "center", gap: 8, pointerEvents: "none" }}>
       {items.map((t) => (
         <div key={t.id} className="nv-in" style={{ background: t.tone === "good" ? "var(--brand)" : t.tone === "bad" ? "var(--bad)" : "var(--ink)", color: t.tone === "good" || t.tone === "bad" ? "var(--onBrand)" : "var(--bg)", borderRadius: 999, padding: "10px 18px", fontWeight: 650, fontSize: 15, boxShadow: "var(--shadow)", maxWidth: "90vw" }}>
           {t.message}
         </div>
       ))}
-    </div>
+    </div>,
+    document.body,
   );
 }
 

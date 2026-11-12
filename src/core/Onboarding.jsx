@@ -105,8 +105,9 @@ export default function Onboarding({ t, locale, onDone }) {
             ))}
             <span style={{ width: 1, background: "var(--line)", margin: "6px 4px" }} />
             {Object.entries(REGIONS).map(([k, r]) => (
-              <button key={k} onClick={() => setSetting("region", k)} aria-pressed={locale.region === k} aria-label={r.name[locale.lang]} style={chip(locale.region === k)}>
-                {r.flag} {r.currency}
+              <button key={k} onClick={() => setSetting("region", k)} aria-pressed={locale.region === k} style={chip(locale.region === k)}>
+                <span aria-hidden="true">{r.flag}</span> {r.currency}
+                <span className="nv-sr"> · {r.name[locale.lang]}</span>
               </button>
             ))}
           </div>

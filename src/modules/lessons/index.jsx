@@ -34,6 +34,7 @@ addStrings({
   "lessons.overall_n": S("{done} of {total} lessons", "{done} de {total} lecciones"),
   "lessons.done_review": S("Completed · review", "Completada · repasar"),
   "lessons.review": S("Review", "Repasar"),
+  "lessons.locked_short": S("Locked", "Bloqueada"),
   "lessons.minutes": S("{n} min", "{n} min"),
   "lessons.locked": S("One at a time: finish the lesson before this one first.", "Una a la vez: primero termina la lección anterior."),
   "lessons.unit_n": S("Unit {n}", "Unidad {n}"),
@@ -436,17 +437,20 @@ function SeaChart({ t, tx, go, progress, ci, next, all, setAll, opened, toggle, 
               </div>
             </div>
           );
+        // The row is the button (named like a unit card); the words on it are
+        // for the eye, so they're hidden from screen readers and let taps through.
         return (
-          <button key={u.id} onClick={() => toggle(u.id)} aria-expanded={!!opened[u.id]} aria-label={name} className="nv-press" style={{ position: "absolute", left: 0, width: "100%", top: pct(y, H), height: pct(ROW - 8, H), border: "none", background: "transparent", cursor: "pointer", padding: 0, font: "inherit", textAlign: "left", borderRadius: 18 }}>
-            <span aria-hidden="true" style={{ position: "absolute", left: pct(i % 2 ? 14 : 150, W), top: 24, width: pct(176, W), opacity: i > ci ? 0.6 : 1 }}>
+          <div key={u.id}>
+            <button onClick={() => toggle(u.id)} aria-expanded={!!opened[u.id]} aria-label={name} className="nv-press" style={{ position: "absolute", left: 0, width: "100%", top: pct(y, H), height: pct(ROW - 8, H), border: "none", background: "transparent", cursor: "pointer", padding: 0, borderRadius: 18 }} />
+            <span aria-hidden="true" style={{ position: "absolute", left: pct(i % 2 ? 14 : 150, W), top: pct(y + 24, H), width: pct(176, W), pointerEvents: "none" }}>
               <span style={{ display: "block", fontSize: 12.5, fontWeight: 650, color: "var(--low)" }}>{t("lessons.unit_n", { n: i + 1 })}</span>
               <span style={{ display: "block", fontWeight: 700, color: "var(--head)", fontSize: 15, lineHeight: 1.25 }}>{tx(u.title)}</span>
-              <span style={{ display: "inline-flex", alignItems: "center", gap: 4, marginTop: 4, fontSize: 12, fontWeight: 700, borderRadius: 999, padding: "2px 9px", background: done ? "var(--rightSoft)" : "var(--surface2)", color: done ? "var(--right)" : "var(--low)" }}>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 4, marginTop: 4, fontSize: 12, fontWeight: 700, borderRadius: 999, padding: "2px 9px", background: done ? "var(--rightSoft)" : "var(--surface2)", color: done ? "var(--right)" : "var(--mid)" }}>
                 {done && <Icon name="check" size={12} stroke={2.6} />}
                 {meta}
               </span>
             </span>
-          </button>
+          </div>
         );
       })}
       {list.length < UNITS.length && (
@@ -485,7 +489,7 @@ function Course({ t, locale, go, route }) {
         {i < list.length - 1 && <span style={{ position: "absolute", left: 30, top: 40, bottom: -18, borderLeft: "3px dotted var(--artSea2)" }} />}
         <button
           onClick={() => (st === "locked" ? toast(t("lessons.locked")) : go("lessons", { lesson: l.id }))}
-          aria-label={`${tx(l.title)} — ${st === "done" ? t("lessons.review") : st === "open" ? t("lessons.start") : t("lessons.locked")}`}
+          aria-label={`${tx(l.title)} — ${st === "done" ? t("lessons.done_review") : t("lessons.minutes", { n: Math.round(minutes(l)) })}${now ? ` · ${t("lessons.start")}` : st === "locked" ? ` · ${t("lessons.locked_short")}` : ""}`}
           className="nv-press"
           style={{ display: "flex", alignItems: "center", gap: 14, flex: 1, minWidth: 0, textAlign: "left", border: "none", background: "transparent", color: "var(--ink)", padding: "10px 16px", cursor: "pointer", minHeight: now ? 68 : 58, font: "inherit" }}
         >
@@ -497,9 +501,10 @@ function Course({ t, locale, go, route }) {
             </span>
           )}
           <span style={{ flex: 1, minWidth: 0 }}>
-            <span style={{ display: "block", fontSize: now ? 17 : 16, fontWeight: now ? 750 : 600, color: st === "locked" ? "var(--low)" : now ? "var(--head)" : "var(--ink)" }}>{tx(l.title)}</span>
+            <span style={{ display: "block", fontSize: now ? 17 : 16, fontWeight: now ? 750 : 600, color: st === "locked" ? "var(--low)" : now ? "var(--head)" : "var(--ink)" }}>{tx(l.title)}</span>{" "}
             <span style={{ display: "block", fontSize: 14, color: "var(--mid)", marginTop: 1 }}>{st === "done" ? t("lessons.done_review") : t("lessons.minutes", { n: Math.round(minutes(l)) })}</span>
           </span>
+          {now && " "}
           {now && (
             <span className="nv-btn" style={{ background: "var(--brand)", color: "var(--onBrand)", borderRadius: 14, padding: "8px 14px", fontSize: 14, fontWeight: 700, "--btn-edge": "var(--edge)" }} aria-hidden="true">
               {t("lessons.start")}
