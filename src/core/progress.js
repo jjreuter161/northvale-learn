@@ -160,7 +160,7 @@ export const goalMet = (p, today) => xpOn(p, today) >= p.dailyGoal;
 export const BADGES = [
   { id: "first_lesson", icon: "book", test: (p) => (p.counters.lessons || 0) >= 1 },
   { id: "perfect", icon: "target", test: (p) => (p.counters.perfect || 0) >= 1 },
-  { id: "streak_3", icon: "flame", test: (p) => p.streak.best >= 3 },
+  { id: "streak_3", icon: "streak", test: (p) => p.streak.best >= 3 },
   { id: "streak_7", icon: "calendar", test: (p) => p.streak.best >= 7 },
   { id: "streak_30", icon: "trophy", test: (p) => p.streak.best >= 30 },
   { id: "unit", icon: "compass", test: (p, f) => (f.unitsDone || 0) >= 1 },

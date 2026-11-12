@@ -1,4 +1,4 @@
-# Playful navy and cream, Step 1: plan and mockups (nothing is built yet)
+# Playful navy and cream: the plan (approved and built; see RESULTS.md)
 
 **The test for every screen:** playful enough that a teen enjoys it, and polished enough that a 25-year-old wouldn't be embarrassed to use it in public. Think Headspace, Airbnb or Monzo: friendly shapes, warm pictures and small fun moments. No mascots or faces, no cartoon characters, no childish wording and no confetti.
 
@@ -104,3 +104,11 @@ Both versions get the same pills, accent, badges, motion and dark mode.
 4. **The accent:** **sunrise coral** (recommended) or golden sand? Sand sits close to the amber that means "behind".
 5. **The streak icon:** the **north star** instead of the flame (recommended)?
 6. **Anything to cut?** For example: the sunrise on Lesson complete, the boat on the progress bar, the easter egg.
+
+## Approved (2026-11-11)
+
+1. Playful.
+2. The Learn path with islands, replacing the rows of finished units.
+3. Fraunces (soft) for headings and big numbers.
+4. Sunrise coral, and the north star instead of the flame for the streak.
+5. Nothing cut.

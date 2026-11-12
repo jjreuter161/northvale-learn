@@ -366,7 +366,7 @@ export function Question({ t, locale, step, value, setValue, checked, right, lab
   return (
     <div>
       <div style={{ fontSize: 14, fontWeight: 650, color: "var(--mid)", marginBottom: 8 }}>{label || t(Q.label)}</div>
-      <h2 style={{ fontSize: step.q && text(step.q, locale).length > 110 ? 20 : 23, fontWeight: 700, margin: "0 0 18px", lineHeight: 1.3 }}>{text(step.q, locale)}</h2>
+      <h2 className="nv-disp" style={{ fontSize: step.q && text(step.q, locale).length > 110 ? 22 : 26, margin: "0 0 18px", lineHeight: 1.22 }}>{text(step.q, locale)}</h2>
       <Q.View t={t} locale={locale} step={step} value={value} setValue={setValue} checked={checked} right={right} submit={submit} label={label} bare={pick} />
     </div>
   );

@@ -26,6 +26,7 @@
     <link rel="preload" href="/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
     <style>
       @font-face { font-family: "Inter"; font-weight: 100 900; font-display: swap; src: url(/fonts/inter-latin-wght-normal.woff2) format("woff2"); }
+      @font-face { font-family: "Fraunces"; font-weight: 100 900; font-display: swap; src: url(/fonts/fraunces-latin-soft-normal.woff2) format("woff2"); }
       @font-face { font-family: "EB Garamond"; font-weight: 600 700; font-display: swap; src: url(/fonts/eb-garamond-latin-600-normal.woff2) format("woff2"); }
       :root { --bg: #F7F2E8; --surface: #FFFDF8; --surface2: #EFE7D8; --ink: #22303F; --head: #13315C; --mid: #4C5866; --low: #5C6573; --line: #E6DCCB; --brand: #13315C; --brandSoft: #E3E7EE; --accent: #13315C; --accentSoft: #EDE3CF; --bad: #A8231A; --badSoft: #F9E7E2; --warnSoft: #F7E9D2 }
       * { box-sizing: border-box }
@@ -89,6 +90,21 @@
       footer nav { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 12px }
       .btn { white-space: nowrap }
       @media (max-width: 440px) { header .btn { display: none } }
+      h1, h2 { font-family: Fraunces, Georgia, serif; font-variation-settings: "SOFT" 100, "WONK" 0; font-weight: 620 }
+      .btn { border-radius: 16px; box-shadow: 0 3px 0 #071833; transition: transform .12s, box-shadow .12s }
+      .btn.secondary { box-shadow: 0 3px 0 var(--line) }
+      .btn:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 #071833 }
+      .card { border-radius: 22px }
+      /* The sea: under the hero, and at the end of the brand story (two places only). */
+      .sea { position: relative; height: 120px; background: linear-gradient(var(--bg), #E8EDF4); overflow: hidden }
+      .sea .waves { position: absolute; inset: 0; width: 100%; height: 100% }
+      .sea .sun { position: absolute; left: 66%; bottom: 36px; width: 84px; height: 84px }
+      .sea .boat { position: absolute; left: 58%; bottom: 46px; width: 64px; height: 64px }
+      .sea.end { background: linear-gradient(var(--surface), #E8EDF4) }
+      .sea.end .waves path:last-child { fill: var(--bg) }
+      .sea.end .boat { left: 22% }
+      .sea.end .sun { left: 30% }
+      .star4 { width: 28px; height: 28px; display: block; margin-bottom: 8px }
       [hidden] { display: none !important }
       @media (min-width: 820px) {
         .hero { grid-template-columns: 1.2fr .8fr; padding-top: 64px; padding-bottom: 72px }
@@ -124,6 +140,11 @@
         <div class="phone"><img src="/shots/es-1.jpg" width="585" height="1170" alt="Hoy en la app: la siguiente lección, por qué importa y la meta para la que aprendes" fetchpriority="high" /></div>
       </div>
 
+      <div class="sea" aria-hidden="true">
+        <svg class="sun" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="#F5C2AC"/></svg>
+        <svg class="boat" viewBox="0 0 100 100"><path d="M50 4L53 13L62 16L53 19L50 28L47 19L38 16L47 13ZM46 32V74H20ZM52 42V74H74ZM14 80H86L76 92H24Z" fill="#13315C"/></svg>
+        <svg class="waves" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M0 52q37.5 -10 75 0t75 0q37.5 -10 75 0t75 0q37.5 -10 75 0t75 0q37.5 -10 75 0t75 0q37.5 -10 75 0t75 0q37.5 -10 75 0t75 0q37.5 -10 75 0t75 0q37.5 -10 75 0t75 0V120H0Z" fill="#D3DDEA"/><path d="M0 78q30 -8 60 0t60 0q30 -8 60 0t60 0q30 -8 60 0t60 0q30 -8 60 0t60 0q30 -8 60 0t60 0q30 -8 60 0t60 0q30 -8 60 0t60 0q30 -8 60 0t60 0q30 -8 60 0t60 0q30 -8 60 0t60 0V120H0Z" fill="#A9BBD5" opacity=".7"/><path d="M0 104q50 -9 100 0t100 0q50 -9 100 0t100 0q50 -9 100 0t100 0q50 -9 100 0t100 0q50 -9 100 0t100 0q50 -9 100 0t100 0V120H0Z" fill="#FFFDF8"/></svg>
+      </div>
       <section class="band" aria-labelledby="how">
         <div class="wrap">
           <h2 id="how">Cómo funciona</h2>
@@ -177,11 +198,17 @@
 
       <section class="band" aria-labelledby="story">
         <div class="wrap">
+          <svg class="star4" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L14.7 9.3L22 12L14.7 14.7L12 22L9.3 14.7L2 12L9.3 9.3Z" fill="#E9805F"/></svg>
           <h2 id="story">Rumbo a mar abierto</h2>
           <p class="lead" style="max-width: 640px">En mar abierto, tú decides a dónde vas. Nadie más marca tu rumbo, y eso es lo más libre que puede ser una persona. Pero no se llega lejos hasta que tu dinero está bajo control: saber a dónde va, guardar una parte y hacerlo crecer. Para eso es Northvale. Rumbo a mar abierto.</p>
           <p style="max-width: 640px"><a href="/?legal=promise&amp;lang=es">Nuestra promesa</a>: sin anuncios, nunca vendemos tus datos y nadie nos paga por recomendar nada.</p>
         </div>
       </section>
+      <div class="sea end" aria-hidden="true">
+        <svg class="sun" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="#F5C2AC"/></svg>
+        <svg class="boat" viewBox="0 0 100 100"><path d="M50 4L53 13L62 16L53 19L50 28L47 19L38 16L47 13ZM46 32V74H20ZM52 42V74H74ZM14 80H86L76 92H24Z" fill="#13315C"/></svg>
+        <svg class="waves" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M0 52q37.5 -10 75 0t75 0q37.5 -10 75 0t75 0q37.5 -10 75 0t75 0q37.5 -10 75 0t75 0q37.5 -10 75 0t75 0q37.5 -10 75 0t75 0q37.5 -10 75 0t75 0q37.5 -10 75 0t75 0V120H0Z" fill="#D3DDEA"/><path d="M0 78q30 -8 60 0t60 0q30 -8 60 0t60 0q30 -8 60 0t60 0q30 -8 60 0t60 0q30 -8 60 0t60 0q30 -8 60 0t60 0q30 -8 60 0t60 0q30 -8 60 0t60 0q30 -8 60 0t60 0q30 -8 60 0t60 0V120H0Z" fill="#A9BBD5" opacity=".7"/><path d="M0 104q50 -9 100 0t100 0q50 -9 100 0t100 0q50 -9 100 0t100 0q50 -9 100 0t100 0q50 -9 100 0t100 0q50 -9 100 0t100 0V120H0Z" fill="#FFFDF8"/></svg>
+      </div>
 
       <section id="teachers" aria-labelledby="teach">
         <div class="wrap">

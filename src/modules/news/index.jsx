@@ -7,7 +7,7 @@ import { registerModule, service } from "../../core/registry.js";
 import { recordPractice } from "../../core/game.js";
 import { api } from "../../core/api.js";
 import { addStrings } from "../../core/i18n.js";
-import { Button, Card, Chip, Icon, ListRow, Note, Title } from "../../core/ui.jsx";
+import { Button, Card, Chip, Icon, ListRow, Loading, Note, Title } from "../../core/ui.jsx";
 import { useAppState } from "../../core/store.js";
 import { useSeen, markIntro, lessonsDone } from "../../core/Practice.jsx";
 
@@ -95,7 +95,7 @@ function Story({ item, t, onRead, read }) {
 function Feed({ t, locale, limit, onAnyRead }) {
   const news = useNews(locale);
   const [read, setRead] = useState({});
-  if (news.loading) return <p className="nv-pulse" style={{ color: "var(--mid)" }}>{t("news.loading")}</p>;
+  if (news.loading) return <Loading label={t("news.loading")} />;
   if (news.error) return <Note icon="info">{t("news.offline")}</Note>;
   if (!news.items || !news.items.length) return <Note icon="info">{t("news.empty")}</Note>;
   return (

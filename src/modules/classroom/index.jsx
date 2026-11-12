@@ -13,7 +13,7 @@ import { addStrings, makeT, shortDate, text } from "../../core/i18n.js";
 import { api } from "../../core/api.js";
 import { dayKey } from "../../core/progress.js";
 import { sendVerify, acceptTeacherTerms, sessionNow, setLeague } from "../../core/session.js";
-import { Button, Card, Field, Icon, Label, Note, Sheet, Switch, Title, toast } from "../../core/ui.jsx";
+import { Button, Card, Field, Icon, Label, Loading, Note, Sheet, Switch, Title, toast } from "../../core/ui.jsx";
 import { classReport, conceptCounts } from "./report.js";
 
 const S = (en, es) => ({ en, es });
@@ -393,7 +393,7 @@ function Teaching({ t, locale, go, session }) {
         <div style={{ marginTop: 8 }}>{guide}</div>
       </Card>
     );
-  if (!data) return error ? <Note tone="bad">{error}</Note> : <Card><span className="nv-pulse">…</span></Card>;
+  if (!data) return error ? <Note tone="bad">{error}</Note> : <Card><Loading label={t("common.loading")} /></Card>;
   if (open) return <ClassAdmin t={t} locale={locale} id={open} onBack={() => (setOpen(null), load())} />;
   const r = data.ready;
   return (
@@ -470,7 +470,7 @@ function ClassAdmin({ t, locale, id, onBack }) {
       <Icon name="back" size={18} /> {t("cls.t.back")}
     </button>
   );
-  if (!v) return <div>{back}{error ? <Note tone="bad">{error}</Note> : <span className="nv-pulse">…</span>}</div>;
+  if (!v) return <div>{back}{error ? <Note tone="bad">{error}</Note> : <Loading label={t("common.loading")} />}</div>;
   const all = units();
   const unitTitle = (u) => text((all.find((x) => x.id === u) || { title: { en: u } }).title, locale);
   const link = `${location.origin}/?join=${v.code}`;

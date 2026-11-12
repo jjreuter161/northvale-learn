@@ -10,7 +10,7 @@ import { addStrings, money } from "./i18n.js";
 import { fact } from "./facts.js";
 import { allModules } from "./registry.js";
 import { dayKey } from "./progress.js";
-import { Button, Card, Icon, List, Progress, Sheet, Title } from "./ui.jsx";
+import { Button, Card, Icon, List, Progress, Scene, Sheet, Title } from "./ui.jsx";
 
 const S = (en, es) => ({ en, es });
 addStrings({
@@ -52,11 +52,10 @@ export default function Practice(ctx) {
     return (
       <div>
         <Title sub={t("practice.sub")}>{t("nav.practice")}</Title>
-        <Card pad={22}>
-          <span style={{ width: 48, height: 48, borderRadius: 14, background: "var(--bg)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 14 }}>
-            <Icon name="lock" size={22} color="var(--mid)" />
-          </span>
-          <div style={{ fontSize: 20, fontWeight: 750, marginBottom: 6 }}>{t("practice.locked.title")}</div>
+        <Card pad={0} style={{ overflow: "hidden" }}>
+          <Scene name="harbor" w={358} h={170} />
+          <div style={{ padding: "18px 22px 22px" }}>
+          <div className="nv-disp" style={{ fontSize: 26, lineHeight: 1.15, color: "var(--head)", marginBottom: 6 }}>{t("practice.locked.title")}</div>
           <p style={{ margin: "0 0 16px", color: "var(--mid)", lineHeight: 1.5 }}>{t("practice.locked.body", { cash })}</p>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18 }}>
             <Progress value={n} max={3} height={6} label={t("practice.locked.n", { n })} />
@@ -65,6 +64,7 @@ export default function Practice(ctx) {
           <Button full onClick={() => ctx.go("lessons")}>
             {t("practice.locked.go")}
           </Button>
+          </div>
         </Card>
       </div>
     );

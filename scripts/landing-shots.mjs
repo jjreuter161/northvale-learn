@@ -60,7 +60,7 @@ try {
     for (let i = 0; i < 10 && !(await page.getByRole("radio").count()); i++) await page.getByRole("dialog").getByRole("button", { name: /^(Continue|Continuar)$/ }).click();
     await page.waitForTimeout(300);
     await jpeg(page, `${lang}-2.jpg`);
-    await page.getByRole("button", { name: /^(Close|Cerrar)$/ }).first().click();
+    await page.getByRole("dialog").last().getByRole("button", { name: /^(Close|Cerrar)$/ }).first().click();
     await page.getByRole("button", { name: /^(Leave|Salir)$/ }).click();
     // The practice portfolio, after a practice buy.
     await menu(es ? "Práctica" : "Practice", es ? "Portafolio de práctica" : "Practice portfolio");

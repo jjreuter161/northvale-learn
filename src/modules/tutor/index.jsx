@@ -14,7 +14,7 @@ import { addStrings, text } from "../../core/i18n.js";
 import { stream } from "../../core/api.js";
 import { useSession } from "../../core/session.js";
 import { level } from "../../core/progress.js";
-import { Button, Chip, Icon, Note, Segmented, Sheet } from "../../core/ui.jsx";
+import { Button, Chip, Icon, Loading, Note, Segmented, Sheet } from "../../core/ui.jsx";
 import { lookup, suggestedWords, findLesson } from "./glossary.js";
 import { sessionNow } from "../../core/session.js";
 import { UNITS, ALL_LESSONS, unitDone, lessonState } from "../lessons/content.js";
@@ -240,7 +240,7 @@ function Overlay({ t, locale, go }) {
               ) : m.text ? (
                 <Rich value={m.text} />
               ) : (
-                <span className="nv-pulse" style={{ color: "var(--low)" }}>{t("tutor.thinking")}</span>
+                <Loading label={t("tutor.thinking")} size={28} />
               )}
               {m.lesson && !m.error && (m.offline || m.text) && related(m.lesson)}
             </div>

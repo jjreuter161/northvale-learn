@@ -11,6 +11,7 @@ addStrings({
   "common.close": S("Close", "Cerrar"),
   "common.cancel": S("Cancel", "Cancelar"),
   "common.done": S("Done", "Listo"),
+  "common.loading": S("Loading…", "Cargando…"),
   "common.skip": S("Skip", "Saltar"),
   "common.try_again": S("Try again", "Intenta de nuevo"),
   "common.ask_tutor": S("Ask the tutor", "Pregúntale al tutor"),

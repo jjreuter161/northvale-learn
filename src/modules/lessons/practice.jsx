@@ -79,7 +79,7 @@ export function QuestionView({ t, locale, step, picked, setPicked, checked, labe
   return (
     <div>
       {!bare && <div style={{ fontSize: 14, fontWeight: 650, color: "var(--mid)", marginBottom: 8 }}>{label || t("lessons.question")}</div>}
-      {!bare && <h2 style={{ fontSize: 23, fontWeight: 700, margin: "0 0 20px", lineHeight: 1.3 }}>{x(step.q)}</h2>}
+      {!bare && <h2 className="nv-disp" style={{ fontSize: 26, margin: "0 0 20px", lineHeight: 1.2 }}>{x(step.q)}</h2>}
       <div role="radiogroup" style={{ display: "flex", flexDirection: step.type === "tf" ? "row" : "column", gap: 10 }}>
         {opts.map((o, i) => {
           const sel = picked === o.v;
@@ -115,9 +115,12 @@ export function Feedback({ t, locale, step, picked, checked, note, heading, extr
   const miss = !right && step.type === "choice" && step.miss && step.miss[picked];
   const why = Array.isArray(step.why) ? step.why : [step.why];
   return (
-    <div className="nv-in" role="status" style={{ background: right ? "var(--rightSoft)" : "var(--warnSoft)", borderRadius: 14, padding: "14px 16px", marginBottom: 12 }}>
-      <div style={{ fontWeight: 700, fontSize: 18, color: right ? "var(--right)" : "var(--warn)", display: "flex", alignItems: "center", gap: 8 }}>
-        <Icon name={right ? "check" : "info"} size={22} stroke={right ? 3 : 2.2} />
+    <div className="nv-in" role="status" style={{ background: right ? "var(--rightSoft)" : "var(--warnSoft)", borderRadius: 20, padding: "14px 16px", marginBottom: 12 }}>
+      <div className="nv-disp" style={{ fontSize: 22, color: right ? "var(--right)" : "var(--warn)", display: "flex", alignItems: "center", gap: 8 }}>
+        {/* A right answer: a soft ripple around the check, once. */}
+        <span className={right ? "nv-ripple" : undefined} style={{ display: "inline-flex", borderRadius: "50%" }}>
+          <Icon name={right ? "check" : "info"} size={22} stroke={right ? 3 : 2.2} />
+        </span>
         {heading || (right ? t("lessons.correct") : t("lessons.wrong"))}
       </div>
       {miss && <p style={{ margin: "6px 0 0", fontSize: 16, lineHeight: 1.5, fontWeight: 600 }}>{x(miss)}</p>}

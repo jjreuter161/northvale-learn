@@ -61,8 +61,8 @@ try {
 
 let current = null; // on a failure, what the page showed
 // `cookie`: signed in to that account.
-async function open(seed, { cookie } = {}) {
-  const context = await browser.newContext({ viewport: { width: 390, height: 800 }, locale: "en-US", timezoneId: "America/Mexico_City", serviceWorkers: "block", reducedMotion: "reduce" });
+async function open(seed, { cookie, motion } = {}) {
+  const context = await browser.newContext({ viewport: { width: 390, height: 800 }, locale: "en-US", timezoneId: "America/Mexico_City", serviceWorkers: "block", reducedMotion: motion ? "no-preference" : "reduce" });
   if (cookie) await context.addCookies([{ name: "nvl_session", value: cookie.split("=")[1], url: BASE }]);
   if (seed) await context.addInitScript((s) => localStorage.getItem("northvale-learn-v1") || localStorage.setItem("northvale-learn-v1", s), JSON.stringify(seed));
   const page = await context.newPage();
@@ -444,6 +444,42 @@ try {
     await sound.click();
     await page.waitForFunction(() => JSON.parse(localStorage.getItem("northvale-learn-v1")).settings.sound === true);
     console.log("ok: a 7-day streak gets its moment (then the finish screen); sounds off and vibration on by default, both in Settings");
+    await app.close();
+  }
+
+  // --- the playful look: the course as a voyage; every animation stops with Reduce motion ---
+  {
+    const done = (ids) => Object.fromEntries(ids.map((id) => [id, { done: true, at: "2026-11-01", last: "2026-11-01", best: 0, times: 1 }]));
+    const seed = learner({ ageBand: "18-25" }, { lessons: done(["budget-1", "budget-2", "budget-3", "save-1"]), counters: { lessons: 4 } });
+    seed.settings.reduceMotion = false;
+    const app = await open(seed, { motion: true });
+    const { page, menu, clean } = app;
+    // Unit 1 is an island you can open; the boat sits at the current lesson.
+    const isle = page.getByRole("button", { name: "Unit 1 · Budgeting · 3 of 3" });
+    await isle.click();
+    assert.equal(await isle.getAttribute("aria-expanded"), "true", "an island opens its unit");
+    await page.getByRole("button", { name: /^What's a budget\? — / }).waitFor();
+    assert.equal(await page.locator(".nv-glide").count(), 1, "one boat, at the current lesson");
+    await clean("the course as a voyage");
+    // Each animation class, measured inside the app (motion on, then Reduce motion).
+    const timings = () =>
+      page.evaluate(() => {
+        const root = document.querySelector("#root > div");
+        return ["nv-ripple", "nv-bob", "nv-drift", "nv-twinkle", "nv-glide", "nv-btn", "nv-in"].map((c) => {
+          const e = Object.assign(document.createElement("span"), { className: c });
+          root.appendChild(e);
+          const st = getComputedStyle(e);
+          const v = Math.max(parseFloat(st.animationDuration) || 0, parseFloat(st.transitionDuration) || 0);
+          e.remove();
+          return [c, v];
+        });
+      });
+    for (const [c, v] of await timings()) assert.ok(v >= 0.1, `${c} moves with motion on (${v}s)`);
+    await menu("Settings");
+    await page.getByRole("switch", { name: "Reduce motion" }).click();
+    await page.waitForFunction(() => !!document.querySelector(".nv-reduce"));
+    for (const [c, v] of await timings()) assert.ok(v < 0.01, `${c} is still with Reduce motion (${v}s)`);
+    console.log("ok: the course as a voyage (an island opens its unit, the boat at the current lesson); every animation stops with Reduce motion");
     await app.close();
   }
 

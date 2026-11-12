@@ -13,7 +13,7 @@ import { recordPractice, checkBadges } from "../../core/game.js";
 import { addStrings, makeT, money, shortDate, text } from "../../core/i18n.js";
 import { dayKey, addDays } from "../../core/progress.js";
 import { fact } from "../../core/facts.js";
-import { Button, Card, Field, Icon, Label, Legend, LineChart, List, ListRow, Note, Segmented, Sheet, Slider, Title, toast } from "../../core/ui.jsx";
+import { Button, Card, Field, Icon, Label, Legend, LineChart, List, ListRow, Mark, Note, Scene, Segmented, Sheet, Slider, Title, toast } from "../../core/ui.jsx";
 import { openShare } from "../../core/share.jsx";
 import { update } from "../../core/store.js";
 import { useSeen, markIntro } from "../../core/Practice.jsx";
@@ -319,6 +319,28 @@ function Bar({ pct, pctWithInvest = pct, height }) {
     </div>
   );
 }
+// The main goal's bar as a voyage: the boat at how far you've come, on a
+// route to an island with a flag.
+function VoyageBar({ pct, pctWithInvest = pct }) {
+  const p = Math.max(0, Math.min(100, pct));
+  const pi = Math.max(p, Math.min(100, pctWithInvest));
+  const ease = "cubic-bezier(.2,.7,.2,1)";
+  return (
+    <div role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(pct)} style={{ position: "relative", height: 42, margin: "4px 34px 0 6px" }}>
+      <div style={{ position: "absolute", left: 0, right: 0, top: 27, borderTop: "3px dotted var(--artSea2)" }} />
+      {pi > p && <div style={{ position: "absolute", left: 0, top: 26, height: 6, width: `${pi}%`, background: "var(--accent)", opacity: 0.3, borderRadius: 3 }} />}
+      <div style={{ position: "absolute", left: 0, top: 26, height: 6, width: `${p}%`, background: "var(--accent)", borderRadius: 3, transition: `width .6s ${ease}` }} />
+      <span aria-hidden="true" style={{ position: "absolute", top: 1, left: `calc(${p}% - 14px)`, transition: `left .6s ${ease}` }}>
+        <Mark size={28} color="var(--artInk)" />
+      </span>
+      <svg aria-hidden="true" width="40" height="34" viewBox="-20 -26 40 34" style={{ position: "absolute", right: -36, top: 2 }}>
+        <path d="M-16 6c4-11 28-11 32 0Z" fill="var(--artSand)" />
+        <path d="M1 -2V-22" stroke="var(--artInk)" strokeWidth="2.2" strokeLinecap="round" />
+        <path d="M2 -22L14 -18L2 -14Z" fill="var(--artSun)" />
+      </svg>
+    </div>
+  );
+}
 // A goal kept in another country's currency, converted (approximately).
 function Approx({ t, locale, g, amount, fx }) {
   const to = P.currencyOf(locale.region);
@@ -539,13 +561,11 @@ function GoalCard({ t, locale, row, fx, big, onClick }) {
       </div>
       {big && <div style={{ fontSize: 13, color: "var(--mid)", marginTop: 16 }}>{t("goal.saved_so_far")}</div>}
       <div style={{ display: "flex", alignItems: "baseline", flexWrap: "wrap", gap: "0 8px", margin: big ? "2px 0 0" : "12px 0 0", ...NUM }}>
-        <span style={{ fontSize: big ? 34 : 22, fontWeight: 700, letterSpacing: big ? -0.8 : -0.3, lineHeight: 1.15 }}>{fmt(saved)}</span>
+        <span className={big ? "nv-disp" : undefined} style={{ fontSize: big ? 40 : 22, fontWeight: big ? undefined : 700, letterSpacing: big ? -0.8 : -0.3, lineHeight: 1.15, color: big ? "var(--head)" : undefined }}>{fmt(saved)}</span>
         <span style={{ fontSize: big ? 15 : 14, color: "var(--mid)" }}>{t("goal.of", { target: fmt(g.target) })}</span>
       </div>
       <Approx t={t} locale={locale} g={g} amount={saved} fx={fx} />
-      <div style={{ marginTop: big ? 12 : 8 }}>
-        <Bar pct={pct} pctWithInvest={pctWithInvest} height={big ? 8 : 6} />
-      </div>
+      <div style={{ marginTop: big ? 10 : 8 }}>{big ? <VoyageBar pct={pct} pctWithInvest={pctWithInvest} /> : <Bar pct={pct} pctWithInvest={pctWithInvest} height={6} />}</div>
       <InvestLine t={t} row={row} fmt={fmt} />
       {big && (
         <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8, fontSize: 14, color: "var(--mid)", ...NUM }}>
@@ -606,6 +626,9 @@ function Home({ t, locale, go, data, setOpen, sheets }) {
       <Title sub={t("goals.sub")}>{t("goals.nav")}</Title>
       {!leadRow ? (
         <>
+          <div style={{ borderRadius: 24, overflow: "hidden", boxShadow: "var(--lift)", marginBottom: 14 }}>
+            <Scene name="harbor" w={358} h={140} />
+          </div>
           <Label style={{ marginTop: 4 }}>{t("home.empty.title")}</Label>
           <p style={{ fontSize: 15, color: "var(--mid)", lineHeight: 1.45, margin: "-4px 0 14px" }}>{t("home.empty.sub")}</p>
           <TemplateGrid t={t} onPick={(id) => sheets.newGoal(id)} highlight={goalFor} />
@@ -1071,7 +1094,7 @@ function WeekStory({ t, locale, go, onClose }) {
       <List>
         {line("book", t("mw.learned"), learned.length ? t("mw.learned.n", { n: learned.length, unit: text(top.title, locale) }) : t("mw.learned.none"))}
         {solid.length > 0 && line("star", t("mw.solid"), solid.slice(0, 2).map((x) => text(x, locale)).join(" · "))}
-        {progress.streak.count > 0 && line("flame", t("mw.streak", { n: progress.streak.count }), progress.streak.count >= progress.streak.best ? t("mw.best") : t("mw.going"))}
+        {progress.streak.count > 0 && line("streak", t("mw.streak", { n: progress.streak.count }), progress.streak.count >= progress.streak.best ? t("mw.best") : t("mw.going"))}
         {row && line(P.template(row.g.template).icon, change ? `${nameOf(row.g, t)}: ${fmt(row.saved - change)} → ${fmt(row.saved)}` : t("mw.goal.same", { name: nameOf(row.g, t), saved: fmt(row.saved) }), t("mw.goal.sub", { pct: Math.floor(row.pct) }))}
       </List>
       {next && nextUnit && (

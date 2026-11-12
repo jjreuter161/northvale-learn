@@ -1,7 +1,8 @@
 // DESIGN SYSTEM — the look (navy and cream, Light and Dark) as CSS variables,
 // and the small set of pieces every module builds with. Phone first: 44pt
 // tap targets, 16px inputs (so iPhones don't zoom), one column.
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
+import { MARK_PATHS, UNIT_ART, BADGE_ART, SCENE, wave } from "./art.js";
 import { createPortal } from "react-dom";
 
 // Navy and cream. Light: a soft cream page, lighter cream cards, deep navy
@@ -9,9 +10,12 @@ import { createPortal } from "react-dom";
 // logo, and dark grey-navy body text. Dark: a deep navy page with cream
 // text and cream accents. Green (--right) is only for a correct answer in
 // a lesson; amber only for "not quite" or "behind"; red only for a loss or
-// an error. One card style: a fill, no border, no shadow. Every text pair
-// meets WCAG AA (test/look.test.mjs checks). The saved names stay "white"
-// (Light) and "navy" (Dark), so nobody's setting changes.
+// an error. One card style: a fill and a soft lift, no border. One warm
+// accent, sunrise coral (--warm), only for pictures, celebrations and
+// highlights; it never means right, behind or wrong. --art* are the
+// pictures' colors (art.js). Every text pair meets WCAG AA
+// (test/look.test.mjs checks). The saved names stay "white" (Light) and
+// "navy" (Dark), so nobody's setting changes.
 export const LOOKS = {
   white: {
     "--bg": "#F7F2E8",
@@ -43,6 +47,19 @@ export const LOOKS = {
     "--level3": "#13315C",
     "--focus": "#2B5CB3",
     "--shadow": "none",
+    "--lift": "0 1px 0 rgba(19,49,92,.04), 0 12px 26px -16px rgba(19,49,92,.28)",
+    "--edge": "#071833",
+    "--warm": "#E9805F",
+    "--warmSoft": "#FBE4D9",
+    "--warmInk": "#A8462A",
+    "--artInk": "#13315C",
+    "--artPaper": "#FFFDF8",
+    "--artSky": "#E8EDF4",
+    "--artSea": "#D3DDEA",
+    "--artSea2": "#A9BBD5",
+    "--artSand": "#EFE0C2",
+    "--artSun": "#E9805F",
+    "--artSun2": "#F5C2AC",
   },
   navy: {
     "--bg": "#0D1A2D",
@@ -74,6 +91,19 @@ export const LOOKS = {
     "--level3": "#F0E3C6",
     "--focus": "#A9C4F0",
     "--shadow": "none",
+    "--lift": "0 12px 26px -16px rgba(0,0,0,.7)",
+    "--edge": "#B3A07A",
+    "--warm": "#F29B7D",
+    "--warmSoft": "#3D2C30",
+    "--warmInk": "#F6B39C",
+    "--artInk": "#F0E3C6",
+    "--artPaper": "#15253C",
+    "--artSky": "#16294A",
+    "--artSea": "#22395B",
+    "--artSea2": "#3A5784",
+    "--artSand": "#2F4263",
+    "--artSun": "#F29B7D",
+    "--artSun2": "#A35F4C",
   },
 };
 
@@ -82,6 +112,9 @@ export const AVATARS = ["#3D5A80", "#2B5CB3", "#1E7A5F", "#7A5C2E", "#5B4B8A", "
 
 export const FONT = "'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif";
 export const SERIF = "'EB Garamond', Georgia, serif";
+// Headings and big numbers: Fraunces with its soft corners (self-hosted,
+// web/fonts; SIL Open Font License). Only at 20px and up.
+export const DISPLAY = "'Fraunces', Georgia, serif";
 
 export const GLOBAL_CSS = `
 *{box-sizing:border-box}
@@ -92,17 +125,27 @@ button{font-family:inherit}
 input,select,textarea{font-family:inherit;font-size:16px}
 :focus-visible{outline:3px solid var(--focus);outline-offset:2px}
 h1,h2{color:var(--head)}
+.nv-disp{font-family:${DISPLAY};font-variation-settings:"SOFT" 100,"WONK" 0;font-weight:620;letter-spacing:-.3px}
+.nv-btn{box-shadow:0 3px 0 var(--btn-edge,transparent);transition:transform .12s ease-out,box-shadow .12s ease-out}
+.nv-btn:active:not(:disabled){transform:translateY(2px);box-shadow:0 1px 0 var(--btn-edge,transparent)}
+.nv-ripple{border-radius:50%;animation:nvRipple .8s ease-out 1}
+.nv-bob{animation:nvBob 1.6s ease-in-out infinite;transform-origin:50% 90%}
+.nv-drift{animation:nvDrift 2.4s ease-in-out 2 alternate}
+.nv-twinkle{animation:nvTwinkle .7s ease-out 1;transform-box:fill-box;transform-origin:center}
+.nv-glide{transition:transform .7s cubic-bezier(.3,.8,.3,1)}
+@keyframes nvRipple{from{box-shadow:0 0 0 0 color-mix(in srgb,var(--right) 45%,transparent)}to{box-shadow:0 0 0 16px transparent}}
+@keyframes nvBob{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-3px) rotate(5deg)}}
+@keyframes nvDrift{from{transform:translateX(0)}to{transform:translateX(-36px)}}
+@keyframes nvTwinkle{0%,100%{transform:scale(1)}45%{transform:scale(1.6) rotate(45deg)}}
+@keyframes nvSpring{0%{transform:translateY(100%)}75%{transform:translateY(-5px)}100%{transform:none}}
 .nv-press{transition:transform .15s cubic-bezier(.2,.7,.2,1),filter .15s;-webkit-tap-highlight-color:transparent}
 .nv-press:active{transform:scale(.98);filter:brightness(.97)}
 .nv-in{animation:nvIn .2s ease-out both}
 .nv-pop{animation:nvIn .2s ease-out both}
-.nv-pulse{animation:nvPulse 1.2s ease-in-out infinite}
 @keyframes nvIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
-@keyframes nvPulse{0%,100%{opacity:.35}50%{opacity:1}}
-@keyframes nvSheet{from{transform:translateY(100%)}to{transform:none}}
 @keyframes nvFade{from{opacity:0}to{opacity:1}}
-@media (prefers-reduced-motion: reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
-.nv-reduce *{animation-duration:.01ms!important;transition-duration:.01ms!important}
+@media (prefers-reduced-motion: reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+.nv-reduce *{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 .nv-list>*+*{border-top:1px solid var(--line)}
 `;
 
@@ -153,6 +196,7 @@ const PATHS = {
 };
 
 export function Icon({ name, size = 22, color = "currentColor", stroke = 2, fill = "none", label }) {
+  if (name === "streak") return <StreakStar size={size} color={color} label={label} />;
   if (name === "flame")
     return (
       <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden={!label} aria-label={label} role={label ? "img" : undefined}>
@@ -179,22 +223,23 @@ export function Icon({ name, size = 22, color = "currentColor", stroke = 2, fill
   );
 }
 
+// Buttons have a pressable edge underneath; tapping pushes them in.
 const BUTTON = {
-  primary: { background: "var(--brand)", color: "var(--onBrand)" },
-  good: { background: "var(--good)", color: "var(--onBrand)" },
-  bad: { background: "var(--bad)", color: "var(--onBrand)" },
-  secondary: { background: "var(--bg)", color: "var(--ink)", border: "1px solid var(--line)" },
-  ghost: { background: "transparent", color: "var(--brand)", boxShadow: "none" },
+  primary: { background: "var(--brand)", color: "var(--onBrand)", "--btn-edge": "var(--edge)" },
+  good: { background: "var(--good)", color: "var(--onBrand)", "--btn-edge": "var(--edge)" },
+  bad: { background: "var(--bad)", color: "var(--onBrand)", "--btn-edge": "rgba(0,0,0,.28)" },
+  secondary: { background: "var(--surface)", color: "var(--ink)", border: "1.5px solid var(--line)", "--btn-edge": "var(--line)" },
+  ghost: { background: "transparent", color: "var(--brand)" },
 };
 export function Button({ kind = "primary", size = "lg", full, disabled, onClick, children, style, type = "button", ...rest }) {
   const pad = size === "lg" ? "16px 22px" : size === "md" ? "11px 18px" : "8px 14px";
   return (
     <button
       type={type}
-      className="nv-press"
+      className="nv-press nv-btn"
       onClick={disabled ? undefined : onClick}
       disabled={disabled}
-      style={{ border: "none", borderRadius: 14, padding: pad, minHeight: size === "sm" ? 36 : size === "lg" ? 52 : 44, fontSize: size === "lg" ? 17 : 15, fontWeight: 700, letterSpacing: -0.1, cursor: disabled ? "default" : "pointer", width: full ? "100%" : undefined, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, opacity: disabled ? 0.45 : 1, ...BUTTON[kind], ...style }}
+      style={{ border: "none", borderRadius: size === "lg" ? 18 : 15, padding: pad, minHeight: size === "sm" ? 36 : size === "lg" ? 52 : 44, fontSize: size === "lg" ? 17 : 15, fontWeight: 700, letterSpacing: -0.1, cursor: disabled ? "default" : "pointer", width: full ? "100%" : undefined, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, opacity: disabled ? 0.45 : 1, ...BUTTON[kind], ...style }}
       {...rest}
     >
       {children}
@@ -205,7 +250,7 @@ export function Button({ kind = "primary", size = "lg", full, disabled, onClick,
 export function Card({ children, style, onClick, pad = 18, ...rest }) {
   const Tag = onClick ? "button" : "div";
   return (
-    <Tag className={onClick ? "nv-press" : undefined} onClick={onClick} style={{ display: "block", width: "100%", textAlign: "left", background: "var(--surface)", border: "none", borderRadius: 18, padding: pad, color: "var(--ink)", font: "inherit", cursor: onClick ? "pointer" : undefined, ...style }} {...rest}>
+    <Tag className={onClick ? "nv-press" : undefined} onClick={onClick} style={{ display: "block", width: "100%", textAlign: "left", background: "var(--surface)", border: "none", borderRadius: 24, boxShadow: "var(--lift)", padding: pad, color: "var(--ink)", font: "inherit", cursor: onClick ? "pointer" : undefined, ...style }} {...rest}>
       {children}
     </Tag>
   );
@@ -213,7 +258,7 @@ export function Card({ children, style, onClick, pad = 18, ...rest }) {
 
 // A list in one card, rows split by hairlines (the one list style).
 export const List = ({ children, style }) => (
-  <div className="nv-list" style={{ background: "var(--surface)", borderRadius: 18, overflow: "hidden", ...style }}>
+  <div className="nv-list" style={{ background: "var(--surface)", borderRadius: 24, boxShadow: "var(--lift)", overflow: "hidden", ...style }}>
     {children}
   </div>
 );
@@ -225,7 +270,7 @@ export function ListRow({ icon, title, sub, onClick, right, locked, isNew, label
   return (
     <Tag onClick={locked ? undefined : onClick} className={onClick && !locked ? "nv-press" : undefined} aria-label={label} style={{ display: "flex", alignItems: "center", gap: 12, width: "100%", textAlign: "left", border: "none", background: "transparent", color: "var(--ink)", padding: "13px 16px", minHeight: 60, font: "inherit", cursor: onClick && !locked ? "pointer" : "default" }}>
       {icon && (
-        <span style={{ width: 36, height: 36, borderRadius: 10, background: "var(--bg)", color: locked ? "var(--low)" : "var(--ink)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+        <span style={{ width: 38, height: 38, borderRadius: 12, background: "var(--bg)", color: locked ? "var(--low)" : "var(--ink)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
           <Icon name={locked ? "lock" : icon} size={19} />
         </span>
       )}
@@ -320,10 +365,10 @@ export function Sheet({ open, onClose, title, children, tall }) {
     <Layer>
     <div role="dialog" aria-modal="true" aria-label={title} style={{ position: "fixed", inset: 0, zIndex: 60, display: "flex", alignItems: "flex-end", justifyContent: "center", color: "var(--ink)", fontFamily: FONT }}>
       <div onClick={onClose} style={{ position: "absolute", inset: 0, background: "rgba(5,12,25,.45)", animation: "nvFade .2s both" }} />
-      <div style={{ position: "relative", width: "100%", maxWidth: 560, maxHeight: tall ? "92dvh" : "85dvh", overflowY: "auto", background: "var(--bg)", borderRadius: "24px 24px 0 0", padding: "10px 18px calc(22px + env(safe-area-inset-bottom))", animation: "nvSheet .3s cubic-bezier(.2,.7,.2,1) both" }}>
+      <div style={{ position: "relative", width: "100%", maxWidth: 560, maxHeight: tall ? "92dvh" : "85dvh", overflowY: "auto", background: "var(--bg)", borderRadius: "24px 24px 0 0", padding: "10px 18px calc(22px + env(safe-area-inset-bottom))", animation: "nvSpring .26s cubic-bezier(.2,.8,.3,1) both" }}>
         <div style={{ width: 40, height: 5, borderRadius: 3, background: "var(--line)", margin: "0 auto 10px" }} />
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-          <h2 style={{ fontSize: 20, fontWeight: 750, margin: 0 }}>{title}</h2>
+          <h2 className="nv-disp" style={{ fontSize: 23, margin: 0 }}>{title}</h2>
           <button onClick={onClose} aria-label="Close" style={{ border: "none", background: "var(--surface2)", borderRadius: 20, width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "var(--ink)" }}>
             <Icon name="close" size={18} />
           </button>
@@ -350,7 +395,7 @@ export function Title({ children, sub, right }) {
   return (
     <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 12, margin: "4px 0 16px" }}>
       <div>
-        <h1 style={{ fontSize: 30, fontWeight: 750, letterSpacing: -0.6, margin: 0, lineHeight: 1.15 }}>{children}</h1>
+        <h1 className="nv-disp" style={{ fontSize: 34, margin: 0, lineHeight: 1.1 }}>{children}</h1>
         {sub && <p style={{ fontSize: 15, color: "var(--mid)", margin: "6px 0 0", lineHeight: 1.4 }}>{sub}</p>}
       </div>
       {right}
@@ -360,29 +405,93 @@ export function Title({ children, sub, right }) {
 export const Label = ({ children, style }) => <h2 style={{ fontSize: 18, fontWeight: 700, letterSpacing: -0.2, color: "var(--ink)", margin: "28px 0 10px", ...style }}>{children}</h2>;
 
 // THE LOGO — a sail under the north star (docs/design/brand), in one
-// color. web/icon.svg, the landing pages and share cards draw the same paths.
-export const MARK_PATHS = ["M50 4L53 13L62 16L53 19L50 28L47 19L38 16L47 13Z", "M46 32V74H20Z", "M52 42V74H74Z", "M14 80H86L76 92H24Z"];
-export function Mark({ size = 24, color = "var(--head)" }) {
+// color. web/icon.svg, the landing pages and share cards draw the same
+// paths. `fill` (0–1) fills the sails from the bottom (the day's XP goal in
+// the header); when the goal is met the star turns coral. With `play`,
+// tapping it makes the star twinkle (a small easter egg).
+export { MARK_PATHS };
+export function Mark({ size = 24, color = "var(--head)", fill = 1, play }) {
+  const id = `nvm${useId().replace(/[^a-z0-9]/gi, "")}`;
+  const [tw, setTw] = useState(0);
+  const sails = MARK_PATHS[1] + MARK_PATHS[2];
+  const full = fill >= 1;
   return (
-    <svg width={size} height={size} viewBox="0 0 100 100" aria-hidden="true" style={{ display: "block", flexShrink: 0 }}>
-      {MARK_PATHS.map((d) => (
-        <path key={d} d={d} fill={color} />
-      ))}
+    <svg width={size} height={size} viewBox="0 0 100 100" aria-hidden="true" onClick={play ? () => setTw((x) => x + 1) : undefined} style={{ display: "block", flexShrink: 0, overflow: "visible", cursor: play ? "pointer" : undefined }}>
+      <path key={tw} d={MARK_PATHS[0]} fill={play && full ? "var(--warm)" : color} className={tw ? "nv-twinkle" : undefined} />
+      {full ? (
+        <path d={sails} fill={color} />
+      ) : (
+        <>
+          <clipPath id={id}>
+            <rect x="0" y={74 - 42 * Math.max(0, fill)} width="100" height="100" />
+          </clipPath>
+          <path d={sails} fill="none" stroke={color} strokeWidth="5" strokeLinejoin="round" />
+          <path d={sails} fill={color} clipPath={`url(#${id})`} />
+        </>
+      )}
+      <path d={MARK_PATHS[3]} fill={color} />
     </svg>
   );
 }
 // The name in the brand serif; with `mark`, the logo before it.
-export function Wordmark({ size = 24, mark }) {
+export function Wordmark({ size = 24, mark, fill, play }) {
   const word = <span style={{ fontFamily: SERIF, fontWeight: 650, fontSize: size, letterSpacing: -0.3, lineHeight: 1, color: "var(--head)" }}>Northvale</span>;
   return mark ? (
     <span style={{ display: "inline-flex", alignItems: "center", gap: Math.round(size * 0.28) }}>
-      <Mark size={Math.round(size * 1.15)} />
+      <Mark size={Math.round(size * 1.15)} fill={fill} play={play} />
       {word}
     </span>
   ) : (
     word
   );
 }
+
+// The streak's north star: a soft coral glow from 7 days, brighter at 30,
+// small rays at 100.
+const STAR4 = "M12 2L14.7 9.3L22 12L14.7 14.7L12 22L9.3 14.7L2 12L9.3 9.3Z";
+export function StreakStar({ count = 0, size = 18, color = "var(--flame)", label }) {
+  const g = count >= 100 ? 3 : count >= 30 ? 2 : count >= 7 ? 1 : 0;
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden={!label} aria-label={label} role={label ? "img" : undefined} style={{ display: "block", flexShrink: 0, overflow: "visible" }}>
+      {g > 0 && <circle cx="12" cy="12" r={6.5 + g * 2.8} fill="var(--warm)" opacity={0.24 + g * 0.12} />}
+      {g === 3 && <path d="M3 3l3.5 3.5M21 3l-3.5 3.5M3 21l3.5-3.5M21 21l-3.5-3.5" stroke="var(--warm)" strokeWidth="1.8" strokeLinecap="round" />}
+      <path d={STAR4} fill={color} />
+    </svg>
+  );
+}
+
+// Waiting: a small boat bobbing on a wave (still with "reduce motion").
+export function Loading({ label, size = 34 }) {
+  return (
+    <span role="status" style={{ display: "inline-flex", alignItems: "center", gap: 10, color: "var(--mid)", fontSize: 15 }}>
+      <svg width={size} height={size * 0.9} viewBox="0 0 100 90" aria-hidden="true" style={{ display: "block", overflow: "visible" }}>
+        <g className="nv-bob">
+          <path d={MARK_PATHS.join("")} fill="var(--artInk)" />
+        </g>
+        <path d="M0 92q12-8 25 0t25 0 25 0 25 0" fill="none" stroke="var(--artSea2)" strokeWidth="6" strokeLinecap="round" />
+      </svg>
+      {label}
+    </span>
+  );
+}
+
+// PICTURES (art.js) — decoration, hidden from screen readers.
+const svgArt = (w, h, box, html, style) => <svg width={w} height={h} viewBox={box} aria-hidden="true" style={{ display: "block", flexShrink: 0, ...style }} dangerouslySetInnerHTML={{ __html: html }} />;
+export const UnitArt = ({ id, width = 120, style }) => (UNIT_ART[id] ? svgArt(width, Math.round(width * 0.75), "0 0 160 120", UNIT_ART[id], style) : null);
+// An achievement's medallion; not yet earned, it's grey.
+export function Badge({ id, size = 64, locked }) {
+  const cid = `nvb${useId().replace(/[^a-z0-9]/gi, "")}`;
+  const [inner, rim = ""] = BADGE_ART[id] || [""];
+  return svgArt(size, size, "0 0 96 96", `<defs><clipPath id="${cid}"><circle cx="48" cy="48" r="38"/></clipPath></defs><circle cx="48" cy="48" r="46" fill="var(--artSea)"/><circle cx="48" cy="48" r="38" fill="var(--artPaper)"/><g clip-path="url(#${cid})">${inner}</g>${rim}`, locked ? { filter: "grayscale(1)", opacity: 0.45 } : undefined);
+}
+// A wide scene (art.js SCENE), drawn at w×h and scaled to the width.
+export const Scene = ({ name, w = 358, h = 170, style }) => <svg viewBox={`0 0 ${w} ${h}`} width="100%" aria-hidden="true" preserveAspectRatio="xMidYMax slice" style={{ display: "block", ...style }} dangerouslySetInnerHTML={{ __html: SCENE[name](w, h) }} />;
+// A soft wave edge between a picture and what's under it.
+export const WaveEdge = ({ color = "var(--surface)", style }) => (
+  <svg viewBox="0 0 390 24" width="100%" height="20" preserveAspectRatio="none" aria-hidden="true" style={{ display: "block", ...style }}>
+    <path d={wave(390, 24, 6, 5, 14)} fill={color} />
+  </svg>
+);
 
 // TOASTS — short notes at the top ("+5 XP", "Saved"). Anyone can call toast().
 const toastListeners = new Set();
