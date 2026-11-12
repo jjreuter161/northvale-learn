@@ -64,7 +64,9 @@ If you'd like testers to see `northvalelearn.com` instead of `northvale-learn.fl
 1. The adult buys `northvalelearn.com` at any registrar (Cloudflare, Porkbun, Namecheap, GoDaddy…). Keep the login handy: at deploy time you'll add two or three DNS records there, and the builder will tell you exactly which.
 2. Tell the builder you have it.
 
-**Decide before inviting testers.** Each phone keeps a tester's progress under the address they first used. A tester without an account who moves to a new address later would start over, and everyone would have to sign in again. Skipping this is fine: the `fly.dev` address works the same.
+**Decide before inviting testers.** Each phone keeps a tester's progress under the address they first used. A tester without an account who moves to a new address later would start over, and everyone would have to sign in again.
+
+**We plan to move to Vercel + Supabase after testers' first week** (the `vercel-supabase` branch, `docs/VERCEL-SUPABASE.md`), so **your own domain is recommended**. With it, the address never changes when the app moves, and nobody loses anything. Without it, testers move from the `fly.dev` address to a new one at the switch.
 
 ### 5. Fill in `.env`
 
