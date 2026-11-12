@@ -315,8 +315,11 @@ try {
       await page.getByRole("button", { name: new RegExp(`^${esc(title)} — `) }).click();
       for (let i = 0; i < 20 && !(await top().locator(`[data-q="${kind}"], [data-q="${kind}-item"], [data-q="${kind}-left"], [data-q="${kind}-part"]`).count()); i++) {
         const names = await top().getByRole("button").evaluateAll((bs) => bs.map((b) => b.innerText.trim()));
-        if (names.includes("Check")) (await answerAny(top()), await button("Check", top()).click());
-        await button("Continue", top()).click();
+        if (names.includes("Skip for now")) await button("Skip for now", top()).click();
+        else {
+          if (names.includes("Check")) (await answerAny(top()), await button("Check", top()).click());
+          await button("Continue", top()).click();
+        }
       }
     };
     const check = async (heading, why) => {
@@ -343,18 +346,22 @@ try {
     await check("Spot on", "about $1,040");
     await leave();
 
+    // A wrong order: amber, and the right order spelled out. Then (leaving
+    // keeps the place) the same lesson picks up after it, and the order
+    // question comes back at the end for a second try: the right order.
+    await reach(2, "Pay yourself first", "order");
+    for (const item of ["You spend what's left on wants", "You pay for your needs", "An automatic transfer moves your savings out", "Your pay lands in your account"]) await top().getByRole("button", { name: new RegExp(`^${esc(item)}`) }).click();
+    await check("Not quite", "The right order");
+    await leave();
+
     await reach(2, "Pay yourself first", "order");
     for (const item of ["Your pay lands in your account", "An automatic transfer moves your savings out", "You pay for your needs"]) await top().getByRole("button", { name: new RegExp(`^${esc(item)}`) }).click();
     assert.equal(await top().getByRole("button", { name: "Position 3: You pay for your needs" }).count(), 1, "a screen reader hears each item's place");
     await top().getByRole("button", { name: /^You spend what's left on wants/ }).click();
     await check("Correct", "Then needs, then wants.");
-    await leave();
-
-    // A wrong order: amber, and the right order spelled out.
-    await reach(2, "Pay yourself first", "order");
-    for (const item of ["You spend what's left on wants", "You pay for your needs", "An automatic transfer moves your savings out", "Your pay lands in your account"]) await top().getByRole("button", { name: new RegExp(`^${esc(item)}`) }).click();
-    await check("Not quite", "The right order");
-    await leave();
+    // That was the lesson's last step: it's finished.
+    if (await top().locator("[data-moment]").count()) await button("Continue", top()).click();
+    await button("Done", top()).click();
 
     await reach(2, "Where to keep savings", "match");
     for (const [a, b] of [["Savings account", "Pays interest"], ["Checking account", "Made for everyday"], ["Cash at home", "Earns nothing"], ["FDIC insurance", "Protects deposits"]]) (await top().locator('[data-q="match-left"]', { hasText: a }).click(), await top().locator('[data-q="match-right"]', { hasText: b }).click());

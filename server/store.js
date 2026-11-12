@@ -14,6 +14,12 @@ import { join } from "node:path";
 const DIR = process.env.NORTHVALE_DATA || join(import.meta.dirname, "data");
 const FILE = join(DIR, "learn.json");
 mkdirSync(DIR, { recursive: true, mode: 0o700 });
+// A RESTORE (npm run restore) waits as learn.json.restore until this start,
+// so a running server can't save over it. The data it replaces is kept.
+if (existsSync(`${FILE}.restore`)) {
+  if (existsSync(FILE)) renameSync(FILE, join(DIR, `learn.before-restore-${new Date().toISOString().replace(/[:.]/g, "-")}.json`));
+  renameSync(`${FILE}.restore`, FILE);
+}
 
 const data = { users: {}, sessions: {}, progress: {}, weeks: {}, usage: {}, ai: null, resets: {}, ...(existsSync(FILE) ? JSON.parse(readFileSync(FILE, "utf8")) : {}) };
 let timer = null;

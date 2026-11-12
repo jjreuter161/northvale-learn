@@ -5,7 +5,7 @@
 // goals, news), found through the registry.
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { registerModule, actionWidget, service } from "../../core/registry.js";
-import { useAppState, getState, setSlice } from "../../core/store.js";
+import { useAppState, getState, setSlice, saveNow } from "../../core/store.js";
 import { recordLesson, recordReview, recordPractice } from "../../core/game.js";
 import { mythOf } from "./myths.js";
 import { openShare } from "../../core/share.jsx";
@@ -59,7 +59,7 @@ addStrings({
   "lessons.course_done": S("You finished the whole course. Open water ahead.", "Terminaste todo el curso. Hay mar abierto por delante."),
   "lessons.all_done": S("Reviews keep it fresh, and your goals are waiting.", "Los repasos lo mantienen fresco, y tus metas te esperan."),
   "lessons.quit.title": S("Leave now?", "¿Salir ahora?"),
-  "lessons.quit.body": S("This lesson starts over next time. It's only about 4 minutes.", "La lección empieza de nuevo la próxima vez. Son solo unos 4 minutos."),
+  "lessons.quit.body": S("You'll pick up right here next time.", "La próxima vez sigues justo aquí."),
   "lessons.quit.yes": S("Leave", "Salir"),
   "lessons.quit.no": S("Keep going", "Seguir"),
   "lessons.true": S("True", "Verdadero"),
@@ -688,16 +688,39 @@ function FinishRing({ t, before, after, goal, gained, streak }) {
 // extra card and an easier question on that concept right away, and the
 // missed question comes back once at the end. Each question's first
 // attempt updates the learner's mastery of its concept.
+// A LESSON LEFT PARTWAY (closed, or the phone shutting the app) picks up
+// at the same step next time, for a week: its place is saved after every
+// step in the lessons slice as `open`. Steps are saved by key: "3" is step
+// 3, "3x"/"3e" the extra card and easier question after missing it, "…r"
+// a missed question's second try.
+function stepOfKey(steps, key) {
+  const i = parseInt(key, 10);
+  const tail = key.slice(String(i).length);
+  const s = steps[i];
+  if (!s || !/^[xe]?r?$/.test(tail)) return null;
+  const c = /^[xe]/.test(tail) && conceptById(s.c);
+  if (/^[xe]/.test(tail) && !c) return null;
+  const base = tail[0] === "x" ? { ...c.explain, extra: true } : tail[0] === "e" ? { ...c.easy, c: s.c, extra: true } : s;
+  return { ...base, key, ...(tail.endsWith("r") ? { retry: true } : {}) };
+}
+function resumeOf(run) {
+  const o = run.mode === "lesson" && (getState().modules.lessons || {}).open;
+  if (!o || o.id !== run.lesson.id || o.n !== run.steps.length || o.day < addDays(dayKey(), -7)) return null;
+  const queue = o.keys.map((k) => stepOfKey(run.steps, k));
+  return queue.every(Boolean) && o.at > 0 && o.at < queue.length ? { ...o, queue } : null;
+}
+
 function Player({ t, locale, run, onExit, go, ...ctx }) {
   const { mode, lesson } = run;
   const tx = useLocaleText(locale);
-  const [queue, setQueue] = useState(() => run.steps.map((s, i) => ({ ...s, key: `${i}` })));
-  const firsts = useRef([]); // first attempts: [{ c, right }]
-  const helped = useRef(new Set()); // concepts that already got extra help
-  const [at, setAt] = useState(0);
+  const [saved] = useState(() => resumeOf(run));
+  const [queue, setQueue] = useState(() => (saved ? saved.queue : run.steps.map((s, i) => ({ ...s, key: `${i}` }))));
+  const firsts = useRef(saved ? saved.firsts : []); // first attempts: [{ c, right }]
+  const helped = useRef(new Set(saved ? saved.helped : [])); // concepts that already got extra help
+  const [at, setAt] = useState(saved ? saved.at : 0);
   const [picked, setPicked] = useState(null);
   const [checked, setChecked] = useState(null); // null | "right" | "wrong"
-  const [mistakes, setMistakes] = useState(0);
+  const [mistakes, setMistakes] = useState(saved ? saved.mistakes : 0);
   const [actionDone, setActionDone] = useState(false);
   const [result, setResult] = useState(null);
   const [quit, setQuit] = useState(false);
@@ -708,6 +731,11 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
   // Each lesson step reached (so the admin page can show where people stop).
   useEffect(() => {
     if (mode === "lesson") track("lesson_step", { lesson: lesson.id, step: at, of: total });
+    // Everything before `at` is done: save the place.
+    if (mode === "lesson" && at > 0) {
+      setSlice("lessons", (s) => ({ ...s, open: { id: lesson.id, n: run.steps.length, keys: queue.map((q) => q.key), at, mistakes, firsts: [...firsts.current], helped: [...helped.current], day: dayKey() } }));
+      saveNow();
+    }
   }, [at]);
 
   const advance = () => {
@@ -728,6 +756,8 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
     const allDone = () => UNITS.every((u) => unitDone(getState().progress, u));
     const wasAllDone = allDone();
     const r = recordLesson({ id: lesson.id, perfect: mistakes === 0, mistakes });
+    setSlice("lessons", (s) => ({ ...s, open: null }));
+    saveNow();
     const unitJustDone = !wasUnitDone && unitDone(getState().progress, unit);
     const moment = momentShown ? null : unitJustDone ? "unit" : r.streakUp && STREAKS.includes(r.streak) ? "streak" : null;
     if (moment) momentShown = true;

@@ -1,0 +1,98 @@
+{
+ "version": 1,
+ "updatedAt": 1792950000000,
+ "profile": {
+  "onboarded": true,
+  "nickname": "Leo",
+  "avatar": 3
+ },
+ "settings": {
+  "lang": "es",
+  "region": "MX",
+  "look": "navy"
+ },
+ "progress": {
+  "xp": 240,
+  "days": {
+   "2026-10-18": 30,
+   "2026-10-19": 40,
+   "2026-10-20": 20
+  },
+  "streak": {
+   "count": 3,
+   "last": "2026-10-20",
+   "best": 3,
+   "frozen": []
+  },
+  "freezes": 1,
+  "dailyGoal": 20,
+  "lessons": {
+   "budget-1": {
+    "done": true,
+    "at": "2026-10-18"
+   },
+   "budget-2": {
+    "done": true,
+    "at": "2026-10-19"
+   },
+   "save-1": {
+    "done": true,
+    "at": "2026-10-20"
+   },
+   "intro-1": {
+    "done": true,
+    "at": "2026-10-17"
+   }
+  },
+  "lessonDays": [
+   "2026-10-17",
+   "2026-10-18",
+   "2026-10-19",
+   "2026-10-20"
+  ],
+  "badges": {
+   "first_lesson": "2026-10-17"
+  }
+ },
+ "modules": {
+  "goals": {
+   "goals": [
+    {
+     "id": "g1",
+     "name": "Bici",
+     "target": 4000,
+     "months": 6,
+     "start": 500,
+     "path": "save"
+    }
+   ]
+  },
+  "portfolio": {
+   "pf": {
+    "currency": "MXN",
+    "cash": 180000,
+    "start": 200000,
+    "holdings": {
+     "CETES28": {
+      "shares": 1668.4432497566854,
+      "cost": 20000
+     }
+    },
+    "trades": [
+     {
+      "id": "2026-10-19-CETES28-b",
+      "at": "2026-10-19",
+      "symbol": "CETES28",
+      "side": "buy",
+      "shares": 1668.4432497566854,
+      "price": 11.987222222222222,
+      "amount": 20000
+     }
+    ],
+    "watchlist": [],
+    "startedAt": "2026-10-18",
+    "snapshots": []
+   }
+  }
+ }
+}

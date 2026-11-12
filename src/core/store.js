@@ -56,6 +56,9 @@ function save() {
     // Private mode or full storage: the app still works for this visit.
   }
 }
+// Right away, for what must survive the app being shut a moment later
+// (a lesson step, a finished lesson).
+export const saveNow = () => saveTimer && save();
 // Closed, reloaded or sent to the background within that moment: save now,
 // so nothing just done (a finished lesson, a survey answer) is lost.
 if (typeof document !== "undefined") {
