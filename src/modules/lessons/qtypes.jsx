@@ -87,7 +87,7 @@ function OrderView({ step, value, setValue, checked, t, locale }) {
           const pos = value.indexOf(i);
           const state = checked ? (pos === i ? "right" : "wrong") : pos >= 0 ? "on" : null;
           return (
-            <button key={i} data-q="order-item" disabled={!!checked} aria-pressed={pos >= 0} aria-label={`${pos >= 0 ? `${t("q.order.pos", { n: pos + 1 })}: ` : ""}${x(step.items[i])}`} onClick={() => setValue(pos >= 0 ? value.slice(0, pos) : [...value, i])} className="nv-press" style={{ ...btn, ...tone(state), cursor: checked ? "default" : "pointer" }}>
+            <button key={i} data-q="order-item" data-i={i} disabled={!!checked} aria-pressed={pos >= 0} aria-label={`${pos >= 0 ? `${t("q.order.pos", { n: pos + 1 })}: ` : ""}${x(step.items[i])}`} onClick={() => setValue(pos >= 0 ? value.slice(0, pos) : [...value, i])} className="nv-press" style={{ ...btn, ...tone(state), cursor: checked ? "default" : "pointer" }}>
               <Badge n={pos >= 0 ? pos + 1 : null} on={pos >= 0} />{" "}
               <span style={{ flex: 1 }}>{x(step.items[i])}</span>
               {checked && <Mark right={pos === i} />}
@@ -199,7 +199,7 @@ function MatchView({ step, value, setValue, checked, t, locale }) {
     const pair = value[k];
     const state = checked ? (pair && pair[0] === pair[1] ? "right" : "wrong") : (side === 0 && sel === i) || k >= 0 ? "on" : null;
     return (
-      <button key={`${side}${i}`} data-q={side ? "match-right" : "match-left"} disabled={!!checked} aria-pressed={k >= 0 || (side === 0 && sel === i)} aria-label={`${label}${k >= 0 ? `, ${t("q.match.pair", { n: k + 1 })}` : ""}`} onClick={() => (side ? tapRight(i) : tapLeft(i))} className="nv-press" style={{ ...btn, ...tone(state), fontSize: side ? 14 : 15, padding: "12px", minHeight: 60, cursor: checked ? "default" : "pointer" }}>
+      <button key={`${side}${i}`} data-q={side ? "match-right" : "match-left"} data-i={i} disabled={!!checked} aria-pressed={k >= 0 || (side === 0 && sel === i)} aria-label={`${label}${k >= 0 ? `, ${t("q.match.pair", { n: k + 1 })}` : ""}`} onClick={() => (side ? tapRight(i) : tapLeft(i))} className="nv-press" style={{ ...btn, ...tone(state), fontSize: side ? 14 : 15, padding: "12px", minHeight: 60, cursor: checked ? "default" : "pointer" }}>
         {k >= 0 && <Badge n={k + 1} on />}
         <span style={{ flex: 1 }}>{label}</span>
       </button>
@@ -267,7 +267,7 @@ function SpotView({ step, value, setValue, checked, t, locale }) {
             const state = checked ? (p.flag && on ? "right" : p.flag || on ? "wrong" : null) : on ? "on" : null;
             const border = state === "right" ? "var(--right)" : state === "wrong" ? "var(--warn)" : state === "on" ? "var(--brand)" : "var(--line)";
             return (
-              <button key={i} data-q="spot-part" disabled={!!checked} aria-pressed={on} aria-label={`${x(p.tap)}${checked && p.flag ? `, ${t("q.spot.flag")}` : ""}`} onClick={() => tap(i)} style={{ font: "inherit", color: "var(--ink)", background: state === "right" ? "var(--rightSoft)" : state === "wrong" ? "var(--warnSoft)" : state === "on" ? "var(--brandSoft)" : "transparent", border: `2px ${checked && p.flag && !on ? "dashed" : "solid"} ${lines && !state ? "transparent" : border}`, borderRadius: lines ? 10 : 6, padding: lines ? "8px 10px" : "0 3px", margin: lines ? 0 : "0 1px", textAlign: "left", width: lines ? "100%" : undefined, cursor: checked ? "default" : "pointer", lineHeight: 1.5, fontVariantNumeric: "tabular-nums" }}>
+              <button key={i} data-q="spot-part" data-i={i} disabled={!!checked} aria-pressed={on} aria-label={`${x(p.tap)}${checked && p.flag ? `, ${t("q.spot.flag")}` : ""}`} onClick={() => tap(i)} style={{ font: "inherit", color: "var(--ink)", background: state === "right" ? "var(--rightSoft)" : state === "wrong" ? "var(--warnSoft)" : state === "on" ? "var(--brandSoft)" : "transparent", border: `2px ${checked && p.flag && !on ? "dashed" : "solid"} ${lines && !state ? "transparent" : border}`, borderRadius: lines ? 10 : 6, padding: lines ? "8px 10px" : "0 3px", margin: lines ? 0 : "0 1px", textAlign: "left", width: lines ? "100%" : undefined, cursor: checked ? "default" : "pointer", lineHeight: 1.5, fontVariantNumeric: "tabular-nums" }}>
                 {x(p.tap)}
               </button>
             );

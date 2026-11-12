@@ -115,7 +115,7 @@ export function Feedback({ t, locale, step, picked, checked, note, heading, extr
   const miss = !right && step.type === "choice" && step.miss && step.miss[picked];
   const why = Array.isArray(step.why) ? step.why : [step.why];
   return (
-    <div className="nv-in" role="status" style={{ background: right ? "var(--rightSoft)" : "var(--warnSoft)", borderRadius: 20, padding: "14px 16px", marginBottom: 12 }}>
+    <div className="nv-in" role="status" data-right={right} style={{ background: right ? "var(--rightSoft)" : "var(--warnSoft)", borderRadius: 20, padding: "14px 16px", marginBottom: 12 }}>
       <div className="nv-disp" style={{ fontSize: 22, color: right ? "var(--right)" : "var(--warn)", display: "flex", alignItems: "center", gap: 8 }}>
         {/* A right answer: a soft ripple around the check, once. */}
         <span className={right ? "nv-ripple" : undefined} style={{ display: "inline-flex", borderRadius: "50%" }}>
