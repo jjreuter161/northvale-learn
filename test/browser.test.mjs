@@ -18,6 +18,7 @@ import { join } from "node:path";
 import assert from "node:assert/strict";
 import { chromium } from "playwright-core";
 import { ALL_LESSONS, UNITS } from "../src/modules/lessons/content.js";
+import { UNITS as FULL_UNITS } from "../src/modules/lessons/units/all.js";
 import { MISSIONS } from "../src/modules/missions/catalog.js";
 import { newGoal } from "../src/modules/goals/plan.js";
 import { weekStart, dayKey } from "../src/core/progress.js";
@@ -118,7 +119,9 @@ const slide = (el, v) => el.evaluate((e, v) => (Object.getOwnPropertyDescriptor(
 // Plays the open lesson, review or challenge: first option for each
 // question (a miss comes back once at the end), skips the "do it" step.
 // `untilAction` stops at the "do it" step instead.
-async function play({ top, button }, { untilAction = false, untilMoment = false } = {}) {
+async function play({ page, top, button }, { untilAction = false, untilMoment = false } = {}) {
+  // A unit still loading shows the boat for a moment first.
+  await page.locator('[aria-busy="true"]').waitFor({ state: "detached", timeout: 10000 });
   for (let i = 0; i < 80; i++) {
     const d = top();
     if (untilMoment && (await d.locator("[data-moment]").count())) return;
@@ -1063,7 +1066,7 @@ try {
 
     // The first lesson that uses each "do it" tool.
     const firsts = new Map();
-    for (const l of ALL_LESSONS) for (const s of l.steps) if (s.type === "action" && !firsts.has(s.kind)) firsts.set(s.kind, l);
+    for (const u of FULL_UNITS) for (const l of u.lessons) for (const s of l.steps) if (s.type === "action" && !firsts.has(s.kind)) firsts.set(s.kind, { ...l, unit: u.id });
     await menu("Learn");
     for (const [kind, lesson] of firsts) {
       const unit = page.getByRole("button", { name: new RegExp(`^Unit ${UNITS.findIndex((u) => u.id === lesson.unit) + 1} · `) });

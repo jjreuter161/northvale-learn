@@ -43,6 +43,7 @@ const tab = (page, name) => page.getByRole("navigation").getByRole("button", { n
 // Plays the open lesson to its finish (answers whatever is showing).
 let rightShot = false;
 async function play(page) {
+  await page.locator('[aria-busy="true"]').waitFor({ state: "detached", timeout: 10000 });
   for (let i = 0; i < 40; i++) {
     const dlg = page.getByRole("dialog").last();
     if (await dlg.getByText(/^(Lesson complete|Lección completa)$/).count()) return;

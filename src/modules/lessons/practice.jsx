@@ -2,15 +2,15 @@
 // its feedback (with why a wrong answer is wrong), the Review card, the
 // session-complete screen for reviews and challenges, the skills overview
 // on Me, and the placement test in onboarding. Rules in mastery.js.
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSlice, setSlice, getState, useAppState, update } from "../../core/store.js";
 import { addStrings, shortDate, text } from "../../core/i18n.js";
 import { dayKey } from "../../core/progress.js";
 import { track } from "../../core/analytics.js";
 import { service } from "../../core/registry.js";
-import { Button, Card, Icon, Label, Sheet } from "../../core/ui.jsx";
+import { Button, Card, Icon, Label, Loading, Sheet } from "../../core/ui.jsx";
 import * as M from "./mastery.js";
-import { UNITS, conceptsOfLesson, conceptsOfUnit } from "./content.js";
+import { UNITS, conceptsOfLesson, conceptsOfUnit, loadUnits } from "./content.js";
 import { CONCEPTS, PLACEMENT, conceptById } from "./concepts.js";
 
 const S = (en, es) => ({ en, es });
@@ -296,6 +296,12 @@ export function Placement({ t, locale, header, startUnit, onNext }) {
   const [results, setResults] = useState([]);
   const [picked, setPicked] = useState(null);
   const [checked, setChecked] = useState(null);
+  // The test's questions come with their units: fetched as soon as this
+  // screen opens, so they're ready when the learner picks the check.
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    loadUnits(PLACEMENT_UNITS).then(() => setReady(true), () => setReady("error"));
+  }, []);
   const step = conceptById(PLACEMENT[results.length] || PLACEMENT[0]).challenge;
   const first = UNITS.find((u) => u.id === startUnit) || UNITS[0];
   const plan = service("goals", "startPlan")();
@@ -354,6 +360,15 @@ export function Placement({ t, locale, header, startUnit, onNext }) {
       </>
     );
   }
+  if (ready !== true)
+    return (
+      <>
+        {header}
+        <div role="status" style={{ padding: "48px 0", display: "flex", justifyContent: "center", textAlign: "center" }}>
+          {ready === "error" ? <p style={{ color: "var(--mid)" }}>{t("common.load_error")}</p> : <Loading label={t("common.loading")} />}
+        </div>
+      </>
+    );
   const check = () => setChecked(picked === step.answer ? "right" : "wrong");
   const next = () => {
     const res = [...results, checked === "right"];

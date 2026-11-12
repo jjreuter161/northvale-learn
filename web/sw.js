@@ -1,9 +1,10 @@
-// Offline: the app (which carries every lesson), its fonts and icons come
+// Offline: the app, its fonts and icons, and each unit once it has been
+// opened (units load on demand, in web/chunks), come
 // from the cache when there's no connection, so lessons, the practice
 // portfolio (sample prices) and the goal simulator work offline; progress
 // syncs when the connection is back. /api always goes to the network.
 // Also shows the daily reminder (server/push.js) and opens the app on tap.
-const CACHE = "northvale-learn-v4";
+const CACHE = "northvale-learn-v5";
 const SHELL = ["/", "/app.js", "/manifest.webmanifest", "/icon.svg", "/icon-192.png", "/icon-512.png", "/icon-180.png", "/fonts/inter-latin-wght-normal.woff2", "/fonts/inter-latin-ext-wght-normal.woff2", "/fonts/eb-garamond-latin-600-normal.woff2", "/fonts/fraunces-latin-soft-normal.woff2"];
 self.addEventListener("install", (e) => e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting())));
 self.addEventListener("activate", (e) => e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim())));

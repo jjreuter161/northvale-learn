@@ -1,15 +1,14 @@
 // LEGAL — the privacy policy and terms, shown from the same files a lawyer
 // reviews (docs/legal/*.md), in the learner's language.
-import privacyEn from "../../docs/legal/privacy.en.md";
-import privacyEs from "../../docs/legal/privacy.es.md";
-import termsEn from "../../docs/legal/terms.en.md";
-import termsEs from "../../docs/legal/terms.es.md";
-import teacherEn from "../../docs/legal/teacher.en.md";
-import teacherEs from "../../docs/legal/teacher.es.md";
-import promiseEn from "../../docs/legal/promise.en.md";
-import promiseEs from "../../docs/legal/promise.es.md";
-
-const DOCS = { privacy: { en: privacyEn, es: privacyEs }, terms: { en: termsEn, es: termsEs }, teacher: { en: teacherEn, es: teacherEs }, promise: { en: promiseEn, es: promiseEs } };
+import { useEffect, useState } from "react";
+import { Loading } from "./ui.jsx";
+// Each document loads when it's opened (its own small file in the build).
+const DOCS = {
+  privacy: { en: () => import("../../docs/legal/privacy.en.md"), es: () => import("../../docs/legal/privacy.es.md") },
+  terms: { en: () => import("../../docs/legal/terms.en.md"), es: () => import("../../docs/legal/terms.es.md") },
+  teacher: { en: () => import("../../docs/legal/teacher.en.md"), es: () => import("../../docs/legal/teacher.es.md") },
+  promise: { en: () => import("../../docs/legal/promise.en.md"), es: () => import("../../docs/legal/promise.es.md") },
+};
 
 // Just enough Markdown for these pages: headings, lists, **bold**.
 function Md({ text }) {
@@ -43,11 +42,19 @@ function Md({ text }) {
 
 export default function Legal({ route, locale, go, t }) {
   const doc = DOCS[route.params.doc] || DOCS.privacy;
+  const load = doc[locale.lang] || doc.en;
+  const [text, setText] = useState(null);
+  useEffect(() => {
+    let on = true;
+    setText(null);
+    load().then((m) => on && setText(m.default), () => on && setText(false));
+    return () => {
+      on = false;
+    };
+  }, [load]);
   return (
     <div>
-      <article style={{ fontSize: 15 }}>
-        <Md text={doc[locale.lang] || doc.en} />
-      </article>
+      <article style={{ fontSize: 15 }}>{text ? <Md text={text} /> : text === false ? <p role="alert">{t("common.load_error")}</p> : <Loading label={t("common.loading")} />}</article>
     </div>
   );
 }

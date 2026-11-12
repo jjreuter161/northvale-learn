@@ -12,13 +12,13 @@ import { openShare } from "../../core/share.jsx";
 import { track } from "../../core/analytics.js";
 import { text, addStrings } from "../../core/i18n.js";
 import { xpOn, dayKey, addDays } from "../../core/progress.js";
-import { Button, Card, Icon, Layer, List, ListRow, Mark, Progress, Ring, Scene, Sheet, UnitArt, WaveEdge, toast } from "../../core/ui.jsx";
+import { Button, Card, Icon, Layer, List, ListRow, Loading, Mark, Progress, Ring, Scene, Sheet, UnitArt, WaveEdge, toast } from "../../core/ui.jsx";
 import { star, wave, boat, LANDMARK } from "../../core/art.js";
 import { AgeCard } from "../../core/Settings.jsx";
 import { ReminderCard } from "../../core/reminders.jsx";
 import { practiceOpen, markIntro } from "../../core/Practice.jsx";
 import { feel, reducedMotion } from "../../core/feel.js";
-import { UNITS, ALL_LESSONS, lessonById, lessonState, nextLesson, nextFor, unitDone, isQuestion, conceptPool, conceptsOfLesson, conceptsOfUnit, minutes } from "./content.js";
+import { UNITS, ALL_LESSONS, lessonById, lessonState, nextLesson, nextFor, unitDone, isQuestion, conceptPool, loadUnits, unitLoaded, conceptsOfLesson, conceptsOfUnit, minutes } from "./content.js";
 import { conceptById } from "./concepts.js";
 import * as M from "./mastery.js";
 import { Question, QTYPES, startValue } from "./qtypes.jsx";
@@ -561,6 +561,15 @@ function Course({ t, locale, go, route }) {
 }
 
 function Learn(ctx) {
+  // The next lesson's unit, fetched quietly once the page has shown, so
+  // Continue opens at once.
+  const next = currentLesson(useAppState((s) => s.progress));
+  const unit = next && next.unit;
+  useEffect(() => {
+    if (!unit) return undefined;
+    const id = setTimeout(() => loadUnits([unit]).catch(() => {}), 800);
+    return () => clearTimeout(id);
+  }, [unit]);
   return (
     <div>
       <Today {...ctx} />
@@ -1000,13 +1009,49 @@ function sessionFor(params, t, locale) {
   return l && (lessonState(progress, id) !== "locked" || params.assigned) ? { mode: "lesson", lesson: l, title: text(l.title, locale), steps: l.steps } : null;
 }
 
+// The units a session needs (their cards and questions) before it starts.
+function unitsFor(p) {
+  if (p.review) return M.pickReview(conceptsNow(), dayKey()).ids.map((c) => (conceptById(c) || {}).unit);
+  if (p.challenge) return [(lessonById(p.challenge) || {}).unit];
+  if (p.lesson) return [(lessonById(p.lesson) || {}).unit];
+  if (p.startUnit) return [p.startUnit, (nextFor(getState().progress, service("goals", "recommendedUnits")() || []) || {}).unit];
+  return [];
+}
+
 function Screen(ctx) {
   const p = ctx.route.params;
   const key = p.review ? "review" : p.challenge ? `challenge:${p.challenge}` : p.lesson || p.startUnit || null;
-  const session = useMemo(() => (key ? sessionFor(p, ctx.t, ctx.locale) : null), [key]);
+  // Loaded already (usually: the next unit is fetched in the background),
+  // the lesson opens at once; otherwise the boat shows for a moment.
+  const needs = key ? unitsFor(p).filter(Boolean) : [];
+  const [loaded, setLoaded] = useState(null); // the key whose units arrived, or "!key" if they couldn't
+  useEffect(() => {
+    if (!key || needs.every(unitLoaded)) return undefined;
+    let on = true;
+    loadUnits(needs).then(() => on && setLoaded(key), () => on && setLoaded(`!${key}`));
+    return () => {
+      on = false;
+    };
+  }, [key]);
+  const ready = !!key && (loaded === key || needs.every(unitLoaded));
+  const session = useMemo(() => (ready ? sessionFor(p, ctx.t, ctx.locale) : null), [key, ready]);
   return (
     <>
       <Learn {...ctx} />
+      {key && !ready && (
+        <Overlay label={ctx.t("common.loading")}>
+          <div aria-busy={loaded !== `!${key}`} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 18, textAlign: "center" }}>
+            {loaded === `!${key}` ? (
+              <>
+                <p role="alert" style={{ fontSize: 17, maxWidth: 320, margin: 0 }}>{ctx.t("common.load_error")}</p>
+                <Button onClick={() => ctx.go("lessons")}>{ctx.t("common.close")}</Button>
+              </>
+            ) : (
+              <Loading label={ctx.t("common.loading")} />
+            )}
+          </div>
+        </Overlay>
+      )}
       {session && <Player key={key} {...ctx} run={session} onExit={() => ctx.go("lessons")} />}
     </>
   );
@@ -1054,7 +1099,7 @@ registerModule({
     current: () => currentLesson(getState().progress),
     // The first lesson whose "do it" step uses this tool (Practice → Tools
     // opens each tool after its lesson), and a lesson's title and unit.
-    firstLessonWith: (kind) => ALL_LESSONS.find((l) => l.steps.some((s) => s.type === "action" && s.kind === kind)) || null,
+    firstLessonWith: (kind) => ALL_LESSONS.find((l) => l.action === kind) || null,
     lessonDone: (id) => lessonState(getState().progress, id) === "done",
     unitTitles: (ids) => ids.map((id) => (UNITS.find((u) => u.id === id) || {}).title).filter(Boolean),
     nextFor: (units) => {

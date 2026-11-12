@@ -66,6 +66,7 @@ async function answer(dlg) {
 }
 // Plays the open lesson; photographs the first of each new kind of question.
 async function play(page, prefix, seen = new Set()) {
+  await page.locator('[aria-busy="true"]').waitFor({ state: "detached", timeout: 10000 });
   for (let i = 0; i < 40; i++) {
     const dlg = page.getByRole("dialog").last();
     if ((await dlg.locator("[data-moment]").count()) || (await dlg.getByText(/^(Lesson complete|Lección completa)$/).count())) return;

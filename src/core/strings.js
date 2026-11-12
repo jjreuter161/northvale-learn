@@ -12,6 +12,7 @@ addStrings({
   "common.cancel": S("Cancel", "Cancelar"),
   "common.done": S("Done", "Listo"),
   "common.loading": S("Loading…", "Cargando…"),
+  "common.load_error": S("This didn't load. Check your connection, then try again.", "No se pudo cargar. Revisa tu conexión e inténtalo de nuevo."),
   "common.skip": S("Skip", "Saltar"),
   "common.try_again": S("Try again", "Intenta de nuevo"),
   "common.ask_tutor": S("Ask the tutor", "Pregúntale al tutor"),

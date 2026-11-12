@@ -109,7 +109,7 @@ let INDEX = null;
 const strings = (x) => (typeof x === "string" ? [x] : x && typeof x === "object" ? Object.values(x).flatMap(strings) : []);
 export function findLesson(question, lessons, conceptName) {
   if (!INDEX) {
-    INDEX = lessons.map((l) => ({ l, w: new Set([l.title, ...l.steps.filter((s) => s.type === "card").map((s) => s.title), ...[...new Set(l.steps.map((s) => s.c).filter(Boolean))].map(conceptName)].flatMap(strings).flatMap(words)) }));
+    INDEX = lessons.map((l) => ({ l, w: new Set([l.title, ...(l.cards || []), ...(l.concepts || []).map(conceptName)].flatMap(strings).flatMap(words)) }));
     INDEX.df = new Map();
     for (const { w } of INDEX) for (const x of w) INDEX.df.set(x, (INDEX.df.get(x) || 0) + 1);
   }

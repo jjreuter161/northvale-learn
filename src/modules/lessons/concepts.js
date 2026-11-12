@@ -7,7 +7,8 @@
 //               a concept is strong
 import { UNITS, PLACEMENT as PLACEMENT_PAIRS } from "./units/index.js";
 
-export const CONCEPTS = UNITS.flatMap((u) => u.concepts.map((c) => ({ ...c, unit: u.id })));
+// (The index has each concept's name; loadUnits in content.js adds the rest.)
+export const CONCEPTS = UNITS.flatMap((u) => u.concepts);
 export const conceptById = (id) => CONCEPTS.find((c) => c.id === id) || null;
 // Placement: one concept per unit, in course order.
 export const PLACEMENT = PLACEMENT_PAIRS.map(([, c]) => c);

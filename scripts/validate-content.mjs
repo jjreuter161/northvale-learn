@@ -11,10 +11,10 @@
 // Run: node scripts/validate-content.mjs (npm test runs it too).
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import { UNITS, PLACEMENT } from "../src/modules/lessons/units/index.js";
+import { UNITS, PLACEMENT } from "../src/modules/lessons/units/all.js";
 import { FACTS } from "../src/core/facts.js";
 import { pick, fill } from "../src/core/i18n.js";
-import { minutes, isQuestion, QUESTION_TYPES } from "../src/modules/lessons/content.js";
+import { minutesOf as minutes, isQuestion, QUESTION_TYPES } from "../src/modules/lessons/units/time.js";
 import { fv } from "../src/modules/lessons/units/helpers.js";
 import { MISSIONS } from "../src/modules/missions/catalog.js";
 import { MYTHS } from "../src/modules/lessons/myths.js";
