@@ -1,5 +1,7 @@
 // Accounts, sessions, synced progress and weekly leagues, kept in one JSON
-// file on this machine (NORTHVALE_DATA, default server/data).
+// file on this machine (NORTHVALE_DATA, default server/data) — or, when
+// DATABASE_URL is set (Vercel + Supabase), in Postgres (see pgstore.js):
+// the same in-memory copy, loaded before each request and saved after it.
 // - Passwords only as scrypt hashes, sessions only as SHA-256s of their
 //   tokens (see auth.js).
 // - What a learner shares: email (to sign in), a nickname, an age range
@@ -10,33 +12,45 @@
 import { randomUUID } from "node:crypto";
 import { readFileSync, writeFileSync, existsSync, mkdirSync, renameSync, copyFileSync, readdirSync, unlinkSync, chmodSync } from "node:fs";
 import { join } from "node:path";
+import { persistence, dbFor } from "./pgstore.js";
 
 const DIR = process.env.NORTHVALE_DATA || join(import.meta.dirname, "data");
 const FILE = join(DIR, "learn.json");
-mkdirSync(DIR, { recursive: true, mode: 0o700 });
+const PG = !!process.env.DATABASE_URL || process.env.NORTHVALE_PGLITE === "1";
+if (!PG) mkdirSync(DIR, { recursive: true, mode: 0o700 });
 
-const data = { users: {}, sessions: {}, progress: {}, weeks: {}, usage: {}, ai: null, resets: {}, ...(existsSync(FILE) ? JSON.parse(readFileSync(FILE, "utf8")) : {}) };
+const data = { users: {}, sessions: {}, progress: {}, weeks: {}, usage: {}, ai: null, resets: {}, ...(!PG && existsSync(FILE) ? JSON.parse(readFileSync(FILE, "utf8")) : {}) };
+const pg = PG ? persistence(await dbFor(process.env.DATABASE_URL), data) : null;
+if (pg) (await pg.setup(), await pg.load());
+// With Postgres: load() before each request, commit() after it (index.js).
+export const db = { on: !!pg, load: () => (pg ? pg.load() : null), commit: () => (pg ? pg.commit() : 0) };
 let timer = null;
 function save() {
+  if (pg) return; // saved after the request (db.commit)
   // Write-then-rename, so a crash mid-write never leaves a broken file.
   // Batched a little: progress syncs can come in quick bursts.
   clearTimeout(timer);
   timer = setTimeout(flush, 200);
 }
 export function flush() {
+  if (pg) return;
   clearTimeout(timer);
   writeFileSync(`${FILE}.tmp`, JSON.stringify(data), { mode: 0o600 });
   renameSync(`${FILE}.tmp`, FILE);
 }
-process.on("exit", flush);
-// A stop signal (a deploy, a restart, Ctrl-C) saves first: otherwise the
-// last 200 ms of changes would be lost.
-for (const [sig, code] of [["SIGTERM", 143], ["SIGINT", 130]]) process.on(sig, () => process.exit(code));
+if (!pg) {
+  process.on("exit", flush);
+  // A stop signal (a deploy, a restart, Ctrl-C) saves first: otherwise the
+  // last 200 ms of changes would be lost.
+  for (const [sig, code] of [["SIGTERM", 143], ["SIGINT", 130]]) process.on(sig, () => process.exit(code));
+}
 
 // BACKUPS — once a day, a copy of the data file in backups/ (the last 14
 // days are kept). On a host, also turn on its disk snapshots (README).
+// With Postgres, the copy goes in northvale.backups (a promise).
 const BACKUPS = join(DIR, "backups");
 export function backup(today = new Date().toISOString().slice(0, 10)) {
+  if (pg) return pg.backup(today);
   mkdirSync(BACKUPS, { recursive: true, mode: 0o700 });
   const target = join(BACKUPS, `learn-${today}.json`);
   if (existsSync(target)) return null;

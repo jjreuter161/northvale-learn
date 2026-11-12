@@ -1,0 +1,1 @@
+Northvale Learn. The app and its pages are served by the server function (api/index.js); Vercel needs this folder to exist.

@@ -8,20 +8,22 @@
 // ANTHROPIC_API_KEY, TUTOR_MODEL, NEWS_MODEL, AI_MONTHLY_BUDGET_USD,
 // TUTOR_DAILY_LIMIT, TUTOR_PER_MINUTE, TWELVEDATA_API_KEY, CETES_RATE,
 // CETES_RATE_DATE, ADMIN_TOKEN, ALERT_WEBHOOK_URL, SMTP_USER, SMTP_PASS,
-// MAIL_FROM, MAIL_POSTAL_ADDRESS, PUBLIC_URL, CONTACT_EMAIL, NORTHVALE_DATA
-// — see README.
+// MAIL_FROM, MAIL_POSTAL_ADDRESS, PUBLIC_URL, CONTACT_EMAIL, NORTHVALE_DATA,
+// DATABASE_URL and CRON_SECRET (Vercel + Supabase) — see README and
+// docs/VERCEL-SUPABASE.md.
 import http from "node:http";
 import { readFile, stat } from "node:fs/promises";
 import { gzipSync } from "node:zlib";
 import { existsSync } from "node:fs";
 import { join, extname, resolve, sep } from "node:path";
+import { pathToFileURL } from "node:url";
 
 const ROOT = join(import.meta.dirname, "..");
 // The settings file (tests and demo servers set NORTHVALE_DOTENV=0 so your
 // real keys are never used by them).
 if (process.env.NORTHVALE_DOTENV !== "0" && existsSync(join(ROOT, ".env"))) process.loadEnvFile(join(ROOT, ".env"));
 
-const { store, AGE_BANDS, cleanNickname, backup } = await import("./store.js");
+const { store, AGE_BANDS, cleanNickname, backup, db } = await import("./store.js");
 const insights = await import("./insights.js");
 const { alert } = await import("./alerts.js");
 const mail = await import("./mail.js");
@@ -85,7 +87,11 @@ function tooFast(userId) {
   list.push(now);
   return false;
 }
+// ALLOWED_HOSTS: names this server answers to, comma-separated; one that
+// starts with "*." allows its subdomains (Vercel's preview addresses).
 const HOSTS = new Set([`localhost:${PORT}`, `127.0.0.1:${PORT}`, `[::1]:${PORT}`, ...(process.env.ALLOWED_HOSTS || "").split(",").map((h) => h.trim()).filter(Boolean)]);
+const WILD = [...HOSTS].filter((h) => h.startsWith("*.")).map((h) => h.slice(1));
+const hostOk = (h) => !!h && (HOSTS.has(h) || WILD.some((w) => h.endsWith(w) && h.length > w.length));
 const TYPES = { ".woff2": "font/woff2", ".txt": "text/plain; charset=utf-8", ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".map": "application/json", ".json": "application/json", ".webmanifest": "application/manifest+json", ".svg": "image/svg+xml", ".png": "image/png", ".jpg": "image/jpeg", ".ico": "image/x-icon" };
 // Pages by a friendlier address: the admin page and the landing page.
 const PAGES = { "/admin": "/admin.html", "/welcome": "/welcome.html", "/bienvenida": "/bienvenida.html" };
@@ -541,7 +547,7 @@ async function handle(req, res) {
       res.writeHead(200, { "Content-Type": "text/plain", "Cache-Control": "no-store" });
       return res.end("ok");
     }
-    if (!HOSTS.has(req.headers.host)) return send(req, res, 421, { error: { message: "Unknown host" } });
+    if (!hostOk(req.headers.host)) return send(req, res, 421, { error: { message: "Unknown host" } });
     const url = new URL(req.url, "http://x");
     if (!url.pathname.startsWith("/api/")) return req.method === "GET" ? serveFile(req, res, PAGES[url.pathname] || url.pathname) : send(req, res, 405, {});
     // A header other sites can't send without asking first (and the server
@@ -577,17 +583,73 @@ async function handle(req, res) {
     }
 }
 
+// SCHEDULED WORK on Vercel (no always-on server): POST /api/cron with
+// "Authorization: Bearer CRON_SECRET", every 15 minutes from Supabase
+// (pg_cron) and once a day from Vercel Cron. The daily backup and the old
+// classes' clean-up run once a day; reminders and recaps each time.
+const CRON_SECRET = process.env.CRON_SECRET && process.env.CRON_SECRET.length >= 20 ? process.env.CRON_SECRET : null;
+async function cronTick(now = new Date()) {
+  const day = now.toISOString().slice(0, 10);
+  const jobs = store.section("jobs", () => ({}));
+  if (jobs.daily !== day) {
+    jobs.daily = day;
+    store.changed();
+    try {
+      await backup(day);
+    } catch (e) {
+      alert("backup", `Backup failed: ${e.message}`);
+    }
+    classes.purge();
+  }
+  await push.tick(now);
+  await recap.tick(now, { users: store.allUsers, progressOf: store.progress, base: process.env.PUBLIC_URL || "" });
+}
+
+// One request. With Postgres, API requests load what other copies of the
+// server changed first, and save what they changed before the reply ends.
 // One bad request must never take the server down for everyone.
-http
-  .createServer((req, res) =>
-    handle(req, res).catch((e) => {
-      console.error(e);
-      serverError(e);
-      if (!res.headersSent && !res.destroyed) send(req, res, 500, { error: { message: "Something went wrong." } });
-      else res.destroy();
-    })
-  )
+export async function handler(req, res) {
+  // Vercel sends every address to this one function (vercel.json); when
+  // it passes the original path as ?__path=, put it back.
+  const u = new URL(req.url || "/", "http://x");
+  if (u.searchParams.has("__path")) {
+    const path = u.searchParams.get("__path");
+    u.searchParams.delete("__path");
+    req.url = `${path}${u.searchParams.size ? `?${u.searchParams}` : ""}`;
+  }
+  try {
+    const api = req.url.startsWith("/api/");
+    if (api && db.on) {
+      await db.load();
+      const end = res.end.bind(res);
+      res.end = (...args) => {
+        db.commit()
+          .catch((e) => (console.error(e), serverError(e)))
+          .finally(() => end(...args));
+        return res;
+      };
+    }
+    if (req.url.split("?")[0] === "/api/cron") {
+      if (!CRON_SECRET || !auth.sameSecret(String(req.headers.authorization || ""), `Bearer ${CRON_SECRET}`)) return send(req, res, 401, { error: { message: "Not allowed" } });
+      await cronTick();
+      return send(req, res, 200, { ok: true });
+    }
+    await handle(req, res);
+  } catch (e) {
+    console.error(e);
+    serverError(e);
+    if (!res.headersSent && !res.destroyed) send(req, res, 500, { error: { message: "Something went wrong." } });
+    else res.destroy();
+  }
+}
+
+// Run directly (`npm start`, Fly.io, tests): a server that stays on, with
+// its own timers. On Vercel, api/index.js uses handler() instead.
+if (import.meta.url === pathToFileURL(process.argv[1] || "").href) http
+  .createServer((req, res) => handler(req, res))
   .listen(PORT, HOST, () => {
+    // With Postgres, the scheduled work runs the same way as on Vercel.
+    if (db.on) setInterval(() => db.load().then(() => cronTick()).then(() => db.commit()).catch((e) => serverError(e)), 60000).unref();
     const daily = () => {
       try {
         backup();
@@ -596,16 +658,18 @@ http
       }
       classes.purge();
     };
-    daily();
-    setInterval(daily, 6 * 3600000).unref();
-    // Reminders each minute; recaps every 10 minutes (Sunday evenings).
-    setInterval(() => push.tick().catch((e) => serverError(e)), 60000).unref();
-    const base = process.env.PUBLIC_URL || `http://localhost:${PORT}`;
-    setInterval(() => recap.tick(new Date(), { users: store.allUsers, progressOf: store.progress, base }).catch((e) => serverError(e)), 600000).unref();
+    if (!db.on) {
+      daily();
+      setInterval(daily, 6 * 3600000).unref();
+      // Reminders each minute; recaps every 10 minutes (Sunday evenings).
+      setInterval(() => push.tick().catch((e) => serverError(e)), 60000).unref();
+      const base = process.env.PUBLIC_URL || `http://localhost:${PORT}`;
+      setInterval(() => recap.tick(new Date(), { users: store.allUsers, progressOf: store.progress, base }).catch((e) => serverError(e)), 600000).unref();
+    }
     const m = market.marketInfo();
     console.log(`Northvale Learn on http://${HOST === "0.0.0.0" ? "localhost" : HOST}:${PORT}`);
     console.log(`  tutor:  ${ai ? `Claude (${ai.TUTOR_MODEL}), budget $${AI_BUDGET}/month` : "glossary only (set ANTHROPIC_API_KEY for the AI tutor and news summaries)"}`);
     console.log(`  admin:  ${ADMIN_TOKEN ? "/admin" : "off (set ADMIN_TOKEN, 20+ characters)"} · alerts: ${process.env.ALERT_WEBHOOK_URL ? "webhook" : "log only"} · password reset email: ${{ smtp: "on", log: "links printed here (local)", off: "off (set SMTP_USER/SMTP_PASS)" }[mail.mailMode()]}`);
     console.log(`  prices: ${m.source === "twelvedata" ? "Twelve Data (delayed)" : "sample prices (set TWELVEDATA_API_KEY for real delayed prices)"}`);
-    console.log(`  accounts: ${store.userCount()}${process.env.SIGNUP_CODE ? " · sign-up needs SIGNUP_CODE" : " · sign-up open"}`);
+    console.log(`  accounts: ${store.userCount()}${process.env.SIGNUP_CODE ? " · sign-up needs SIGNUP_CODE" : " · sign-up open"} · data: ${db.on ? "Postgres" : "file"}`);
   });

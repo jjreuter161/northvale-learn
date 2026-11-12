@@ -60,7 +60,8 @@ The server uses your IP address for a few minutes to stop password-guessing and 
 
 ## Who else processes data
 
-- **Our hosting provider** **Fly.io, with servers in Dallas, Texas (US)** runs the server and stores the data.
+- **Vercel** runs the server and delivers the app and website. **[Lawyer to confirm: Vercel's server region.]**
+- **Supabase** stores the data (accounts, progress, leagues and the waitlist) in a database in the United States. **[Lawyer to confirm: the project's region and Supabase's data processing terms.]**
 - **Anthropic** answers tutor questions and writes the news summaries.
 - **Twelve Data** sends us market prices. It never receives anything about you.
 - **Google (Gmail)** delivers password reset emails and, if you turn it on, the weekly recap. It receives your email address and the email. We never send newsletters or marketing.
