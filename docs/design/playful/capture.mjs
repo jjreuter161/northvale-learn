@@ -82,6 +82,8 @@ try {
     await page.getByRole("heading", { name: /^(Your course|Tu curso)$/ }).scrollIntoViewIfNeeded();
     await page.evaluate(() => window.scrollBy(0, -70));
     await shot(page, `${p}03-learn-map`);
+    // The whole sea chart, top to bottom.
+    await page.locator("section[aria-label]").last().screenshot({ path: join(OUT, `${p}03c-course-full.png`) });
     if (lang === "en") {
       await page.getByRole("button", { name: /^Unit 2 · / }).click();
       await shot(page, `${p}03b-island-opened`);

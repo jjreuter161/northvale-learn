@@ -28,7 +28,7 @@ addStrings({
   "cls.sees.yes": S("Your teacher sees", "Tu profe ve"),
   "cls.sees.nick": S("The nickname you pick below", "El apodo que elijas abajo"),
   "cls.sees.lessons": S("Lessons and units you finish from now on", "Las lecciones y unidades que termines desde ahora"),
-  "cls.sees.missions": S("How many Money Missions you finish (never your notes)", "Cuántas Misiones de dinero terminas (nunca tus notas)"),
+  "cls.sees.missions": S("How many real-life missions you finish (never your notes)", "Cuántas misiones de la vida real terminas (nunca tus notas)"),
   "cls.sees.assign": S("Your progress on what your teacher assigns", "Tu avance en lo que asigne tu profe"),
   "cls.sees.concepts": S("Which topics the class finds hard, as class totals — never just yours", "Qué temas se le dificultan al grupo, en totales del grupo — nunca solo los tuyos"),
   "cls.sees.no": S("Your teacher never sees", "Tu profe nunca ve"),

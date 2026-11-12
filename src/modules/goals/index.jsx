@@ -1289,7 +1289,7 @@ registerModule({
       const g = goalsNow().find((x) => x.linked.includes(symbol));
       return g ? nameOf(g, makeT(locNow())) : null;
     },
-    // For Money Missions: each active goal's kind and name, the main one first.
+    // For real-life missions: each active goal's kind and name, the main one first.
     goalKinds: () => {
       const goals = goalsNow().filter((g) => g.status !== "paused");
       const lead = P.primaryGoal(goals);

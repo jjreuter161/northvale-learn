@@ -168,3 +168,16 @@ Our edge: independent, both countries, learning by doing.
 6. **Certificates for 13–17:** the verification page shows **only the track and date** (recommended), or the nickname too?
 7. **Rename "Money Missions":** "Real-life missions" / "Misiones de la vida real" (recommended), or "Try it for real" / "Pruébalo de verdad"? The lawyer checks the one you pick.
 8. **Milestone 5's order:** two countries → Explain this → the money year → certificates (recommended)?
+
+## Approved (2026-11-12)
+
+1. "Your course": the detailed sea chart.
+2. New learners' look: Match my device.
+3. Two countries: a third country choice, "Both."
+4. Simulator meter: "Peace of mind."
+5. Explain this hides card and account numbers on the phone before anything is sent, and still shows the warning.
+6. Certificates for 13–17: the public page shows only the track and the date.
+7. "Money Missions" becomes "Real-life missions" everywhere (app, docs, landing page, EN/ES). It's on the lawyer list.
+8. Milestone 5's order: two countries → Explain this → the money year → certificates, starting after testers' first week.
+
+Also decided: no separate branch before launch. Everything goes into `main` as Release Candidate 1 (v1.0.0-rc1).

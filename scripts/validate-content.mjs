@@ -6,7 +6,7 @@
 //     well formed (nothing left unfilled, in US or Mexico, either language)
 //   - every lesson ends with a real action, and takes 3–5 minutes
 //   - every concept has its extra material and is taught somewhere
-//   - every Money Mission: both languages, a real unit, a known icon and time
+//   - every real-life mission: both languages, a real unit, a known icon and time
 //   - every t("key") the app shows has its text (English and Spanish)
 // Run: node scripts/validate-content.mjs (npm test runs it too).
 import { readFileSync, readdirSync } from "node:fs";

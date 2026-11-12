@@ -19,7 +19,7 @@ These terms are for adults who create a class in Northvale Learn. They apply on 
 
 - **Nicknames only.** Let students choose a nickname. Don't require their real or full names in the app.
 - **Don't collect personal information** through Northvale Learn: no emails, phone numbers, addresses, birthdays or photos. The app doesn't ask for them in a class, and you shouldn't ask either.
-- **Use what you see only for teaching.** You see nicknames, lessons and units finished since each student joined, how many Money Missions they finished, progress on what you assign, and class-wide totals for hard topics. Don't copy it anywhere else except your own grade book, and only when your school allows that.
+- **Use what you see only for teaching.** You see nicknames, lessons and units finished since each student joined, how many real-life missions they finished, progress on what you assign, and class-wide totals for hard topics. Don't copy it anywhere else except your own grade book, and only when your school allows that.
 - **Never share it with anyone outside your school** or use it for anything but teaching that class.
 - **Students can leave any time.** Leaving removes them from your view. Don't pressure them to rejoin or to stay on the leaderboard.
 

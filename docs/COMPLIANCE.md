@@ -50,7 +50,7 @@ Laws that can apply once a school uses it:
 
 - **Teachers:** an account, 18+ (self-declared at sign-up), a **confirmed email** (a one-time link, 24 hours), and the **teacher terms** accepted ([docs/legal/teacher.en.md](legal/teacher.en.md), Spanish too). The date of each is kept.
 - **Students:** join with a class code or the teacher's link. **No account or email**: only a nickname for the class and an age range (13+). A screen before joining says exactly what the teacher will and won't see.
-- **The teacher sees only:** nicknames; lessons and units finished since the student joined; how many Money Missions they finished; progress on assigned units (which counts earlier lessons only if the student ticks "Count lessons I already finished for class assignments" — off by default, changeable any time, and only lessons in assigned units); and **class-wide** totals for topics the class misses (only once 3+ students have answered on a topic). Never goals, amounts, savings, the practice portfolio, mission notes, tutor questions, age, email, or anything from before joining. The server builds the teacher's view field by field (`server/classes.js teacherView`), and the student's device only ever sends those fields (`src/modules/classroom/report.js`). Tests check that private data never reaches the teacher.
+- **The teacher sees only:** nicknames; lessons and units finished since the student joined; how many real-life missions they finished; progress on assigned units (which counts earlier lessons only if the student ticks "Count lessons I already finished for class assignments" — off by default, changeable any time, and only lessons in assigned units); and **class-wide** totals for topics the class misses (only once 3+ students have answered on a topic). Never goals, amounts, savings, the practice portfolio, mission notes, tutor questions, age, email, or anything from before joining. The server builds the teacher's view field by field (`server/classes.js teacherView`), and the student's device only ever sends those fields (`src/modules/classroom/report.js`). Tests check that private data never reaches the teacher.
 - **Codes:** 6 characters (no look-alikes), changeable by the teacher (the old one stops working), and the teacher can close the class to new students. Wrong codes are throttled per network address; joins are capped per address.
 - **No messaging of any kind.**
 - **Class leaderboard:** nicknames and this week's XP only. Any student can hide.
@@ -99,7 +99,7 @@ Laws that can apply once a school uses it:
 - **Deleting everything:** Settings → Privacy → **Delete my data** removes the account, this device's usage stats and the device's data. Backups age out within 14 days.
 - **Turning analytics off:** analytics can be switched off, and they're off automatically with Global Privacy Control or Do Not Track.
 - **Legal drafts in both languages:** a privacy policy and terms in English and Spanish, marked as drafts.
-- **Money Missions (real-world tasks):**
+- **Real-life missions (real-world tasks):**
   - nothing is collected: people do them on their own and mark them done;
   - notes are optional, capped at 280 characters, stored with the learner's progress, and never sent with usage stats (only "finished, with or without a note");
   - the note box says to leave out account numbers, passwords and other private details;

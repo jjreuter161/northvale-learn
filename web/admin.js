@@ -138,7 +138,7 @@ async function load(token) {
     ...growth(s),
     el("h2", {}, "Learning"),
     el("div", { class: "grid" }, card("Lessons finished", s.lessons.total), card("Per learner", `${s.lessons.perLearnerAvg} avg`, `median ${s.lessons.perLearnerMedian} · ${s.lessons.zero} finished none`), card("Streaks", `${s.streaks.median} median`, `longest ${s.streaks.max} · ${s.streaks.atLeast3} at 3+ · ${s.streaks.atLeast7} at 7+`), card("Tutor questions", s.tutor.questions, `${s.tutor.learnersAsking} learners asked`)),
-    el("h2", {}, "Money Missions"),
+    el("h2", {}, "Real-life missions"),
     el("div", { class: "grid" }, card("Missions finished", s.missions.done), card("Learners with a mission", s.missions.learners, `of ${s.learners} learners`)),
     table(["Mission", "Started", "Finished", "With a note"], s.missions.list.map((m) => [m.title, m.started, m.done, m.notes])),
     el("h2", {}, "Where people stop inside a lesson (started 1+ days ago, not finished)"),

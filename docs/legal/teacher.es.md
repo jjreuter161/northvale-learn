@@ -19,7 +19,7 @@ Estos términos son para personas adultas que crean una clase en Northvale Learn
 
 - **Solo apodos.** Deja que cada estudiante elija un apodo. No pidas su nombre real ni completo en la app.
 - **No recabes datos personales** por medio de Northvale Learn: ni correos, ni teléfonos, ni domicilios, ni fechas de nacimiento, ni fotos. La app no los pide en una clase y tú tampoco debes pedirlos.
-- **Usa lo que ves solo para enseñar.** Ves apodos, lecciones y unidades terminadas desde que cada estudiante se unió, cuántas Misiones de dinero terminó, su avance en lo que asignas y totales del grupo de los temas difíciles. No lo copies a ningún otro lugar, salvo a tu propio registro de calificaciones y solo si tu escuela lo permite.
+- **Usa lo que ves solo para enseñar.** Ves apodos, lecciones y unidades terminadas desde que cada estudiante se unió, cuántas misiones de la vida real terminó, su avance en lo que asignas y totales del grupo de los temas difíciles. No lo copies a ningún otro lugar, salvo a tu propio registro de calificaciones y solo si tu escuela lo permite.
 - **Nunca lo compartas con nadie fuera de tu escuela** ni lo uses para otra cosa que no sea dar esa clase.
 - **Cada estudiante puede salirse cuando quiera.** Al salirse, desaparece de tu vista. No le presiones para volver ni para seguir en la tabla de la clase.
 

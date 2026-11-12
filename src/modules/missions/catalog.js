@@ -1,4 +1,4 @@
-// MONEY MISSIONS — small real-life tasks that put a lesson to work. Nothing
+// REAL-LIFE MISSIONS — small real-life tasks that put a lesson to work. Nothing
 // moves real money and nothing is collected: people do them on their own
 // and mark them done. Text uses the lesson format (T, {$US|MX}, {@fact});
 // scripts/validate-content.mjs checks these too.

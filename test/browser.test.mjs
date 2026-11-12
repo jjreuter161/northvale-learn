@@ -1,5 +1,5 @@
 // THE APP IN A REAL BROWSER — headless Chrome clicks through the main
-// flows on a throwaway server: onboarding, a full lesson, a Money Mission,
+// flows on a throwaway server: onboarding, a full lesson, a real-life mission,
 // a new goal, every calculator, a review, a practice buy, every lesson's
 // "do it" tool, and every screen in English (US) and Spanish (Mexico);
 // classroom mode (a teacher, a student who joins after seeing what the
@@ -140,7 +140,7 @@ const esc = (x) => x.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 // Where each place is: a tab, and a row on its page.
 const PLACES = {
   Learn: ["Learn"], Aprender: ["Aprender"], Goals: ["Goals"], Metas: ["Metas"], Practice: ["Practice"], Práctica: ["Práctica"], Me: ["Me"], Yo: ["Yo"],
-  Missions: ["Practice", "Money Missions"], Misiones: ["Práctica", "Misiones de dinero"],
+  Missions: ["Practice", "Real-life missions"], Misiones: ["Práctica", "Misiones de la vida real"],
   Portfolio: ["Practice", "Practice portfolio"], Portafolio: ["Práctica", "Portafolio de práctica"],
   News: ["Practice", "News, explained"], Noticias: ["Práctica", "Noticias explicadas"],
   Tools: ["Practice", "Tools from your lessons"], Herramientas: ["Práctica", "Herramientas de tus lecciones"],
@@ -249,7 +249,7 @@ try {
     await top().getByText("+20 XP").waitFor();
     await clean("mission done");
     await page.keyboard.press("Escape");
-    console.log("ok: a Money Mission, marked done with a note (+20 XP)");
+    console.log("ok: a real-life mission, marked done with a note (+20 XP)");
 
     await menu("Goals");
     await button("New goal").click();
@@ -465,7 +465,7 @@ try {
     const timings = () =>
       page.evaluate(() => {
         const root = document.querySelector("#root > div");
-        return ["nv-ripple", "nv-bob", "nv-drift", "nv-twinkle", "nv-glide", "nv-btn", "nv-in"].map((c) => {
+        return ["nv-ripple", "nv-bob", "nv-drift", "nv-twinkle", "nv-glide", "nv-btn", "nv-in", "nv-beam", "nv-water"].map((c) => {
           const e = Object.assign(document.createElement("span"), { className: c });
           root.appendChild(e);
           const st = getComputedStyle(e);
@@ -724,7 +724,7 @@ try {
     await clean("settings: reminders");
     // Opened from a reminder, and a bad "turn off the recap" link.
     await page.goto(`${BASE}?from=push&kind=mission`);
-    await page.getByRole("heading", { name: "Money Missions" }).waitFor();
+    await page.getByRole("heading", { name: "Real-life missions" }).waitFor();
     assert.equal(new URL(page.url()).search, "", "the address is tidied");
     await page.goto(`${BASE}?recap_off=nope.nope`);
     await page.getByText("That link isn't valid anymore.").waitFor();

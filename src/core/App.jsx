@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useAppState, update, on } from "./store.js";
 import { makeT } from "./i18n.js";
 import { allModules, getModule } from "./registry.js";
-import { LOOKS, GLOBAL_CSS, Icon, Wordmark, StreakStar, Toasts, Sheet, toast, Button } from "./ui.jsx";
+import { LOOKS, GLOBAL_CSS, Icon, Wordmark, StreakStar, Toasts, Sheet, toast, Button, useLook } from "./ui.jsx";
 import { useSession, refreshSession, schedulePush, verifyEmail } from "./session.js";
 import { settleOnOpen } from "./game.js";
 import { OpenNotice, RepairOffer, COMEBACK_DAYS } from "./Comeback.jsx";
@@ -73,14 +73,15 @@ export default function App() {
 
   // The look's colors live on the page root, so layers opened at the top of
   // the page (sheets, lessons) use them too.
+  const lookNow = useLook(settings.look);
   useEffect(() => {
     const root = document.documentElement;
     root.lang = settings.lang;
-    for (const [k, v] of Object.entries(LOOKS[settings.look] || LOOKS.white)) root.style.setProperty(k, v);
+    for (const [k, v] of Object.entries(LOOKS[lookNow])) root.style.setProperty(k, v);
+    root.style.colorScheme = lookNow === "navy" ? "dark" : "light";
     root.classList.toggle("nv-reduce", !!settings.reduceMotion);
-    const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute("content", LOOKS[settings.look]["--bg"]);
-  }, [settings.lang, settings.look, settings.reduceMotion]);
+    for (const meta of document.querySelectorAll('meta[name="theme-color"]')) meta.setAttribute("content", LOOKS[lookNow]["--bg"]);
+  }, [settings.lang, lookNow, settings.reduceMotion]);
   useEffect(() => {
     refreshSession();
   }, []);
@@ -133,7 +134,7 @@ export default function App() {
     window.scrollTo(0, 0);
   };
 
-  const look = LOOKS[settings.look] || LOOKS.white;
+  const look = LOOKS[lookNow];
   const rootStyle = { ...look, background: "var(--bg)", color: "var(--ink)", minHeight: "100dvh", fontFamily: "'Inter', system-ui, sans-serif" };
 
   if (legalPage) {

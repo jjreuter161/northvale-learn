@@ -107,6 +107,22 @@ export const LOOKS = {
   },
 };
 
+// The look to show: "white" (Cream), "navy" (Navy), or "auto" (Match my
+// device: Navy when the phone is in dark mode), kept up to date.
+export function useLook(look) {
+  const dark = () => typeof matchMedia === "function" && matchMedia("(prefers-color-scheme: dark)").matches;
+  const [deviceDark, setDeviceDark] = useState(dark);
+  useEffect(() => {
+    if (look !== "auto" || typeof matchMedia !== "function") return undefined;
+    const m = matchMedia("(prefers-color-scheme: dark)");
+    const on = () => setDeviceDark(m.matches);
+    on();
+    m.addEventListener("change", on);
+    return () => m.removeEventListener("change", on);
+  }, [look]);
+  return look === "auto" ? (deviceDark ? "navy" : "white") : LOOKS[look] ? look : "white";
+}
+
 // Profile colors (the avatar is the nickname's first letter on one).
 export const AVATARS = ["#3D5A80", "#2B5CB3", "#1E7A5F", "#7A5C2E", "#5B4B8A", "#8A3B4B"];
 
@@ -133,10 +149,14 @@ h1,h2{color:var(--head)}
 .nv-drift{animation:nvDrift 2.4s ease-in-out 2 alternate}
 .nv-twinkle{animation:nvTwinkle .7s ease-out 1;transform-box:fill-box;transform-origin:center}
 .nv-glide{transition:transform .7s cubic-bezier(.3,.8,.3,1)}
+.nv-beam{transform-box:view-box;animation:nvSweep 3s ease-in-out infinite alternate}
+.nv-water{animation:nvWater 7s ease-in-out infinite alternate}
 @keyframes nvRipple{from{box-shadow:0 0 0 0 color-mix(in srgb,var(--right) 45%,transparent)}to{box-shadow:0 0 0 16px transparent}}
 @keyframes nvBob{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-3px) rotate(5deg)}}
 @keyframes nvDrift{from{transform:translateX(0)}to{transform:translateX(-36px)}}
 @keyframes nvTwinkle{0%,100%{transform:scale(1)}45%{transform:scale(1.6) rotate(45deg)}}
+@keyframes nvSweep{0%{transform:rotate(-24deg);opacity:.65}50%{opacity:1}100%{transform:rotate(24deg);opacity:.65}}
+@keyframes nvWater{from{transform:translateX(0)}to{transform:translateX(-14px)}}
 @keyframes nvSpring{0%{transform:translateY(100%)}75%{transform:translateY(-5px)}100%{transform:none}}
 .nv-press{transition:transform .15s cubic-bezier(.2,.7,.2,1),filter .15s;-webkit-tap-highlight-color:transparent}
 .nv-press:active{transform:scale(.98);filter:brightness(.97)}
@@ -146,6 +166,8 @@ h1,h2{color:var(--head)}
 @keyframes nvFade{from{opacity:0}to{opacity:1}}
 @media (prefers-reduced-motion: reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 .nv-reduce *{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+@media (prefers-reduced-motion: reduce){.nv-beam,.nv-water{animation:none!important}}
+.nv-reduce .nv-beam,.nv-reduce .nv-water{animation:none!important}
 .nv-list>*+*{border-top:1px solid var(--line)}
 `;
 

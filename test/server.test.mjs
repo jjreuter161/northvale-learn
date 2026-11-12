@@ -199,7 +199,7 @@ try {
   await ev(A1, [e("app_open", addDays(today, -8), { streak: 1 }), e("lesson_step", addDays(today, -8), { lesson: "budget-1", step: 0, of: 5 }), e("lesson_step", addDays(today, -8), { lesson: "budget-1", step: 2, of: 5 }), e("app_open", addDays(today, -7), { streak: 2 }), e("app_open", addDays(today, -1), { streak: 1 }), e("lesson_complete", addDays(today, -1), { lesson: "budget-2" }), e("tutor_ask", addDays(today, -1))]);
   // B: started 3 days ago, never came back.
   await ev(B1, [e("app_open", addDays(today, -3)), e("onboarding", addDays(today, -3), { reason: "invest", minutes: 5 })]);
-  // Money Missions: counted by mission; a note is only ever a yes/no.
+  // real-life missions: counted by mission; a note is only ever a yes/no.
   await ev(A1, [e("mission_start", addDays(today, -1), { mission: "track3" }), e("mission_done", addDays(today, -1), { mission: "track3", note: true, first: true })]);
   await ev(B1, [e("mission_done", addDays(today, -3), { mission: "track3", note: "my secret note" })]);
   // What brings people back (no new days, so the numbers above hold): A got

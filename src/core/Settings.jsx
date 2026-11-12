@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useAppState, update, resetState } from "./store.js";
 import { LANGS, REGIONS } from "./i18n.js";
 import { DAILY_GOALS } from "./progress.js";
-import { AVATARS, Button, Card, Field, Label, Note, Segmented, Sheet, Switch, Title, toast } from "./ui.jsx";
+import { AVATARS, LOOKS, Button, Card, Field, Label, Note, Segmented, Sheet, Switch, Title, toast } from "./ui.jsx";
 import { useSession, signIn, signUp, signOut, changePassword, deleteAccount, setNickname, setRecap, forgotPassword, resetPassword } from "./session.js";
 import { analyticsOn, installId, forgetInstall } from "./analytics.js";
 import { api } from "./api.js";
@@ -317,7 +317,7 @@ export default function Settings({ t, locale, go }) {
 
       <Label>{t("settings.look")}</Label>
       <Card>
-        <Segmented label={t("settings.look")} value={settings.look} onChange={(v) => setSetting("look", v)} options={[{ value: "white", label: t("look.white") }, { value: "navy", label: t("look.navy") }]} />
+        <LookPicker t={t} value={settings.look} onChange={(v) => setSetting("look", v)} />
         {row(t("settings.motion"), t("settings.motion.sub"), <Switch label={t("settings.motion")} checked={settings.reduceMotion} onChange={(v) => setSetting("reduceMotion", v)} />)}
         {row(t("settings.sound"), t("settings.sound.sub"), <Switch label={t("settings.sound")} checked={!!settings.sound} onChange={(v) => setSetting("sound", v)} />)}
         {canVibrate() && row(t("settings.vibrate"), t("settings.vibrate.sub"), <Switch label={t("settings.vibrate")} checked={settings.vibrate !== false} onChange={(v) => setSetting("vibrate", v)} />)}
@@ -416,6 +416,45 @@ export default function Settings({ t, locale, go }) {
           <Button full kind="bad" type="submit">{t("account.delete.yes")}</Button>
         </form>
       </Sheet>
+    </div>
+  );
+}
+
+// LOOK — Cream, Navy, or Match my device, each with a small preview.
+function LookPicker({ t, value, onChange }) {
+  const mini = (L) => (
+    <span style={{ flex: 1, display: "block", background: L["--bg"], padding: 7 }}>
+      <span style={{ display: "block", height: 5, width: "55%", borderRadius: 3, background: L["--head"] }} />
+      <span style={{ display: "block", height: 20, marginTop: 6, borderRadius: 6, background: L["--surface"] }} />
+      <span style={{ display: "block", height: 9, marginTop: 5, borderRadius: 5, background: L["--brand"] }} />
+    </span>
+  );
+  return (
+    <div role="radiogroup" aria-label={t("settings.look")} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 6 }}>
+      {["white", "navy", "auto"].map((k) => {
+        const on = value === k;
+        return (
+          <button key={k} role="radio" aria-checked={on} onClick={() => onChange(k)} className="nv-press" style={{ gridColumn: k === "auto" ? "1 / -1" : undefined, textAlign: "left", border: "none", borderRadius: 20, padding: 10, background: "var(--surface)", boxShadow: on ? "0 0 0 2.5px var(--brand)" : "0 0 0 1.5px var(--line)", color: "var(--ink)", font: "inherit", cursor: "pointer" }}>
+            <span aria-hidden="true" style={{ display: "flex", height: k === "auto" ? 64 : 80, borderRadius: 14, overflow: "hidden" }}>
+              {k === "auto" ? (
+                <>
+                  {mini(LOOKS.white)}
+                  {mini(LOOKS.navy)}
+                </>
+              ) : (
+                mini(LOOKS[k])
+              )}
+            </span>
+            <span style={{ display: "flex", alignItems: "center", gap: 7, marginTop: 8, fontWeight: 700, color: "var(--head)" }}>
+              <span aria-hidden="true" style={{ width: 18, height: 18, borderRadius: 9, border: "2px solid var(--brand)", display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                {on && <span style={{ width: 9, height: 9, borderRadius: 5, background: "var(--brand)" }} />}
+              </span>
+              {t(`look.${k}`)}
+            </span>
+            <span style={{ display: "block", fontSize: 13, color: "var(--low)", marginTop: 2, lineHeight: 1.35 }}>{t(`look.${k}.sub`)}</span>
+          </button>
+        );
+      })}
     </div>
   );
 }

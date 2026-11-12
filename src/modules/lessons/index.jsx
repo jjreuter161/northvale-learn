@@ -13,7 +13,7 @@ import { track } from "../../core/analytics.js";
 import { text, addStrings } from "../../core/i18n.js";
 import { xpOn, dayKey, addDays } from "../../core/progress.js";
 import { Button, Card, Icon, Layer, List, ListRow, Mark, Progress, Ring, Scene, Sheet, UnitArt, WaveEdge, toast } from "../../core/ui.jsx";
-import { star, wave, boat } from "../../core/art.js";
+import { star, wave, boat, LANDMARK } from "../../core/art.js";
 import { AgeCard } from "../../core/Settings.jsx";
 import { ReminderCard } from "../../core/reminders.jsx";
 import { practiceOpen, markIntro } from "../../core/Practice.jsx";
@@ -123,6 +123,9 @@ addStrings({
   "path.after": S("after Unit {n}", "después de la Unidad {n}"),
   "path.more": S("{n} more units", "{n} unidades más"),
   "path.open": S("Open water", "Mar abierto"),
+  "path.mist": S("{n} more {n|island|islands} in the mist", "{n} {n|isla|islas} más en la niebla"),
+  "path.lessons_of": S("{done} of {n} lessons", "{done} de {n} lecciones"),
+  "path.continue": S("Continue: {title}", "Continuar: {title}"),
 
   // Why each unit matters, in one line (Today and after a lesson)
   "why.budget": S("A plan for your money is the first step to everything else.", "Un plan para tu dinero es el primer paso para todo lo demás."),
@@ -345,68 +348,117 @@ function BoatNode({ id, playing }) {
   );
 }
 
-// The sea map: 3 islands to a row, snaking up toward the horizon.
-function VoyageMap({ t, tx, progress, ci, opened, toggle }) {
-  const before = UNITS.slice(0, ci);
-  const ahead = UNITS.slice(ci + 1, ci + 3);
-  const here = ci < UNITS.length ? 1 : 0;
-  const W = 300, ROW = 86, TOP = 50;
-  const slots = before.length + here + ahead.length;
-  const rows = Math.ceil(slots / 3);
-  const H = TOP + rows * ROW + 4;
-  const at = (k) => {
-    const r = Math.floor(k / 3), c = k % 3;
-    return [50 + (r % 2 ? 2 - c : c) * 100, H - 46 - r * ROW];
-  };
-  const pts = Array.from({ length: slots }, (_, k) => at(k));
+// THE SEA CHART — every unit is its own landmark island (art.js LANDMARK),
+// zigzagging down a dotted route: soft waves, buoys and a few birds; the
+// current unit bigger, with the boat and a Continue card; finished units
+// with a flag; the next ones in the mist; open water at the end. Each
+// island is a button (named like a unit card) that opens its lessons
+// below; the pictures are hidden from screen readers.
+function SeaChart({ t, tx, go, progress, ci, next, all, setAll, opened, toggle, currentRef }) {
+  const W = 358, ROW = 132, TOP = 22;
+  const list = all || ci >= UNITS.length - 1 ? UNITS : UNITS.slice(0, ci + 4);
+  const Y = [];
+  let acc = TOP;
+  for (let i = 0; i < list.length; i++) (Y.push(acc), (acc += i === ci ? ROW + 56 : ROW));
+  const H = acc + 140;
+  const pos = (i) => (i % 2 ? [W - 136, Y[i]] : [16, Y[i]]);
+  const ctr = (i) => [pos(i)[0] + 60, pos(i)[1] + 62];
+  const pts = list.map((_, i) => ctr(i));
   const curve = (p) =>
     p.length < 2 ? "" : p.slice(0, -1).map((a, i) => {
       const p0 = p[i - 1] || a, p2 = p[i + 1], p3 = p[i + 2] || p2;
       return `${i ? "" : `M${a}`}C${a[0] + (p2[0] - p0[0]) / 6},${a[1] + (p2[1] - p0[1]) / 6} ${p2[0] - (p3[0] - a[0]) / 6},${p2[1] - (p3[1] - a[1]) / 6} ${p2}`;
     }).join("");
-  const end = [276, 24];
-  const doneTo = before.length + here;
-  const isle = ([x, y], faint, flag) =>
-    `<g transform="translate(${x} ${y - 6})" opacity="${faint ? 0.45 : 1}"><ellipse cx="0" cy="6" rx="31" ry="7" fill="var(--artSea2)" opacity=".55"/><path d="M-26 6c6-17 46-17 52 0Z" fill="var(--artSand)"/>${flag ? `<path d="M2 -5V-30" stroke="var(--artInk)" stroke-width="2.6" stroke-linecap="round"/><path d="M3.3 -30L19 -25L3.3 -20Z" fill="var(--artSun)"/>` : ""}</g>`;
+  const here = Math.min(ci, list.length - 1);
+  // Soft wave lines, scattered (always the same way) and clear of the islands.
+  let seed = 7;
+  const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+  const waves = Array.from({ length: Math.round(H / 26) }, () => [rnd() * (W - 30) + 8, rnd() * (H - 150) + 14])
+    .filter(([x, y]) => !list.some((_, i) => Math.abs(x - ctr(i)[0]) < 64 && Math.abs(y - ctr(i)[1] + 8) < 46))
+    .map(([x, y]) => `<path d="M${x.toFixed(0)} ${y.toFixed(0)}q5-3 10 0t10 0" stroke="var(--artSea2)" stroke-width="1.6" fill="none" stroke-linecap="round" opacity=".55"/>`)
+    .join("");
+  const buoys = pts.slice(0, -1).map((a, i) => {
+    const b = pts[i + 1];
+    const x = (a[0] + b[0]) / 2 + (i % 2 ? -18 : 18), y = (a[1] + b[1]) / 2;
+    return `<g transform="translate(${x} ${y})"><path d="M-5 6h10l-2-11h-6Z" fill="${i < ci ? "var(--artSun)" : "var(--artSea2)"}"/><path d="M0 -5v-5" stroke="var(--artInk)" stroke-width="1.4"/><ellipse cx="0" cy="7" rx="8" ry="2" fill="var(--artSea2)" opacity=".5"/></g>`;
+  }).join("");
+  const bird = ([x, y]) => `<path d="M${x} ${y}q5-5 10 0q5-5 10 0" stroke="var(--artInk)" stroke-width="1.6" fill="none" stroke-linecap="round" opacity=".7"/>`;
+  const birds = [[W - 70, 34], [W - 52, 46], [96, ctr(here)[1] - 72], [114, ctr(here)[1] - 82]].map(bird).join("");
+  const isles = list.map((u, i) => {
+    const [x, y] = pos(i);
+    const done = unitDone(progress, u);
+    const s = i === ci ? 1.18 : 1;
+    const flag = done ? `<path d="M${x + 96} ${y + 60}V${y + 34}" stroke="var(--artInk)" stroke-width="2.2" stroke-linecap="round"/><path d="M${x + 97} ${y + 34}L${x + 110} ${y + 38.5}L${x + 97} ${y + 43}Z" fill="var(--artSun)"/>` : "";
+    const halo = i === ci ? `<ellipse cx="${x + 60}" cy="${y + 58}" rx="78" ry="54" fill="var(--artPaper)" opacity=".55"/>` : "";
+    return `${halo}<g transform="translate(${x + 60 - 60 * s} ${y + 4 - 12 * (s - 1)}) scale(${s})" opacity="${i > ci ? 0.42 : 1}">${LANDMARK[u.id] || ""}</g>${flag}`;
+  }).join("");
+  const mistTop = ci + 1 < list.length ? Y[ci + 1] - 10 : H;
+  const boatAt = ci < UNITS.length ? [ctr(here)[0] + (here % 2 ? -98 : 58), ctr(here)[1] - 6] : [W / 2 - 16, H - 150];
   const svg = [
-    `<path d="M0 36H${W}" stroke="var(--artSea2)" stroke-width="1.5"/>${star(end[0] + 10, 18, 8, "var(--artSun)")}`,
-    `<path d="${curve([...pts.slice(doneTo - 1), end])}" fill="none" stroke="var(--artSea2)" stroke-width="3" stroke-linecap="round" stroke-dasharray="0.1 9"/>`,
-    `<path d="${curve(pts.slice(0, doneTo))}" fill="none" stroke="var(--artInk)" stroke-width="3" stroke-linecap="round" stroke-dasharray="0.1 9"/>`,
-    ...before.map((u, k) => isle(pts[k], false, unitDone(progress, u))),
-    ...ahead.map((u, k) => isle(pts[doneTo + k], true, false)),
-    here ? `<circle cx="${pts[before.length][0]}" cy="${pts[before.length][1] - 10}" r="25" fill="var(--surface)" opacity=".9"/>${boat(pts[before.length][0] - 16, pts[before.length][1] - 30, 0.34)}` : "",
+    `<defs><linearGradient id="nvmist" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--artPaper)" stop-opacity="0"/><stop offset="1" stop-color="var(--artPaper)" stop-opacity=".7"/></linearGradient></defs>`,
+    `<g class="nv-water">${waves}</g>`,
+    `<circle cx="${W / 2}" cy="${H - 108}" r="40" fill="var(--artSun2)"/><rect x="0" y="${H - 108}" width="${W}" height="108" fill="var(--artSea)"/><path d="M0 ${H - 108}H${W}" stroke="var(--artSea2)" stroke-width="2"/>${star(W / 2, H - 170, 10, "var(--artSun)")}<path d="M${W / 2 - 30} ${H - 92}h60M${W / 2 - 16} ${H - 82}h32" stroke="var(--artSun2)" stroke-width="4" stroke-linecap="round"/>`,
+    `<path d="${curve(pts.slice(here))}" fill="none" stroke="var(--artSea2)" stroke-width="3" stroke-linecap="round" stroke-dasharray="0.1 9"/>`,
+    `<path d="${curve(pts.slice(0, here + 1))}" fill="none" stroke="var(--artInk)" stroke-width="3" stroke-linecap="round" stroke-dasharray="0.1 9"/>`,
+    buoys, birds, isles,
+    mistTop < H ? `<rect x="0" y="${mistTop}" width="${W}" height="${Math.max(0, H - 150 - mistTop)}" fill="url(#nvmist)"/>` : "",
+    `<g class="nv-bob">${boat(boatAt[0], boatAt[1], 0.4)}</g>`,
   ].join("");
   const pct = (v, of) => `${(v / of) * 100}%`;
+  const doneOf = (u) => u.lessons.filter((l) => lessonState(progress, l.id) === "done").length;
   return (
-    <div style={{ position: "relative", width: "100%", maxWidth: 460, margin: "14px auto 0", aspectRatio: `${W} / ${H}`, borderRadius: 24, overflow: "hidden", background: "var(--artSky)", boxShadow: "var(--lift)" }}>
+    <div style={{ position: "relative", width: "100%", maxWidth: 460, margin: "16px auto 0", aspectRatio: `${W} / ${H}`, borderRadius: 28, overflow: "hidden", background: "linear-gradient(180deg, var(--artSky), color-mix(in srgb, var(--artSea) 55%, var(--artSky)))", boxShadow: "var(--lift)" }}>
       <svg viewBox={`0 0 ${W} ${H}`} width="100%" height="100%" aria-hidden="true" style={{ position: "absolute", inset: 0, display: "block" }} dangerouslySetInnerHTML={{ __html: svg }} />
-      <span aria-hidden="true" style={{ position: "absolute", right: "12%", top: pct(14, H), fontSize: 12, fontWeight: 650, color: "var(--mid)" }}>
-        {t("path.open")}
-      </span>
-      {before.map((u, k) => {
-        const [x, y] = pts[k];
-        const done = u.lessons.filter((l) => lessonState(progress, l.id) === "done").length;
-        const meta = done === u.lessons.length ? t("path.of", { done, n: u.lessons.length }) : t("path.left", { n: u.lessons.length - done });
+      {list.map((u, i) => {
+        const [x, y] = pos(i);
+        const n = u.lessons.length;
+        const d = doneOf(u);
+        const done = d === n;
+        const now = i === ci;
+        const meta = now ? t("path.lessons_of", { done: d, n }) : done ? t("path.of", { done: d, n }) : i < ci ? t("path.left", { n: n - d }) : t("path.after", { n: i });
+        const name = `${t("lessons.unit_n", { n: i + 1 })} · ${tx(u.title)} · ${meta}`;
+        if (now)
+          return (
+            <div key={u.id}>
+              <button onClick={() => currentRef.current && currentRef.current.scrollIntoView({ behavior: "smooth", block: "start" })} aria-expanded="true" aria-label={name} className="nv-press" style={{ position: "absolute", left: pct(x - 8, W), top: pct(y - 6, H), width: pct(136, W), height: pct(118, H), border: "none", background: "transparent", borderRadius: 20, cursor: "pointer", padding: 0 }} />
+              <div style={{ position: "absolute", left: pct(i % 2 ? 10 : 168, W), top: pct(y + 2, H), width: pct(180, W), background: "var(--surface)", borderRadius: 18, padding: 12, boxShadow: "0 0 0 2px var(--head), var(--lift)" }}>
+                <span style={{ display: "inline-block", fontSize: 12, fontWeight: 700, borderRadius: 999, padding: "2px 9px", background: "var(--warmSoft)", color: "var(--warmInk)" }}>{t("path.now", { n: i + 1 })}</span>
+                <div className="nv-disp" style={{ fontSize: 19, lineHeight: 1.15, margin: "6px 0 2px", color: "var(--head)" }}>{tx(u.title)}</div>
+                <div style={{ fontSize: 13, color: "var(--mid)" }}>{meta}</div>
+                <div style={{ height: 6, borderRadius: 3, background: "var(--surface2)", overflow: "hidden", margin: "6px 0 10px" }}>
+                  <div style={{ width: `${(d / n) * 100}%`, height: "100%", background: "var(--brand)" }} />
+                </div>
+                {next && (
+                  <Button full size="sm" onClick={() => go("lessons", { lesson: next.id })} aria-label={t("path.continue", { title: tx(next.title) })}>
+                    {t("common.continue")}
+                  </Button>
+                )}
+              </div>
+            </div>
+          );
         return (
-          <button
-            key={u.id}
-            onClick={() => toggle(u.id)}
-            aria-expanded={!!opened[u.id]}
-            aria-label={`${t("lessons.unit_n", { n: k + 1 })} · ${tx(u.title)} · ${meta}`}
-            className="nv-press"
-            style={{ position: "absolute", left: pct(x - 48, W), top: pct(y - 40, H), width: pct(96, W), height: pct(76, H), border: "none", background: "transparent", cursor: "pointer", display: "flex", flexDirection: "column", justifyContent: "flex-end", alignItems: "center", padding: 0, font: "inherit", borderRadius: 16, outlineOffset: -2 }}
-          >
-            <span style={{ fontSize: 11.5, fontWeight: 700, lineHeight: 1.2, color: "var(--head)", textAlign: "center", background: opened[u.id] ? "var(--surface)" : "color-mix(in srgb, var(--artSky) 88%, transparent)", borderRadius: 8, padding: "1px 5px" }}>
-              {k + 1} · {tx(u.title)}
+          <button key={u.id} onClick={() => toggle(u.id)} aria-expanded={!!opened[u.id]} aria-label={name} className="nv-press" style={{ position: "absolute", left: 0, width: "100%", top: pct(y, H), height: pct(ROW - 8, H), border: "none", background: "transparent", cursor: "pointer", padding: 0, font: "inherit", textAlign: "left", borderRadius: 18 }}>
+            <span aria-hidden="true" style={{ position: "absolute", left: pct(i % 2 ? 14 : 150, W), top: 24, width: pct(176, W), opacity: i > ci ? 0.6 : 1 }}>
+              <span style={{ display: "block", fontSize: 12.5, fontWeight: 650, color: "var(--low)" }}>{t("lessons.unit_n", { n: i + 1 })}</span>
+              <span style={{ display: "block", fontWeight: 700, color: "var(--head)", fontSize: 15, lineHeight: 1.25 }}>{tx(u.title)}</span>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 4, marginTop: 4, fontSize: 12, fontWeight: 700, borderRadius: 999, padding: "2px 9px", background: done ? "var(--rightSoft)" : "var(--surface2)", color: done ? "var(--right)" : "var(--low)" }}>
+                {done && <Icon name="check" size={12} stroke={2.6} />}
+                {meta}
+              </span>
             </span>
           </button>
         );
       })}
-      {here > 0 && (
-        <span aria-hidden="true" style={{ position: "absolute", left: pct(pts[before.length][0] - 48, W), width: pct(96, W), top: pct(pts[before.length][1] + 18, H), textAlign: "center", fontSize: 12, fontWeight: 800, color: "var(--head)" }}>
-          {t("path.now", { n: ci + 1 })}
-        </span>
+      {list.length < UNITS.length && (
+        <div style={{ position: "absolute", left: 0, right: 0, top: pct(H - 150, H), textAlign: "center" }}>
+          <button onClick={() => setAll(true)} className="nv-press" style={{ border: "none", background: "var(--surface)", borderRadius: 999, padding: "8px 16px", fontWeight: 650, fontSize: 14, color: "var(--head)", boxShadow: "var(--lift)", cursor: "pointer", font: "inherit", minHeight: 40 }}>
+            {t("path.mist", { n: UNITS.length - list.length })}
+          </button>
+        </div>
       )}
+      <span aria-hidden="true" style={{ position: "absolute", left: 0, right: 0, bottom: pct(46, H), textAlign: "center", fontSize: 13, fontWeight: 650, color: "var(--mid)" }}>
+        {t("path.open")}
+      </span>
     </div>
   );
 }
@@ -423,7 +475,7 @@ function Course({ t, locale, go, route }) {
   const ci = next ? UNITS.findIndex((u) => u.id === next.unit) : UNITS.length;
   const doneCount = ALL_LESSONS.filter((l) => lessonState(progress, l.id) === "done").length;
   const unitsDone = UNITS.filter((u) => unitDone(progress, u)).length;
-  const shown = all ? UNITS.filter((u, i) => i >= ci) : UNITS.filter((u, i) => i >= ci && i <= ci + 3);
+  const currentRef = useRef(null);
   const lessonRow = (l, i, list) => {
     const st = lessonState(progress, l.id);
     const now = next && l.id === next.id;
@@ -462,14 +514,16 @@ function Course({ t, locale, go, route }) {
       </div>
     );
   };
-  // A passed unit, opened from its island: its lessons (to review or challenge).
-  const openedCards = UNITS.slice(0, ci).filter((u) => opened[u.id]);
+  // A unit opened from its island (not the current one): its lessons, to
+  // review, take a challenge, or see what's ahead.
+  const openedCards = UNITS.filter((u, i) => i !== ci && opened[u.id]);
+  const current = ci < UNITS.length ? UNITS[ci] : null;
   return (
     <section aria-label={t("path.title")} style={{ marginTop: 30 }}>
       <h2 className="nv-disp" style={{ fontSize: 28, margin: "0 0 4px" }}>{t("path.title")}</h2>
       <div style={{ fontSize: 14, color: "var(--mid)", marginBottom: 10 }}>{t("path.count", { done: doneCount, total: ALL_LESSONS.length, units: unitsDone, unitsTotal: UNITS.length })}</div>
       <Progress value={doneCount} max={ALL_LESSONS.length} height={6} label={t("lessons.overall")} />
-      {ci > 0 && <VoyageMap t={t} tx={tx} progress={progress} ci={ci} opened={opened} toggle={toggle} />}
+      <SeaChart t={t} tx={tx} go={go} progress={progress} ci={ci} next={next} all={all} setAll={setAll} opened={opened} toggle={toggle} currentRef={currentRef} />
       <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 14 }}>
         {openedCards.map((u) => (
           <Card key={u.id} pad="14px 0 6px">
@@ -485,59 +539,23 @@ function Course({ t, locale, go, route }) {
             {u.lessons.map(lessonRow)}
           </Card>
         ))}
-        {shown.map((u) => {
-          const ui = UNITS.indexOf(u);
-          const done = u.lessons.filter((l) => lessonState(progress, l.id) === "done").length;
-          const complete = done === u.lessons.length;
-          const locked = lessonState(progress, u.lessons[0].id) === "locked";
-          if (ui === ci)
-            return (
-              <Card key={u.id} pad="16px 0 6px">
-                <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "0 16px 6px 18px" }}>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 13, color: "var(--low)", fontWeight: 600 }}>{t("path.now", { n: ui + 1 })}</div>
-                    <div className="nv-disp" style={{ fontSize: 24, lineHeight: 1.15, color: "var(--head)" }}>{tx(u.title)}</div>
-                  </div>
-                  <span style={{ width: 80, height: 62, borderRadius: 16, background: "var(--artSky)", overflow: "hidden", display: "flex", alignItems: "flex-end", justifyContent: "center", flexShrink: 0 }}>
-                    <UnitArt id={u.id} width={82} />
-                  </span>
+        {current && (
+          <div ref={currentRef} style={{ scrollMarginTop: 80 }}>
+            <Card pad="16px 0 6px">
+              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "0 16px 6px 18px" }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 13, color: "var(--low)", fontWeight: 600 }}>{t("path.now", { n: ci + 1 })}</div>
+                  <div className="nv-disp" style={{ fontSize: 24, lineHeight: 1.15, color: "var(--head)" }}>{tx(current.title)}</div>
                 </div>
-                {u.lessons.map(lessonRow)}
-              </Card>
-            );
-          const meta = complete ? t("path.of", { done, n: u.lessons.length }) : locked ? t("path.after", { n: ui }) : t("path.lessons", { n: u.lessons.length });
-          const open = !!opened[u.id];
-          return (
-            <div key={u.id} style={{ background: "var(--surface)", borderRadius: 24, boxShadow: "var(--lift)", overflow: "hidden" }}>
-              <button
-                onClick={() => toggle(u.id)}
-                aria-expanded={open}
-                aria-label={`${t("lessons.unit_n", { n: ui + 1 })} · ${tx(u.title)} · ${meta}`}
-                className="nv-press"
-                style={{ display: "flex", alignItems: "center", gap: 14, width: "100%", textAlign: "left", border: "none", background: "transparent", color: "var(--ink)", padding: "12px 16px", minHeight: 60, cursor: "pointer", font: "inherit" }}
-              >
-                <span style={{ width: 26, height: 26, borderRadius: 13, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: complete ? "var(--accent)" : "transparent", border: complete ? "none" : "2px solid var(--line)", color: complete ? "var(--onBrand)" : "var(--low)" }}>
-                  {complete ? <Icon name="check" size={14} stroke={2.6} /> : locked ? <Icon name="lock" size={12} /> : null}
+                <span style={{ width: 80, height: 62, borderRadius: 16, background: "var(--artSky)", overflow: "hidden", display: "flex", alignItems: "flex-end", justifyContent: "center", flexShrink: 0 }}>
+                  <UnitArt id={current.id} width={82} />
                 </span>
-                <span style={{ flex: 1, minWidth: 0 }}>
-                  <span style={{ display: "block", fontSize: 13, color: "var(--low)", fontWeight: 600 }}>{t("lessons.unit_n", { n: ui + 1 })}</span>
-                  <span style={{ display: "block", fontWeight: 650, color: locked ? "var(--mid)" : "var(--ink)" }}>{tx(u.title)}</span>
-                </span>
-                <span style={{ fontSize: 14, color: "var(--mid)", whiteSpace: "nowrap" }}>{meta}</span>
-                <span style={{ display: "flex", transform: open ? "rotate(90deg)" : "none" }}>
-                  <Icon name="next" size={16} color="var(--low)" />
-                </span>
-              </button>
-              {open && <div style={{ paddingBottom: 6 }}>{u.lessons.map(lessonRow)}</div>}
-            </div>
-          );
-        })}
+              </div>
+              {current.lessons.map(lessonRow)}
+            </Card>
+          </div>
+        )}
       </div>
-      {!all && UNITS.length - ci - 4 > 0 && (
-        <Button full kind="ghost" style={{ marginTop: 8 }} onClick={() => setAll(true)}>
-          {t("path.more", { n: UNITS.length - ci - 4 })}
-        </Button>
-      )}
     </section>
   );
 }
@@ -1016,7 +1034,7 @@ registerModule({
     // next one is (reminders).
     reviewStatus,
     reviewDueOn: () => M.nextDue(conceptsNow()),
-    // For Money Missions: units with a finished lesson (or tested out of),
+    // For real-life missions: units with a finished lesson (or tested out of),
     // and units studied in the last week.
     unitActivity: () => {
       const p = getState().progress;

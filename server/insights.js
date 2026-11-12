@@ -75,7 +75,7 @@ export function record({ installId, events }, ip) {
     if (e.name === "tutor_ask") inst.tutor++;
     if (e.name === "practice") a.practice[str(p.kind, 16)] = (a.practice[str(p.kind, 16)] || 0) + 1;
     if (e.name === "account_created") inst.account = true;
-    // Money Missions: which mission, and whether a note was written — the
+    // real-life missions: which mission, and whether a note was written — the
     // note itself never leaves the device.
     if (e.name === "mission_start" || e.name === "mission_done") {
       const mm = ((a.missions ||= {})[str(p.mission, 24)] ||= { started: 0, done: 0, notes: 0 });

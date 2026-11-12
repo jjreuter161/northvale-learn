@@ -1,6 +1,6 @@
 // The landing page's pictures, taken from the real app (so they never
 // show anything the app doesn't do): Today, a lesson, the practice
-// portfolio, Money Missions and a goal, in English and Spanish, plus the
+// portfolio, real-life missions and a goal, in English and Spanish, plus the
 // share-preview image for each page. Re-run after the app's look changes:
 //   npm run build && node scripts/landing-shots.mjs
 // Writes web/shots/{en,es}-{1..5}.jpg and web/og-{en,es}.jpg.
@@ -72,8 +72,8 @@ try {
     await page.evaluate(() => window.scrollTo(0, 0));
     await page.waitForTimeout(4000);
     await jpeg(page, `${lang}-3.jpg`);
-    // Money Missions, and the goal.
-    await menu(es ? "Práctica" : "Practice", es ? "Misiones de dinero" : "Money Missions");
+    // real-life missions, and the goal.
+    await menu(es ? "Práctica" : "Practice", es ? "Misiones de la vida real" : "Real-life missions");
     await jpeg(page, `${lang}-4.jpg`);
     await menu(es ? "Metas" : "Goals");
     await jpeg(page, `${lang}-5.jpg`);

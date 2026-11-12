@@ -3,7 +3,7 @@
 //   lessons   ids of lessons finished (last time) on or after the join day
 //   concepts  { id: [answered, missed] } since joining (today's counts
 //             minus the ones saved at joining, `base`)
-//   missions  how many Money Missions were finished since joining
+//   missions  how many real-life missions were finished since joining
 //   week, xp  this week's XP since joining (the class leaderboard)
 //   earlier   only if the student chose to (`shareEarlier`): lessons in
 //             assigned units they'd finished before joining — counted

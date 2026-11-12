@@ -1,4 +1,4 @@
-// MONEY MISSIONS — real-life practice. Each week suggests one small task
+// REAL-LIFE MISSIONS — real-life practice. Each week suggests one small task
 // that goes with what you're learning and your goal ("find the fees on a
 // bank account"); you do it on your own, mark it done and can write a
 // short note. XP and achievements for finishing. No money moves; the note
@@ -19,8 +19,8 @@ import { DEFAULTS, NOTE_MAX, thisWeek, another, start, drop, finish, finished, r
 const S = (en, es) => ({ en, es });
 addStrings({
   "mi.nav": S("Missions", "Misiones"),
-  "mi.title": S("Money Missions", "Misiones de dinero"),
-  "mi.count": S("{n} small real-life tasks", "{n} pequeñas tareas de la vida real"),
+  "mi.title": S("Real-life missions", "Misiones de la vida real"),
+  "mi.count": S("{n} small tasks to do for real", "{n} pequeñas tareas para hacer de verdad"),
   "mi.sub": S("Small real-life tasks that put what you learn to work. Nothing here moves real money: you do them on your own and mark them done.", "Pequeñas tareas de la vida real para poner en práctica lo que aprendes. Aquí no se mueve dinero real: las haces por tu cuenta y las marcas como hechas."),
   "mi.week": S("This week's mission", "Misión de la semana"),
   "mi.started": S("In progress · started {date}", "En curso · la empezaste el {date}"),

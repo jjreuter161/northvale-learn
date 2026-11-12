@@ -57,7 +57,7 @@ People aged 15–25, many of them earning for the first time, in the US and Mexi
   - 1 action at the end, so the learner does something:
     - a tool in the goal simulator;
     - the practice portfolio.
-  - After the lesson, the app offers a Money Mission from the same unit (see below), so the real-life step doesn't make the lesson longer.
+  - After the lesson, the app offers a real-life mission from the same unit (see below), so the real-life step doesn't make the lesson longer.
 - **Every question:**
   - is tagged with a concept;
   - explains the right answer in 1–2 sentences (`why`);
@@ -99,7 +99,7 @@ Northvale teaches how money works; it doesn't tell anyone what to do with theirs
 - **Risky things** (crypto, leverage, options, gambling-style apps) are described accurately, including how they can lose everything. Never present them as opportunities.
 - **Never promise.** Write "historically", "has tended to", "can", "not guaranteed". There are no guaranteed returns, and nothing "can't lose".
 
-## Money Missions
+## Real-life missions
 
 A mission is a small real-life task that goes with a unit. The catalog is `src/modules/missions/catalog.js`, and the validator checks it too.
 

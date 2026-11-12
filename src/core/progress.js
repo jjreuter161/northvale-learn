@@ -13,7 +13,7 @@
 //   between count like freeze days).
 // - XP: 10 a lesson (+5 if perfect), 5 for replaying a finished lesson,
 //   and a little for doing things in the practice tools (once a day each).
-// - Money Missions: 20 XP the first time you finish each one. They don't
+// - real-life missions: 20 XP the first time you finish each one. They don't
 //   count for the streak (that's for learning in the app).
 
 export const dayKey = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -127,7 +127,7 @@ export function completeReview(p, { kind = "review" }, today) {
   return { p: extended.p, gained: XP.review, streakUp: extended.up, freezeEarned: extended.freezeEarned };
 }
 
-// A finished Money Mission: XP if it's the first time (see missions/pick.js).
+// A finished real-life mission: XP if it's the first time (see missions/pick.js).
 export function completeMission(p, { first }, today) {
   const gained = first ? XP.mission : 0;
   const next = gained ? addXp(p, gained, today) : p;
@@ -171,7 +171,7 @@ export const BADGES = [
   { id: "news_5", icon: "news", test: (p) => (p.practiced.news || []).length >= 5 },
   { id: "curious", icon: "chat", test: (p) => (p.counters.tutor || 0) >= 5 },
   { id: "level_5", icon: "star", test: (p) => level(p.xp).level >= 5 },
-  // Money Missions (real-life practice).
+  // real-life missions (real-life practice).
   { id: "mission_1", icon: "flag", test: (p, f) => (f.missionsDone || 0) >= 1 },
   { id: "mission_5", icon: "star", test: (p, f) => (f.missionsDone || 0) >= 5 },
   { id: "mission_weeks_4", icon: "calendar", test: (p, f) => (f.missionWeeks || 0) >= 4 },
