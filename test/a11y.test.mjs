@@ -109,6 +109,9 @@ try {
     await page.keyboard.press("Escape");
     await page.locator("header").getByRole("button", { name: w.ask }).click();
     await axe(page, `${tag} Ask`);
+    await page.getByRole("dialog").last().getByRole("radio", { name: w.ask === "Ask" ? "Explain this" : "Explícame esto" }).click();
+    await page.getByRole("dialog").last().getByRole("textbox").fill("Card 4111 1111 1111 1111");
+    await axe(page, `${tag} Explain this`);
     await ctx.close();
     // The privacy policy, on its own page.
     {

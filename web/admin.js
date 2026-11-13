@@ -168,7 +168,7 @@ async function load(token) {
     table(["Reason", "Learners"], Object.entries(s.reasons).map(([k, v]) => [k, v])),
     ...flagsSection(s.flags),
     el("h2", {}, "AI spending this month"),
-    el("div", { class: "card" }, el("div", { class: "big" }, `$${s.ai.spent.toFixed(2)} of $${s.ai.budget}`), el("div", { class: "label" }, `${s.ai.calls} calls · tutor $${(s.ai.tutor || 0).toFixed(2)} · news $${(s.ai.news || 0).toFixed(2)} · ${s.ai.on ? "on" : "paused"}`), el("div", { class: "bar" }, el("div", { style: `width:${Math.min(100, (s.ai.spent / s.ai.budget) * 100)}%` }))),
+    el("div", { class: "card" }, el("div", { class: "big" }, `$${s.ai.spent.toFixed(2)} of $${s.ai.budget}`), el("div", { class: "label" }, `${s.ai.calls} calls · tutor $${(s.ai.tutor || 0).toFixed(2)} · news $${(s.ai.news || 0).toFixed(2)} · explain this $${(s.ai.explain || 0).toFixed(2)} (${s.ai.explainCalls || 0} uses${s.ai.explainPerUse ? ", $" + s.ai.explainPerUse.toFixed(4) + " each" : ""}, ${s.ai.explainLimit}/person/day) · ${s.ai.on ? "on" : "paused"}`), el("div", { class: "bar" }, el("div", { style: `width:${Math.min(100, (s.ai.spent / s.ai.budget) * 100)}%` }))),
     el("h2", {}, "Survey answers (latest)"),
     table(["When", "Answer", "Lessons", "Why"], s.survey.recent.map((r) => [new Date(r.at).toLocaleDateString(), r.answer, r.lessons, r.why])),
     el("h2", {}, "Feedback (latest)"),

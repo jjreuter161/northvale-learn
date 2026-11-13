@@ -68,6 +68,7 @@ From \`docs/CONTENT-REVIEW.md\` (Phase 2 and Phase 3 lists, confirmed 2026-10-26
 - ☐ **Card statements:** US statements show how long minimum payments take (CARD Act); Mexican statements show the "pago para no generar intereses". Sources: consumerfinance.gov; Banxico's rules on statements.
 - ☐ **Mexico: CONDUSEF's** Buró de Entidades Financieras compares institutions on complaints, fines and fees. Source: condusef.gob.mx.
 - ☐ **US: colleges** have a net price calculator (required for schools taking federal student aid). Source: studentaid.gov.
+- ☐ **Explain this (new).** The prompt tells a scam victim where to report: **reportfraud.ftc.gov** (US) and the bank plus **CONDUSEF** or the **Policía Cibernética** (Mexico). Check each is current and the right place for a young person. It must never say to sign, accept, buy or pay (tested in \`scripts/tutor-check.mjs\`; run it with \`--yes\` before launch, it costs a few cents). The privacy policy's "Explain this" paragraph needs the lawyer's check (pasted text can hold other people's data). Photos stay out until a lawyer reviews them.
 - ☐ **Money across borders (new).** The unit "Money across borders" and its tool state the following. Check each against its source, and that the example numbers (\`remit*\` facts) are plain teaching numbers, never a real company's rates.
   - ☐ The US **Remittance Rule** requires the exchange rate, fees and amount received to be shown before you pay, and a sender can usually cancel within \`remitCancelMinutes\` minutes. Source: consumerfinance.gov.
   - ☐ **Profeco's** official comparison of money-sending services exists and works at **qqed.profeco.gob.mx** (the app names no companies and links no rankings). Confirm the address still works, in both languages' text.
@@ -106,7 +107,7 @@ ${MYTHS.map((m) => `| ☐ | ${cell(T(m.claim, m.only))} | ${m.answer} | ${cell(T
 | ☐ | Feedback | kept up to 2 years | \`server/insights.js\`, privacy policy |
 | ☐ | Archived classes | deleted after 90 days (classroom mode is off for real users) | \`server/classes.js\` |
 | ☐ | Waitlist | deleted within 30 days after the beta | \`server/waitlist.js\`, privacy policy |
-| ☐ | AI spending | a monthly budget (\`AI_MONTHLY_BUDGET_USD\`, 25 in .env.example); per account \`TUTOR_DAILY_LIMIT\` 30 a day and \`TUTOR_PER_MINUTE\` 5 a minute | \`server/ai.js\`, \`.env\` |
+| ☐ | AI spending | a monthly budget (\`AI_MONTHLY_BUDGET_USD\`, 25 in .env.example); per account \`TUTOR_DAILY_LIMIT\` 30 a day, \`EXPLAIN_DAILY_LIMIT\` 8 a day and \`TUTOR_PER_MINUTE\` 5 a minute | \`server/ai.js\`, \`.env\` |
 | ☐ | League | at most 500 XP a day counts; 13–17 and 18+ in separate leagues | \`server/index.js\`, \`server/store.js\` |
 | ☐ | Sign-in limits | 5 failed sign-ins per email and 20 per address in 15 minutes; 120 sign-ups per address | \`server/index.js\` |
 | ☐ | Reminders | opt-in, at most one a day, not 9 pm–8 am unless quiet hours are off | \`server/push.js\` |

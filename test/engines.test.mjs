@@ -233,3 +233,22 @@ console.log("ok: RSS headlines parsed (CDATA, entities, dates); items without li
   assert.notEqual(nextLesson(afterBanking).unit, "borders");
   console.log("ok: money across borders: {US$}/{MX$}/Both amounts, the remittance math (\"no fee\" isn't always cheaper), the unit opens after Banking for Both only");
 }
+
+// Explain this: private numbers are hidden before text leaves the phone.
+{
+  const { redact } = await import("../src/core/redact.js");
+  const r = (t) => redact(t);
+  assert.deepEqual(r("Card 4111 1111 1111 1111 exp 12/28"), { text: "Card [card or account number hidden] exp 12/28", hidden: 1 });
+  assert.equal(r("4111-1111-1111-1111").hidden, 1);
+  assert.equal(r("CLABE 012345678901234567").text, "CLABE [card or account number hidden]");
+  assert.equal(r("SSN 123-45-6789").text, "SSN [ID number hidden]");
+  assert.equal(r("CURP GOMC800101HDFRRL09 RFC GOMC800101AB1").hidden, 2);
+  assert.equal(r("routing 021000021, account 1234567890").hidden, 2);
+  assert.equal(r("Acct no: 9988-7766-55").text, "Acct no: [number hidden]");
+  // What should stay: amounts, dates, rates, small numbers, phone-sized numbers.
+  for (const keep of ["You owe $1,234,567.89 by 12/31 at 24.99% APR", "Net pay $1,482.10; check #4471; fee $4.50", "Call 555-123-4567 before 5pm", "Pay 3 installments of $199", "Date 2026-11-13, balance 1234567.89"]) assert.deepEqual(r(keep), { text: keep, hidden: 0 }, keep);
+  // Running it twice changes nothing more.
+  const once = r("card 4111 1111 1111 1111, SSN 123-45-6789, acct 1234567890").text;
+  assert.deepEqual(r(once), { text: once, hidden: 0 });
+  console.log("ok: Explain this hides card, account and ID numbers (and long digit strings) and leaves amounts, dates and rates");
+}

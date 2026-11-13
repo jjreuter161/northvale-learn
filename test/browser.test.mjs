@@ -706,6 +706,58 @@ try {
     await app.close();
   }
 
+  // --- Explain this: offline it says it needs the AI; typing shows what will be hidden; nothing is saved ---
+  {
+    const app = await open(learner({ ageBand: "18-25" }));
+    const { page, top, clean, menu } = app;
+    await menu("Tutor");
+    await top().getByRole("radio", { name: "Explain this" }).click();
+    await top().getByText("Explain this needs the AI. A free account turns it on.").waitFor();
+    await top().getByText("Before you paste, delete card, account and ID numbers.").waitFor();
+    await top().getByRole("textbox", { name: "Paste the text here" }).fill("Card 4111 1111 1111 1111 and SSN 123-45-6789: pay $200 in gift cards today");
+    await top().getByText("2 numbers will be hidden before sending.").waitFor();
+    assert.equal(await top().getByRole("button", { name: "Explain this", exact: true }).isDisabled(), true, "no AI: nothing can be sent");
+    assert.doesNotMatch(await page.evaluate(() => JSON.stringify({ ...localStorage })), /gift cards|4111/, "what's typed is never saved on the phone");
+    await clean("explain this, offline");
+    await top().getByRole("button", { name: "Use the glossary" }).click();
+    await top().getByText("The tutor is in offline mode, so it can only explain basic terms.").waitFor();
+    console.log("ok: Explain this offline says it needs the AI, shows how many numbers will be hidden, keeps nothing, and offers the glossary");
+    await app.close();
+  }
+
+  // --- Explain this with the AI (answers mocked): numbers hidden before sending, topics become lessons, nothing saved ---
+  for (const [lang, region] of [["en", "US"], ["es", "MX"]]) {
+    const es = lang === "es";
+    const cookie = await account({ email: `explain-${lang}@example.test`, nickname: "Eli", ageBand: "18-25" });
+    const app = await open({ ...learner({ ageBand: "18-25" }), settings: { lang, region, look: "white", reduceMotion: true } }, { cookie });
+    const { page, top, clean, menu } = app;
+    let sentBody = null;
+    await page.route("**/api/health", async (r) => r.fulfill({ json: { ...(await (await r.fetch()).json()), ai: true } }));
+    await page.route("**/api/explain/turn", async (r) => {
+      sentBody = JSON.parse(r.request().postData());
+      const ev = (e, d) => `event: ${e}\ndata: ${JSON.stringify(d)}\n\n`;
+      const body = es ? "**Qué es esto** — Un mensaje sospechoso.\n**Ojo con esto** — Pide tarjetas de regalo." : "**What this is** — A suspicious message.\n**Watch out for** — It asks for gift cards.";
+      await r.fulfill({ status: 200, headers: { "Content-Type": "text/event-stream" }, body: ev("text", { text: body + "\n[Topics: scams]" }) + ev("done", { text: body, topics: ["scams"], stop_reason: "end_turn" }) });
+    });
+    await page.reload();
+    await menu("Tutor");
+    await top().getByRole("radio", { name: es ? "Explícame esto" : "Explain this" }).click();
+    await top().getByRole("textbox").fill("URGENT: card 4111 1111 1111 1111 is locked. Pay $200 in gift cards by 5pm.");
+    await top().getByRole("button", { name: es ? "Explícame esto" : "Explain this", exact: true }).click();
+    await top().getByText(es ? "Pide tarjetas de regalo." : "It asks for gift cards.").waitFor();
+    assert.match(sentBody.text, /\[card or account number hidden\]/);
+    assert.doesNotMatch(JSON.stringify(sentBody), /4111/, "the app hides the card number before sending");
+    assert.equal(sentBody.lang, lang);
+    await top().getByText(es ? /Lección relacionada: Fraudes y estafas/ : /Related lesson: Scams/).waitFor();
+    await top().getByText(es ? "No se guarda: este texto desaparece cuando cierras esta pantalla." : "Not saved: this text disappears when you close this screen.").waitFor();
+    assert.doesNotMatch(await page.evaluate(() => JSON.stringify({ ...localStorage })), /gift cards|Pide tarjetas/, "the answer and the text are never saved on the phone");
+    await clean(`explain this, ${lang}`);
+    await top().getByRole("button", { name: es ? "Explicar otra cosa" : "Explain something else" }).click();
+    await top().getByRole("textbox").waitFor();
+    console.log(`ok: Explain this (${lang}): private numbers hidden before sending, the answer streams, the topic becomes a lesson, nothing is saved`);
+    await app.close();
+  }
+
   // --- back after 5 days away, with a 4-day streak that ended ---
   {
     const day = (n) => new Date(Date.now() + n * 864e5).toLocaleDateString("en-CA", { timeZone: "America/Mexico_City" });

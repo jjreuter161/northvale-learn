@@ -50,11 +50,15 @@ Your lessons (including where you are in one you haven't finished), XP, streak, 
 - your weekly XP, so you can be in a league (other learners see only your nickname and XP; ages 13–17 are only in leagues with other 13–17s), and who you compete with: everyone in this week's group, only friends, or only your class;
 - friends you added through an invite link: each of you sees the other's nickname and weekly XP, nothing else, and either can remove the link;
 - if you confirm your email (needed to teach a class), the date you did; if you teach, the date you accepted the teacher terms and your classes (their names, codes and assignments).
-- how many tutor questions you asked today (to keep the service fair).
+- how many tutor questions and "Explain this" uses you had today (to keep the service fair).
 
 ## The AI tutor and AI news summaries
 
 When you ask the tutor a question, your question is sent to Anthropic, the company that makes the AI (Claude), so it can be answered. It goes along with a few broad facts: your level, the units you finished, your age range, and what's in your practice portfolio. We don't send your email or nickname, and our server doesn't keep your questions. Anthropic handles this data under its commercial terms. **[Lawyer to confirm: retention period, and that inputs aren't used for training.]**
+
+### Explain this
+
+In Ask, "Explain this" lets you paste money text (a pay stub, an offer, an ad, a message) to have it explained. Before anything is sent, your phone hides card numbers, account numbers, ID numbers (like a Social Security number, CURP or RFC) and other long numbers, and our server hides them again. The text that is left goes to Anthropic for that one answer, with nothing about you: not your email, nickname, level or age range. **We do not store it, log it or keep it in our analytics, feedback or classroom data, and the app does not save it on your phone either**; it disappears when you close the screen. We keep only a count of how many times you used it today (a limit that keeps the service fair) and what the answer cost. Please remove any private number we might not recognize before you paste. Photos and files can't be pasted. **[Lawyer to confirm: wording for pasted text that may contain other people's information, and Anthropic's handling of it.]**
 
 ## Your IP address
 

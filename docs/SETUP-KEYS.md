@@ -70,6 +70,7 @@ With Haiku, normal beta use (50 testers asking ~3 questions a day) is about **$3
 The app stops calling the AI once `AI_MONTHLY_BUDGET_USD` is spent. The tutor then falls back to the glossary, and news shows headlines only, until the next month. Each account also has limits:
 
 - `TUTOR_DAILY_LIMIT` questions a day (default 30);
+- `EXPLAIN_DAILY_LIMIT` "Explain this" uses a day (default 8; each one costs a little more than a tutor answer, and /admin shows the cost per use);
 - `TUTOR_PER_MINUTE` questions a minute (default 5).
 
 ## 3. Check the AI before testers see it

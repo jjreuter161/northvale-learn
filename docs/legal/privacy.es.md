@@ -50,11 +50,15 @@ Tus lecciones (incluido en qué paso vas de una que no has terminado), XP, racha
 - tu XP de la semana, para la liga (los demás solo ven tu apodo y tu XP; de 13 a 17 años solo compites con personas de 13 a 17), y con quién compites: todos los de tu grupo de la semana, solo amigos o solo tu clase;
 - los amigos que agregaste con un enlace de invitación: cada quien ve solo el apodo y el XP de la semana del otro, y cualquiera puede quitar la amistad;
 - si confirmas tu correo (se necesita para dar una clase), la fecha en que lo hiciste; si das clases, la fecha en que aceptaste los términos para docentes y tus clases (nombres, códigos y tareas).
-- cuántas preguntas le hiciste hoy al tutor (para que el servicio sea justo para todos).
+- cuántas preguntas le hiciste hoy al tutor y cuántas veces usaste "Explícame esto" (para que el servicio sea justo para todos).
 
 ## El tutor con IA y los resúmenes de noticias
 
 Cuando le preguntas algo al tutor, tu pregunta se envía a Anthropic, la empresa que hace la IA (Claude), para que la responda. Junto con ella van algunos datos generales: tu nivel, las unidades que terminaste, tu rango de edad y lo que hay en tu portafolio de práctica. No enviamos tu correo ni tu apodo, y nuestro servidor no guarda tus preguntas. Anthropic trata estos datos según sus términos comerciales. **[El abogado debe confirmar el plazo de conservación y que no se usan para entrenar.]**
+
+### Explícame esto
+
+En Preguntar, "Explícame esto" te deja pegar texto de dinero (un recibo de nómina, una oferta, un anuncio, un mensaje) para que te lo explique. Antes de enviar nada, tu celular oculta números de tarjeta, de cuenta, de identificación (como un número de Seguro Social, una CURP o un RFC) y otros números largos, y nuestro servidor los vuelve a ocultar. El texto que queda va a Anthropic para esa única respuesta, sin nada sobre ti: ni tu correo, ni tu apodo, ni tu nivel, ni tu rango de edad. **No lo guardamos, no lo registramos ni lo conservamos en nuestras estadísticas, en los comentarios ni en los datos de clases, y la app tampoco lo guarda en tu celular**; desaparece cuando cierras la pantalla. Solo guardamos cuántas veces lo usaste hoy (un límite para que el servicio sea justo) y cuánto costó la respuesta. Quita cualquier número privado que no reconozcamos antes de pegar. No se pueden pegar fotos ni archivos. **[Abogado por confirmar: la redacción para texto pegado que pueda contener datos de otras personas, y cómo lo trata Anthropic.]**
 
 ## Tu dirección IP
 

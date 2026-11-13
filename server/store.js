@@ -178,9 +178,19 @@ export const store = {
   aiSpend: (month) => (data.ai && data.ai.month === month ? data.ai : { month, spent: 0, calls: 0, tutor: 0, news: 0 }),
   addAiSpend(month, kind, cost) {
     const a = store.aiSpend(month);
-    data.ai = { ...a, spent: a.spent + cost, calls: a.calls + 1, [kind]: (a[kind] || 0) + cost };
+    data.ai = { ...a, spent: a.spent + cost, calls: a.calls + 1, [kind]: (a[kind] || 0) + cost, [`${kind}Calls`]: (a[`${kind}Calls`] || 0) + 1 };
     save();
     return data.ai;
+  },
+
+  // How many "Explain this" uses today (per account); its own limit. Only the
+  // count is kept, never the text.
+  useExplain(userId, day, limit) {
+    const u = data.usage[userId] && data.usage[userId].day === day ? data.usage[userId] : { day, tutor: 0 };
+    if ((u.explain || 0) >= limit) return false;
+    data.usage[userId] = { ...u, explain: (u.explain || 0) + 1 };
+    save();
+    return true;
   },
 
   // How many tutor questions today (per account).

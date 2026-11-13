@@ -16,6 +16,7 @@ import { useSession } from "../../core/session.js";
 import { level } from "../../core/progress.js";
 import { Button, Chip, Icon, Loading, Note, Segmented, Sheet } from "../../core/ui.jsx";
 import { lookup, suggestedWords, findLesson } from "./glossary.js";
+import { redact } from "../../core/redact.js";
 import { sessionNow } from "../../core/session.js";
 import { UNITS, ALL_LESSONS, unitDone, lessonState } from "../lessons/content.js";
 import { conceptById } from "../lessons/concepts.js";
@@ -59,6 +60,21 @@ addStrings({
   "tutor.s3": S("Stocks vs. bonds — what's the difference?", "¿Qué diferencia hay entre acciones y bonos?"),
   "tutor.s4": S("How do credit scores work?", "¿Cómo funciona un puntaje de crédito?"),
   "tutor.s4.MX": S("What is the Buró de Crédito?", "¿Qué es el Buró de Crédito?"),
+  "explain.tab": S("Explain this", "Explícame esto"),
+  "explain.chat": S("Chat", "Chat"),
+  "explain.view": S("What do you want to do?", "¿Qué quieres hacer?"),
+  "explain.hello": S("Paste a pay stub, receipt, statement, offer, ad, message or headline. I'll explain it in plain words, point out the numbers that matter and flag red flags. I teach; I never tell you to sign or buy.", "Pega un recibo de nómina, un ticket, un estado de cuenta, una oferta, un anuncio, un mensaje o un titular. Te lo explico con palabras sencillas, te señalo los números que importan y las señales de alerta. Yo enseño; nunca te digo que firmes o compres."),
+  "explain.warn": S("Before you paste, delete card, account and ID numbers. Numbers like these are hidden on your phone before anything is sent, but check anyway. What you paste is used for this one answer only: it isn't saved, logged or shared.", "Antes de pegar, borra números de tarjeta, de cuenta y de identificación. Números así se ocultan en tu celular antes de enviar nada, pero revísalo tú también. Lo que pegas se usa solo para esta respuesta: no se guarda, no se registra y no se comparte."),
+  "explain.placeholder": S("Paste the text here", "Pega aquí el texto"),
+  "explain.go": S("Explain this", "Explícame esto"),
+  "explain.hidden": S("{n} {n|number|numbers} will be hidden before sending.", "{n} {n|número|números} se ocultarán antes de enviar."),
+  "explain.sent": S("What was sent", "Lo que se envió"),
+  "explain.private": S("Not saved: this text disappears when you close this screen.", "No se guarda: este texto desaparece cuando cierras esta pantalla."),
+  "explain.offline": S("Explain this needs the AI. A free account turns it on. For single words, the glossary works without it.", "Explícame esto necesita la IA. Una cuenta gratis la activa. Para palabras sueltas, el glosario funciona sin ella."),
+  "explain.glossary": S("Use the glossary", "Usar el glosario"),
+  "explain.again": S("Explain something else", "Explicar otra cosa"),
+  "explain.limit": S("That's today's Explain this uses. It's back tomorrow.", "Ya usaste Explícame esto hoy. Regresa mañana."),
+  "explain.error": S("That didn't go through. Nothing you pasted was kept. Check your connection and try again.", "No se envió. Nada de lo que pegaste se guardó. Revisa tu conexión e inténtalo de nuevo."),
   "tutor.s5": S("What's a Roth IRA?", "¿Qué es una Roth IRA?"),
   "tutor.s5.MX": S("How does my AFORE work?", "¿Cómo funciona mi AFORE?"),
 });
@@ -105,9 +121,94 @@ function learnerSnapshot() {
   return { level: level(s.progress.xp).level, unitsDone: units, ageBand: s.profile.ageBand, goals: service("goals", "summary")() || [], portfolio: pf };
 }
 
+const stripTopics = (x) => x.replace(/\n?\[Topics:[^\]]*\]?\s*$/i, "");
+
+// EXPLAIN THIS — paste money text, get it explained. Everything lives in this
+// component's own state: nothing goes into the saved store, so it's gone when
+// the sheet closes. Private numbers are hidden here before sending (redact.js).
+function ExplainPanel({ t, locale, mode, aiReady, session, go, onGlossary, related }) {
+  const [input, setInput] = useState("");
+  const [out, setOut] = useState("");
+  const [topics, setTopics] = useState([]);
+  const [sent, setSent] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState(null);
+  const hiddenNow = redact(input).hidden;
+  const run = async () => {
+    if (!input.trim() || busy || !aiReady) return;
+    const r = redact(input);
+    setSent(r.text);
+    setOut("");
+    setTopics([]);
+    setError(null);
+    setBusy(true);
+    recordPractice("tutor");
+    track("explain_use", { mode, hidden: r.hidden ? 1 : 0 });
+    let acc = "";
+    try {
+      const done = await stream("/api/explain/turn", { text: r.text, mode, lang: locale.lang, region: locale.region }, (piece) => {
+        acc += piece;
+        setOut(acc);
+      });
+      setOut(done.text || acc);
+      setTopics(Array.isArray(done.topics) ? done.topics : []);
+    } catch (e) {
+      setError(e.code === "DAILY_LIMIT" ? t("explain.limit") : e.code === "SLOW_DOWN" ? t("tutor.slow") : e.code === "AI_PAUSED" ? t("tutor.paused") : t("explain.error"));
+    } finally {
+      setBusy(false);
+    }
+  };
+  const lessonIds = topics.map((id) => (ALL_LESSONS.find((l) => l.unit === id) || {}).id).filter(Boolean);
+  const showing = out || sent !== null;
+  return (
+    <div>
+      <div style={{ background: "var(--surface)", borderRadius: 18, padding: 14, fontSize: 16, lineHeight: 1.5, marginBottom: 12 }}>{t("explain.hello")}</div>
+      <Note icon="shield" style={{ marginBottom: 12 }}>{t("explain.warn")}</Note>
+      {!aiReady && (
+        <Note icon="info" style={{ marginBottom: 12 }}>
+          <strong style={{ display: "block" }}>{t("explain.offline")}</strong>
+          <div style={{ display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap" }}>
+            <Button size="sm" kind="secondary" onClick={onGlossary}>{t("explain.glossary")}</Button>
+            {!session.user && session.online && (
+              <Button size="sm" kind="secondary" onClick={() => go("settings")}>{t("tutor.signin")}</Button>
+            )}
+          </div>
+        </Note>
+      )}
+      {!showing && (
+        <>
+          <textarea value={input} onChange={(e) => setInput(e.target.value)} placeholder={t("explain.placeholder")} aria-label={t("explain.placeholder")} rows={7} maxLength={4000} style={{ width: "100%", boxSizing: "border-box", borderRadius: 16, border: "1px solid var(--line)", background: "var(--surface)", color: "var(--ink)", padding: 12, fontSize: 16, lineHeight: 1.45, fontFamily: "inherit", resize: "vertical" }} />
+          <div aria-live="polite" style={{ fontSize: 13, color: "var(--mid)", minHeight: 20, margin: "6px 2px 10px" }}>{hiddenNow ? t("explain.hidden", { n: hiddenNow }) : ""}</div>
+          <Button full onClick={run} disabled={!input.trim() || busy || !aiReady}>{t("explain.go")}</Button>
+        </>
+      )}
+      {showing && (
+        <div style={{ background: "var(--surface)", borderRadius: "18px 18px 18px 4px", padding: "12px 14px", fontSize: 16, lineHeight: 1.5 }}>
+          {error ? <p style={{ margin: 0 }}>{error}</p> : out ? <Rich value={stripTopics(out)} /> : <Loading label={t("tutor.thinking")} size={28} />}
+          {!busy && lessonIds.map((id) => <div key={id}>{related(id)}</div>)}
+          {sent !== null && (
+            <details style={{ marginTop: 10, fontSize: 13, color: "var(--mid)" }}>
+              <summary style={{ cursor: "pointer", minHeight: 24 }}>{t("explain.sent")}</summary>
+              <pre style={{ whiteSpace: "pre-wrap", wordBreak: "break-word", fontFamily: "inherit", margin: "6px 0 0" }}>{sent}</pre>
+            </details>
+          )}
+          <p style={{ margin: "10px 0 0", fontSize: 12, color: "var(--low)" }}>{t("explain.private")}</p>
+        </div>
+      )}
+      {showing && !busy && (
+        <div style={{ marginTop: 12 }}>
+          <Button full kind="secondary" onClick={() => (setInput(""), setOut(""), setTopics([]), setSent(null), setError(null))}>{t("explain.again")}</Button>
+        </div>
+      )}
+      <p style={{ fontSize: 12, color: "var(--low)", textAlign: "center", margin: "12px 0 0" }}>{t("tutor.disclaimer")}</p>
+    </div>
+  );
+}
+
 function Overlay({ t, locale, go }) {
   const [open, setOpen] = useState(false);
   const [about, setAbout] = useState(null);
+  const [view, setView] = useState("chat");
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const slice = useSlice("tutor", DEFAULTS);
@@ -118,6 +219,7 @@ function Overlay({ t, locale, go }) {
 
   openFn = ({ question, context } = {}) => {
     setOpen(true);
+    setView("chat");
     setAbout(context ? { question, context } : null);
     if (question && !context) setTimeout(() => ask(question), 50);
     else if (question) setInput(question);
@@ -205,6 +307,13 @@ function Overlay({ t, locale, go }) {
         )}
       </div>
 
+      <div style={{ marginBottom: 12 }}>
+        <Segmented label={t("explain.view")} value={view} onChange={setView} options={[{ value: "chat", label: t("explain.chat") }, { value: "explain", label: t("explain.tab") }]} />
+      </div>
+      {view === "explain" ? (
+        <ExplainPanel t={t} locale={locale} mode={slice.mode} aiReady={aiReady} session={session} go={(r) => (setOpen(false), go(r))} onGlossary={() => setView("chat")} related={related} />
+      ) : (
+        <>
       {!aiReady && (
         <Note icon="info" style={{ marginBottom: 12 }}>
           <strong style={{ display: "block" }}>{t("tutor.offline.banner")}</strong>
@@ -251,7 +360,7 @@ function Overlay({ t, locale, go }) {
 
       {(slice.messages.length === 0 || missed) && (
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8, margin: "14px 0 4px" }}>
-          {(aiReady ? suggestions : glossaryWords).map((s) => (
+          {(aiReady ? suggestions : glossaryWords.slice(0, 5)).map((s) => (
             <Chip key={s} onClick={() => ask(s)} style={{ fontSize: 14 }}>
               {s}
             </Chip>
@@ -278,6 +387,8 @@ function Overlay({ t, locale, go }) {
         </button>
       </form>
       <p style={{ fontSize: 12, color: "var(--low)", textAlign: "center", margin: "8px 0 0" }}>{t("tutor.disclaimer")}</p>
+        </>
+      )}
     </Sheet>
   );
 }

@@ -45,6 +45,7 @@ const HOST = process.env.HOST || "127.0.0.1";
 const WEB = join(ROOT, "web");
 const TRUST_PROXY = process.env.TRUST_PROXY === "1";
 const TUTOR_DAILY_LIMIT = Number(process.env.TUTOR_DAILY_LIMIT) || 30;
+const EXPLAIN_DAILY_LIMIT = Number(process.env.EXPLAIN_DAILY_LIMIT) || 8;
 const TUTOR_PER_MINUTE = Number(process.env.TUTOR_PER_MINUTE) || 5;
 // The AI stops for the rest of the month once this much is spent (the
 // tutor falls back to the glossary; news shows headlines only).
@@ -388,6 +389,29 @@ const routes = {
     },
   },
 
+  // "EXPLAIN THIS": pasted money text explained, streamed like the tutor. Its
+  // text is never stored or logged: only a count per account per day and the
+  // cost, and a failure says nothing about what was pasted.
+  "POST /api/explain/turn": {
+    limit: 40000,
+    stream: true,
+    run: async (c) => {
+      if (!ai) throw fail(503, "Explain this needs the AI, which isn't set up on this server. The glossary still works.", "AI_OFF");
+      if (!aiOpen()) throw fail(503, "Explain this is resting until next month. The glossary still works.", "AI_PAUSED");
+      const request = ai.explainRequest(c.body);
+      if (tooFast(c.user.id)) throw fail(429, "That's a lot at once — wait a minute, then try again.", "SLOW_DOWN");
+      if (!store.useExplain(c.user.id, dayKey(), EXPLAIN_DAILY_LIMIT)) throw fail(429, "That's today's Explain this uses. It's back tomorrow.", "DAILY_LIMIT");
+      let turn;
+      try {
+        turn = await ai.explainTurn(request, (text) => c.sse("text", { text }));
+      } catch {
+        throw fail(502, "That didn't go through. Nothing you pasted was kept.", "EXPLAIN_FAILED");
+      }
+      spend("explain", turn.cost);
+      c.sse("done", { text: turn.text, topics: turn.topics, stop_reason: turn.stop_reason });
+    },
+  },
+
   // TESTER INSIGHTS — usage events, the survey, feedback, app errors.
   "POST /api/events": { open: true, limit: 32000, run: async (c) => insights.record(c.body, c.ip) },
   "DELETE /api/events": { open: true, run: async (c) => (insights.forget(String(c.body.installId || "")), { ok: true }) },
@@ -419,7 +443,7 @@ const routes = {
       s.comingBack.push.devicesNow = push.deviceCount();
       s.comingBack.recap.optedIn = store.allUsers().filter((u) => u.recap).length;
       s.comingBack.recap.emailOn = mail.mailMode() !== "off";
-      return { ...s, accounts: store.userCount(), waitlist: waitlist.summary(), growth: invites.stats(), classroom: classes.stats(), flags: flags.list(), ai: { ...ai, budget: AI_BUDGET, on: aiOpen() }, generatedAt: new Date().toISOString() };
+      return { ...s, accounts: store.userCount(), waitlist: waitlist.summary(), growth: invites.stats(), classroom: classes.stats(), flags: flags.list(), ai: { ...ai, budget: AI_BUDGET, on: aiOpen(), explainLimit: EXPLAIN_DAILY_LIMIT, explainPerUse: ai.explainCalls ? ai.explain / ai.explainCalls : null }, generatedAt: new Date().toISOString() };
     },
   },
   "POST /api/admin/waitlist/export": {

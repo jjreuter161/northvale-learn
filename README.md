@@ -77,7 +77,7 @@ Everything works without keys. To turn on the AI tutor, real prices and reset em
 | `ANTHROPIC_API_KEY` | AI tutor + news summaries. |
 | `TUTOR_MODEL`, `NEWS_MODEL` | Which Claude model to use: `claude-haiku-5-5` (default for the beta; $25 covers ~40,000 answers), `claude-sonnet-5-5` or `claude-opus-5-5`. |
 | `AI_MONTHLY_BUDGET_USD` | AI spending stops for the month at this amount (default $25). Alerts are sent at 80% and 100%. |
-| `TUTOR_DAILY_LIMIT`, `TUTOR_PER_MINUTE` | Tutor questions allowed per account (defaults: 30 a day, 5 a minute). |
+| `TUTOR_DAILY_LIMIT`, `TUTOR_PER_MINUTE`, `EXPLAIN_DAILY_LIMIT` | Tutor questions allowed per account (defaults: 30 a day, 5 a minute, shared by the tutor and Explain this) and a separate daily limit for "Explain this" (default 8). |
 | `TWELVEDATA_API_KEY` | Real delayed prices (free key). Without it, prices are labeled samples. |
 | `CETES_RATE`, `CETES_RATE_DATE` | The rate for simulated CETES; otherwise an example rate is used and labeled as one. |
 | `ADMIN_TOKEN` | 20+ characters; opens the private stats page at `/admin`. |
