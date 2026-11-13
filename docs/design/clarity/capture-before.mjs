@@ -1,5 +1,5 @@
 // "Before" screenshots for the clarity rebuild: the app as it was at
-// commit 65d538b (☰ menu, goal-first Home), on a phone screen — a new
+// commit ba6fe91 (☰ menu, goal-first Home), on a phone screen — a new
 // learner's first minutes, and Dani three weeks in. (capture-after.mjs
 // takes the same moments in the rebuilt app.)
 //   npm run build && node docs/design/clarity/capture-before.mjs
