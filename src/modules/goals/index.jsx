@@ -13,7 +13,7 @@ import { recordPractice, checkBadges } from "../../core/game.js";
 import { addStrings, makeT, money, shortDate, text } from "../../core/i18n.js";
 import { dayKey, addDays } from "../../core/progress.js";
 import { fact } from "../../core/facts.js";
-import { Button, Card, Field, Icon, Label, Legend, LineChart, List, ListRow, Mark, Note, Scene, Segmented, Sheet, Slider, Title, toast } from "../../core/ui.jsx";
+import { SELECTED, Button, Card, Field, Icon, Label, Legend, LineChart, List, ListRow, Mark, Note, Scene, Segmented, Sheet, Slider, Title, toast } from "../../core/ui.jsx";
 import { openShare } from "../../core/share.jsx";
 import { update } from "../../core/store.js";
 import { useSeen, markIntro } from "../../core/Practice.jsx";
@@ -376,7 +376,7 @@ function TemplateGrid({ t, onPick, highlight }) {
   return (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 10 }}>
       {P.TEMPLATES.map((tp) => (
-        <button key={tp.id} onClick={() => onPick(tp.id)} className="nv-press" style={{ textAlign: "left", border: `1px solid ${highlight === tp.id ? "var(--brand)" : "var(--line)"}`, background: "var(--surface)", color: "var(--ink)", borderRadius: 14, padding: 14, cursor: "pointer", minHeight: 112, display: "flex", flexDirection: "column", gap: 10 }}>
+        <button key={tp.id} onClick={() => onPick(tp.id)} className="nv-press" style={{ textAlign: "left", ...(highlight === tp.id ? SELECTED : { border: "1px solid var(--line)" }), background: "var(--surface)", color: "var(--ink)", borderRadius: 14, padding: 14, cursor: "pointer", minHeight: 112, display: "flex", flexDirection: "column", gap: 10 }}>
           <TemplateIcon id={tp.id} size={36} />
           <span>
             <span style={{ display: "block", fontWeight: 650, fontSize: 15 }}>{t(`tpl.${tp.id}`)}</span>
@@ -1191,7 +1191,7 @@ function RealCostCard({ t, locale, go }) {
       <div style={{ fontSize: 18, fontWeight: 700, lineHeight: 1.35, color: "var(--head)" }}>{t("rc.pick")}</div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8, margin: "12px 0" }} role="radiogroup" aria-label={t("rc.pick")}>
         {[...EVERYDAY.map((x) => [x[0], `${t(`rc.${x[0]}`)} · ${m(x[1][R])}`]), ["own", t("rc.own")]].map(([id, label]) => (
-          <button key={id} role="radio" aria-checked={pick === id} onClick={() => setPick(id)} className="nv-press" style={{ border: "none", borderRadius: 999, padding: "8px 14px", fontWeight: 650, fontSize: 15, cursor: "pointer", background: pick === id ? "var(--brand)" : "var(--bg)", color: pick === id ? "var(--onBrand)" : "var(--ink)", font: "inherit" }}>
+          <button key={id} role="radio" aria-checked={pick === id} onClick={() => setPick(id)} className="nv-press" style={{ ...(pick === id ? SELECTED : { border: "2px solid transparent" }), borderRadius: 999, padding: "6px 14px", fontWeight: 650, fontSize: 15, cursor: "pointer", background: pick === id ? "var(--brand)" : "var(--bg)", color: pick === id ? "var(--onBrand)" : "var(--ink)", font: "inherit" }}>
             {label}
           </button>
         ))}

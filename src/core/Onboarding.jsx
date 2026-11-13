@@ -6,7 +6,7 @@
 import { useState } from "react";
 import { update } from "./store.js";
 import { LANGS, REGIONS } from "./i18n.js";
-import { Button, Scene, Wordmark, Icon, BetaTag } from "./ui.jsx";
+import { Button, Scene, Wordmark, Icon, BetaTag, SELECTED, Chosen } from "./ui.jsx";
 import { LATEST_NOTE } from "./whatsnew.jsx";
 import { AccountForm } from "./Settings.jsx";
 import { track } from "./analytics.js";
@@ -104,17 +104,20 @@ export default function Onboarding({ t, locale, onDone }) {
           <div style={{ display: "flex", justifyContent: "center", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
             {Object.entries(LANGS).map(([k, name]) => (
               <button key={k} onClick={() => setSetting("lang", k)} aria-pressed={locale.lang === k} style={chip(locale.lang === k)}>
+                {locale.lang === k && <Chosen size={14} />}
                 {name}
               </button>
             ))}
             <span style={{ width: 1, background: "var(--line)", margin: "6px 4px" }} />
             {Object.entries(REGIONS).map(([k, r]) => (
               <button key={k} onClick={() => (setSetting("region", k), setSetting("both", false))} aria-pressed={!locale.both && locale.region === k} style={chip(!locale.both && locale.region === k)}>
+                {!locale.both && locale.region === k && <Chosen size={14} />}
                 <span aria-hidden="true">{r.flag}</span> {r.currency}
                 <span className="nv-sr"> · {r.name[locale.lang]}</span>
               </button>
             ))}
             <button onClick={() => setSetting("both", true)} aria-pressed={!!locale.both} style={chip(!!locale.both)}>
+              {locale.both && <Chosen size={14} />}
               <span aria-hidden="true">🇺🇸🇲🇽</span> {t("settings.country.both")}
             </button>
           </div>
@@ -142,4 +145,4 @@ export default function Onboarding({ t, locale, onDone }) {
   );
 }
 
-const chip = (on) => ({ border: "none", background: on ? "var(--brandSoft)" : "transparent", color: "var(--ink)", borderRadius: 999, padding: "8px 12px", fontWeight: 600, fontSize: 14, cursor: "pointer", minHeight: 40 });
+const chip = (on) => ({ ...(on ? SELECTED : { border: "2px solid transparent" }), display: "inline-flex", alignItems: "center", gap: 5, background: on ? "var(--brandSoft)" : "transparent", color: "var(--ink)", borderRadius: 999, padding: "8px 12px", fontWeight: 600, fontSize: 14, cursor: "pointer", minHeight: 40 });

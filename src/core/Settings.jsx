@@ -5,7 +5,7 @@ import { useAppState, update, resetState } from "./store.js";
 import { LANGS, REGIONS } from "./i18n.js";
 import { DAILY_GOALS } from "./progress.js";
 import { COLORS, PRESETS, specFor, snap, optionOk, whyNot, lookValueFor } from "./colors.js";
-import { AVATARS, lookFrom, Icon, Button, Card, Field, Label, Note, Segmented, Sheet, Switch, Title, toast } from "./ui.jsx";
+import { SELECTED, AVATARS, lookFrom, Icon, Button, Card, Field, Label, Note, Segmented, Sheet, Switch, Title, toast } from "./ui.jsx";
 import { useSession, signIn, signUp, signOut, changePassword, deleteAccount, setNickname, setRecap, forgotPassword, resetPassword } from "./session.js";
 import { analyticsOn, installId, forgetInstall } from "./analytics.js";
 import { api } from "./api.js";
@@ -476,7 +476,7 @@ function LookPicker({ t, settings, setSetting }) {
         {keys.map((k) => {
           const on = settings.look === k;
           return (
-            <button key={k} role="radio" aria-checked={on} onClick={() => (setSetting("look", k), k !== "auto" && setSetting("colors", { bg: PRESETS.find((p) => p.value === k).bg, text: PRESETS.find((p) => p.value === k).text, hi: PRESETS.find((p) => p.value === k).hi }))} className="nv-press" style={{ gridColumn: k === "auto" ? "1 / -1" : undefined, textAlign: "left", border: "none", borderRadius: 20, padding: 10, background: "var(--surface)", boxShadow: on ? "0 0 0 2.5px var(--brand)" : "var(--lift)", cursor: "pointer", color: "var(--ink)" }}>
+            <button key={k} role="radio" aria-checked={on} onClick={() => (setSetting("look", k), k !== "auto" && setSetting("colors", { bg: PRESETS.find((p) => p.value === k).bg, text: PRESETS.find((p) => p.value === k).text, hi: PRESETS.find((p) => p.value === k).hi }))} className="nv-press" style={{ gridColumn: k === "auto" ? "1 / -1" : undefined, textAlign: "left", ...(on ? SELECTED : { border: "2px solid transparent", boxShadow: "var(--lift)" }), borderRadius: 20, padding: 8, background: "var(--surface)", cursor: "pointer", color: "var(--ink)" }}>
               <span aria-hidden="true" style={{ display: "flex", height: k === "auto" ? 64 : 80, borderRadius: 14, overflow: "hidden" }}>
                 {k === "auto" ? (
                   <>

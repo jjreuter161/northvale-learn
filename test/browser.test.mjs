@@ -810,6 +810,27 @@ try {
     await app.close();
   }
 
+  // --- A chosen answer is outlined in the main button's color, with a check, in every look ---
+  for (const [name, settings] of [["Navy", { look: "navy" }], ["Cream", { look: "white" }], ["Navy & cream", { look: "navy-cream" }], ["Cream & navy", { look: "cream-navy" }], ["a red page", { look: "custom", colors: { bg: "red", text: "cream", hi: "cream" } }]]) {
+    const lessons = Object.fromEntries([...["budget", "save", "banking"].flatMap((u) => ALL_LESSONS.filter((l) => l.unit === u).map((l) => l.id)), "paycheck-1"].map((id) => [id, { done: true, at: day(-5), last: day(-5), best: 0, times: 1 }]));
+    const app = await open({ ...learner({ ageBand: "18-25" }, { lessons }), settings: { lang: "en", region: "US", reduceMotion: true, ...settings } });
+    const { page, top, button } = app;
+    await button(/^Unit 4 · /).click().catch(() => {});
+    await button(/^What comes out of your pay — /).click();
+    await page.locator('[aria-busy="true"]').waitFor({ state: "detached" });
+    await top().getByRole("button", { name: "Continue", exact: true }).click();
+    await top().getByRole("button", { name: "Continue", exact: true }).click();
+    const option = top().getByRole("radio").first();
+    await option.click();
+    const got = await option.evaluate((el) => ({ border: getComputedStyle(el).borderTopColor, select: getComputedStyle(document.documentElement).getPropertyValue("--select").trim(), width: parseFloat(getComputedStyle(el).borderTopWidth), shadow: getComputedStyle(el).boxShadow, check: !!el.querySelector("svg path[d^='M5 13']") || el.querySelectorAll("svg").length > 0 }));
+    const hex = (c) => "#" + c.match(/\d+/g).slice(0, 3).map((n) => Number(n).toString(16).padStart(2, "0")).join("").toUpperCase();
+    assert.equal(hex(got.border), got.select.toUpperCase(), `${name}: the chosen answer's outline is the button color`);
+    assert.ok(got.width >= 2 && got.shadow !== "none", `${name}: the outline is thick`);
+    assert.ok(got.check, `${name}: a check shows too`);
+    await app.close();
+  }
+  console.log("ok: a chosen answer is outlined in the main button's color, thick, with a check, in Navy, Cream, Navy & cream, Cream & navy and a red page");
+
   // --- Certificates: a finished track earns one (checked on the server); adults choose a name, under 18 never has one on the public page ---
   for (const [who, ageBand, nick] of [["adult", "18-25", "Ada"], ["teen", "13-17", "Tito"]]) {
     const track = ["borders-1", "borders-2", "borders-3", "borders-4"];

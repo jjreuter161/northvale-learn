@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useAppState, update, on } from "./store.js";
 import { makeT } from "./i18n.js";
 import { allModules, getModule } from "./registry.js";
-import { lookFrom, GLOBAL_CSS, Icon, Wordmark, BetaTag, StreakStar, Toasts, Sheet, toast, Button, useLookSpec } from "./ui.jsx";
+import { SELECTED, lookFrom, GLOBAL_CSS, Icon, Wordmark, BetaTag, StreakStar, Toasts, Sheet, toast, Button, useLookSpec } from "./ui.jsx";
 import { useSession, refreshSession, schedulePush, verifyEmail } from "./session.js";
 import { settleOnOpen } from "./game.js";
 import { OpenNotice, RepairOffer, COMEBACK_DAYS } from "./Comeback.jsx";
@@ -216,7 +216,7 @@ export default function App() {
       <div style={{ display: "flex", maxWidth: 640, margin: "0 auto" }}>
         {TABS.map((x) => (
           <button key={x.id} onClick={() => openTab(x)} aria-current={tab.id === x.id ? "page" : undefined} className="nv-press" style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 3, border: "none", background: "transparent", color: tab.id === x.id ? "var(--brand)" : "var(--low)", padding: "8px 2px 6px", minHeight: 58, fontSize: 12, lineHeight: 1.15, fontWeight: 650, cursor: "pointer", textAlign: "center", hyphens: "auto", overflowWrap: "anywhere" }}>
-            <span style={{ width: "100%", maxWidth: 60, height: 32, borderRadius: 999, display: "flex", alignItems: "center", justifyContent: "center", background: tab.id === x.id ? "var(--brandSoft)" : "transparent", transition: "background .2s" }}>
+            <span style={{ width: "100%", maxWidth: 60, height: 32, borderRadius: 999, display: "flex", alignItems: "center", justifyContent: "center", background: tab.id === x.id ? "var(--brandSoft)" : "transparent", ...(tab.id === x.id ? SELECTED : { border: "2px solid transparent" }), transition: "background .2s" }}>
               <Icon name={x.icon} size={23} />
             </span>
             {t(x.label)}

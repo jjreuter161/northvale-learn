@@ -68,6 +68,8 @@ export function lookFrom(bg, text, hi) {
     "--fill": H, "--onFill": labelOn(H), "--ringW": bg === "navy" && hi === "red" ? "2px" : "0px", "--ringC": T,
     "--link": T, "--red": COLORS.red.hex, "--onRed": COLORS.cream.hex, "--ringBad": bg === "cream" ? "0px" : "2px",
     "--spark": mark,
+    // Whatever is chosen (an answer, a chip, a tab, a setting) is outlined in the main button's color, with the same cream edge on navy; keyboard focus uses the readable red (or the text color).
+    "--select": H,
     // Calm by default: progress, selected states and "good" are the text color, never the red.
     "--accent": T, "--accentSoft": S.surface2, "--good": T, "--goodSoft": S.surface2,
     // Feedback without color: a check for right, a gentle hint icon for "not quite", both neutral.
@@ -76,7 +78,7 @@ export function lookFrom(bg, text, hi) {
     "--bad": hi !== "red" ? T : bg === "cream" ? TINTS.redDeep : bg === "navy" ? TINTS.redLight : T, "--badSoft": hi !== "red" ? S.surface2 : bg === "cream" ? TINTS.redSoft : bg === "navy" ? mix(B, COLORS.red.hex, 0.25) : S.surface2,
     "--flame": T, "--gold": T, "--sky": T,
     "--level1": S.line, "--level2": mix(T, B, 0.45), "--level3": T,
-    "--focus": dark ? TINTS.creamDim : COLORS.navy.hex,
+    "--focus": hi === "red" && bg !== "red" ? mark : H,
     "--shadow": "none", "--lift": dark ? "0 12px 26px -16px rgba(0,0,0,.6)" : "0 1px 0 rgba(27,53,96,.04), 0 12px 26px -16px rgba(27,53,96,.28)",
     "--edge": dark ? TINTS.navyDeep : "#10223F",
     "--warm": T, "--warmSoft": S.surface2, "--warmInk": T,

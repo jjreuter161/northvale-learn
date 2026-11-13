@@ -8,7 +8,7 @@ import { useSlice, setSlice, getState, useAppState } from "../../core/store.js";
 import { addStrings } from "../../core/i18n.js";
 import { api } from "../../core/api.js";
 import { installId, track } from "../../core/analytics.js";
-import { Button, Chip, Note, Sheet, toast } from "../../core/ui.jsx";
+import { SELECTED, Button, Chip, Note, Sheet, toast } from "../../core/ui.jsx";
 
 const S = (en, es) => ({ en, es });
 addStrings({
@@ -132,7 +132,7 @@ function Overlay({ t, locale, route }) {
         <p style={{ fontSize: 18, fontWeight: 650, lineHeight: 1.4, margin: "0 0 14px" }}>{t("survey.q")}</p>
         <div role="radiogroup" style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 }}>
           {["very", "somewhat", "not"].map((k) => (
-            <button key={k} role="radio" aria-checked={answer === k} onClick={() => setAnswer(k)} className="nv-press" style={{ textAlign: "left", border: `1px solid ${answer === k ? "var(--brand)" : "var(--line)"}`, background: answer === k ? "var(--brandSoft)" : "var(--surface)", color: "var(--ink)", borderRadius: 12, padding: "14px 16px", fontSize: 16, fontWeight: 600, cursor: "pointer", minHeight: 52 }}>
+            <button key={k} role="radio" aria-checked={answer === k} onClick={() => setAnswer(k)} className="nv-press" style={{ textAlign: "left", ...(answer === k ? SELECTED : { border: "1px solid var(--line)" }), background: answer === k ? "var(--brandSoft)" : "var(--surface)", color: "var(--ink)", borderRadius: 12, padding: "14px 16px", fontSize: 16, fontWeight: 600, cursor: "pointer", minHeight: 52 }}>
               {t(`survey.${k}`)}
             </button>
           ))}

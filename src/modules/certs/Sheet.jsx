@@ -13,7 +13,7 @@ import { api } from "../../core/api.js";
 import { track as logEvent } from "../../core/analytics.js";
 import { addStrings, text } from "../../core/i18n.js";
 import { openShare } from "../../core/share.jsx";
-import { Button, Card, Icon, Loading, Note, Progress, Sheet, toast } from "../../core/ui.jsx";
+import { SELECTED, Button, Card, Icon, Loading, Note, Progress, Sheet, toast } from "../../core/ui.jsx";
 import { ALL_LESSONS } from "../lessons/content.js";
 import { TRACKS, trackById, lessonsOfTrack } from "./tracks.js";
 
@@ -169,7 +169,7 @@ export default function CertSheet({ t, locale, go, onClose }) {
   };
 
   const chip = (value, label) => (
-    <button key={value} role="radio" aria-checked={choice === value} onClick={() => setChoice(value)} className="nv-press" style={{ display: "block", width: "100%", textAlign: "left", minHeight: 48, padding: "10px 14px", borderRadius: 14, border: `2px solid ${choice === value ? "var(--brand)" : "var(--line)"}`, background: choice === value ? "var(--brandSoft)" : "var(--surface)", color: "var(--ink)", fontSize: 16, fontWeight: 650, cursor: "pointer" }}>
+    <button key={value} role="radio" aria-checked={choice === value} onClick={() => setChoice(value)} className="nv-press" style={{ display: "block", width: "100%", textAlign: "left", minHeight: 48, padding: "10px 14px", borderRadius: 14, ...(choice === value ? SELECTED : { border: "2px solid var(--line)" }), background: choice === value ? "var(--brandSoft)" : "var(--surface)", color: "var(--ink)", fontSize: 16, fontWeight: 650, cursor: "pointer" }}>
       {label}
     </button>
   );

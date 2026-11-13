@@ -158,6 +158,11 @@ export function Icon({ name, size = 22, color = "currentColor", stroke = 2, fill
   );
 }
 
+// WHAT'S CHOSEN — outlined in the main button's color (3px, with the button's edge on navy), and never by color alone:
+// whatever wears SELECTED also shows a check or a filled dot.
+export const SELECTED = { border: "2px solid var(--select)", boxShadow: "inset 0 0 0 1px var(--select), 0 0 0 var(--ringW) var(--ringC)" };
+export const Chosen = ({ size = 18 }) => <Icon name="check" size={size} stroke={3} color="var(--ink)" />;
+
 // Buttons have a pressable edge underneath; tapping pushes them in.
 const BUTTON = {
   // The one main button per screen: the highlight color's fill (red by default), its label, and on navy an edge in the text color.
@@ -251,7 +256,8 @@ export function Ring({ value, max = 1, size = 56, stroke = 7, color = "var(--acc
 
 export function Chip({ active, onClick, children, style }) {
   return (
-    <button className="nv-press" onClick={onClick} aria-pressed={!!active} style={{ border: active ? "1px solid var(--brand)" : "1px solid transparent", background: active ? "var(--brandSoft)" : "var(--surface)", color: "var(--ink)", borderRadius: 999, padding: "8px 14px", minHeight: 40, fontSize: 15, fontWeight: 650, cursor: "pointer", ...style }}>
+    <button className="nv-press" onClick={onClick} aria-pressed={!!active} style={{ ...(active ? SELECTED : { border: "2px solid transparent" }), display: "inline-flex", alignItems: "center", gap: 6, background: active ? "var(--brandSoft)" : "var(--surface)", color: "var(--ink)", borderRadius: 999, padding: "7px 14px", minHeight: 40, fontSize: 15, fontWeight: 650, cursor: "pointer", ...style }}>
+      {active && <Chosen size={15} />}
       {children}
     </button>
   );
@@ -261,7 +267,7 @@ export function Segmented({ options, value, onChange, label }) {
   return (
     <div role="radiogroup" aria-label={label} style={{ display: "flex", background: "var(--surface)", borderRadius: 14, padding: 4, gap: 4 }}>
       {options.map((o) => (
-        <button key={o.value} role="radio" aria-checked={value === o.value} onClick={() => onChange(o.value)} style={{ flex: 1, minWidth: 0, overflowWrap: "anywhere", border: "none", borderRadius: 11, padding: "9px 8px", minHeight: 40, fontSize: 14, fontWeight: 650, cursor: "pointer", background: value === o.value ? "var(--bg)" : "transparent", color: value === o.value ? "var(--ink)" : "var(--mid)", boxShadow: value === o.value ? "0 1px 2px rgba(0,0,0,.08)" : "none" }}>
+        <button key={o.value} role="radio" aria-checked={value === o.value} onClick={() => onChange(o.value)} style={{ flex: 1, minWidth: 0, overflowWrap: "anywhere", ...(value === o.value ? SELECTED : { border: "2px solid transparent" }), borderRadius: 11, padding: "7px 8px", minHeight: 40, fontSize: 14, fontWeight: value === o.value ? 750 : 650, cursor: "pointer", background: value === o.value ? "var(--bg)" : "transparent", color: value === o.value ? "var(--ink)" : "var(--mid)" }}>
           {o.label}
         </button>
       ))}
