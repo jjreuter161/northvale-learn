@@ -1,6 +1,6 @@
 # Security review 2 (2026-11-12, Release Candidate 1)
 
-**Scope:** everything added since the first review (Milestone 4 Phase 6, commit 6c01165): launch prep (preflight, demo data, preview sync), the clarity rebuild, M4.5 (six new kinds of question, myths, money week, real cost), the navy and cream look, the brand pages, the playful design (pictures), and RC1 (units loaded on demand, the look picker, lessons that pick up where they were left, backup restore). The `vercel-supabase` branch isn't in RC1; its database design (row-level security, a separate schema) is in `docs/VERCEL-SUPABASE.md` and gets its own check at the switch. Method: a code review of every change in `server/`, `web/`, `scripts/` and the app, `npm audit`, and tests for each fix.
+**Scope:** everything added since the first review (Milestone 4 Phase 6, commit e418dc3): launch prep (preflight, demo data, preview sync), the clarity rebuild, M4.5 (six new kinds of question, myths, money week, real cost), the navy and cream look, the brand pages, the playful design (pictures), and RC1 (units loaded on demand, the look picker, lessons that pick up where they were left, backup restore). The `vercel-supabase` branch isn't in RC1; its database design (row-level security, a separate schema) is in `docs/VERCEL-SUPABASE.md` and gets its own check at the switch. Method: a code review of every change in `server/`, `web/`, `scripts/` and the app, `npm audit`, and tests for each fix.
 
 ## Fixed in this review
 

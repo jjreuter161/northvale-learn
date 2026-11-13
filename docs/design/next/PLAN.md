@@ -1,7 +1,7 @@
 # Next round: plan and mockups (nothing is built yet)
 
 Two parts:
-1. **Design follow-ups:** the advisor's notes on the playful design, which is already built on `milestone-4.5`, commit d6009a0.
+1. **Design follow-ups:** the advisor's notes on the playful design, which is already built on `milestone-4.5`, commit 518e989.
 2. **Milestone 5, Step 1:** competitor research (`docs/COMPETITION.md`) and the signature features plan.
 
 **Mockups** (from `mockups.mjs`; `mockups.html` shows them all):

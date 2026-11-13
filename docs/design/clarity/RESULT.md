@@ -1,6 +1,6 @@
 # Clarity rebuild — Step 2 (done)
 
-The app was rebuilt to the approved plan (`PLAN.md`) with your six decisions. The pictures are in `before/` (the app at commit 65d538b) and `after/` (now), taken of the same moments on a phone screen. `capture-before.mjs` and `capture-after.mjs` retake them.
+The app was rebuilt to the approved plan (`PLAN.md`) with your six decisions. The pictures are in `before/` (the app at commit ba6fe91) and `after/` (now), taken of the same moments on a phone screen. `capture-before.mjs` and `capture-after.mjs` retake them.
 
 ## What changed
 

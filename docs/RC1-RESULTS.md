@@ -6,7 +6,7 @@ What each launch-hardening check found, with the numbers. The checks are in `npm
 
 Units load on demand; a size budget (`test/size.test.mjs`: 245 KB to open the app, 14 KB per unit).
 
-| | Before (d88c96a) | After |
+| | Before (e3c223c) | After |
 |---|---|---|
 | Downloaded to open the app (compressed) | 343 KB | 227 KB |
 | Slow phone, first visit: Today ready | 2.70 s | 2.23 s |
