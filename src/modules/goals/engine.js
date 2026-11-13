@@ -128,3 +128,13 @@ export function swingPath(start, rangePct, seed, months = 12, driftPct = 0) {
   for (const p of pts) (high = Math.max(high, p)), (drop = Math.max(drop, high ? (high - p) / high : 0));
   return { pts, end: pts[pts.length - 1], maxDrop: drop * 100 };
 }
+
+// Sending money from the US to Mexico. The fee comes out of what you send;
+// what's left is converted at the "fair" rate minus the service's markup. The
+// total cost is everything you lose against the fair rate: the fee plus the
+// markup, in dollars. (More cost always means fewer pesos arrive.)
+export function remit({ amount, fee, markupPct, rate }) {
+  const arrives = (amount - fee) * rate * (1 - markupPct / 100);
+  const costUsd = amount - arrives / rate;
+  return { arrives, fair: amount * rate, costUsd, costPct: amount ? (costUsd / amount) * 100 : 0, youPay: amount };
+}

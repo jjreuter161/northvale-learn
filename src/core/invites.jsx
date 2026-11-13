@@ -39,7 +39,7 @@ addStrings({
 
 const G = () => getState().growth || {};
 const setGrowth = (patch) => update((s) => ({ ...s, growth: { ...(s.growth || {}), ...patch } }));
-const tNow = () => makeT({ lang: getState().settings.lang, region: getState().settings.region });
+const tNow = () => makeT({ lang: getState().settings.lang, region: getState().settings.region, both: !!getState().settings.both });
 const addFreezes = (n) => {
   const room = Math.max(0, MAX_FREEZES - getState().progress.freezes);
   if (room) update((s) => ({ ...s, progress: { ...s.progress, freezes: s.progress.freezes + Math.min(n, room) } }));

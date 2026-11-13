@@ -14,6 +14,7 @@
     "test:browser": "npm run build --silent && node test/browser.test.mjs",
     "preview:sync": "node scripts/preview-sync.mjs",
     "seed:demo": "node scripts/seed-demo.mjs",
+    "home-test": "node scripts/home-test.mjs",
     "restore": "node scripts/restore.mjs",
     "load-check": "node scripts/load-check.mjs",
     "deploy:dry-run": "node scripts/deploy-dry-run.mjs",

@@ -19,7 +19,7 @@ import { ReminderCard } from "../../core/reminders.jsx";
 import { WhatsNewCard } from "../../core/whatsnew.jsx";
 import { practiceOpen, markIntro } from "../../core/Practice.jsx";
 import { feel, reducedMotion } from "../../core/feel.js";
-import { UNITS, ALL_LESSONS, lessonById, lessonState, nextLesson, nextFor, unitDone, isQuestion, conceptPool, loadUnits, unitLoaded, conceptsOfLesson, conceptsOfUnit, minutes } from "./content.js";
+import { UNITS, ALL_LESSONS, lessonById, lessonState, nextLesson, nextFor, unitDone, isQuestion, conceptPool, loadUnits, unitLoaded, conceptsOfLesson, conceptsOfUnit, minutes, setBothMode } from "./content.js";
 import { conceptById } from "./concepts.js";
 import * as M from "./mastery.js";
 import { Question, QTYPES, startValue } from "./qtypes.jsx";
@@ -146,6 +146,7 @@ addStrings({
   "why.crypto": S("Know what you're buying before the hype decides for you.", "Entiende qué compras antes de que la moda decida por ti."),
   "why.retire": S("Starting early makes retirement much easier to afford.", "Empezar temprano hace mucho más fácil pagar el retiro."),
   "why.earning": S("Earning more is the other half of having more.", "Ganar más es la otra mitad de tener más."),
+  "why.borders": S("If your life touches two countries, the details of sending, saving and borrowing across the border save you real money.", "Si tu vida toca dos países, los detalles de enviar, ahorrar y pedir prestado entre fronteras te ahorran dinero de verdad."),
   "why.news": S("The news moves rates and prices that touch your money.", "Las noticias mueven tasas y precios que afectan tu dinero."),
 });
 
@@ -1122,6 +1123,8 @@ registerModule({
     return { unitsDone: done, pathDone: done === UNITS.length };
   },
   services: {
+    // "Both" in Settings: money across borders opens after Banking.
+    setBothMode,
     // How many concepts are due for review (Home shows it), and when the
     // next one is (reminders).
     reviewStatus,

@@ -15,6 +15,6 @@ const first = [...new Set([...app.matchAll(/from"\.\/(chunks\/[^"]+\.js)"/g)].ma
 const start = gz("app.js") + first.reduce((n, f) => n + gz(f), 0);
 assert.ok(start <= BUDGET.start, `opening the app downloads ${(start / 1024).toFixed(0)} KB (budget ${BUDGET.start / 1024} KB)`);
 const units = readdirSync(join(WEB, "chunks")).filter((f) => f.endsWith(".js") && !first.includes(`chunks/${f}`) && !f.startsWith("chunk-"));
-assert.ok(units.length >= 17, "each unit is its own file");
+assert.ok(units.length >= 18, "each unit is its own file");
 for (const f of units) assert.ok(gz(`chunks/${f}`) <= BUDGET.unit, `${f} is ${(gz(`chunks/${f}`) / 1024).toFixed(1)} KB (budget ${BUDGET.unit / 1024} KB)`);
 console.log(`ok: opening the app downloads ${(start / 1024).toFixed(0)} KB compressed (budget ${BUDGET.start / 1024} KB); ${units.length} units and pages load on demand, each under ${BUDGET.unit / 1024} KB`);

@@ -64,9 +64,18 @@ function factText(name, lang, region) {
   return number(f.value, { lang, region });
 }
 // …then fills {@fact} values, {$us|mx} amounts, {n|one|other} and {name}.
-export function fill(s, { lang, region }, vars = {}) {
+// {$$us|mx} is an amount that shows both currencies for someone with ties to
+// both countries ("Both" in Settings): "$100 ≈ $1,800 MXN". Everyone else
+// sees the same as {$us|mx}.
+export function fill(s, { lang, region, both }, vars = {}) {
   return String(s)
     .replace(/\{@(\w+)\}/g, (_, name) => factText(name, lang, region))
+    // {US$200} and {MX$3600} are always dollars or pesos, whoever reads them.
+    .replace(/\{(US|MX)\$([\d.]+)\}/g, (_, cur, n) => money(Number(n), { lang, region, currency: cur === "US" ? "USD" : "MXN" }))
+    .replace(/\{\$\$([\d.]+)\|([\d.]+)\}/g, (_, us, mx) => {
+      const mine = money(Number(region === "MX" ? mx : us), { lang, region });
+      return both ? `${mine} ≈ ${money(Number(region === "MX" ? us : mx), { lang, region, currency: region === "MX" ? "USD" : "MXN" })}` : mine;
+    })
     .replace(/\{\$([\d.]+)\|([\d.]+)\}/g, (_, us, mx) => money(Number(region === "MX" ? mx : us), { lang, region }))
     .replace(/\{(\w+)\|([^|{}]*)\|([^{}]*)\}/g, (m, k, one, other) => (k in vars ? (Number(vars[k]) === 1 ? one : other) : m))
     .replace(/\{(\w+)\}/g, (m, k) => (k in vars ? String(vars[k]) : m));

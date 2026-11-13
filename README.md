@@ -20,7 +20,7 @@ Learn money by doing: four-minute lessons, a goal to learn for, and practice wit
   - Each goal keeps its own currency, with an approximate conversion if you switch country.
   - You can have several goals and edit, pause or delete them.
 - **Your course, as a sea chart** (Learn, below Today): every unit is its own landmark island on a dotted route, the boat at the current unit, finished units flagged, the next ones in the mist. Tap an island for its lessons.
-- **Lessons.** 17 units with 59 lessons of about 4 minutes each (3.8–4.5, in English and in Spanish). A lesson left partway picks up at the same step. They run from budgeting, saving, banking, your first paycheck, credit and scams through compound interest, taxes, insurance, the psychology of money, stocks, funds, risk, crypto and risky bets, retirement and earning more, to reading financial news. Each lesson has short cards, quick questions with instant feedback, and ends with a real action in the practice portfolio or a goal tool (including paycheck, sales tax/IVA, tax brackets, bank fees, scam red flags, insurance, volatility and side-hustle tools). The next lesson is picked for your goal, and each finished lesson says how it helps that goal.
+- **Lessons.** 18 units with 63 lessons of about 4 minutes each (3.8–4.5, in English and in Spanish). A lesson left partway picks up at the same step. They run from budgeting, saving, banking, your first paycheck, credit and scams through compound interest, taxes, insurance, the psychology of money, stocks, funds, risk, crypto and risky bets, retirement and earning more, to reading financial news. Each lesson has short cards, quick questions with instant feedback, and ends with a real action in the practice portfolio or a goal tool (including paycheck, sales tax/IVA, tax brackets, bank fees, scam red flags, insurance, volatility and side-hustle tools). The next lesson is picked for your goal, and each finished lesson says how it helps that goal.
 - **A learning engine that remembers.**
   - Every question tests a concept (59 of them), and each learner's mastery of each concept is tracked: new → learning → solid → mastered.
   - A 2–3 minute **Review** brings back concepts you missed or haven't seen in a while, using spaced repetition. It counts toward the daily goal and the streak.
@@ -64,6 +64,8 @@ npm test
 **Demo data and the preview:**
 
 - `npm run seed:demo` makes the demo people on a running local server (default `http://localhost:8950`; `-- --url …` for another port): Dani (the demo learner, with goals, three weeks of lessons, a streak and a practice fund) and this week's league (Maya, Leo and Ari; Sofía and Teo in the 13–17 league). Running it again resets them. It refuses any other address, a server that says it's production, and a machine set up as the live one. Sign in as `dani@example.test` (the test password is in `scripts/seed-demo.mjs`).
+- `npm run home-test` starts the app on your home Wi-Fi and prints the address to type into a phone's browser (plus a QR code if `qrencode` is installed), so someone else can try it while you watch. No real keys, the AI tutor offline, practice data in a temporary folder (`-- --fresh` clears it, `-- --port 9000` changes the port); it prints what to watch for. Your computer may ask to allow incoming connections: click Allow.
+- **"Both"** (Country in onboarding and Settings) is for people with ties to the US and Mexico: the new unit "Money across borders" opens after Banking, and the remittance tool and lessons show both currencies. Amounts in that unit are written `{US$200}` / `{MX$3600}` (always dollars or pesos); `{$$100|1800}` shows both for people who chose Both.
 - `PREVIEW_DIR=/path npm run preview:sync` builds the app and copies it into a preview's own folder (for a preview that can't read this one), keeping that copy's data. It makes the demo people too if they're missing, so an emptied preview folder comes back with one command. Restart the preview server afterwards.
 
 Tests and the demo scripts set `NORTHVALE_DOTENV=0`, so the servers they start never read your real `.env`.
@@ -180,7 +182,7 @@ See docs/SECURITY-REVIEW.md for details.
 
 `npm test` runs **122 checks** (about 6 minutes on a laptop). Besides the rules and the click-through tests below, Release Candidate 1 added:
 
-- **Every lesson, played through** (`test/lessons.test.mjs`): all 59 lessons in English/US and in Spanish/Mexico on a small phone, one question missed on purpose in each; the grade, the extra card, the second try, raw text, broken numbers, cut-off text, and the button to go on staying on screen.
+- **Every lesson, played through** (`test/lessons.test.mjs`): all 63 lessons in English/US and in Spanish/Mexico on a small phone, one question missed on purpose in each; the grade, the extra card, the second try, raw text, broken numbers, cut-off text, and the button to go on staying on screen.
 - **Accessibility** (`test/a11y.test.mjs`): WCAG 2.2 AA with axe-core on 66 screens, both looks and languages; focus rings; 200% zoom.
 - **Data safety** (`test/data.test.mjs`): a backup restored; learners saved by every milestone; a crash mid-lesson.
 - **Install and offline** (`test/install.test.mjs`); **size budget** (`test/size.test.mjs`).
@@ -194,7 +196,7 @@ See docs/SECURITY-REVIEW.md for details.
   - XP, streaks and freezes, badges and starting units;
   - money by country and the facts;
   - portfolio and goal math;
-  - all 59 lessons, 31 real-life missions, every piece of app text and the glossary being complete in both languages and both countries;
+  - all 63 lessons, 32 real-life missions, every piece of app text and the glossary being complete in both languages and both countries;
   - Real-life missions: who each fits, their order, the weekly suggestion, notes, XP once and achievements;
   - streak repair (2+ days, within 7 days, once a month) and days away.
 - **The waitlist** (`test/waitlist.test.mjs`): the age rules, only the asked-for fields, the hidden bot field and rate limits, "already on the list", the confirmation email in both languages, the take-me-off link, the admin CSV (safe in spreadsheets) and delete.

@@ -61,6 +61,16 @@ export const FACTS = {
   resicoWithholding: { value: 1.25, kind: "pct", check: "LISR art. 113-J — ISR a company (persona moral) withholds when paying someone in RESICO", review: "yearly" },
   mxTaxDeadline: { value: { en: "April 30", es: "30 de abril" }, kind: "text", check: "sat.gob.mx — personas físicas file the declaración anual during April", review: "yearly" },
   mxSalaryFilingMin: { value: 400000, kind: "mxn", check: "LISR art. 98 — employees earning more than this in a year must file a declaración anual", review: "rarely (set by law)" },
+  // Money across borders (illustrative numbers never name or rank real companies)
+  remitRateExample: { value: 18, kind: "number", check: "an easy teaching number for pesos per US dollar; keep it within about 10% of the real rate (banxico.org.mx, FIX)", review: "yearly" },
+  remitSendExample: { value: 200, kind: "usd", check: "an example amount sent; teaching number", review: "rarely" },
+  remitFeeExampleA: { value: 5, kind: "usd", check: "an example flat fee for a service that charges one; real fees vary and can be $0 (compare at qqed.profeco.gob.mx)", review: "yearly" },
+  remitMarkupExampleA: { value: 3, kind: "pct", check: "an example markup hidden in the exchange rate; real markups vary by service, amount and day", review: "yearly" },
+  remitFeeExampleB: { value: 0, kind: "usd", check: "an example of a service advertising no fee; teaching number", review: "yearly" },
+  remitMarkupExampleB: { value: 5, kind: "pct", check: "an example bigger markup hidden in the exchange rate; teaching number", review: "yearly" },
+  remitCancelMinutes: { value: 30, kind: "number", check: "consumerfinance.gov — the Remittance Rule: a sender can usually cancel within 30 minutes of paying, if the money hasn't been picked up or deposited", review: "rarely (set by law)" },
+  fbarThreshold: { value: 10000, kind: "usd", check: "fincen.gov — people in the US must report foreign accounts if together they top this at any time in the year (FBAR)", review: "rarely (set by law)" },
+  f1WorkHours: { value: 20, kind: "number", check: "studyinthestates.dhs.gov — an F-1 student can usually work on campus up to this many hours a week while classes are in session", review: "rarely (set by law)" },
   // Sample market data (used only when no market data key is set)
   sampleUsdMxn: { value: 18.5, kind: "number", check: "banxico.org.mx FIX rate — keep near reality even as a sample", review: "monthly" },
   // The practice portfolio

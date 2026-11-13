@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased — built for life between the US and Mexico, and a home test
+
+- **"Both"** (a third choice beside USD and MXN, in onboarding and Me → Settings → Country): for someone with ties to both countries. The other currency shows where it helps, and the new unit opens after Banking and comes up in "what's next" (for everyone else it's the last unit). Pick which currency shows first.
+- **A new unit, "Money across borders"** (4 lessons, its own landmark on the sea chart, each at most 4.5 minutes in both languages): exchange rates, what sending money really costs, accounts and cards in two countries, credit and work when you move.
+- **A remittance cost tool** (in the lessons): a fee plus a markup hidden in the exchange rate, two illustrative services, and a link to Profeco's official comparison. It never names or ranks real companies.
+- **A real-life mission:** compare the total cost of sending money through two services.
+- Every new fact is in `core/facts.js` and on `docs/VERIFY-BEFORE-LAUNCH.md` (marked new).
+- **`npm run home-test`** opens the app on your home Wi-Fi so a family member can try it on their phone: your computer's address (and a QR code if `qrencode` is installed), no real keys, the tutor offline, a list of what to watch for.
+
 ## 1.0.0-rc1 — Release Candidate 1 (2026-11-12)
 
 Everything built so far, in one release for the first testers. Numbers and checks are in `docs/RC1-RESULTS.md`.

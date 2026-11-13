@@ -5,7 +5,7 @@ import { useState } from "react";
 import { addStrings, money, text } from "../../core/i18n.js";
 import { fact } from "../../core/facts.js";
 import { Button, Card, Icon, Legend, LineChart, Note, Slider } from "../../core/ui.jsx";
-import { paycheck, withTaxAdded, taxInside, bracketTax, accountYear, insuranceYear, hustle, swingPath } from "./engine.js";
+import { paycheck, withTaxAdded, taxInside, bracketTax, accountYear, insuranceYear, hustle, swingPath, remit } from "./engine.js";
 import { amt, useTouched } from "./tools.jsx";
 
 const S = (en, es) => ({ en, es });
@@ -162,6 +162,51 @@ export function BracketTool({ t, locale, onDone, done }) {
       </div>
       <p style={{ margin: "8px 0 0", fontWeight: 600 }}>{t("br.effective", { pct: pct(b.effective, locale) })}</p>
       <p style={{ fontSize: 13, color: "var(--low)", lineHeight: 1.45, margin: "8px 0 0" }}>{t("br.note")}</p>
+    </Card>
+  );
+}
+
+addStrings({
+  "remit.amount": S("You send", "Tú envías"),
+  "remit.service": S("Service {n}", "Servicio {n}"),
+  "remit.fee": S("Fee: {amount}", "Comisión: {amount}"),
+  "remit.markup": S("Hidden in the exchange rate: {pct} (about {amount})", "Escondido en el tipo de cambio: {pct} (unos {amount})"),
+  "remit.arrives": S("Arrives: {amount}", "Llegan: {amount}"),
+  "remit.cost": S("Total cost: {amount} ({pct})", "Costo total: {amount} ({pct})"),
+  "remit.best": S("Costs less", "Cuesta menos"),
+  "remit.gap": S("The difference: {usd} of your money, about {mxn} for the family.", "La diferencia: {usd} de tu dinero, unos {mxn} para tu familia."),
+  "remit.note": S("Illustrative numbers, not real companies. Real fees and markups change by service, amount and day. Compare real options with Profeco's official comparison (qqed.profeco.gob.mx) before you send.", "Números ilustrativos, no de empresas reales. Las comisiones y los márgenes reales cambian según el servicio, el monto y el día. Compara opciones reales con el comparativo oficial de Profeco (qqed.profeco.gob.mx) antes de enviar."),
+});
+
+// ---- Sending money across the border ----------------------------------------------
+export function RemitTool({ t, locale, onDone, done }) {
+  const usd = (n) => money(n, { ...locale, currency: "USD" });
+  const mxn = (n) => money(n, { ...locale, currency: "MXN" });
+  const [amount, setAmount] = useState(fact("remitSendExample"));
+  const touch = useTouched(onDone, done);
+  const rate = fact("remitRateExample");
+  const svc = [
+    { n: "A", fee: fact("remitFeeExampleA"), markupPct: fact("remitMarkupExampleA") },
+    { n: "B", fee: fact("remitFeeExampleB"), markupPct: fact("remitMarkupExampleB") },
+  ].map((x) => ({ ...x, ...remit({ amount, fee: x.fee, markupPct: x.markupPct, rate }) }));
+  const best = svc[0].costUsd <= svc[1].costUsd ? 0 : 1;
+  const other = svc[1 - best];
+  return (
+    <Card>
+      <Slider label={t("remit.amount")} value={amount} min={50} max={1000} step={10} display={usd(amount)} onChange={(v) => (setAmount(v), touch())} />
+      <div style={{ display: "flex", gap: 10, marginBottom: 12 }}>
+        {svc.map((x, i) => (
+          <div key={x.n} style={{ flex: 1, border: `1px solid ${i === best ? "var(--accent)" : "var(--line)"}`, borderRadius: 12, padding: 12, background: i === best ? "var(--accentSoft)" : "var(--surface)" }}>
+            <div style={{ fontWeight: 650, marginBottom: 6 }}>{t("remit.service", { n: x.n })}{i === best ? ` · ${t("remit.best")}` : ""}</div>
+            <div style={{ fontSize: 13, color: "var(--mid)", lineHeight: 1.4 }}>{t("remit.fee", { amount: usd(x.fee) })}</div>
+            <div style={{ fontSize: 13, color: "var(--mid)", lineHeight: 1.4, minHeight: 52 }}>{t("remit.markup", { pct: pct(x.markupPct, locale), amount: usd((amount * x.markupPct) / 100) })}</div>
+            <div style={{ fontWeight: 700, fontVariantNumeric: "tabular-nums", marginTop: 4 }}>{t("remit.arrives", { amount: mxn(x.arrives) })}</div>
+            <div style={{ fontSize: 13, fontVariantNumeric: "tabular-nums", marginTop: 4 }}>{t("remit.cost", { amount: usd(x.costUsd), pct: pct(x.costPct, locale) })}</div>
+          </div>
+        ))}
+      </div>
+      <p style={{ margin: "0 0 8px", fontWeight: 600 }}>{t("remit.gap", { usd: usd(other.costUsd - svc[best].costUsd), mxn: mxn(svc[best].arrives - other.arrives) })}</p>
+      <p style={{ fontSize: 13, color: "var(--low)", lineHeight: 1.45, margin: 0 }}>{t("remit.note")}</p>
     </Card>
   );
 }

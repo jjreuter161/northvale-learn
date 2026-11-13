@@ -311,7 +311,18 @@ export default function Settings({ t, locale, go }) {
       <Card>
         <Segmented label={t("settings.language")} value={settings.lang} onChange={(v) => setSetting("lang", v)} options={Object.entries(LANGS).map(([value, label]) => ({ value, label }))} />
         <div style={{ height: 12 }} />
-        <Segmented label={t("settings.country")} value={settings.region} onChange={(v) => setSetting("region", v)} options={Object.entries(REGIONS).map(([value, r]) => ({ value, label: `${r.flag} ${r.name[locale.lang]}` }))} />
+        <Segmented
+          label={t("settings.country")}
+          value={settings.both ? "BOTH" : settings.region}
+          onChange={(v) => (v === "BOTH" ? setSetting("both", true) : (setSetting("region", v), setSetting("both", false)))}
+          options={[...Object.entries(REGIONS).map(([value, r]) => ({ value, label: `${r.flag} ${r.name[locale.lang]}` })), { value: "BOTH", label: `🇺🇸🇲🇽 ${t("settings.country.both")}` }]}
+        />
+        {settings.both && (
+          <>
+            <div style={{ height: 12 }} />
+            <Segmented label={t("settings.country.main")} value={settings.region} onChange={(v) => setSetting("region", v)} options={Object.entries(REGIONS).map(([value, r]) => ({ value, label: `${r.flag} ${r.currency}` }))} />
+          </>
+        )}
         <p style={{ fontSize: 13, color: "var(--low)", margin: "10px 0 0", lineHeight: 1.4 }}>{t("settings.country.how")}</p>
       </Card>
 

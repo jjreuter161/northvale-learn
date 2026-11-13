@@ -1,4 +1,4 @@
-// EVERY LESSON, PLAYED THROUGH — all 59 lessons, start to finish, in
+// EVERY LESSON, PLAYED THROUGH — all 63 lessons, start to finish, in
 // English (US, Cream) and Spanish (Mexico, Navy, on a small phone), in a
 // real browser. In each
 // lesson the first question is answered wrong on purpose and everything else

@@ -200,3 +200,36 @@ console.log("ok: RSS headlines parsed (CDATA, entities, dates); items without li
   assert.equal(P.awayDays(P.newProgress(), "2026-10-09"), null);
   console.log("ok: streak repair (2+ days, within 7 days, once a month, joins a new streak); days away");
 }
+
+// Money across borders: fixed-currency amounts, "Both", the remittance math, and when the unit opens.
+{
+  const { remit } = await import("../src/modules/goals/engine.js");
+  const { setBothMode } = await import("../src/modules/lessons/content.js");
+  const loc = (region, both) => ({ lang: "en", region, both });
+  assert.equal(fill("{US$200} {MX$3600}", loc("US", false)), "$200 $3,600 MXN");
+  assert.equal(fill("{US$200} {MX$3600}", loc("MX", false)), "$200 USD $3,600");
+  assert.equal(fill("{$$100|1800}", loc("US", false)), "$100", "not Both: one currency");
+  assert.equal(fill("{$$100|1800}", loc("US", true)), "$100 ≈ $1,800 MXN");
+  assert.equal(fill("{$$100|1800}", loc("MX", true)), "$1,800 ≈ $100 USD");
+  // $500: a $5 fee and 3% markup costs about $20 (19.85); no fee and 5% costs $25, so "no fee" isn't always cheaper.
+  const a = remit({ amount: 500, fee: 5, markupPct: 3, rate: 18 });
+  const b = remit({ amount: 500, fee: 0, markupPct: 5, rate: 18 });
+  assert.ok(Math.abs(a.costUsd - 19.85) < 1e-9);
+  assert.equal(b.costUsd, 25);
+  assert.ok(a.arrives > b.arrives, "the cheaper service delivers more pesos");
+  assert.equal(remit({ amount: 200, fee: 0, markupPct: 0, rate: 18 }).arrives, 3600);
+  const small = [remit({ amount: 200, fee: 5, markupPct: 3, rate: 18 }), remit({ amount: 200, fee: 0, markupPct: 5, rate: 18 })];
+  assert.ok(small[1].costUsd < small[0].costUsd && small[1].arrives > small[0].arrives, "at $200 the no-fee service is cheaper, and delivers more pesos");
+  // The unit is last for everyone and locked; "Both" opens it after Banking.
+  const prog = (done) => ({ lessons: Object.fromEntries(ALL_LESSONS.filter((l) => done.includes(l.unit)).map((l) => [l.id, { done: true }])), startUnit: "budget" });
+  const afterBanking = prog(["budget", "save", "banking"]);
+  assert.equal(lessonState(afterBanking, "borders-1"), "locked");
+  setBothMode(true);
+  assert.equal(lessonState(afterBanking, "borders-1"), "open");
+  assert.equal(lessonState(afterBanking, "borders-2"), "locked", "lessons still go in order");
+  assert.equal(lessonState(prog(["budget"]), "borders-1"), "locked", "not before Banking is done");
+  assert.equal(nextLesson(afterBanking).unit, "borders", "Both: what's next comes after Banking");
+  setBothMode(false);
+  assert.notEqual(nextLesson(afterBanking).unit, "borders");
+  console.log("ok: money across borders: {US$}/{MX$}/Both amounts, the remittance math (\"no fee\" isn't always cheaper), the unit opens after Banking for Both only");
+}

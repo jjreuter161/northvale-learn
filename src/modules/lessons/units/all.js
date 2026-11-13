@@ -23,7 +23,8 @@ import crypto from "./crypto.js";
 import retire from "./retire.js";
 import earning from "./earning.js";
 import news from "./news.js";
+import borders from "./borders.js";
 
-export const UNITS = [budget, save, banking, paycheck, credit, scams, compound, taxes, insurance, psychology, stocks, etf, risk, crypto, retire, earning, news];
+export const UNITS = [budget, save, banking, paycheck, credit, scams, compound, taxes, insurance, psychology, stocks, etf, risk, crypto, retire, earning, news, borders];
 
 export { PLACEMENT } from "./placement.js";

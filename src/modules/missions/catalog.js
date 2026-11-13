@@ -336,6 +336,16 @@ export const MISSIONS = [
     ask: T("What would you earn per hour after costs?", "¿Cuánto ganarías por hora después de costos?"),
   }),
 
+  // Money across borders
+  m("sendcost", {
+    unit: "borders",
+    icon: "globe",
+    time: 20,
+    title: T("Compare the total cost of sending money through two services", "Compara el costo total de enviar dinero con dos servicios"),
+    how: T("Pick an amount you might send, like {US$200}. For two different services, find the fee and the exchange rate they offer, and check Profeco's official comparison (qqed.profeco.gob.mx). Work out each one's total cost: the fee plus what the worse rate takes. Don't send anything.", "Elige un monto que podrías enviar, como {US$200}. En dos servicios distintos, busca la comisión y el tipo de cambio que ofrecen, y revisa el comparativo oficial de Profeco (qqed.profeco.gob.mx). Calcula el costo total de cada uno: la comisión más lo que se lleva el peor tipo de cambio. No envíes nada."),
+    ask: T("Which one costs less, and by how much?", "¿Cuál cuesta menos y por cuánto?"),
+  }),
+
   // Reading the news
   m("headline", {
     unit: "news",

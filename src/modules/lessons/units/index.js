@@ -25,4 +25,5 @@ export const LOADERS = {
   retire: () => import("./retire.js"),
   earning: () => import("./earning.js"),
   news: () => import("./news.js"),
+  borders: () => import("./borders.js"),
 };

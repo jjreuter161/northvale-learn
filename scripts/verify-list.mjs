@@ -34,7 +34,7 @@ Each one appears in the lessons, the glossary or the tools as \`{@name}\`; \`doc
 | ✓ | Fact | Now | Check at | How often |
 |---|---|---|---|---|
 ${Object.entries(FACTS)
-  .map(([k, f]) => `| ☐ | \`${k}\`${["ficoRange", "ficoFactors", "buroFreeReportMonths", "rothRule"].includes(k) ? " **new**" : ""} | ${cell(show(f))} | ${cell(f.check)} | ${cell(f.review)} |`)
+  .map(([k, f]) => `| ☐ | \`${k}\`${["ficoRange", "ficoFactors", "buroFreeReportMonths", "rothRule", "remitRateExample", "remitSendExample", "remitFeeExampleA", "remitMarkupExampleA", "remitFeeExampleB", "remitMarkupExampleB", "remitCancelMinutes", "fbarThreshold", "f1WorkHours"].includes(k) ? " **new**" : ""} | ${cell(show(f))} | ${cell(f.check)} | ${cell(f.review)} |`)
   .join("\n")}
 
 ## 2. Worked examples: ${WORKED.length}
@@ -68,6 +68,15 @@ From \`docs/CONTENT-REVIEW.md\` (Phase 2 and Phase 3 lists, confirmed 2026-10-26
 - ☐ **Card statements:** US statements show how long minimum payments take (CARD Act); Mexican statements show the "pago para no generar intereses". Sources: consumerfinance.gov; Banxico's rules on statements.
 - ☐ **Mexico: CONDUSEF's** Buró de Entidades Financieras compares institutions on complaints, fines and fees. Source: condusef.gob.mx.
 - ☐ **US: colleges** have a net price calculator (required for schools taking federal student aid). Source: studentaid.gov.
+- ☐ **Money across borders (new).** The unit "Money across borders" and its tool state the following. Check each against its source, and that the example numbers (\`remit*\` facts) are plain teaching numbers, never a real company's rates.
+  - ☐ The US **Remittance Rule** requires the exchange rate, fees and amount received to be shown before you pay, and a sender can usually cancel within \`remitCancelMinutes\` minutes. Source: consumerfinance.gov.
+  - ☐ **Profeco's** official comparison of money-sending services exists and works at **qqed.profeco.gob.mx** (the app names no companies and links no rankings). Confirm the address still works, in both languages' text.
+  - ☐ **FBAR:** people in the US report foreign accounts that total more than \`fbarThreshold\` at any time in the year. Source: fincen.gov.
+  - ☐ **F-1 students** can usually work on campus up to \`f1WorkHours\` hours a week during classes. Source: studyinthestates.dhs.gov.
+  - ☐ **Credit files are separate** in the US and Mexico (US history doesn't transfer to Buró de Crédito, or the reverse), and **some US lenders accept an ITIN** instead of an SSN. Source: consumerfinance.gov, burodecredito.com.mx; a lender's own rules.
+  - ☐ **Card terminals abroad:** choosing the local currency usually gives a better rate than letting the merchant convert (dynamic currency conversion). Source: consumerfinance.gov.
+  - ☐ **FDIC** covers only US banks; **IPAB** covers only Mexican banks. Source: fdic.gov, ipab.org.mx.
+  - ☐ A US debit card often adds a **foreign ATM fee and a currency fee** abroad; the lessons give no number.
 - ☐ **US: Social Security card:** keep it safe at home, not in your wallet. Source: ssa.gov.
 - ☐ **Retirement (Mexico):** employer, worker and government contribute to the AFORE for IMSS workers (ISSSTE and independent workers differ); the PPR deduction rule (\`pprDeductionPct\`, \`pprDeductionUmas\`, \`pprAge\`, not in RESICO). Source: LSS, LISR art. 151 fracc. V, consar.gob.mx.
 - ☐ **Retirement (US):** a custodial Roth IRA for teens with earned income, up to what they earned or \`iraLimit\`; managed by an adult until 18 or 21 depending on the state. Source: irs.gov Publication 590-A.

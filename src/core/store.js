@@ -15,7 +15,7 @@ export function initialState() {
     version: 1,
     updatedAt: 0,
     profile: { onboarded: false, nickname: "", ageBand: null, avatar: 0 },
-    settings: { lang, region, look: "auto", reduceMotion: false, vibrate: true, sound: false },
+    settings: { lang, region, both: false, look: "auto", reduceMotion: false, vibrate: true, sound: false },
     progress: newProgress(),
     modules: {},
   };

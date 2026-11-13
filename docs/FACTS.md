@@ -54,3 +54,15 @@ Some lessons show a calculation done with a fact's current value (a card's inter
 - **Teaching examples** (a $480 paycheck, a 24% card, 6% into a 401(k)): made-up amounts, not facts.
 - **Product rules.** XP amounts, streak freezes and daily goals live in `src/core/progress.js`. AI prices and limits live in `server/ai.js` and `.env`.
 - **Live data.** Real prices come from Twelve Data when `TWELVEDATA_API_KEY` is set, and the CETES rate comes from `CETES_RATE`.
+
+## Money across borders (new)
+
+| Fact | Now | Appears in | Notes |
+|---|---|---|---|
+| `remitRateExample` | 18 pesos per dollar | the remittance tool (`goals.remit`), "Money across borders" lessons | an easy teaching number, not a forecast |
+| `remitSendExample` | $200 | the remittance tool's starting amount | teaching number |
+| `remitFeeExampleA` / `remitMarkupExampleA` | $5 / 3% | the remittance tool, "Service A" | illustrative; never a real company |
+| `remitFeeExampleB` / `remitMarkupExampleB` | $0 / 5% | the remittance tool, "Service B" | illustrative; shows "no fee" isn't always cheaper |
+| `remitCancelMinutes` | 30 | lesson "What sending money really costs" | the Remittance Rule's cancellation window |
+| `fbarThreshold` | $10,000 | lesson "Accounts and cards in two countries" | FinCEN's FBAR threshold |
+| `f1WorkHours` | 20 | lesson "Credit and work when you move" | F-1 on-campus work limit during classes |

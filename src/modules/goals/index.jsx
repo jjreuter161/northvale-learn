@@ -20,7 +20,7 @@ import { useSeen, markIntro } from "../../core/Practice.jsx";
 import { PATHS, exampleRates } from "./engine.js";
 import * as P from "./plan.js";
 import { DEFAULTS, amt, dur, pathLabel, PATH_COLORS, TOOLS, BudgetTool, LeakTool, CompareTool, DebtTool, EarlyTool, InvestTool, RetireTool } from "./tools.jsx";
-import { PaycheckTool, SalesTaxTool, BracketTool, FeeTool, ScamTool, InsuranceTool, SwingTool, HustleTool } from "./life.jsx";
+import { PaycheckTool, SalesTaxTool, BracketTool, FeeTool, RemitTool, ScamTool, InsuranceTool, SwingTool, HustleTool } from "./life.jsx";
 
 // Home's calculators: the goal tools plus two everyday ones.
 const CALCULATORS = [...TOOLS, ["paycheck", "wallet", PaycheckTool], ["hustle", "chart", HustleTool]];
@@ -1241,6 +1241,7 @@ registerModule({
     "goals.salestax": SalesTaxTool,
     "goals.brackets": BracketTool,
     "goals.fees": FeeTool,
+    "goals.remit": RemitTool,
     "goals.scam": ScamTool,
     "goals.insurance": InsuranceTool,
     "goals.swing": SwingTool,

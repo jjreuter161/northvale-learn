@@ -57,12 +57,32 @@ const placed = (progress, unitId) => (progress.placed || []).includes(unitId);
 export const unitDone = (progress, unit) => unit.lessons.every((l) => isDone(progress, l.id));
 const started = (progress, unit) => unit.lessons.some((l) => isDone(progress, l.id));
 const reached = (progress, ui) => UNITS.slice(ui).some((u) => started(progress, u));
+// "Both" (Settings → Country): money across borders is for everyone at the
+// end of the course, and for someone with ties to both countries it opens
+// after Banking and comes up in "what's next" there. The app sets this when
+// the setting changes (App.jsx); the server and the tests leave it off.
+const BORDERS = "borders";
+let BOTH = false;
+export const setBothMode = (v) => {
+  BOTH = !!v;
+};
+const courseOrder = () => {
+  if (!BOTH) return UNITS;
+  const rest = UNITS.filter((u) => u.id !== BORDERS);
+  const at = rest.findIndex((u) => u.id === "banking") + 1;
+  return [...rest.slice(0, at), ...UNITS.filter((u) => u.id === BORDERS), ...rest.slice(at)];
+};
 export function lessonState(progress, id) {
   if (isDone(progress, id)) return "done";
   const l = ALL_LESSONS.find((x) => x.id === id);
   if (!l) return "locked";
   const ui = unitIndex(l.unit);
   const start = Math.max(0, unitIndex(progress.startUnit || UNITS[0].id));
+  if (BOTH && l.unit === BORDERS) {
+    const anchor = unitIndex("banking");
+    const open = start > anchor || unitDone(progress, UNITS[anchor]) || placed(progress, "banking") || reached(progress, ui);
+    return open && (l.index === 0 || isDone(progress, UNITS[ui].lessons[l.index - 1].id)) ? "open" : "locked";
+  }
   const prev = UNITS[ui - 1];
   if (ui > start && !unitDone(progress, prev) && !placed(progress, prev.id) && !placed(progress, l.unit) && !reached(progress, ui)) return "locked";
   return l.index === 0 || placed(progress, l.unit) || isDone(progress, UNITS[ui].lessons[l.index - 1].id) ? "open" : "locked";
@@ -80,8 +100,9 @@ export function nextFor(progress, units = []) {
 // What's next: finish a unit already started; otherwise from the starting
 // unit onward, then anything earlier; tested-out units last.
 export function nextLesson(progress) {
-  const start = Math.max(0, unitIndex(progress.startUnit || UNITS[0].id));
-  const order = [...UNITS.slice(start), ...UNITS.slice(0, start)].flatMap((u) => ALL_LESSONS.filter((l) => l.unit === u.id));
+  const U = courseOrder();
+  const start = Math.max(0, U.findIndex((u) => u.id === (progress.startUnit || UNITS[0].id)));
+  const order = [...U.slice(start), ...U.slice(0, start)].flatMap((u) => ALL_LESSONS.filter((l) => l.unit === u.id));
   const inProgress = order.find((l) => fresh(progress, l) && started(progress, UNITS[unitIndex(l.unit)]));
   return inProgress || order.find((l) => fresh(progress, l)) || order.find((l) => lessonState(progress, l.id) === "open") || null;
 }

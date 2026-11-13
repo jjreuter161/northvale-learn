@@ -52,8 +52,9 @@ export default function App() {
   const profile = useAppState((s) => s.profile);
   const progress = useAppState((s) => s.progress);
   const session = useSession();
-  const locale = useMemo(() => ({ lang: settings.lang, region: settings.region }), [settings.lang, settings.region]);
+  const locale = useMemo(() => ({ lang: settings.lang, region: settings.region, both: !!settings.both }), [settings.lang, settings.region, settings.both]);
   const t = useMemo(() => makeT(locale), [locale]);
+  getModule("lessons").services.setBothMode(!!settings.both);
   const [route, setRoute] = useState({ id: "lessons", params: {} });
   // A tap on a tab always opens it fresh (the goals list, not the goal
   // that was open).

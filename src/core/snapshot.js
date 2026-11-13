@@ -9,7 +9,7 @@ import { text } from "./i18n.js";
 
 export function snapshot() {
   const s = getState();
-  const locale = { lang: s.settings.lang, region: s.settings.region };
+  const locale = { lang: s.settings.lang, region: s.settings.region, both: !!s.settings.both };
   const p = s.progress;
   const next = service("lessons", "nextFor")(service("goals", "recommendedUnits")() || []);
   const goals = service("goals", "progressLines")(locale) || [];

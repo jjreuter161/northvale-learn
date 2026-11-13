@@ -226,7 +226,7 @@ try {
       await play(app, { untilMoment: i === 1 });
       if (i === 1) {
         // The first unit done: one calm full-screen moment, with a share option.
-        await top().getByText("Unit 1 of 17 · complete").waitFor();
+        await top().getByText("Unit 1 of 18 · complete").waitFor();
         await top().getByRole("heading", { name: "Budgeting" }).waitFor();
         await button("Share", top()).waitFor();
         await clean("unit moment");
