@@ -6,7 +6,7 @@ import { Suspense, lazy, useEffect, useMemo, useState } from "react";
 import { useAppState, update, on } from "./store.js";
 import { makeT } from "./i18n.js";
 import { allModules, getModule } from "./registry.js";
-import { SELECTED, lookFrom, GLOBAL_CSS, Icon, Wordmark, BetaTag, StreakStar, Toasts, Sheet, toast, Button, useLookSpec } from "./ui.jsx";
+import { SELECTED, lookFrom, GLOBAL_CSS, Icon, Wordmark, BetaTag, StreakStar, Toasts, Sheet, toast, Button, Loading, useLookSpec } from "./ui.jsx";
 import { useSession, refreshSession, schedulePush, verifyEmail } from "./session.js";
 import { settleOnOpen } from "./game.js";
 import { OpenNotice, RepairOffer, COMEBACK_DAYS } from "./Comeback.jsx";
@@ -236,7 +236,7 @@ export default function App() {
       <div style={{ maxWidth: wide ? 720 : 640, margin: "0 auto" }}>
         {header}
         <main key={`${route.id}:${visit}`} className="nv-in" style={{ padding: "8px 16px calc(96px + env(safe-area-inset-bottom))" }}>
-          <Boundary t={t} screen={route.id}><Suspense fallback={<div style={{ minHeight: "60dvh" }} />}>{Screen ? <Screen {...ctx} /> : null}</Suspense></Boundary>
+          <Boundary t={t} screen={route.id}><Suspense fallback={<div style={{ minHeight: "60dvh", paddingTop: 24 }}><Loading label={t("common.loading")} /></div>}>{Screen ? <Screen {...ctx} /> : null}</Suspense></Boundary>
         </main>
       </div>
       {tabBar}

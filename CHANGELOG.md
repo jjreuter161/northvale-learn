@@ -1,6 +1,15 @@
 # Changelog
 
-## Unreleased — navy, cream and signal red
+## Unreleased — easy, smart and professional
+
+- **Easy:** from opening the app to the first answered question is **3 taps** (was 7), with no account: a warm-up question comes right after "Get started" (test: the 60-second test). The "how to start" screen is gone from first run. Settings are shorter: sound, privacy, legal and data are under **More**; "Look" is now **Colors**. Details and before/after counts: `docs/EASE.md`.
+- **Smart:** Today shows the one best next step (the lesson, a review when many ideas are due, this week's mission or Your Money Year) with a one-line reason. After three perfect lessons in a row the finish screen offers the 2-minute check to skip what you know; after a tricky lesson it offers a quick review. Ask knows your current lesson and goal and suggests questions about them. The next-up reminder says how many lessons you've finished. All on the existing data; nothing new is tracked.
+- **Selection:** whatever is chosen (answers, chips, onboarding choices, pickers, the active tab) is outlined in the main button's color with its cream edge on navy, thick, with a check, in every look; keyboard focus uses the readable red.
+- **Professional:** the first download is **209 KB** (was 243 KB; the budget is now 220 KB): Settings, Me, Legal, the classroom screens and the glossary and myth lists load when needed. Odd font sizes and corner radii snapped to the app's scale. The internal /admin page uses the new palette. A loading indicator while a screen loads on a slow connection.
+- **Setup:** `docs/LAUNCH.md` is a guided checklist with exact button names; `npm run setup` is a six-step wizard that tries each key as it's typed; `npm run ready` tries every key for real, runs the whole checklist and says "You're ready to deploy" or what to fix.
+- Fixed: the skip-ahead offer disappeared as soon as it was marked as made, and a class join link closed its own sheet once the address was cleaned; both found by the new tests.
+
+## Earlier in this version — navy, cream and signal red
 
 - **New colors:** navy, cream and signal red, with tints for depth; the sunrise coral, green and amber are gone. Red is a spark: the main button (one per screen, with a cream edge on navy) and the current island on the sea chart. Wrong answers are never red: a neutral card with a dashed edge, a hint icon and "Not quite". Right answers: a check icon and a solid edge. Gains and losses in the practice portfolio use ▲ ▼ and signs; chart lines differ by dash. A real scam warning in Explain this gets a flag mark and a soft panel (the words stay in the text color).
 - **Settings → Look:** four ready-made looks, Match my device, or your own colors (background, text and icons, main buttons and highlights). Only readable combinations (WCAG AA) are offered: five of the 27; a red background is marked bold. Saved looks migrate untouched ("white" is Cream, "navy" is Navy).

@@ -11,7 +11,7 @@ import { UNITS as FULL } from "../../../src/modules/lessons/units/all.js";
 import { PRESETS } from "./tokens.mjs";
 
 const ROOT = join(import.meta.dirname, "../../..");
-const OUT = join(import.meta.dirname, "build");
+const OUT = process.env.SHOTS_OUT ? join(ROOT, process.env.SHOTS_OUT) : join(import.meta.dirname, "build");
 mkdirSync(OUT, { recursive: true });
 const port = 20000 + Math.floor(Math.random() * 20000);
 const env = { ...process.env, NORTHVALE_DOTENV: "0", PORT: String(port), NORTHVALE_DATA: mkdtempSync(join(tmpdir(), "nvl-colors-")), ANTHROPIC_API_KEY: "", ANTHROPIC_AUTH_TOKEN: "", TWELVEDATA_API_KEY: "" };
@@ -145,7 +145,7 @@ async function runPreset(p, lang = "en", region = "US", only = null) {
 
   // Settings → Colors (the real picker, with your own colors open), and Explain this with a scam warning.
   await page.getByRole("button", { name: es ? /^Ajustes/ : /^Settings/ }).first().click();
-  const lookGroup = page.getByRole("radiogroup", { name: es ? "Apariencia" : "Look" });
+  const lookGroup = page.getByRole("radiogroup", { name: es ? "Colores" : "Colors" });
   await lookGroup.scrollIntoViewIfNeeded();
   await page.getByRole("button", { name: es ? /^Elige tus propios colores/ : /^Choose your own colors/ }).click();
   await page.getByRole("radiogroup", { name: es ? "Fondo" : "Background" }).scrollIntoViewIfNeeded();
