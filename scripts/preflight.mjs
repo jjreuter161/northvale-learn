@@ -86,6 +86,17 @@ for (const f of ["privacy.en.md", "privacy.es.md", "terms.en.md", "terms.es.md"]
   if (lawyer) note(L, `${f}: ${lawyer} note${lawyer === 1 ? "" : "s"} for a lawyer (fine for the beta; before a public launch)`);
 }
 
+// ---- the public pages and the marketing kit ---------------------------------------------------
+const M = "Public pages and marketing kit (docs/marketing)";
+for (const [f, bracket] of [["welcome.html", "[Your first name]"], ["bienvenida.html", "[Tu nombre]"]])
+  check(M, !readFileSync(join(ROOT, "web", f), "utf8").includes(bracket), `web/${f}: your first name is in the "Built by a student" section`, `Replace ${bracket} with your first name (first name only), as docs/marketing/README.md says.`);
+const built = (() => { try { return JSON.parse(readFileSync(join(ROOT, "docs", "marketing", "pdf", "build.json"), "utf8")); } catch { return null; } })();
+const publicUrl = env && String(env.PUBLIC_URL || "").trim();
+if (built && publicUrl && /^https:\/\/[^/\s]+$/.test(publicUrl))
+  check(M, built.url === publicUrl, "the flyer's QR codes point at PUBLIC_URL", `They point at ${built.url}. Run: node docs/marketing/build.mjs (before printing anything).`);
+else if (built) note(M, `the flyer's QR codes point at ${built.url} (set PUBLIC_URL in .env, then rebuild before printing: node docs/marketing/build.mjs)`);
+else check(M, false, "the flyer PDFs exist", "Run: node docs/marketing/build.mjs");
+
 // ---- the list -------------------------------------------------------------------------------
 console.log("\nNorthvale Learn — preflight\n");
 let fails = 0;

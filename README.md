@@ -99,6 +99,7 @@ Everything works without keys. To turn on the AI tutor, real prices and reset em
 | [CHANGELOG.md](CHANGELOG.md) | What each release changed |
 | [docs/RC1-RESULTS.md](docs/RC1-RESULTS.md) | Release Candidate 1: performance, accessibility, every lesson played, data safety, security, load, offline, the first five minutes |
 | [docs/VERIFY-BEFORE-LAUNCH.md](docs/VERIFY-BEFORE-LAUNCH.md) | **Every fact, number and rule to check before launch,** with sources (written from the code) |
+| [docs/marketing/](docs/marketing) | **The marketing kit** (English/Spanish): landing page copy, a printable flyer and about sheet (PDFs with a QR code), a teacher message, a 15-post social plan, a 45-second video script, and the honesty rules. `npm run marketing` rebuilds the PDFs for your web address |
 | [docs/LAUNCH.md](docs/LAUNCH.md) | **Launch day, in order:** your steps (accounts, keys, `.env`, Fly.io), the builder's steps after "go", the invite messages, the parent note, the one-week questions, and what to watch on `/admin` |
 | [docs/SETUP-KEYS.md](docs/SETUP-KEYS.md) | Getting the Twelve Data and Anthropic keys, AI costs by model, the tutor safety check |
 | [docs/DEPLOY.md](docs/DEPLOY.md) | Hosting recommendation, deploying to Fly.io step by step, backups, alerts, installing on phones |

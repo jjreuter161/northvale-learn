@@ -51,6 +51,8 @@
       .btn:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid #1B3560; outline-offset: 2px }
       .pill { display: inline-block; font-size: 14px; font-weight: 650; color: var(--brand); background: var(--brandSoft); border-radius: 999px; padding: 5px 12px }
       h1, h2, h3 { color: var(--head) }
+      .promise-line { margin: 18px 0 20px; padding-left: 14px; border-left: 4px solid var(--fill); font-size: 16.5px; color: var(--ink); max-width: 30em }
+      .promise-line strong { color: var(--ink) }
       h1 { font-size: clamp(38px, 9vw, 60px); line-height: 1.04; letter-spacing: -1.5px; margin: 16px 0 14px }
       h2 { font-size: clamp(26px, 5.5vw, 36px); line-height: 1.15; letter-spacing: -.6px; margin: 0 0 12px }
       h3 { font-size: 19px; margin: 0 0 6px }
@@ -128,9 +130,10 @@
       <div class="wrap hero">
         <div>
           <span class="pill">Beta gratuita · México y EE. UU.</span>
-          <h1>Aprende de dinero practicando.</h1>
+          <h1 style="font-size: clamp(30px, 7.2vw, 46px); letter-spacing: -1px">La app de dinero, tranquila y bilingüe, para jóvenes cuya vida cruza la frontera.</h1>
           <p class="tagline">Rumbo a mar abierto.</p>
-          <p class="lead">Northvale Learn es una app para mayores de 13 años. Ponte una meta, aprende lo que se necesita en lecciones de cuatro minutos y practica con dinero de práctica — en español o en inglés.</p>
+          <p class="lead">Northvale Learn es una app gratis para mayores de 13 años. Ponte una meta, aprende lo que se necesita en lecciones de cuatro minutos y practica con dinero de práctica, en español o en inglés. Te sirve vivas donde vivas, y está pensada para la frontera entre México y Estados Unidos, en lugares como Ciudad Juárez y El Paso.</p>
+          <p class="promise-line"><strong>Sin anuncios. Nunca vendemos tus datos. Nadie nos paga por recomendar nada.</strong> <a href="/?legal=promise&amp;lang=es">Nuestra promesa</a></p>
           <div class="ctas">
             <a class="btn" href="#join">Únete a la beta</a>
             <a href="/" class="fine">¿Ya tienes invitación? Abre la app</a>
@@ -145,6 +148,18 @@
         <svg class="boat" viewBox="0 0 100 100"><path d="M50 4L53 13L62 16L53 19L50 28L47 19L38 16L47 13ZM46 32V74H20ZM52 42V74H74ZM14 80H86L76 92H24Z" fill="#1B3560"/></svg>
         <svg class="waves" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M0 52q37.5 -10 75 0t75 0q37.5 -10 75 0t75 0q37.5 -10 75 0t75 0q37.5 -10 75 0t75 0q37.5 -10 75 0t75 0q37.5 -10 75 0t75 0q37.5 -10 75 0t75 0q37.5 -10 75 0t75 0V120H0Z" fill="#D3DDEA"/><path d="M0 78q30 -8 60 0t60 0q30 -8 60 0t60 0q30 -8 60 0t60 0q30 -8 60 0t60 0q30 -8 60 0t60 0q30 -8 60 0t60 0q30 -8 60 0t60 0q30 -8 60 0t60 0q30 -8 60 0t60 0q30 -8 60 0t60 0V120H0Z" fill="#A9BBD5" opacity=".7"/><path d="M0 104q50 -9 100 0t100 0q50 -9 100 0t100 0q50 -9 100 0t100 0q50 -9 100 0t100 0q50 -9 100 0t100 0q50 -9 100 0t100 0V120H0Z" fill="#FFFDF8"/></svg>
       </div>
+      <section aria-labelledby="border">
+        <div class="wrap">
+          <h2 id="border">Hecha para la vida en los dos lados de la frontera, útil para todos</h2>
+          <p class="lead" style="max-width: 640px">Si tienes familia, escuela, trabajo o una cuenta de banco en los dos lados, el dinero se complica de formas que casi ninguna app toma en cuenta. Northvale Learn lo enseña con calma, en dos idiomas. Y si tu vida está en un solo lado, todo lo demás también te sirve.</p>
+          <div class="cards">
+            <div class="card"><h3>Dos idiomas, dos países</h3><p>Cada lección está en español y en inglés, con versiones de México y de EE. UU.: pesos o dólares, IPAB o FDIC, AFORE o 401(k). Elige "Ambos" para verlos juntos.</p></div>
+            <div class="card"><h3>Dinero entre fronteras</h3><p>Tipos de cambio, cuánto cuesta de verdad enviar dinero, cuentas y tarjetas en dos países y cómo construir crédito cuando te mudas. Una herramienta de costos usa números inventados y apunta al comparativo oficial de Profeco.</p></div>
+            <div class="card"><h3>Útil en cualquier lugar</h3><p>Presupuesto, ahorro, tu primer sueldo, crédito, fraudes, impuestos y lo básico de invertir, para cualquiera de 13 años en adelante.</p></div>
+          </div>
+        </div>
+      </section>
+
       <section class="band" aria-labelledby="how">
         <div class="wrap">
           <h2 id="how">Cómo funciona</h2>
@@ -194,6 +209,14 @@
             <li><span><strong>Sin anuncios, y nunca vendemos tus datos.</strong> La cuenta es opcional: sin una, tu avance se queda en tu celular.</span></li>
             <li><span><strong>No está terminada.</strong> Es una beta pequeña, así que habrá cambios. Hay un botón para comentarios en cada pantalla y leemos todo.</span></li>
           </ul>
+        </div>
+      </section>
+
+      <section aria-labelledby="built">
+        <div class="wrap">
+          <h2 id="built">Hecha por un estudiante, para estudiantes</h2>
+          <!-- EDITA ANTES DEL LANZAMIENTO: cambia [Tu nombre] por tu nombre de pila (nada más sobre ti hace falta) y las palabras de abajo por las tuyas. npm run ready no pasa hasta que el corchete desaparezca. -->
+          <p class="lead" style="max-width: 640px">Hola, soy [Tu nombre]. Soy estudiante y estoy construyendo Northvale Learn para que sea el lugar tranquilo para aprender cómo funciona el dinero que a mí me gustaría usar: sin anuncios, sin presión, sin tecnicismos. Es una beta pequeña y yo también sigo aprendiendo. Dime qué confunde o qué arreglarías: hay un botón de comentarios en cada pantalla y leo todo.</p>
         </div>
       </section>
 

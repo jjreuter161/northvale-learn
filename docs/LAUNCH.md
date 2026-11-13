@@ -103,7 +103,7 @@ Without it the practice portfolio uses clearly labeled sample prices, which is f
   Your typing is hidden, and nothing is ever printed back. At the end it says **"Everything needed is there"** or lists, by name, what's still missing (run it again when you have it; what you typed is kept).
 - [ ] Delete your note with the keys.
 
-### Step 6. Your name and contact in the legal drafts
+### Step 6. Your name and contact in the legal drafts (and your first name on the welcome page)
 
 - [ ] Open these four files and replace each **[bracketed blank]** that asks for a name or contact:
   - `docs/legal/privacy.en.md`: your name or company, an address, and the contact email, in 3 places;
@@ -119,6 +119,18 @@ Without it the practice portfolio uses clearly labeled sample prices, which is f
   ```bash
   git commit -m "Contact details in the legal drafts"
   ```
+
+- [ ] **Your first name on the welcome page.** Open `web/welcome.html` and `web/bienvenida.html`, find `[Your first name]` and `[Tu nombre]` (in the "Built by a student, for students" section), and replace each with your **first name only**: no last name, age, school or photo. You can change the sentences around it to sound like you. (Until you do, step 7 says "Not yet": the page would otherwise show the bracket.) Then:
+
+  ```bash
+  git add web/welcome.html web/bienvenida.html
+  ```
+
+  ```bash
+  git commit -m "My first name on the welcome page"
+  ```
+
+  The flyer, about sheet, teacher message, social plan and video script are in `docs/marketing/` (see its README). Rebuild the PDFs with `npm run marketing` once your web address is final, before you print anything.
 
 ### Step 7. One command: are you ready?
 

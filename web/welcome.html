@@ -51,6 +51,8 @@
       .btn:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid #1B3560; outline-offset: 2px }
       .pill { display: inline-block; font-size: 14px; font-weight: 650; color: var(--brand); background: var(--brandSoft); border-radius: 999px; padding: 5px 12px }
       h1, h2, h3 { color: var(--head) }
+      .promise-line { margin: 18px 0 20px; padding-left: 14px; border-left: 4px solid var(--fill); font-size: 16.5px; color: var(--ink); max-width: 30em }
+      .promise-line strong { color: var(--ink) }
       h1 { font-size: clamp(38px, 9vw, 60px); line-height: 1.04; letter-spacing: -1.5px; margin: 16px 0 14px }
       h2 { font-size: clamp(26px, 5.5vw, 36px); line-height: 1.15; letter-spacing: -.6px; margin: 0 0 12px }
       h3 { font-size: 19px; margin: 0 0 6px }
@@ -128,9 +130,10 @@
       <div class="wrap hero">
         <div>
           <span class="pill">Free beta · US and Mexico</span>
-          <h1>Learn money by doing.</h1>
+          <h1 style="font-size: clamp(30px, 7.2vw, 46px); letter-spacing: -1px">The calm, bilingual money app for young people whose lives cross the border.</h1>
           <p class="tagline">Find your open water.</p>
-          <p class="lead">Northvale Learn is an app for ages 13 and up. Set a goal, learn what it takes in four-minute lessons, and practice with pretend money — in English or Spanish.</p>
+          <p class="lead">Northvale Learn is a free app for ages 13 and up. Set a goal, learn what it takes in four-minute lessons, and practice with pretend money, in English or Spanish. It's useful wherever you live, and it's built with the US–Mexico border in mind, for places like Ciudad Juárez and El Paso.</p>
+          <p class="promise-line"><strong>No ads. We never sell your data. Nobody pays us to recommend anything.</strong> <a href="/?legal=promise&amp;lang=en">Our promise</a></p>
           <div class="ctas">
             <a class="btn" href="#join">Join the beta</a>
             <a href="/" class="fine">Already invited? Open the app</a>
@@ -145,6 +148,18 @@
         <svg class="boat" viewBox="0 0 100 100"><path d="M50 4L53 13L62 16L53 19L50 28L47 19L38 16L47 13ZM46 32V74H20ZM52 42V74H74ZM14 80H86L76 92H24Z" fill="#1B3560"/></svg>
         <svg class="waves" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M0 52q37.5 -10 75 0t75 0q37.5 -10 75 0t75 0q37.5 -10 75 0t75 0q37.5 -10 75 0t75 0q37.5 -10 75 0t75 0q37.5 -10 75 0t75 0q37.5 -10 75 0t75 0q37.5 -10 75 0t75 0V120H0Z" fill="#D3DDEA"/><path d="M0 78q30 -8 60 0t60 0q30 -8 60 0t60 0q30 -8 60 0t60 0q30 -8 60 0t60 0q30 -8 60 0t60 0q30 -8 60 0t60 0q30 -8 60 0t60 0q30 -8 60 0t60 0q30 -8 60 0t60 0q30 -8 60 0t60 0V120H0Z" fill="#A9BBD5" opacity=".7"/><path d="M0 104q50 -9 100 0t100 0q50 -9 100 0t100 0q50 -9 100 0t100 0q50 -9 100 0t100 0q50 -9 100 0t100 0q50 -9 100 0t100 0V120H0Z" fill="#FFFDF8"/></svg>
       </div>
+      <section aria-labelledby="border">
+        <div class="wrap">
+          <h2 id="border">Made for life on both sides of the border, useful for everyone</h2>
+          <p class="lead" style="max-width: 640px">If you have family, school, work or a bank account on both sides, money gets complicated in ways most apps ignore. Northvale Learn teaches it calmly, in two languages. And if your life stays on one side, everything else works for you too.</p>
+          <div class="cards">
+            <div class="card"><h3>Two languages, two countries</h3><p>Every lesson is in English and Spanish, with US and Mexico versions: dollars or pesos, FDIC or IPAB, 401(k) or AFORE. Choose "Both" to see the two together.</p></div>
+            <div class="card"><h3>Money across borders</h3><p>Exchange rates, what sending money really costs, accounts and cards in two countries, and building credit when you move. A cost tool uses made-up numbers and points to Profeco's official comparison.</p></div>
+            <div class="card"><h3>Useful anywhere</h3><p>Budgeting, saving, your first paycheck, credit, scams, taxes and investing basics, for anyone 13 and up.</p></div>
+          </div>
+        </div>
+      </section>
+
       <section class="band" aria-labelledby="how">
         <div class="wrap">
           <h2 id="how">How it works</h2>
@@ -194,6 +209,14 @@
             <li><span><strong>No ads, and we never sell your data.</strong> Accounts are optional: without one, your progress stays on your phone.</span></li>
             <li><span><strong>Not finished.</strong> It's a small beta, so things will change. There's a feedback button on every screen, and we read everything.</span></li>
           </ul>
+        </div>
+      </section>
+
+      <section aria-labelledby="built">
+        <div class="wrap">
+          <h2 id="built">Built by a student, for students</h2>
+          <!-- EDIT BEFORE LAUNCH: replace [Your first name] with your first name only (nothing else about you is needed), and change the words below to your own. npm run ready won't pass until the bracket is gone. -->
+          <p class="lead" style="max-width: 640px">Hi, I'm [Your first name]. I'm a student, and I'm building Northvale Learn to be the calm place to learn how money works that I'd want to use: no ads, no pressure, no jargon. It's a small beta and I'm still learning too. Tell me what's confusing or what you'd fix: there's a feedback button on every screen, and I read everything.</p>
         </div>
       </section>
 
