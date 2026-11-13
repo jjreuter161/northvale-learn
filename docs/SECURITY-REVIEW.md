@@ -1,4 +1,36 @@
-# Security review (2026-10-24)
+# Security review 2 (2026-11-12, Release Candidate 1)
+
+**Scope:** everything added since the first review (Milestone 4 Phase 6, commit 6c01165): launch prep (preflight, demo data, preview sync), the clarity rebuild, M4.5 (six new kinds of question, myths, money week, real cost), the navy and cream look, the brand pages, the playful design (pictures), and RC1 (units loaded on demand, the look picker, lessons that pick up where they were left, backup restore). The `vercel-supabase` branch isn't in RC1; its database design (row-level security, a separate schema) is in `docs/VERCEL-SUPABASE.md` and gets its own check at the switch. Method: a code review of every change in `server/`, `web/`, `scripts/` and the app, `npm audit`, and tests for each fix.
+
+## Fixed in this review
+
+| Issue | Risk | Fix |
+|---|---|---|
+| A restore would keep the data it replaced forever | Someone who deleted their account could stay in that copy | Fixed: it's deleted after 14 days, like the backups. Tested (`test/data.test.mjs`). The privacy policy says so. |
+| The offline cache saved any response, errors included | An error page could be what shows offline | Fixed: only responses that loaded fine are cached (`web/sw.js`, cache v6). |
+| A finished lesson waited up to 300 ms to be saved | The phone closing the app right then lost the lesson | Fixed: lesson steps and finished lessons are saved at once. Tested with a crash. |
+
+## Checked, no change needed
+
+- **Pictures** (`src/core/art.js`, the sea chart, the sunrise) are put in the page as SVG text. Every piece is a fixed string in the code or a number computed from positions; no lesson, user or server text goes into them (unit names are separate React text). The badge's clip ID is cleaned to letters and numbers.
+- **Units load on demand** from `/chunks/`, our own server only (the content policy allows scripts only from `'self'`). Their names carry a content hash, so they're cached for a year without ever going stale. The path guard runs before the cache header.
+- **The look picker:** with Match my device, the app reads the device's dark-mode setting in the browser; nothing is sent.
+- **A lesson's place** (`open`: lesson ID, step keys, first answers, count of mistakes, date) is small and bounded by the lesson's length. With an account it syncs inside the progress, which the server caps at 600 KB. A saved place that doesn't match the lesson (content changed) is ignored.
+- **`npm run restore`** is run only by you, on the server; it refuses a file without accounts and progress, and swaps the backup in at the next start so a running server can't save over it.
+- **Demo data** (`npm run seed:demo`) refuses anything but a server on this computer, and refuses when it looks like production (NODE_ENV, Fly) or the server says so. Its password is only for that local demo.
+- **Usage stats added since:** "onboarding" (the reason picked) only. "Where people stop in a lesson" sends the lesson ID and step number.
+- **Reminders:** the new streak lines use only the streak count.
+- **Legal pages** are bundled text, loaded per language; `?legal=…&lang=…` only picks which one.
+- **Dependencies:** `npm audit` finds no known vulnerabilities (runtime and dev). New since the first review: `axe-core` (dev only, for the accessibility test).
+
+## Known limits (added)
+
+- **The answers are in the page's code** (as for any quiz that grades on the device). Lessons are practice and XP was already self-reported (the league caps it), so it's accepted.
+- **Old offline files pile up a little:** each release adds its new unit files to the phone's offline cache until the cache's name changes. Change `CACHE` in `web/sw.js` with each release (it's in the release steps in `docs/LAUNCH.md`).
+
+---
+
+# Security review 1 (2026-10-24)
 
 **Scope:** sign-up, sign-in and sessions; every API route; the admin page; data storage and backups; outside data (news, prices, AI). Method: a code review, plus tests for each fix in `npm test`. This was not an external penetration test; get one before a large public launch.
 

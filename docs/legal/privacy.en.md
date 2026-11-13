@@ -1,6 +1,6 @@
 # Privacy Policy
 
-**DRAFT — for the beta. A lawyer must review this before a public launch.** Last updated: October 2026.
+**DRAFT — for the beta. A lawyer must review this before a public launch.** Last updated: November 2026.
 
 Northvale Learn teaches money and investing with pretend money. We built it to collect as little about you as possible. This page says exactly what we keep, why, and how to delete it.
 
@@ -22,7 +22,9 @@ If you join the waitlist on our website (/welcome), we keep only what the form a
 
 ## What stays on your device
 
-Your lessons, XP, streak, badges, practice portfolio, goals, real-life missions (and any notes you write for them), your age range if you choose one, tutor chat, the classes you're in and your invite link are saved in your browser on this device. We can't see them unless you create an account (or join a class, below).
+Your lessons (including where you are in one you haven't finished), XP, streak, badges, practice portfolio, goals, real-life missions (and any notes you write for them), your answers to the daily myth, your age range if you choose one, tutor chat, the classes you're in and your invite link are saved in your browser on this device. We can't see them unless you create an account (or join a class, below).
+
+**Your look** (Cream, Navy or Match my device) is a setting on this device. With Match my device, the app checks whether your device is in dark mode; that's never sent anywhere. Lessons you've opened are also kept on the device so they work offline.
 
 **Share cards** (images like "12-day streak") are made on your device. They never show names, location or your class, and they show a goal's name or amounts only if you turn that on for that one card (not possible for ages 13–17). We only count that a card of a certain kind (streak, unit, badge, goal) was shared or saved.
 
@@ -68,7 +70,7 @@ The server uses your IP address for a few minutes to stop password-guessing and 
 
 ## How long we keep it
 
-- **Account data** stays until you delete the account. Deleted data can stay in our backups for up to 14 days.
+- **Account data** stays until you delete the account. Deleted data can stay in our backups for up to 14 days (and, if we ever restore a backup, in the copy of the data it replaced, which we also delete after 14 days).
 - **Usage stats** are kept as small counts and deleted when you choose "Delete my data".
 - **Feedback** is kept for up to 2 years. After "Delete my data" it's no longer linked to your device.
 - **Class data** stays until you leave the class, your teacher removes you, or the class is deleted. A class the teacher archives is deleted 90 days later, and deleting a teacher's account deletes their classes. "Delete my data" takes you out of every class.

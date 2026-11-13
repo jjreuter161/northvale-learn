@@ -85,7 +85,12 @@ const progressOf = async (s, email) => {
   assert.equal(kept.length, 1, "the replaced data is kept");
   assert.ok(Object.values(JSON.parse(readFileSync(join(dir, kept[0]), "utf8")).users).some((u) => u.email === "after@example.test"));
   await s.stop();
-  console.log("ok: a data file from the Milestone 4 server opens with nothing lost; its daily backup restores with npm run restore (the replaced data kept; a non-backup refused)");
+  // The replaced data is deleted with the backups' 14 days.
+  process.env.NORTHVALE_DATA = dir;
+  const { backup } = await import("../server/store.js");
+  backup(new Date(Date.now() + 15 * 864e5).toISOString().slice(0, 10));
+  assert.equal(readdirSync(dir).filter((f) => f.startsWith("learn.before-restore-")).length, 0, "the replaced data goes after 14 days");
+  console.log("ok: a data file from the Milestone 4 server opens with nothing lost; its daily backup restores with npm run restore (the replaced data kept 14 days; a non-backup refused)");
 }
 
 // ---- the app in a browser --------------------------------------------------------

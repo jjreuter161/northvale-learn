@@ -126,6 +126,12 @@ Laws that can apply once a school uses it:
   - the confirmation email (once Gmail is approved) is a transactional notice with a take-me-off link that asks before removing (so mail scanners can't); the admin page exports (CSV) and deletes entries;
   - **lawyer:** whether waitlist emails to 13–17 need anything more in Mexico (LFPDPPP) or in US states with teen privacy laws; the same mailing-address question as the recap.
 
+- **Release Candidate 1 (2026-11-12):**
+  - **nothing new leaves the device:** the look (Cream, Navy, Match my device: the device's dark-mode setting is read on the device only), the place in an unfinished lesson, and the lessons kept for offline use all stay in the browser; with an account, the lesson place syncs like the rest of the progress;
+  - **backups:** a tested restore (`npm run restore`); the data a restore replaces is kept 14 days, like the backups, so deleted accounts are gone from every copy within 14 days;
+  - **accessibility:** WCAG 2.2 AA checked by axe-core on every main screen in both looks and languages (`test/a11y.test.mjs`), which matters for school use (US Section 508 / ADA, Mexico's accessibility rules for public services);
+  - the privacy policy (EN/ES) says all of this (updated November 2026).
+
 ## Still open — your decisions or a lawyer's
 
 1. **Who is the data controller?** Your name or a company, the contact email, and a postal address are needed in both legal documents.
@@ -141,3 +147,7 @@ Laws that can apply once a school uses it:
    - confirm who is responsible for student data in Mexico (school, teacher or Northvale);
    - confirm 90 days is the right deletion time for archived classes.
 8. **Recap mailing address.** Set `MAIL_POSTAL_ADDRESS` (P.O. box or virtual mailbox) before the public launch, and confirm with the lawyer whether CAN-SPAM requires it for an opted-in progress recap.
+9. **Names (lawyer, before the public launch):**
+   - **"Real-life missions" / "Misiones de la vida real"** replaced "Money Missions", which GoHenry has used for its lessons since 2021 (BBVA México also calls its teen challenges "misiones"). Confirm the new name is clear in the US and Mexico (COMPETITION.md);
+   - "Northvale Learn", the logo and the taglines: the clearance search and filing in BRAND-CHECK.md.
+10. **Coming with Milestone 5 (lawyer, before each ships):** "Explain this" (text first; photos only after your review), certificates (for 13–17 the public page shows only the track and the date), and the cross-border facts.

@@ -8,7 +8,7 @@
 // for thousands of learners on one server; move to a database (and add a
 // "bank" module's encrypted secrets) when it outgrows that.
 import { randomUUID } from "node:crypto";
-import { readFileSync, writeFileSync, existsSync, mkdirSync, renameSync, copyFileSync, readdirSync, unlinkSync, chmodSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync, mkdirSync, renameSync, copyFileSync, readdirSync, unlinkSync, chmodSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 const DIR = process.env.NORTHVALE_DATA || join(import.meta.dirname, "data");
@@ -51,6 +51,10 @@ export function backup(today = new Date().toISOString().slice(0, 10)) {
   chmodSync(target, 0o600);
   const old = readdirSync(BACKUPS).filter((f) => /^learn-\d{4}-\d{2}-\d{2}\.json$/.test(f)).sort().slice(0, -14);
   old.forEach((f) => unlinkSync(join(BACKUPS, f)));
+  // What a restore replaced is kept 14 days too, like the backups (so
+  // deleted accounts are gone from every copy within 14 days).
+  const cutoff = Date.parse(today) - 14 * 864e5;
+  readdirSync(DIR).filter((f) => /^learn\.before-restore-.*\.json$/.test(f) && statSync(join(DIR, f)).mtimeMs < cutoff).forEach((f) => unlinkSync(join(DIR, f)));
   return target;
 }
 
