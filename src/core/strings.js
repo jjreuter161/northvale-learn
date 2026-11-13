@@ -11,6 +11,7 @@ addStrings({
   "common.close": S("Close", "Cerrar"),
   "common.cancel": S("Cancel", "Cancelar"),
   "common.done": S("Done", "Listo"),
+  "common.beta": S("Beta", "Beta"),
   "common.loading": S("Loading…", "Cargando…"),
   "common.load_error": S("This didn't load. Check your connection, then try again.", "No se pudo cargar. Revisa tu conexión e inténtalo de nuevo."),
   "common.skip": S("Skip", "Saltar"),

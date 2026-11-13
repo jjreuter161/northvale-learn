@@ -221,7 +221,15 @@ export function stats(today, titles = {}, missionTitles = {}) {
   const survey = store.section("survey", () => []);
   const count = (v) => survey.filter((x) => x.answer === v).length;
   const streaks = installs.map((i) => i.streakMax);
+  const weekAgo = addDays(today, -6);
   return {
+    // The beta's first week at a glance (/admin's top section).
+    firstWeek: {
+      startedThisWeek: installs.filter((i) => i.first >= weekAgo).length,
+      threePlus: installs.filter((i) => i.lessons >= 3).length,
+      feedbackThisWeek: store.section("feedback", () => []).filter((f) => f.at.slice(0, 10) >= weekAgo).length,
+      errorsThisWeek: store.section("errors", () => []).filter((e) => String(e.first).slice(0, 10) >= weekAgo).length,
+    },
     learners: installs.length,
     withAccount: installs.filter((i) => i.account).length,
     activeToday: installs.filter((i) => i.days.includes(today)).length,

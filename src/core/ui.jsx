@@ -169,7 +169,7 @@ h1,h2{color:var(--head)}
 @media (prefers-reduced-motion: reduce){.nv-beam,.nv-water{animation:none!important}}
 .nv-reduce .nv-beam,.nv-reduce .nv-water{animation:none!important}
 .nv-list>*+*{border-top:1px solid var(--line)}
-@media (max-width:280px){.nv-word{display:none}}
+@media (max-width:280px){.nv-word{display:none}}.nv-hdr{container-type:inline-size}@container (max-width:215px){.nv-beta{display:none}}@container (max-width:160px){.nv-hdr .nv-word{display:none}}
 .nv-sr{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 `;
 
@@ -481,6 +481,14 @@ export function Wordmark({ size = 24, mark, fill, play }) {
     word
   );
 }
+
+// "Beta", beside the wordmark while the app is in its beta. In the header it
+// steps aside when there isn't room (a long streak, Spanish, a small phone).
+export const BetaTag = ({ label, style }) => (
+  <span className="nv-word nv-beta" style={{ fontSize: 11, fontWeight: 750, letterSpacing: 0.6, textTransform: "uppercase", color: "var(--brand)", background: "var(--brandSoft)", borderRadius: 999, padding: "3px 8px", lineHeight: 1.2, ...style }}>
+    {label}
+  </span>
+);
 
 // The streak's north star: a soft coral glow from 7 days, brighter at 30,
 // small rays at 100.

@@ -176,6 +176,13 @@ try {
       const t = await p.evaluate(() => document.body.innerText);
       assert.ok(!BROKEN.test(t), `${when}, ${name}: shows ${t.match(BROKEN)}`);
     }
+    // Someone who used an earlier version gets "What's new" on Today, once.
+    await tab(p, w.tabs[0]);
+    await settle(p);
+    const news = p.getByRole("heading", { name: before.settings.lang === "es" ? "Novedades" : "What's new" });
+    assert.equal(await news.count(), 1, `${when}: "What's new" on Today`);
+    await tab(p, w.tabs[3]);
+    await settle(p);
     await p.getByRole("button", { name: w.settings }).first().click();
     await settle(p);
     const look = await p.getByRole("radio", { name: new RegExp(`^${w.look[before.settings.look]}`) }).getAttribute("aria-checked");
@@ -197,16 +204,19 @@ try {
     // …and it still works: a lesson, finished and saved.
     await tab(p, w.tabs[0]);
     await settle(p);
+    await p.getByRole("button", { name: before.settings.lang === "es" ? "Entendido" : "Got it", exact: true }).click();
+    assert.equal(await news.count(), 0, `${when}: "What's new" goes once it's read`);
     const xp = after.progress.xp;
     await p.getByRole("button", { name: w.cont }).first().click();
     await p.locator('[aria-busy="true"]').waitFor({ state: "detached", timeout: 10000 });
     for (let i = 0; i < 60 && !(await btn(p, w.done).count()); i++) await step(p, w);
     await p.evaluate(() => dispatchEvent(new Event("pagehide")));
     assert.ok((await saved(p)).progress.xp > xp, `${when}: a new lesson adds XP`);
+    assert.equal((await saved(p)).profile.seenNote, "1.0.0-rc1", `${when}: "What's new" stays read`);
     assert.deepEqual(app.errors, [], `${when}: console errors in a lesson`);
     await app.ctx.close();
   }
-  console.log(`ok: a learner saved at each milestone (${MILESTONES.map((m) => m[1]).join(", ")}) opens with lessons, XP, streak, badges, goals, portfolio, language and look kept, and can finish a new lesson`);
+  console.log(`ok: a learner saved at each milestone (${MILESTONES.map((m) => m[1]).join(", ")}) opens with lessons, XP, streak, badges, goals, portfolio, language and look kept, see "What's new" once, and can finish a new lesson`);
 
   // Someone new: the look matches their device.
   for (const scheme of ["light", "dark"]) {

@@ -6,7 +6,8 @@
 import { useState } from "react";
 import { update } from "./store.js";
 import { LANGS, REGIONS } from "./i18n.js";
-import { Button, Scene, Wordmark, Icon } from "./ui.jsx";
+import { Button, Scene, Wordmark, Icon, BetaTag } from "./ui.jsx";
+import { LATEST_NOTE } from "./whatsnew.jsx";
 import { AccountForm } from "./Settings.jsx";
 import { track } from "./analytics.js";
 import { allModules } from "./registry.js";
@@ -25,7 +26,8 @@ export default function Onboarding({ t, locale, onDone }) {
   const steps = extra.length;
   const setSetting = (k, v) => update((s) => ({ ...s, settings: { ...s.settings, [k]: v } }));
   const finish = (start) => {
-    update((s) => ({ ...s, profile: { ...s.profile, onboarded: true, reason }, progress: { ...s.progress, startUnit: start } }));
+    // Someone new doesn't need "What's new".
+    update((s) => ({ ...s, profile: { ...s.profile, onboarded: true, reason, seenNote: LATEST_NOTE }, progress: { ...s.progress, startUnit: start } }));
     track("onboarding", { reason });
     onDone(start);
   };
@@ -85,7 +87,9 @@ export default function Onboarding({ t, locale, onDone }) {
         </div>
         <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: 10, paddingTop: 8 }}>
           <Wordmark size={50} />
-          <div style={{ fontSize: 13, fontWeight: 650, letterSpacing: 4, color: "var(--low)" }}>LEARN</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ fontSize: 13, fontWeight: 650, letterSpacing: 4, color: "var(--low)" }}>LEARN</span> <BetaTag label={t("common.beta")} />
+          </div>
           <div style={{ fontSize: 15, color: "var(--mid)", marginTop: 2 }}>{t("brand.tagline")}</div>
           <h1 className="nv-disp" style={{ fontSize: 33, lineHeight: 1.12, margin: "26px 0 0" }}>{t("onb.tagline")}</h1>
           <p style={{ fontSize: 17, color: "var(--mid)", maxWidth: 340, lineHeight: 1.45, margin: "4px 0 0" }}>{t("onb.tagline.sub")}</p>

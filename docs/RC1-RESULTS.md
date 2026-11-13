@@ -65,3 +65,11 @@ WCAG 2.2 AA, checked by axe-core 4.14.0 (`test/a11y.test.mjs`): 66 screens (Welc
 - **Lessons ≤ 4.5 minutes, now in Spanish too:** English 3.81–4.48, Spanish 3.88–4.50 (six Spanish passages tightened, same meaning). A missed question adds about 1.2 minutes (an extra card, an easier question, the second try).
 - **Outside links:** all 17 sites the app or its sources name open (checked 2026-11-12), except **e-sar.com.mx** (the "find your AFORE" mission), which didn't load from here: check it by hand.
 - **The first five minutes,** someone new in English/US and Spanish/Mexico, Cream and Navy (`docs/design/rc1/first5/`, one sheet each): one real problem, fixed: after an answer, the longer feedback pushed the Continue button below the bottom of the screen (376 times across all lessons in the old layout, in English too). The lesson's buttons now stay on screen, and the feedback scrolls into view. `test/lessons.test.mjs` now checks it on every step, with Spanish on a small phone (375×667).
+
+## Landing page, Beta, What's new, feedback, survey, /admin (Part 5)
+
+- **Landing page and waitlist** (`/welcome`, `/bienvenida`): already in the new look; the pictures are retaken from today's app (`scripts/landing-shots.mjs`), with a sixth one, the course as a sea chart in Navy, so the gallery is two even rows of three.
+- **Beta label:** a small "Beta" tag beside the wordmark in the header and on the welcome screen. In the header it steps aside when there isn't room, and on the tightest headers (Spanish, a 3-digit streak, a small phone) only the sailboat mark shows: before, the word ran under the streak button.
+- **What's new:** a card on Today after an update, shown once to people who used an earlier version until they tap "Got it" (`src/core/whatsnew.jsx`; new learners never see it). Tested with every milestone's saved learner.
+- **Feedback** from Me and from a lesson step, and the **lesson-3 survey**, tested end to end; both show on /admin.
+- **/admin** opens on "First week of the beta": testers, next-day and day-7 return, "very disappointed", 3+ lessons, this week's feedback and new errors, each against its target from `docs/BETA.md`, in words ("On track", "Watch it", "Needs work", "Not enough people yet").

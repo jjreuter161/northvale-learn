@@ -114,6 +114,26 @@ function flagsSection(list) {
   ];
 }
 
+// THE FIRST WEEK — the beta's numbers against its targets (docs/BETA.md),
+// with a plain verdict (never color alone).
+const verdict = (value, of, good, low) => (value == null || of < 5 ? "Not enough people yet (5+)" : value >= good ? `On track (target ${good}%+)` : value < low ? `Needs work (under ${low}%)` : `Watch it (target ${good}%+)`);
+function firstWeek(s) {
+  const w = s.firstWeek;
+  return [
+    el("h2", {}, "First week of the beta"),
+    el(
+      "div",
+      { class: "grid" },
+      card("Testers", s.learners, `${w.startedThisWeek} started this week · ${s.withAccount} with an account · ${s.activeToday} today`),
+      card("Came back the next day", pct(s.retention.day1.pct), `${verdict(s.retention.day1.pct, s.retention.day1.of, 30, 20)} · of ${s.retention.day1.of}`),
+      card("Came back on day 7", pct(s.retention.day7.pct), `${verdict(s.retention.day7.pct, s.retention.day7.of, 15, 10)} · of ${s.retention.day7.of}`),
+      card("“Very disappointed” without it", pct(s.survey.veryPct), `${verdict(s.survey.veryPct, s.survey.answers, 40, 25)} · ${s.survey.answers} answers`),
+      card("Finished 3+ lessons", w.threePlus, `of ${s.learners} · they get the survey`),
+      card("This week", `${w.feedbackThisWeek} notes`, `feedback · ${w.errorsThisWeek} new errors (below)`)
+    ),
+  ];
+}
+
 async function load(token) {
   $("error").textContent = "";
   const res = await fetch("/api/admin/stats", { headers: { "X-Northvale": "1", "X-Admin-Token": token } });
@@ -124,6 +144,7 @@ async function load(token) {
   $("sub").textContent = `Updated ${new Date(s.generatedAt).toLocaleString()} · refreshes every minute`;
   const out = $("out");
   out.replaceChildren(
+    ...firstWeek(s),
     el("h2", {}, "The big question"),
     el(
       "div",

@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useAppState, update, on } from "./store.js";
 import { makeT } from "./i18n.js";
 import { allModules, getModule } from "./registry.js";
-import { LOOKS, GLOBAL_CSS, Icon, Wordmark, StreakStar, Toasts, Sheet, toast, Button, useLook } from "./ui.jsx";
+import { LOOKS, GLOBAL_CSS, Icon, Wordmark, BetaTag, StreakStar, Toasts, Sheet, toast, Button, useLook } from "./ui.jsx";
 import { useSession, refreshSession, schedulePush, verifyEmail } from "./session.js";
 import { settleOnOpen } from "./game.js";
 import { OpenNotice, RepairOffer, COMEBACK_DAYS } from "./Comeback.jsx";
@@ -191,7 +191,13 @@ export default function App() {
         </button>
       )}
       {/* The logo's sails fill as the day's XP goal fills. */}
-      <div style={{ flex: 1, minWidth: 0 }}>{isRoot && <Wordmark size={25} mark play fill={Math.min(1, ((progress.days || {})[today] || 0) / (progress.dailyGoal || 20))} />}</div>
+      <div className="nv-hdr" style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "center", gap: 8 }}>
+        {isRoot && (
+          <>
+            <Wordmark size={25} mark play fill={Math.min(1, ((progress.days || {})[today] || 0) / (progress.dailyGoal || 20))} /> <BetaTag label={t("common.beta")} />
+          </>
+        )}
+      </div>
       <button onClick={() => setStreakOpen(true)} aria-label={t("streak.aria", { n: progress.streak.count })} className="nv-press" style={{ ...chip, color: "var(--mid)" }}>
         <StreakStar count={progress.streak.count} size={18} color={progress.streak.last === today ? "var(--flame)" : "var(--low)"} />
         <span style={{ fontWeight: 650, fontSize: 15, fontVariantNumeric: "tabular-nums" }}>{progress.streak.count}</span>

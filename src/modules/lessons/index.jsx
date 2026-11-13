@@ -16,6 +16,7 @@ import { Button, Card, Icon, Layer, List, ListRow, Loading, Mark, Progress, Ring
 import { star, wave, boat, LANDMARK } from "../../core/art.js";
 import { AgeCard } from "../../core/Settings.jsx";
 import { ReminderCard } from "../../core/reminders.jsx";
+import { WhatsNewCard } from "../../core/whatsnew.jsx";
 import { practiceOpen, markIntro } from "../../core/Practice.jsx";
 import { feel, reducedMotion } from "../../core/feel.js";
 import { UNITS, ALL_LESSONS, lessonById, lessonState, nextLesson, nextFor, unitDone, isQuestion, conceptPool, loadUnits, unitLoaded, conceptsOfLesson, conceptsOfUnit, minutes } from "./content.js";
@@ -250,6 +251,7 @@ function Today({ t, locale, go, openStreak }) {
           .filter(Boolean)
           .slice(0, 2)}
       </List>
+      <WhatsNewCard t={t} locale={locale} />
       {planDue ? (
         <PlanPrompt t={t} go={go} />
       ) : (

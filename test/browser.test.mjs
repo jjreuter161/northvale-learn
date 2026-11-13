@@ -192,6 +192,8 @@ try {
     await page.getByText("Building toward: Car").first().waitFor();
     await page.getByText("Lesson 2 of 3", { exact: false }).waitFor();
     assert.equal(await page.getByText("Myth or fact?").count(), 0, "day 1 is just the first lesson: no myth card");
+    assert.equal(await page.getByRole("heading", { name: "What's new" }).count(), 0, "someone new doesn't get \"What's new\"");
+    assert.equal(await page.locator("header").getByText("Beta", { exact: true }).count(), 1, "a small Beta label in the header");
     await clean("today");
     console.log("ok: a full lesson, start to finish, then Today (the next lesson, and what it's building toward)");
 
@@ -742,6 +744,29 @@ try {
     await app.close();
   }
 
+  // --- feedback: from Me, and from a lesson step (it says which) ---
+  {
+    const app = await open(learner({ ageBand: "18-25" }, { counters: { lessons: 3 } }, { feedback: { pending: [], survey: "skipped" } }));
+    const { page, top, button, clean, menu } = app;
+    await menu("Me");
+    await button("Send feedback").click();
+    await top().getByRole("button", { name: "Idea", exact: true }).click();
+    await top().getByRole("textbox", { name: "Send feedback" }).fill("The sea chart is lovely. A test note from the browser test.");
+    await clean("feedback");
+    await button("Send", top()).click();
+    await page.getByText("Got it, thank you. We read every one.").waitFor();
+    await menu("Learn");
+    await page.getByRole("button", { name: /^(Continue|Start)$/ }).first().click();
+    await page.locator('[aria-busy="true"]').waitFor({ state: "detached", timeout: 10000 });
+    await top().getByRole("button", { name: "Report a problem with this step" }).click();
+    await top().getByText(/^About: /).waitFor();
+    await top().getByRole("textbox", { name: "Send feedback" }).fill("A test note about a lesson step.");
+    await button("Send", top()).click();
+    await page.getByText("Got it, thank you. We read every one.").waitFor();
+    await app.close();
+    console.log("ok: feedback from Me and from a lesson step (which says where it came from)");
+  }
+
   // --- the admin page ---
   {
     const app = await open();
@@ -750,6 +775,12 @@ try {
     await page.getByPlaceholder("Admin token").fill(env.ADMIN_TOKEN);
     await page.keyboard.press("Enter");
     await page.getByText("What brings people back").waitFor();
+    // The first week, first: the beta's numbers against their targets, in words.
+    assert.equal(await page.locator("h2").first().textContent(), "First week of the beta");
+    for (const label of ["Testers", "Came back the next day", "Came back on day 7", "“Very disappointed” without it", "Finished 3+ lessons", "This week"]) await page.getByText(label, { exact: true }).waitFor();
+    await page.getByText(/^(Not enough people yet|On track|Watch it|Needs work)/).first().waitFor();
+    await page.getByText("A test note about a lesson step.").waitFor();
+    assert.match(await page.getByText(/^\d+ notes$/).innerText(), /^[1-9]\d* notes$/, "this week's feedback is counted");
     await page.getByText("Day-30 return").waitFor();
     await page.getByRole("button", { name: "Send a test reminder to every device" }).click();
     await page.getByText("0 of 0 delivered.").waitFor();
@@ -758,7 +789,7 @@ try {
     await page.getByRole("button", { name: "Download the list (CSV)" }).waitFor();
     await page.getByText("classroom: off").waitFor();
     await clean("admin");
-    console.log("ok: the admin page, with what brings people back");
+    console.log("ok: the admin page: the first week against its targets, then what brings people back");
     await app.close();
   }
 
