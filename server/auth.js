@@ -6,8 +6,25 @@
 import { randomBytes, scrypt, timingSafeEqual, createHash } from "node:crypto";
 import { promisify } from "node:util";
 
-const scryptAsync = promisify(scrypt);
 const COST = { N: 32768, r: 8, p: 1, maxmem: 64 * 1024 * 1024 };
+// Each hash takes 32 MB for ~0.1 s. At most 2 at once, the rest wait their
+// turn: a burst of sign-ups (launch day, a class) stays within a 256 MB
+// server (measured by `npm run load-check`).
+// ponytail: one queue for the whole server; raise HASHES_AT_ONCE with the memory.
+const HASHES_AT_ONCE = 2;
+let hashing = 0;
+const queue = [];
+const run = promisify(scrypt);
+async function scryptAsync(...args) {
+  if (hashing >= HASHES_AT_ONCE) await new Promise((r) => queue.push(r));
+  hashing++;
+  try {
+    return await run(...args);
+  } finally {
+    hashing--;
+    if (queue.length) queue.shift()();
+  }
+}
 const SESSION_DAYS = 30;
 export const COOKIE = "nvl_session";
 
