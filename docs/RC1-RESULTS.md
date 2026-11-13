@@ -73,3 +73,11 @@ WCAG 2.2 AA, checked by axe-core 4.14.0 (`test/a11y.test.mjs`): 66 screens (Welc
 - **What's new:** a card on Today after an update, shown once to people who used an earlier version until they tap "Got it" (`src/core/whatsnew.jsx`; new learners never see it). Tested with every milestone's saved learner.
 - **Feedback** from Me and from a lesson step, and the **lesson-3 survey**, tested end to end; both show on /admin.
 - **/admin** opens on "First week of the beta": testers, next-day and day-7 return, "very disappointed", 3+ lessons, this week's feedback and new errors, each against its target from `docs/BETA.md`, in words ("On track", "Watch it", "Needs work", "Not enough people yet").
+
+## Release (Part 6)
+
+- **Version 1.0.0-rc1**, `CHANGELOG.md`, tag `v1.0.0-rc1`.
+- **Deploy dry run** (`npm run deploy:dry-run`): the Dockerfile's two stages with plain Node, from this computer's npm cache, started in production mode: 17 of 17 checks (health check, the app and its start-up files, the content policy, HTTPS-only, year-long caching of units, landing pages, /admin, the manifest and service worker, nothing private served, the restore script present, an unknown host refused). Fly builds the Dockerfile on its own remote builder, so no Docker is needed on this Mac. Fixed along the way: the restore script wasn't in the image, the image copied 74 MB of design pictures, and it built on Node 22 while every test ran on Node 24.
+- **`npm run preflight`, three times in a row:** all 122 checks passed every time (362, 364 and 367 seconds). Each run still says "not ready" for your parts only: `.env`, and your name and contact in the four legal drafts.
+- **Before and after** (pre-RC1 vs. RC1, a returning learner): `docs/design/rc1/compare-{en,es}-{cream,navy}.png`.
+- **GitHub:** uploads work again; the repository is public, with GitHub's private address as the author of every commit.
