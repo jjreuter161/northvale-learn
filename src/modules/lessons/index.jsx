@@ -725,6 +725,11 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
   const [result, setResult] = useState(null);
   const [quit, setQuit] = useState(false);
   const [momentDone, setMomentDone] = useState(false);
+  const feedbackRef = useRef(null);
+  // The feedback comes into view when it appears (long text, small phones).
+  useEffect(() => {
+    if (checked && feedbackRef.current) feedbackRef.current.scrollIntoView({ block: "nearest" });
+  }, [checked]);
   const step = queue[at];
   const unit = UNITS.find((u) => u.id === lesson.unit);
   const total = queue.length;
@@ -943,6 +948,7 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
 
       <div style={{ paddingTop: 14 }}>
         {checked && (
+          <div ref={feedbackRef} style={{ scrollMarginBottom: 90 }}>
           <Feedback
             t={t}
             locale={locale}
@@ -953,7 +959,10 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
             extra={Q.Extra && <Q.Extra step={step} right={checked === "right"} t={t} locale={locale} />}
             note={checked === "wrong" && !step.retry && mode !== "challenge" ? t("lessons.wrong.again") : null}
           />
+          </div>
         )}
+        {/* The buttons stay on screen, however long the step or its feedback. */}
+        <div style={{ position: "sticky", bottom: 0, background: "var(--bg)", padding: "8px 0 4px", boxShadow: "0 -10px 12px -6px var(--bg)" }}>
         {step.type === "card" && (
           <Button full onClick={advance}>
             {t("common.continue")}
@@ -981,6 +990,7 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
             )}
           </>
         )}
+        </div>
       </div>
 
       <Sheet open={quit} onClose={() => setQuit(false)} title={t("lessons.quit.title")}>

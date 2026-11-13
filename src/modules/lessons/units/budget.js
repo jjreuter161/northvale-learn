@@ -68,7 +68,7 @@ export default {
       title: T("Needs vs. wants", "Necesidades vs. gustos"),
       life: T("Before your next purchase, ask: what happens if I skip it?", "Antes de tu próxima compra, pregúntate: ¿qué pasa si no lo compro?"),
       steps: [
-        card(T("Need or want?", "¿Necesidad o gusto?"), T("Needs keep your life running: food, a way to get to school or work, your phone bill if you need it. Wants make life fun: new sneakers, games, eating out. Both are fine — just know which is which.", "Las necesidades mantienen tu vida en marcha: comida, cómo llegar a la escuela o al trabajo, tu plan de celular si lo necesitas. Los gustos hacen la vida divertida: tenis nuevos, videojuegos, comer fuera. Las dos cosas están bien; solo identifica cuál es cuál.")),
+        card(T("Need or want?", "¿Necesidad o gusto?"), T("Needs keep your life running: food, a way to get to school or work, your phone bill if you need it. Wants make life fun: new sneakers, games, eating out. Both are fine — just know which is which.", "Las necesidades mantienen tu vida en marcha: comida, transporte a la escuela o al trabajo, tu plan de celular si lo necesitas. Los gustos la hacen divertida: tenis nuevos, videojuegos, comer fuera. Las dos están bien; solo distínguelas.")),
         choice(
           "needs_wants",
           T("Which one is a want?", "¿Cuál es un gusto?"),

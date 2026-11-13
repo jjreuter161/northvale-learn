@@ -1,12 +1,13 @@
 // EVERY LESSON, PLAYED THROUGH — all 59 lessons, start to finish, in
-// English (US, Cream) and Spanish (Mexico, Navy), in a real browser. In each
+// English (US, Cream) and Spanish (Mexico, Navy, on a small phone), in a
+// real browser. In each
 // lesson the first question is answered wrong on purpose and everything else
 // right, so both kinds of feedback, the extra card, the easier question and
 // the miss coming back at the end are all played. On every step: the step
 // the content says should be next is the one showing, the right/wrong grade
 // is what it should be, and the screen has no console errors, raw text keys
 // ("q.order"), unfilled {placeholders}, NaN/undefined, or anything running
-// off the side. Runs after `npm run build`.
+// off the side, and the button to go on is on screen. Runs after `npm run build`.
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { mkdtempSync, readdirSync, readFileSync } from "node:fs";
@@ -105,7 +106,9 @@ async function answer(dlg, s, right, region) {
 async function playAll(lang, region, look) {
   const locale = { lang, region };
   const W = lang === "es" ? { unit: "Unidad", next: "Continuar", check: "Comprobar", skip: /^(Saltar por ahora|Listo, continuar)$/, done: "Listo" } : { unit: "Unit", next: "Continue", check: "Check", skip: /^(Skip for now|Done — continue)$/, done: "Done" };
-  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, locale: lang === "es" ? "es-MX" : "en-US", timezoneId: "America/Chicago", serviceWorkers: "block", reducedMotion: "reduce" });
+  // Spanish (the longer language) on a small phone (iPhone SE size).
+  const viewport = lang === "es" ? { width: 375, height: 667 } : { width: 390, height: 844 };
+  const ctx = await browser.newContext({ viewport, locale: lang === "es" ? "es-MX" : "en-US", timezoneId: "America/Chicago", serviceWorkers: "block", reducedMotion: "reduce" });
   await ctx.addInitScript((s) => localStorage.getItem("northvale-learn-v1") || localStorage.setItem("northvale-learn-v1", s), JSON.stringify(learner(lang, region, look)));
   const page = await ctx.newPage();
   page.setDefaultTimeout(8000);
@@ -117,6 +120,11 @@ async function playAll(lang, region, look) {
   const btn = (name) => top().getByRole("button", { name, exact: typeof name === "string" }).first();
   const problems = [];
   // Everything showing reads cleanly and fits the screen.
+  // The button to go on is fully on screen.
+  const reachable = async (where, name) => {
+    const b = await btn(name).boundingBox();
+    if (!b || b.y < 0 || b.y + b.height > viewport.height + 1) problems.push(`${where}: the "${name}" button is off screen`);
+  };
   const clean = async (where) => {
     const r = await page.evaluate(() => {
       const w = window.innerWidth;
@@ -157,6 +165,7 @@ async function playAll(lang, region, look) {
         assert.ok(shown.includes(expect), `${here}: expected "${expect}", the screen shows: ${shown.slice(0, 300)}`);
         if (s.type === "card") {
           await clean(here);
+          await reachable(here, W.next);
           await btn(W.next).click();
         } else if (s.type === "action") {
           // Skipped, or (for a tool that counts as soon as it's seen) done.
@@ -169,6 +178,7 @@ async function playAll(lang, region, look) {
           const graded = await top().locator("[data-right]").getAttribute("data-right");
           assert.equal(graded, String(right), `${here}: answered ${right ? "right" : "wrong"} but graded ${graded === "true" ? "right" : "wrong"}`);
           await clean(`${here} feedback`);
+          await reachable(`${here} feedback`, W.next);
           questions++;
           if (!right) {
             const c = concept[s.c];
@@ -198,7 +208,7 @@ try {
   assert.deepEqual(problems, [], `problems while playing every lesson:\n  ${problems.join("\n  ")}`);
   const total = UNITS.reduce((n, u) => n + u.lessons.length, 0);
   for (const r of runs) assert.equal(r.lessons, total);
-  console.log(`ok: all ${total} lessons played start to finish in English (US, Cream) and Spanish (Mexico, Navy): ${runs[0].questions + runs[1].questions} questions graded as expected (one missed on purpose in each lesson, with its extra card, easier question and second try), no errors, raw keys, broken numbers or cut-off text`);
+  console.log(`ok: all ${total} lessons played start to finish in English (US, Cream) and Spanish (Mexico, Navy): ${runs[0].questions + runs[1].questions} questions graded as expected (one missed on purpose in each lesson, with its extra card, easier question and second try), no errors, raw keys, broken numbers, cut-off text or buttons off screen (Spanish on a 375×667 phone)`);
 } finally {
   await browser.close();
   server.kill();

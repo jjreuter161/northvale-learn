@@ -53,3 +53,15 @@ WCAG 2.2 AA, checked by axe-core 4.14.0 (`test/a11y.test.mjs`): 66 screens (Welc
 5,460 requests (88 a second), **no errors**. Server memory: 100 MB idle, 148 MB at most.
 
 **Fixed along the way:** 30 sign-ups at once took memory to 219 MB (each password hash uses 32 MB, four ran at once), too close to the Fly machine's 256 MB. Hashes now run two at a time: 156 MB at most, and sign-up's slowest is 0.2 s. With 100 testers: no errors, 169 MB at most.
+
+## Offline and install (Part 3.7)
+
+`test/install.test.mjs`: Chrome finds nothing missing to install the app; the 4 icons show the North star and sailboat at the sizes the manifest says (the Apple and Android "maskable" icons are now square to the edges, since phones cut their own shape and iOS fills see-through corners with black). Right after the first visit the app opens with no connection, from the service worker alone (fixed: the files the app needs to start are now stored on the first visit, listed by the build in `web/precache.json`). An opened lesson plays offline to the end; a unit never opened says it needs a connection, then loads when it's back.
+
+## Facts, lesson length, the first five minutes (Part 4)
+
+- **`docs/VERIFY-BEFORE-LAUNCH.md`:** every fact (52), worked example (10), myth (66), confirmed statement (24), app rule (12) and legal item to check, with sources. Written from the code by `scripts/verify-list.mjs`; `npm test` fails if it's out of date.
+- **Every changeable number in facts.js:** added the FICO range and weights, Buró de Crédito's free-report interval and the Roth IRA rules, and the IVA rate in Taxes 1 now comes from facts.js. Worked examples (a calculation done with a fact's current value) are re-done by the content check from facts.js, so changing a fact names the lessons to rewrite. (It already caught one: "start at 16 beats twice as much from 26" holds at the 7% example rate but not at 6%.)
+- **Lessons ≤ 4.5 minutes, now in Spanish too:** English 3.81–4.48, Spanish 3.88–4.50 (six Spanish passages tightened, same meaning). A missed question adds about 1.2 minutes (an extra card, an easier question, the second try).
+- **Outside links:** all 17 sites the app or its sources name open (checked 2026-11-12), except **e-sar.com.mx** (the "find your AFORE" mission), which didn't load from here: check it by hand.
+- **The first five minutes,** someone new in English/US and Spanish/Mexico, Cream and Navy (`docs/design/rc1/first5/`, one sheet each): one real problem, fixed: after an answer, the longer feedback pushed the Continue button below the bottom of the screen (376 times across all lessons in the old layout, in English too). The lesson's buttons now stay on screen, and the feedback scrolls into view. `test/lessons.test.mjs` now checks it on every step, with Spanish on a small phone (375×667).

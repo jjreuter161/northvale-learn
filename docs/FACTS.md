@@ -40,9 +40,17 @@ All of these are in **`src/core/facts.js`**. Text facts (like a filing deadline)
 | `mxSalaryFilingMin` | $400,000 MXN | Taxes 3 (Mexico) | LISR art. 98 | rarely (law) |
 | `sampleUsdMxn` | 18.5 | sample prices only (when no market data key) | Banxico FIX rate | monthly |
 | `startCashUS` / `startCashMX` | $10,000 / $200,000 MXN | practice portfolio, onboarding | product choice | — |
+| `ficoRange` / `ficoFactors` | 300 to 850 / payment history ~35%, amounts owed ~30%, length ~15%, new ~10%, mix ~10% | Debt & credit 3 · glossary "credit score" | myfico.com | rarely |
+| `buroFreeReportMonths` | 12 | mission "Check your credit report for free" (Mexico) | Ley para Regular las Sociedades de Información Crediticia, art. 40; burodecredito.com.mx | rarely (law) |
+| `rothRule` | age 59½ and a 5-year rule | glossary "Roth IRA" | irs.gov, Publication 590-B | rarely (law) |
+
+## Worked examples
+
+Some lessons show a calculation done with a fact's current value (a card's interest, growth at the example rate, sales tax, IVA in a price). `scripts/validate-content.mjs` re-does each one from facts.js (its WORKED list), so changing a fact makes `npm test` fail and name the lesson to rewrite. Today: Debt & credit 1, Compound interest 1 and 2, Retirement 1 and 2, Taxes 1, the idea "What taxes are for", and the "Find the sales tax on a receipt" mission.
 
 ## Not in facts.js on purpose
 
-- **Rules and definitions that don't drift.** 50/30/20, a bear market = −20%, the Rule of 72, FICO's 300–850 range, Roth withdrawal rules (age 59½, 5-year rule), form names (W-4, W-2, 1040, 1099, CFDI), a custodial account passing to the child at 18 or 21 depending on the state. If any of these changes, it's a content edit.
+- **Rules of thumb and definitions.** 50/30/20, a bear market = −20%, the Rule of 72, form names (W-4, W-2, 1040, 1099, CFDI), a custodial account passing to the child at 18 or 21 depending on the state, CETES terms (28 days and up), the IPC's ~35 companies. If any of these changes, it's a content edit. (Since RC1, FICO's range and weights and the Roth rules are in facts.js: they're set by FICO or by law and can change.)
+- **Teaching examples** (a $480 paycheck, a 24% card, 6% into a 401(k)): made-up amounts, not facts.
 - **Product rules.** XP amounts, streak freezes and daily goals live in `src/core/progress.js`. AI prices and limits live in `server/ai.js` and `.env`.
 - **Live data.** Real prices come from Twelve Data when `TWELVEDATA_API_KEY` is set, and the CETES rate comes from `CETES_RATE`.

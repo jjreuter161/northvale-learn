@@ -4,10 +4,11 @@
 //   - every question explained; every wrong option says why it's wrong
 //   - every {@fact} exists in core/facts.js and every {$US|MX} amount is
 //     well formed (nothing left unfilled, in US or Mexico, either language)
-//   - every lesson ends with a real action, and takes 3–5 minutes
+//   - every lesson ends with a real action, and takes 2.5–4.5 minutes (English and Spanish)
 //   - every concept has its extra material and is taught somewhere
 //   - every real-life mission: both languages, a real unit, a known icon and time
 //   - every t("key") the app shows has its text (English and Spanish)
+//   - every worked example still matches the facts it was worked out with
 // Run: node scripts/validate-content.mjs (npm test runs it too).
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
@@ -21,6 +22,25 @@ import { MYTHS } from "../src/modules/lessons/myths.js";
 
 const root = join(import.meta.dirname, "..");
 const MINUTES = { min: 2.5, max: 4.5 };
+
+// WORKED EXAMPLES — numbers in lessons worked out with a fact's current
+// value (src/core/facts.js). Change the fact and its check here fails,
+// naming what to rewrite.
+const F = (k) => FACTS[k].value;
+const step = (id, n) => UNITS.flatMap((u) => u.lessons).find((l) => l.id === id).steps[n - 1];
+const near = (a, b, share = 0.02) => Math.abs(a - b) <= Math.abs(b) * share;
+const r = F("indexExampleRate") / 100;
+export const WORKED = [
+  ["Debt & credit 1, step 5: $1,000 at the card rate is about $200 (Mexico: $10,000 at the CAT, about $4,000)", () => near(1000 * F("cardAprTypical") / 100, step("credit-1", 5).spec.answer[0]) && near(10000 * F("catTypical") / 100, step("credit-1", 5).spec.answer[1])],
+  ...[["compound-1", 5], ["retire-1", 5]].map(([id, n]) => [`${id === "compound-1" ? "Compound interest 1" : "Retirement 1"}, step ${n}: grows at the example rate (indexExampleRate)`, () => step(id, n).spec.grow.rate === r]),
+  ["Compound interest 2, step 4: $50 a month from age 16, 26 and 36 to 60 is about $176,000, $83,000 and $37,000 (Mexico: $750 → $2,644,000, $1,251,000, $558,000)", () => [[50, [176000, 83000, 37000]], [750, [2644000, 1251000, 558000]]].every(([m, ends]) => [44, 34, 24].every((y, i) => near(fv(m, r, y), ends[i])))],
+  ["Compound interest 2, first card: starting at 16 beats twice as much from 26 (to age 60)", () => fv(1, r, 44) > fv(2, r, 34)],
+  ["Retirement 2, step 5: the match on 6% of $30,000 is $900", () => near(30000 * 0.06 * F("matchExampleUS") / 100, step("retire-2", 5).spec.answer[0])],
+  ["Taxes 1, step 4: a $20 shirt plus sales tax is $21.50", () => near(20 * (1 + F("salesTaxExample") / 100), step("taxes-1", 4).spec.answer[0], 0.001)],
+  ["Taxes 1, step 4 (Mexico): the IVA in a $232 price tag is $32", () => near(232 - 232 / (1 + F("ivaRate") / 100), step("taxes-1", 4).spec.answer[1], 0.001)],
+  ["The idea \"What taxes are for\": a tax included in the price is about $13.79 of $100 (Mexico: $160 of $1,160), at 16%", () => F("ivaRate") === 16],
+  ["Mission \"Find the sales tax on a receipt\": IVA is about 14% of a price that includes it", () => Math.round((F("ivaRate") / (100 + F("ivaRate"))) * 100) === 14],
+];
 
 // Every action kind a module provides (its `actions: { … }` block).
 export function actionKinds() {
@@ -175,8 +195,10 @@ export function validateContent() {
           taught.add(s.c);
         } else fail(where, `unknown step type "${s.type}"`);
       });
+      // In English and in Spanish (which usually runs a few more words).
       const m = minutes(l);
-      if (m > MINUTES.max) fail(at, `about ${m.toFixed(1)} minutes — keep lessons to ${MINUTES.max}`);
+      const mEs = minutes(l, "es");
+      if (Math.max(m, mEs) > MINUTES.max) fail(at, `about ${Math.max(m, mEs).toFixed(2)} minutes${mEs > m ? " in Spanish" : ""} — keep lessons to ${MINUTES.max}`);
       if (m < MINUTES.min) fail(at, `about ${m.toFixed(1)} minutes — too short for a lesson`);
     }
   for (const [c] of concepts) if (!taught.has(c)) fail(`concept ${c}`, "isn't taught in any lesson");
@@ -223,8 +245,9 @@ export function validateContent() {
     if (!(typeof m.time === "number" || m.time === "days" || m.time === "week")) fail(at, "time must be minutes, \"days\" or \"week\"");
     if (m.only && m.only !== "US" && m.only !== "MX") fail(at, "only must be US or MX");
   }
+  for (const [what, ok] of WORKED) if (!ok()) fail("worked example", `${what}: it no longer matches facts.js; rewrite it with the new value`);
   const lessons = UNITS.flatMap((u) => u.lessons);
-  return { problems, stats: { missions: MISSIONS.length, units: UNITS.length, lessons: lessons.length, concepts: concepts.size, questions: lessons.flatMap((l) => l.steps).filter(isQuestion).length, kinds: Object.fromEntries(QUESTION_TYPES.map((k) => [k, lessons.flatMap((l) => l.steps).filter((s) => s.type === k).length])), actions: kinds.size, minutes: lessons.map(minutes) } };
+  return { problems, stats: { missions: MISSIONS.length, units: UNITS.length, lessons: lessons.length, concepts: concepts.size, questions: lessons.flatMap((l) => l.steps).filter(isQuestion).length, kinds: Object.fromEntries(QUESTION_TYPES.map((k) => [k, lessons.flatMap((l) => l.steps).filter((s) => s.type === k).length])), actions: kinds.size, minutes: lessons.map((l) => minutes(l)) } };
 }
 
 if (process.argv[1] && process.argv[1].endsWith("validate-content.mjs")) {

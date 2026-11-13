@@ -8,14 +8,15 @@ export const QUESTION_TYPES = ["choice", "tf", "order", "estimate", "match", "nu
 export const isQuestion = (s) => QUESTION_TYPES.includes(s.type);
 // All the text a learner reads in a step.
 const stepTexts = (s) => [s.q, ...[].concat(s.why || []), ...(s.options || []).map((o) => (o && o.text) || o), ...(s.options || []).map((o) => o && o.why), ...(s.items || []), ...(s.pairs || []).flat(), ...(s.parts || []).map((p) => p.tap || p)].filter(Boolean);
-const words = (x) => (x && x.en ? x.en.split(/\s+/).filter(Boolean).length : 0);
-export function minutesOf(lesson) {
+const words = (x, lang) => (x && x[lang] ? x[lang].split(/\s+/).filter(Boolean).length : 0);
+// In `lang`'s words (Spanish usually runs a few more).
+export function minutesOf(lesson, lang = "en") {
   let w = 0;
   let q = 0;
   for (const s of lesson.steps) {
-    if (s.type === "card") w += words(s.title) + words(s.body);
-    if (isQuestion(s)) (q++, (w += stepTexts(s).reduce((t, x) => t + words(x), 0)));
-    if (s.type === "action") w += words(s.prompt);
+    if (s.type === "card") w += words(s.title, lang) + words(s.body, lang);
+    if (isQuestion(s)) (q++, (w += stepTexts(s).reduce((t, x) => t + words(x, lang), 0)));
+    if (s.type === "action") w += words(s.prompt, lang);
   }
   return w / 150 + q * 0.4 + (lesson.steps.some((s) => s.type === "action") ? 1.5 : 0);
 }
