@@ -12,6 +12,7 @@ import { Button, Scene, Wordmark, Icon, BetaTag, SELECTED, Chosen } from "./ui.j
 import { LATEST_NOTE } from "./whatsnew.jsx";
 import { AccountForm } from "./Account.jsx";
 import { track } from "./analytics.js";
+import { useLayout } from "./layout.js";
 import { allModules } from "./registry.js";
 
 const ORDER = ["lessons", "goals"]; // the warm-up question first, then what you want money skills for
@@ -19,6 +20,7 @@ const rank = (m) => (ORDER.includes(m.id) ? ORDER.indexOf(m.id) : ORDER.length);
 
 export default function Onboarding({ t, locale, onDone }) {
   const [step, setStep] = useState(0);
+  const phone = useLayout() === "phone";
   const [reason, setReason] = useState("curious");
   const [startUnit, setStartUnit] = useState("budget");
   const [signingIn, setSigningIn] = useState(false);
@@ -84,9 +86,16 @@ export default function Onboarding({ t, locale, onDone }) {
     return (
       <div className="nv-in" style={{ maxWidth: 520, margin: "0 auto", minHeight: "100dvh", display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", padding: "0 22px calc(24px + env(safe-area-inset-bottom))" }}>
         {/* The logo's boat out on open water (a picture; the name follows). */}
-        <div style={{ width: "calc(100% + 44px)", margin: "0 -22px", background: "var(--artSky)", paddingTop: "env(safe-area-inset-top)" }}>
-          <Scene name="welcome" w={390} h={280} style={{ height: "min(30dvh, 260px)", width: "100%" }} />
-        </div>
+        {phone ? (
+          <div style={{ width: "calc(100% + 44px)", margin: "0 -22px", background: "var(--artSky)", paddingTop: "env(safe-area-inset-top)" }}>
+            <Scene name="welcome" w={390} h={280} style={{ height: "min(30dvh, 260px)", width: "100%" }} />
+          </div>
+        ) : (
+          // Bigger screens: the whole picture, as a rounded card (not cropped to a strip).
+          <div style={{ width: 390, maxWidth: "100%", margin: "28px auto 0", borderRadius: 28, overflow: "hidden", background: "var(--artSky)" }}>
+            <Scene name="welcome" w={390} h={280} style={{ height: "auto", width: "100%" }} />
+          </div>
+        )}
         <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: 10, paddingTop: 8 }}>
           <Wordmark size={50} />
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>

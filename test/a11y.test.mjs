@@ -194,6 +194,34 @@ try {
     console.log("ok: keyboard: every control shows a visible focus ring (40 tab stops on Today and the course)");
   }
 
+  // The computer layouts: a tablet, a laptop and a large desktop. The sidebar, the panel beside Today, two
+  // columns, Settings with its sections on the left, a centered dialog and a lesson, in English (Cream) and
+  // Spanish (Navy).
+  for (const [w, h] of [[820, 1180], [1366, 768], [1920, 1080]]) {
+    for (const [lang, region, look] of [["en", "US", "white"], ["es", "MX", "navy"]]) {
+      const x = L[lang];
+      const tag = `${lang}/${look} at ${w}px`;
+      const { ctx, page } = await open(learner(lang, region, look), lang, { viewport: { width: w, height: h } });
+      await axe(page, `${tag} Today`);
+      for (const [name, where] of [[x.goals, "Goals"], [x.practice, "Practice"], [x.me, "Me"]]) (await tab(page, name), await axe(page, `${tag} ${where}`));
+      await page.getByRole("button", { name: x.settings }).first().click();
+      await axe(page, `${tag} Settings`);
+      if (w >= 1024) {
+        await page.getByRole("button", { name: lang === "es" ? "Colores" : "Colors", exact: true }).first().click();
+        await axe(page, `${tag} Settings, Colors`);
+      }
+      await tab(page, x.learn);
+      await page.getByRole("button", { name: lang === "es" ? /^Racha: \d+/ : /^Streak: \d+/ }).first().click();
+      await axe(page, `${tag} streak dialog`);
+      await page.keyboard.press("Escape");
+      await page.getByRole("button", { name: x.cont }).first().click();
+      await page.getByRole("dialog").first().waitFor();
+      await axe(page, `${tag} lesson`);
+      await ctx.close();
+    }
+  }
+  console.log("ok: the computer layouts (a tablet, a laptop, a large desktop; English Cream and Spanish Navy): Today with its panel, Goals, Practice, Me, Settings, a dialog and a lesson");
+
   // Zoomed to 200% (a 390-pixel phone at double size is 195 pixels wide):
   // nothing runs off the side.
   {

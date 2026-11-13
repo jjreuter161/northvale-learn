@@ -1,5 +1,5 @@
 // EVERY LESSON, PLAYED THROUGH — all 63 lessons, start to finish, in
-// English (US, Cream) and Spanish (Mexico, Navy, on a small phone), in a
+// English (US, Cream, on a laptop) and Spanish (Mexico, Navy, on a small phone), in a
 // real browser. In each
 // lesson the first question is answered wrong on purpose and everything else
 // right, so both kinds of feedback, the extra card, the easier question and
@@ -107,7 +107,7 @@ async function playAll(lang, region, look) {
   const locale = { lang, region };
   const W = lang === "es" ? { unit: "Unidad", next: "Continuar", check: "Comprobar", skip: /^(Saltar por ahora|Listo, continuar)$/, done: "Listo" } : { unit: "Unit", next: "Continue", check: "Check", skip: /^(Skip for now|Done — continue)$/, done: "Done" };
   // Spanish (the longer language) on a small phone (iPhone SE size).
-  const viewport = lang === "es" ? { width: 375, height: 667 } : { width: 390, height: 844 };
+  const viewport = lang === "es" ? { width: 375, height: 667 } : { width: 1366, height: 768 }; // English on a laptop, Spanish on a small phone
   const ctx = await browser.newContext({ viewport, locale: lang === "es" ? "es-MX" : "en-US", timezoneId: "America/Chicago", serviceWorkers: "block", reducedMotion: "reduce" });
   await ctx.addInitScript((s) => localStorage.getItem("northvale-learn-v1") || localStorage.setItem("northvale-learn-v1", s), JSON.stringify(learner(lang, region, look)));
   const page = await ctx.newPage();
@@ -208,7 +208,7 @@ try {
   assert.deepEqual(problems, [], `problems while playing every lesson:\n  ${problems.join("\n  ")}`);
   const total = UNITS.reduce((n, u) => n + u.lessons.length, 0);
   for (const r of runs) assert.equal(r.lessons, total);
-  console.log(`ok: all ${total} lessons played start to finish in English (US, Cream) and Spanish (Mexico, Navy): ${runs[0].questions + runs[1].questions} questions graded as expected (one missed on purpose in each lesson, with its extra card, easier question and second try), no errors, raw keys, broken numbers, cut-off text or buttons off screen (Spanish on a 375×667 phone)`);
+  console.log(`ok: all ${total} lessons played start to finish in English (US, Cream, laptop) and Spanish (Mexico, Navy): ${runs[0].questions + runs[1].questions} questions graded as expected (one missed on purpose in each lesson, with its extra card, easier question and second try), no errors, raw keys, broken numbers, cut-off text or buttons off screen (Spanish on a 375×667 phone)`);
 } finally {
   await browser.close();
   server.kill();

@@ -11,12 +11,13 @@ import { openShare } from "../../core/share.jsx";
 import { track } from "../../core/analytics.js";
 import { text, addStrings } from "../../core/i18n.js";
 import { xpOn, dayKey, addDays } from "../../core/progress.js";
-import { Button, Card, Icon, Layer, List, ListRow, Loading, Mark, Progress, Ring, Scene, Sheet, UnitArt, WaveEdge, toast } from "../../core/ui.jsx";
+import { Button, Card, Icon, Layer, List, ListRow, Loading, Mark, Progress, Ring, Scene, Sheet, StreakStar, UnitArt, WaveEdge, toast } from "../../core/ui.jsx";
+import { isDesk } from "../../core/layout.js";
 import { star, wave, boat, LANDMARK } from "../../core/art.js";
 import { AgeCard } from "../../core/Account.jsx";
 import { ReminderCard } from "../../core/reminders.jsx";
 import { WhatsNewCard } from "../../core/whatsnew.jsx";
-import { practiceOpen, markIntro } from "../../core/Practice.jsx";
+import { practiceOpen, markIntro, useSeen } from "../../core/Practice.jsx";
 import { feel, reducedMotion } from "../../core/feel.js";
 import { UNITS, ALL_LESSONS, lessonById, lessonState, nextLesson, nextFor, unitDone, isQuestion, conceptPool, loadUnits, unitLoaded, conceptsOfLesson, conceptsOfUnit, minutes, setBothMode } from "./content.js";
 import { conceptById } from "./concepts.js";
@@ -115,6 +116,8 @@ addStrings({
   "today.streak.keep": S("Today's lesson keeps it going", "La lección de hoy la mantiene"),
   "today.streak.start": S("One lesson starts a streak. Three minutes is enough.", "Una lección empieza una racha. Tres minutos bastan."),
   "today.mission": S("This week's mission", "La misión de esta semana"),
+  "panel.title": S("At a glance", "De un vistazo"),
+  "kb.hint": S("Tip: press 1–4 to choose an answer, and Enter to check or continue.", "Consejo: pulsa 1–4 para elegir una respuesta y Enter para comprobar o continuar."),
   "today.week": S("Your money week", "Tu semana de dinero"),
   "today.week.sub": S("A short look back, then the check-in", "Un repaso corto y luego la revisión"),
   "myth.label": S("Myth or fact?", "¿Mito o realidad?"),
@@ -178,7 +181,71 @@ const todayLine = (locale) => {
 // week's mission, the streak), then at most one question for the learner
 // (goal plan, age, reminders). Nothing is lost when a row doesn't fit: the
 // streak is in the top bar, the check-in on Goals, the mission on Practice.
-function Today({ t, locale, go, openStreak }) {
+// One daily card: Myth or Fact. Not on the first day (that's for the first lesson), not while a question
+// for the learner is waiting, and not on a Sunday with the money week to look at.
+function canShowMyth(progress, profile, planDue, checkIn) {
+  const day = dayKey();
+  const sunday = new Date(`${day}T12:00:00`).getDay() === 0;
+  return (progress.lessonDays || []).some((d) => d < day) && !planDue && !!(profile.ageBand || profile.ageAsked) && !(sunday && checkIn);
+}
+
+// On a wide screen: what people glance at, down the right of Today.
+function Panel({ t, locale, go, openStreak }) {
+  const progress = useAppState((s) => s.progress);
+  const profile = useAppState((s) => s.profile);
+  useAppState((s) => s.modules.goals);
+  useAppState((s) => s.modules.missions);
+  const xp = xpOn(progress, dayKey());
+  const goal = service("goals", "leadProgress")();
+  const mission = practiceOpen(progress) && (service("missions", "status")(locale) || {}).mission;
+  const row = { display: "flex", alignItems: "center", gap: 12 };
+  const small = { fontSize: 14, color: "var(--mid)" };
+  return (
+    <>
+      <Card pad={14} onClick={openStreak}>
+        <div style={row}>
+          <StreakStar count={progress.streak.count} size={34} color={progress.streak.last === dayKey() ? "var(--flame)" : "var(--low)"} />
+          <div>
+            <div style={{ fontWeight: 700, fontSize: 16 }}>{t("streak.days", { n: progress.streak.count })}</div>
+            <div style={small}>{t("streak.best", { n: progress.streak.best })}</div>
+          </div>
+        </div>
+      </Card>
+      <Card pad={14}>
+        <div style={row}>
+          <Ring value={xp} max={progress.dailyGoal} size={52} stroke={5} label={t("goal.aria", { xp, goal: progress.dailyGoal })}>
+            <span style={{ fontSize: 12, fontWeight: 650, fontVariantNumeric: "tabular-nums" }}>{Math.min(100, Math.round((xp / progress.dailyGoal) * 100))}%</span>
+          </Ring>
+          <div style={{ fontWeight: 650, fontSize: 15 }}>{t("me.today", { xp, goal: progress.dailyGoal })}</div>
+        </div>
+      </Card>
+      {goal && (
+        <Card pad={14} onClick={() => go("goals")}>
+          <div style={{ ...row, marginBottom: 10 }}>
+            <Icon name="target" size={20} />
+            <div style={{ fontWeight: 700, fontSize: 16, minWidth: 0, overflowWrap: "anywhere" }}>{goal.name}</div>
+          </div>
+          <Progress value={goal.percent} max={100} height={8} label={`${goal.name}: ${goal.percent}%`} />
+          <div style={{ ...small, marginTop: 6, fontVariantNumeric: "tabular-nums" }}>{goal.percent}%</div>
+        </Card>
+      )}
+      {mission && (
+        <Card pad={14} onClick={() => go("practice")}>
+          <div style={row}>
+            <Icon name="flag" size={20} />
+            <div>
+              <div style={small}>{t("today.mission")}</div>
+              <div style={{ fontWeight: 650, fontSize: 15 }}>{mission.title}</div>
+            </div>
+          </div>
+        </Card>
+      )}
+      {canShowMyth(progress, profile, service("goals", "planPromptDue")(), service("goals", "checkInDue")()) && <MythCard t={t} locale={locale} />}
+    </>
+  );
+}
+
+function Today({ t, locale, go, openStreak, layout }) {
   const progress = useAppState((s) => s.progress);
   useAppState((s) => s.modules.goals); // the "Building toward" line and check-in
   useAppState((s) => s.modules.missions);
@@ -210,8 +277,7 @@ function Today({ t, locale, go, openStreak }) {
   // first lesson), not while a question for the learner is waiting, and
   // not on a Sunday with the money week to look at.
   const day = dayKey();
-  const sunday = new Date(`${day}T12:00:00`).getDay() === 0;
-  const showMyth = (progress.lessonDays || []).some((d) => d < day) && !planDue && !!(profile.ageBand || profile.ageAsked) && !(sunday && checkIn);
+  const showMyth = canShowMyth(progress, profile, planDue, checkIn);
   const mythWaiting = showMyth && !(myth && myth.day === day);
   return (
     <div>
@@ -296,7 +362,7 @@ function Today({ t, locale, go, openStreak }) {
       ) : (
         <>
           <AgeCard t={t} />
-          {showMyth && <MythCard t={t} locale={locale} />}
+          {showMyth && layout !== "wide" && <MythCard t={t} locale={locale} />}
           {/* The reminder offer only when nothing else needs doing today. */}
           {!due && !checkIn && !mythWaiting && <ReminderCard t={t} />}
         </>
@@ -432,7 +498,7 @@ function BoatNode({ id, playing }) {
 // with a flag; the next ones in the mist; open water at the end. Each
 // island is a button (named like a unit card) that opens its lessons
 // below; the pictures are hidden from screen readers.
-function SeaChart({ t, tx, go, progress, ci, next, all, setAll, opened, toggle, currentRef }) {
+function SeaChart({ t, tx, go, progress, ci, next, all, setAll, opened, toggle, currentRef, layout }) {
   const W = 358, ROW = 132, TOP = 22;
   const list = all || ci >= UNITS.length - 1 ? UNITS : UNITS.slice(0, ci + 4);
   const Y = [];
@@ -485,7 +551,7 @@ function SeaChart({ t, tx, go, progress, ci, next, all, setAll, opened, toggle, 
   const pct = (v, of) => `${(v / of) * 100}%`;
   const doneOf = (u) => u.lessons.filter((l) => lessonState(progress, l.id) === "done").length;
   return (
-    <div style={{ position: "relative", width: "100%", maxWidth: 460, margin: "16px auto 0", aspectRatio: `${W} / ${H}`, borderRadius: 28, overflow: "hidden", background: "linear-gradient(180deg, var(--artSky), color-mix(in srgb, var(--artSea) 55%, var(--artSky)))", boxShadow: "var(--lift)" }}>
+    <div style={{ position: "relative", width: "100%", maxWidth: { phone: 460, tablet: 540 }[layout] || 620, margin: "16px auto 0", aspectRatio: `${W} / ${H}`, borderRadius: 28, overflow: "hidden", background: "linear-gradient(180deg, var(--artSky), color-mix(in srgb, var(--artSea) 55%, var(--artSky)))", boxShadow: "var(--lift)" }}>
       <svg viewBox={`0 0 ${W} ${H}`} width="100%" height="100%" aria-hidden="true" style={{ position: "absolute", inset: 0, display: "block" }} dangerouslySetInnerHTML={{ __html: svg }} />
       {list.map((u, i) => {
         const [x, y] = pos(i);
@@ -498,7 +564,7 @@ function SeaChart({ t, tx, go, progress, ci, next, all, setAll, opened, toggle, 
         if (now)
           return (
             <div key={u.id}>
-              <button onClick={() => currentRef.current && currentRef.current.scrollIntoView({ behavior: "smooth", block: "start" })} aria-expanded="true" aria-label={name} className="nv-press" style={{ position: "absolute", left: pct(x - 8, W), top: pct(y - 6, H), width: pct(136, W), height: pct(118, H), border: "none", background: "transparent", borderRadius: 20, cursor: "pointer", padding: 0 }} />
+              <button onClick={() => currentRef.current && currentRef.current.scrollIntoView({ behavior: "smooth", block: "start" })} aria-expanded="true" aria-label={name} className="nv-press nv-hit" style={{ position: "absolute", left: pct(x - 8, W), top: pct(y - 6, H), width: pct(136, W), height: pct(118, H), border: "none", background: "transparent", borderRadius: 20, cursor: "pointer", padding: 0 }} />
               <div style={{ position: "absolute", left: pct(i % 2 ? 10 : 168, W), top: pct(y + 2, H), width: pct(180, W), background: "var(--surface)", borderRadius: 18, padding: 12, boxShadow: "0 0 0 2px var(--head), var(--lift)" }}>
                 <span style={{ display: "inline-block", fontSize: 12, fontWeight: 700, borderRadius: 999, padding: "2px 9px", background: "var(--warmSoft)", color: "var(--warmInk)" }}>{t("path.now", { n: i + 1 })}</span>
                 <div className="nv-disp" style={{ fontSize: 18, lineHeight: 1.15, margin: "6px 0 2px", color: "var(--head)" }}>{tx(u.title)}</div>
@@ -518,7 +584,7 @@ function SeaChart({ t, tx, go, progress, ci, next, all, setAll, opened, toggle, 
         // for the eye, so they're hidden from screen readers and let taps through.
         return (
           <div key={u.id}>
-            <button onClick={() => toggle(u.id)} aria-expanded={!!opened[u.id]} aria-label={name} className="nv-press" style={{ position: "absolute", left: 0, width: "100%", top: pct(y, H), height: pct(ROW - 8, H), border: "none", background: "transparent", cursor: "pointer", padding: 0, borderRadius: 18 }} />
+            <button onClick={() => toggle(u.id)} aria-expanded={!!opened[u.id]} aria-label={name} className="nv-press nv-hit" style={{ position: "absolute", left: 0, width: "100%", top: pct(y, H), height: pct(ROW - 8, H), border: "none", background: "transparent", cursor: "pointer", padding: 0, borderRadius: 18 }} />
             <span aria-hidden="true" style={{ position: "absolute", left: pct(i % 2 ? 14 : 150, W), top: pct(y + 24, H), width: pct(176, W), pointerEvents: "none" }}>
               <span style={{ display: "block", fontSize: 12.5, fontWeight: 650, color: "var(--low)" }}>{t("lessons.unit_n", { n: i + 1 })}</span>
               <span style={{ display: "block", fontWeight: 700, color: "var(--head)", fontSize: 15, lineHeight: 1.25 }}>{tx(u.title)}</span>
@@ -544,11 +610,11 @@ function SeaChart({ t, tx, go, progress, ci, next, all, setAll, opened, toggle, 
   );
 }
 
-function Course({ t, locale, go, route }) {
+function Course({ t, locale, go, route, layout }) {
   const progress = useAppState((s) => s.progress);
   const tx = useLocaleText(locale);
   const [opened, setOpened] = useState({});
-  const [all, setAll] = useState(false);
+  const [all, setAll] = useState(isDesk(layout)); // a computer has the room for every island
   const toggle = (id) => setOpened((o) => ({ ...o, [id]: !o[id] }));
   const next = currentLesson(progress);
   const p = (route && route.params) || {};
@@ -605,7 +671,7 @@ function Course({ t, locale, go, route }) {
       <h2 className="nv-disp" style={{ fontSize: 28, margin: "0 0 4px" }}>{t("path.title")}</h2>
       <div style={{ fontSize: 14, color: "var(--mid)", marginBottom: 10 }}>{t("path.count", { done: doneCount, total: ALL_LESSONS.length, units: unitsDone, unitsTotal: UNITS.length })}</div>
       <Progress value={doneCount} max={ALL_LESSONS.length} height={6} label={t("lessons.overall")} />
-      <SeaChart t={t} tx={tx} go={go} progress={progress} ci={ci} next={next} all={all} setAll={setAll} opened={opened} toggle={toggle} currentRef={currentRef} />
+      <SeaChart layout={layout} t={t} tx={tx} go={go} progress={progress} ci={ci} next={next} all={all} setAll={setAll} opened={opened} toggle={toggle} currentRef={currentRef} />
       <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 14 }}>
         {openedCards.map((u) => (
           <Card key={u.id} pad="14px 0 6px">
@@ -653,9 +719,16 @@ function Learn(ctx) {
     return () => clearTimeout(id);
   }, [unit]);
   return (
-    <div>
-      <Today {...ctx} />
-      <Course {...ctx} />
+    <div className="nv-learn">
+      <div>
+        <Today {...ctx} />
+        <Course {...ctx} />
+      </div>
+      {ctx.layout === "wide" && (
+        <aside aria-label={ctx.t("panel.title")}>
+          <Panel {...ctx} />
+        </aside>
+      )}
     </div>
   );
 }
@@ -805,6 +878,29 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
   const [quit, setQuit] = useState(false);
   const [momentDone, setMomentDone] = useState(false);
   const feedbackRef = useRef(null);
+  // On a computer: 1–4 pick an answer, Enter checks and continues. A small hint, shown until the first lesson is over.
+  const keysSeen = useSeen("keys");
+  const hint = isDesk(ctx.layout) && !keysSeen;
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const top = [...document.querySelectorAll('[role="dialog"]')].pop();
+      if (!top || !top.hasAttribute("data-player")) return; // a sheet is open on top: it keeps its keys
+      const el = e.target;
+      if (el && (/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) || el.isContentEditable)) return;
+      if (/^[1-9]$/.test(e.key)) {
+        const o = top.querySelectorAll('[role="radio"]:not(:disabled)')[Number(e.key) - 1];
+        if (o) (e.preventDefault(), o.click());
+      } else if (e.key === "Enter") {
+        if (el && el.tagName === "BUTTON" && el.getAttribute("role") !== "radio") return; // a focused button does its own thing
+        const go = top.querySelector("[data-go] button:not(:disabled)");
+        if (go) (e.preventDefault(), go.click());
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+  useEffect(() => () => hint && markIntro("keys"), []);
   // The feedback comes into view when it appears (long text, small phones).
   useEffect(() => {
     if (checked && feedbackRef.current) feedbackRef.current.scrollIntoView({ block: "nearest" });
@@ -1043,7 +1139,7 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
           </div>
         )}
         {/* The buttons stay on screen, however long the step or its feedback. */}
-        <div style={{ position: "sticky", bottom: 0, background: "var(--bg)", padding: "8px 0 4px", boxShadow: "0 -10px 12px -6px var(--bg)" }}>
+        <div data-go="" style={{ position: "sticky", bottom: 0, background: "var(--bg)", padding: "8px 0 4px", boxShadow: "0 -10px 12px -6px var(--bg)" }}>
         {step.type === "card" && (
           <Button full onClick={advance}>
             {t("common.continue")}
@@ -1071,6 +1167,7 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
             )}
           </>
         )}
+        {hint && isQuestion(step) && <p style={{ fontSize: 13, color: "var(--mid)", textAlign: "center", margin: "8px 0 0" }}>{t("kb.hint")}</p>}
         </div>
       </div>
 
@@ -1100,8 +1197,8 @@ function Overlay({ label, children }) {
   }, []);
   return (
     <Layer>
-      <div role="dialog" aria-modal="true" aria-label={label} style={{ position: "fixed", inset: 0, zIndex: 40, background: "var(--bg)", color: "var(--ink)", overflowY: "auto" }}>
-        <div style={{ maxWidth: 640, minHeight: "100%", margin: "0 auto", display: "flex", flexDirection: "column", padding: "calc(10px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom))" }}>{children}</div>
+      <div role="dialog" aria-modal="true" aria-label={label} data-player="" style={{ position: "fixed", inset: 0, zIndex: 40, background: "var(--bg)", color: "var(--ink)", overflowY: "auto" }}>
+        <div className="nv-ovl" style={{ maxWidth: 640, minHeight: "100%", margin: "0 auto", display: "flex", flexDirection: "column", padding: "calc(10px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom))" }}>{children}</div>
       </div>
     </Layer>
   );

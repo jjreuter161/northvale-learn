@@ -612,7 +612,7 @@ function CheckIn({ t, locale, rows, onRecord, onDone }) {
   );
 }
 
-function Home({ t, locale, go, data, setOpen, sheets }) {
+function Home({ t, locale, go, data, setOpen, sheets, layout }) {
   const { slice, rows } = data;
   const goalFor = useAppState((s) => s.profile.goalFor);
   const lead = P.primaryGoal(rows.map((r) => r.g));
@@ -625,16 +625,17 @@ function Home({ t, locale, go, data, setOpen, sheets }) {
     <div>
       <Title sub={t("goals.sub")}>{t("goals.nav")}</Title>
       {!leadRow ? (
-        <>
+        <div style={layout !== "phone" ? { maxWidth: 760 } : undefined}>
           <div style={{ borderRadius: 24, overflow: "hidden", boxShadow: "var(--lift)", marginBottom: 14 }}>
             <Scene name="harbor" w={358} h={140} />
           </div>
           <Label style={{ marginTop: 4 }}>{t("home.empty.title")}</Label>
           <p style={{ fontSize: 15, color: "var(--mid)", lineHeight: 1.45, margin: "-4px 0 14px" }}>{t("home.empty.sub")}</p>
           <TemplateGrid t={t} onPick={(id) => sheets.newGoal(id)} highlight={goalFor} />
-        </>
+        </div>
       ) : (
-        <>
+        <div className="nv-cols" style={others.length || layout === "phone" ? undefined : { maxWidth: 760, gridTemplateColumns: "minmax(0,1fr)" }}>
+          <div>
           <GoalCard t={t} locale={locale} row={leadRow} fx={data.holdings.fx} big onClick={() => setOpen(leadRow.g.id)} />
           {checkIn && (
             <div style={{ marginTop: 12 }}>
@@ -644,6 +645,8 @@ function Home({ t, locale, go, data, setOpen, sheets }) {
           <Button full kind="secondary" style={{ marginTop: 12 }} onClick={() => sheets.record(lead.id)}>
             <Icon name="plus" size={18} /> {t("goal.record")}
           </Button>
+          </div>
+          <div>
           {others.length > 0 && <Label>{t("home.other_goals")}</Label>}
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {others.map((r) => (
@@ -653,7 +656,8 @@ function Home({ t, locale, go, data, setOpen, sheets }) {
           <Button full kind="ghost" style={{ marginTop: 10 }} onClick={() => sheets.newGoal()}>
             <Icon name="plus" size={18} /> {t("home.new_goal")}
           </Button>
-        </>
+          </div>
+        </div>
       )}
       <Note icon="shield" style={{ marginTop: 18 }}>{t("goals.disclaimer")}</Note>
     </div>
@@ -960,7 +964,7 @@ function GoalPage({ t, locale, go, row, data, onBack, sheets }) {
 
 // ---- the screen -----------------------------------------------------------
 
-function Screen({ t, locale, go, route }) {
+function Screen({ t, locale, go, route, layout }) {
   const data = useGoals(locale);
   const [open, setOpen] = useState(route.params.goal || null);
   const [newGoal, setNewGoal] = useState(route.params.newGoal ? { template: route.params.newGoal } : null); // null | { template }
@@ -974,7 +978,7 @@ function Screen({ t, locale, go, route }) {
   const row = open && data.rows.find((r) => r.g.id === open);
   return (
     <>
-      {row ? <GoalPage t={t} locale={locale} go={go} row={row} data={data} onBack={() => setOpen(null)} sheets={sheets} /> : <Home t={t} locale={locale} go={go} data={data} setOpen={setOpen} sheets={sheets} />}
+      {row ? <div style={layout !== "phone" ? { maxWidth: 760, margin: "0 auto" } : undefined}><GoalPage t={t} locale={locale} go={go} row={row} data={data} onBack={() => setOpen(null)} sheets={sheets} /></div> : <Home t={t} locale={locale} go={go} data={data} setOpen={setOpen} sheets={sheets} layout={layout} />}
       <NewGoalSheet t={t} locale={locale} open={!!newGoal} initial={newGoal && newGoal.template} onClose={() => setNewGoal(null)} onCreated={(g) => setOpen(g.id)} />
       <RecordSheet t={t} locale={locale} open={!!record} goalId={record} goals={data.rows.filter((r) => r.g.status !== "paused").map((r) => r.g)} onClose={() => setRecord(null)} />
       <MilestoneSheet t={t} locale={locale} shown={milestone} rows={data.rows} onClose={() => setMilestone(null)} onNewGoal={() => (setOpen(null), setNewGoal({}))} />
@@ -1267,6 +1271,11 @@ registerModule({
       const id = goalForNow();
       const t = makeT(locNow());
       return g ? nameOf(g, t) : id ? t(`tpl.${id}`) : null;
+    },
+    // The panel on wide screens: the leading goal and how far along it is.
+    leadProgress: () => {
+      const g = leadNow();
+      return g ? { name: nameOf(g, makeT(locNow())), percent: Math.round(P.percentOf(g, P.saved(g))) } : null;
     },
     // Onboarding's "why these lessons": the goal picked and its first units.
     startPlan: () => {

@@ -73,14 +73,20 @@ export default function Practice(ctx) {
   return (
     <div>
       <Title sub={t("practice.sub")}>{t("nav.practice")}</Title>
-      {parts.filter((m) => m.practice.Card).map((m) => (
-        <m.practice.Card key={m.id} {...ctx} />
-      ))}
-      <List style={{ marginTop: 12 }}>
-        {parts.filter((m) => m.practice.Row).map((m) => (
-          <m.practice.Row key={m.id} {...ctx} />
-        ))}
-      </List>
+      <div className="nv-cols">
+        <div>
+          {parts.filter((m) => m.practice.Card).map((m) => (
+            <m.practice.Card key={m.id} {...ctx} />
+          ))}
+        </div>
+        <div>
+          <List style={{ marginTop: 12 }}>
+            {parts.filter((m) => m.practice.Row).map((m) => (
+              <m.practice.Row key={m.id} {...ctx} />
+            ))}
+          </List>
+        </div>
+      </div>
       <p style={{ fontSize: 13, color: "var(--low)", lineHeight: 1.45, margin: "14px 2px 0" }}>{t("practice.fine")}</p>
       <Sheet open={intro} onClose={close} title={t("practice.intro.title")}>
         <p style={{ margin: "0 0 10px", lineHeight: 1.5 }}>{t("practice.intro.body")}</p>

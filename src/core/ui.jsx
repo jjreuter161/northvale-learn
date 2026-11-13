@@ -82,6 +82,19 @@ h1,h2{color:var(--head)}
 .nv-list>*+*{border-top:1px solid var(--line)}
 @media (max-width:280px){.nv-word{display:none}}.nv-hdr{container-type:inline-size}@container (max-width:215px){.nv-beta{display:none}}@container (max-width:160px){.nv-hdr .nv-word{display:none}}
 .nv-sr{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.nv-app{min-height:100dvh}
+@media(min-width:1024px){.nv-app{display:grid;grid-template-columns:240px minmax(0,1fr)}}
+.nv-side{position:sticky;top:0;height:100dvh;display:flex;flex-direction:column;gap:4px;padding:20px 14px 18px;border-right:1px solid var(--line);overflow-y:auto}
+.nv-sidebtn{display:flex;align-items:center;gap:12px;width:100%;min-height:48px;padding:0 14px;border:2px solid transparent;border-radius:14px;background:transparent;color:var(--low);font:inherit;font-size:16px;font-weight:650;cursor:pointer;text-align:left}
+.nv-learn{display:grid;grid-template-columns:minmax(0,700px);justify-content:center;gap:32px}
+@media(min-width:1180px){.nv-learn{grid-template-columns:minmax(0,700px) 300px;align-items:start}.nv-learn>aside{position:sticky;top:76px;display:flex;flex-direction:column;gap:14px}}
+.nv-cols{display:block}
+@media(min-width:600px){.nv-cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;align-items:start}.nv-cols>.nv-span{grid-column:1/-1}.nv-cols>div>:first-child{margin-top:0!important}}
+@media(min-width:1024px){.nv-cols.nv-c3{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.nv-sheetwrap{align-items:flex-end}
+@media(min-width:700px){.nv-sheetwrap{align-items:center}.nv-sheet{border-radius:24px!important;padding-bottom:22px!important;max-height:min(88dvh,760px)!important;animation:nvIn .22s ease-out both!important;box-shadow:var(--lift)}.nv-grab{display:none}}
+@media(min-width:1024px){.nv-ovl{padding-top:40px!important;padding-bottom:28px!important}}
+@media(hover:hover) and (pointer:fine){.nv-press:hover:not(:disabled){filter:brightness(.97)}.nv-btn.nv-press:hover:not(:disabled){filter:brightness(1.07)}.nv-list>.nv-press:hover{background:var(--bg)!important}.nv-sidebtn:not([aria-current]):hover{background:var(--surface);color:var(--ink)}.nv-hit:hover{background:color-mix(in srgb,var(--artPaper) 32%,transparent)!important;outline:2px solid var(--artSea2)}}
 `;
 
 const PATHS = {
@@ -320,11 +333,11 @@ export function Sheet({ open, onClose, title, children, tall }) {
   if (!open) return null;
   return (
     <Layer>
-    <div role="dialog" aria-modal="true" aria-label={title} style={{ position: "fixed", inset: 0, zIndex: 60, display: "flex", alignItems: "flex-end", justifyContent: "center", color: "var(--ink)", fontFamily: FONT }}>
+    <div role="dialog" aria-modal="true" aria-label={title} className="nv-sheetwrap" style={{ position: "fixed", inset: 0, zIndex: 60, display: "flex", justifyContent: "center", color: "var(--ink)", fontFamily: FONT }}>
       <div onClick={onClose} style={{ position: "absolute", inset: 0, background: "rgba(5,12,25,.45)", animation: "nvFade .2s both" }} />
-      <div style={{ position: "relative", width: "100%", maxWidth: 560, maxHeight: tall ? "92dvh" : "85dvh", overflowY: "auto", background: "var(--bg)", borderRadius: "24px 24px 0 0", padding: "10px 18px calc(22px + env(safe-area-inset-bottom))", animation: "nvSpring .26s cubic-bezier(.2,.8,.3,1) both" }}>
-        <div style={{ width: 40, height: 5, borderRadius: 3, background: "var(--line)", margin: "0 auto 10px" }} />
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+      <div className="nv-sheet" style={{ position: "relative", width: "100%", maxWidth: 560, maxHeight: tall ? "92dvh" : "85dvh", overflowY: "auto", background: "var(--bg)", borderRadius: "24px 24px 0 0", padding: "10px 18px calc(22px + env(safe-area-inset-bottom))", animation: "nvSpring .26s cubic-bezier(.2,.8,.3,1) both" }}>
+        <div className="nv-grab" style={{ width: 40, height: 5, borderRadius: 3, background: "var(--line)", margin: "0 auto 10px" }} />
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "0 0 12px", paddingTop: 2 }}>
           <h2 className="nv-disp" style={{ fontSize: 24, margin: 0 }}>{title}</h2>
           <button onClick={onClose} aria-label="Close" style={{ border: "none", background: "var(--surface2)", borderRadius: 20, width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "var(--ink)" }}>
             <Icon name="close" size={18} />

@@ -25,18 +25,7 @@ const Legal = lazy(() => import("./Legal.jsx"));
 import "./strings.js";
 import { track } from "./analytics.js";
 import { Boundary } from "./errors.jsx";
-
-function useWide() {
-  const q = "(min-width: 900px)";
-  const [wide, setWide] = useState(() => typeof matchMedia !== "undefined" && matchMedia(q).matches);
-  useEffect(() => {
-    const m = matchMedia(q);
-    const f = () => setWide(m.matches);
-    m.addEventListener("change", f);
-    return () => m.removeEventListener("change", f);
-  }, []);
-  return wide;
-}
+import { useLayout, isDesk } from "./layout.js";
 
 const CORE_SCREENS = { me: Me, settings: Settings, legal: Legal, practice: Practice };
 // The 4 tabs and the route each one opens.
@@ -72,7 +61,8 @@ export default function App() {
   });
   // Opened from a teacher's class link: that comes first, not "welcome back".
   const [classLink] = useState(() => new URLSearchParams(location.search).has("join"));
-  const wide = useWide();
+  const layout = useLayout();
+  const desk = isDesk(layout);
 
   // The look's colors live on the page root, so layers opened at the top of
   // the page (sheets, lessons) use them too.
@@ -185,21 +175,23 @@ export default function App() {
   const from = route.params.from;
   const back = from ? (getModule(from) && getModule(from).nav ? getModule(from).nav.label : CORE_TITLE[from]) : tab.label;
   const today = dayKey();
-  const ctx = { t, locale, go, route, session, wide, openStreak: () => setStreakOpen(true) };
+  const ctx = { t, locale, go, route, session, layout, wide: layout !== "phone", openStreak: () => setStreakOpen(true) };
   const openTab = (x) => (setVisit((v) => v + 1), go(x.route));
 
+  // The logo's sails fill as the day's XP goal fills.
+  const logo = <Wordmark size={desk ? 27 : 25} mark play fill={Math.min(1, ((progress.days || {})[today] || 0) / (progress.dailyGoal || 20))} />;
+
   const header = (
-    <header style={{ position: "sticky", top: 0, zIndex: 20, background: "var(--bg)", padding: "calc(8px + env(safe-area-inset-top)) 12px 6px 16px", display: "flex", alignItems: "center", gap: 6 }}>
+    <header style={{ position: "sticky", top: 0, zIndex: 20, background: "var(--bg)", padding: desk ? "14px 32px 6px" : "calc(8px + env(safe-area-inset-top)) 12px 6px 16px", display: "flex", alignItems: "center", gap: 6 }}>
       {!isRoot && (
         <button onClick={() => go(from || tab.route)} aria-label={`${t("common.back")}: ${t(back)}`} className="nv-press" style={{ ...iconBtn, width: "auto", gap: 2, padding: "0 10px 0 2px", marginLeft: -8, fontSize: 16, fontWeight: 650, minWidth: 0 }}>
           <Icon name="back" /> <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t(back)}</span>
         </button>
       )}
-      {/* The logo's sails fill as the day's XP goal fills. */}
       <div className="nv-hdr" style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "center", gap: 8 }}>
-        {isRoot && (
+        {isRoot && !desk && (
           <>
-            <Wordmark size={25} mark play fill={Math.min(1, ((progress.days || {})[today] || 0) / (progress.dailyGoal || 20))} /> <BetaTag label={t("common.beta")} />
+            {logo} <BetaTag label={t("common.beta")} />
           </>
         )}
       </div>
@@ -207,12 +199,35 @@ export default function App() {
         <StreakStar count={progress.streak.count} size={18} color={progress.streak.last === today ? "var(--flame)" : "var(--low)"} />
         <span style={{ fontWeight: 650, fontSize: 15, fontVariantNumeric: "tabular-nums" }}>{progress.streak.count}</span>
       </button>
-      {getModule("tutor") && (
+      {getModule("tutor") && !desk && (
         <button onClick={() => getModule("tutor").services.open({})} aria-label={t("nav.ask")} className="nv-press" style={{ display: "inline-flex", alignItems: "center", gap: 6, border: "none", background: "var(--surface)", color: "var(--ink)", borderRadius: 999, height: 38, padding: "0 14px", fontSize: 15, fontWeight: 650, cursor: "pointer", flexShrink: 0 }}>
           <Icon name="chat" size={17} /> <span className="nv-word">{t("nav.ask")}</span>
         </button>
       )}
     </header>
+  );
+
+  // On a computer: the same four sections (and Ask) down the left side.
+  const tutor = getModule("tutor");
+  const sidebar = (
+    <aside className="nv-side">
+      <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "2px 10px 20px" }}>
+        {logo} <BetaTag label={t("common.beta")} />
+      </div>
+      <nav aria-label={t("nav.menu")} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+        {TABS.map((x) => (
+          <button key={x.id} onClick={() => openTab(x)} aria-current={tab.id === x.id ? "page" : undefined} className="nv-sidebtn nv-press" style={tab.id === x.id ? { ...SELECTED, background: "var(--brandSoft)", color: "var(--brand)" } : undefined}>
+            <Icon name={x.icon} size={24} /> {t(x.label)}
+          </button>
+        ))}
+      </nav>
+      <div style={{ flex: 1 }} />
+      {tutor && (
+        <button onClick={() => tutor.services.open({})} aria-label={t("nav.ask")} className="nv-sidebtn nv-press" style={{ background: "var(--surface)", color: "var(--ink)" }}>
+          <Icon name="chat" size={22} /> {t("nav.ask")}
+        </button>
+      )}
+    </aside>
   );
 
   const tabBar = (
@@ -230,16 +245,25 @@ export default function App() {
     </nav>
   );
 
+  // How wide the page may be: one column on a phone; wider on a tablet; on a computer the four main
+  // screens use the room (grids, side by side), the rest stay in a comfortable reading column.
+  const pageMax = layout === "phone" ? 640 : layout === "tablet" ? 880 : route.id === "settings" ? 1040 : isRoot ? 1120 : 760;
+
   return (
     <div style={rootStyle} className={settings.reduceMotion ? "nv-reduce" : undefined}>
       <style>{GLOBAL_CSS}</style>
-      <div style={{ maxWidth: wide ? 720 : 640, margin: "0 auto" }}>
-        {header}
-        <main key={`${route.id}:${visit}`} className="nv-in" style={{ padding: "8px 16px calc(96px + env(safe-area-inset-bottom))" }}>
-          <Boundary t={t} screen={route.id}><Suspense fallback={<div style={{ minHeight: "60dvh", paddingTop: 24 }}><Loading label={t("common.loading")} /></div>}>{Screen ? <Screen {...ctx} /> : null}</Suspense></Boundary>
-        </main>
+      <div className="nv-app">
+        {desk && sidebar}
+        <div style={{ minWidth: 0 }}>
+          <div style={{ maxWidth: pageMax, margin: "0 auto" }}>
+            {header}
+            <main key={`${route.id}:${visit}`} className="nv-in" style={{ padding: desk ? "8px 32px 56px" : layout === "tablet" ? "8px 24px calc(96px + env(safe-area-inset-bottom))" : "8px 16px calc(96px + env(safe-area-inset-bottom))" }}>
+              <Boundary t={t} screen={route.id}><Suspense fallback={<div style={{ minHeight: "60dvh", paddingTop: 24 }}><Loading label={t("common.loading")} /></div>}>{Screen ? <Screen {...ctx} /> : null}</Suspense></Boundary>
+            </main>
+          </div>
+        </div>
       </div>
-      {tabBar}
+      {!desk && tabBar}
       {allModules()
         .filter((m) => m.Overlay)
         .map((m) => (

@@ -5,6 +5,7 @@ import { useAppState, update, resetState } from "./store.js";
 import { LANGS, REGIONS } from "./i18n.js";
 import { DAILY_GOALS } from "./progress.js";
 import { COLORS, PRESETS, specFor, snap, optionOk, whyNot, lookValueFor } from "./colors.js";
+import { isDesk } from "./layout.js";
 import { SELECTED, AVATARS, lookFrom, Icon, Button, Card, Field, Label, Note, Segmented, Sheet, Switch, Title, toast } from "./ui.jsx";
 import { useSession, signIn, signUp, signOut, changePassword, deleteAccount, setNickname, setRecap, forgotPassword, resetPassword } from "./session.js";
 import { analyticsOn, installId, forgetInstall } from "./analytics.js";
@@ -14,6 +15,11 @@ import { forgetInvite } from "./invites.jsx";
 import { service } from "./registry.js";
 import { canVibrate } from "./feel.js";
 import { AccountForm } from "./Account.jsx";
+
+// A section of the page: with its title on a phone or tablet; on a computer only the one picked on the left (no title: the left names it).
+function Sec({ k, desk, sel, t, children }) {
+  return !desk || sel === k ? <>{!desk && <Label>{t(`settings.${k}`)}</Label>}{children}</> : null;
+}
 
 const setSetting = (k, v) => update((s) => ({ ...s, settings: { ...s.settings, [k]: v } }));
 
@@ -47,7 +53,7 @@ async function deleteEverything(signedIn, password) {
   location.reload();
 }
 
-export default function Settings({ t, locale, go }) {
+export default function Settings({ t, locale, go, layout }) {
   const settings = useAppState((s) => s.settings);
   const profile = useAppState((s) => s.profile);
   const progress = useAppState((s) => s.progress);
@@ -55,6 +61,8 @@ export default function Settings({ t, locale, go }) {
   const [time, setTime] = useState("18:00");
   const [confirm, setConfirm] = useState(null);
   const [more, setMore] = useState(false);
+  const desk = isDesk(layout);
+  const [sel, setSel] = useState("account"); // on a computer: one section at a time, picked on the left
   const [pw, setPw] = useState({ current: "", next: "" });
   const [delPw, setDelPw] = useState("");
   const [err, setErr] = useState(null);
@@ -69,11 +77,25 @@ export default function Settings({ t, locale, go }) {
     </div>
   );
 
+  const SECTIONS = ["account", "profile", "learning", "language", "look", "soundfeel", "privacy", "legal", "about"];
+  const sp = { desk, sel, t };
+
   return (
     <div>
       <Title>{t("nav.settings")}</Title>
+      <div style={desk ? { display: "grid", gridTemplateColumns: "230px minmax(0, 680px)", gap: 36, alignItems: "start" } : undefined}>
+        {desk && (
+          <nav aria-label={t("nav.settings")} style={{ position: "sticky", top: 76, display: "flex", flexDirection: "column", gap: 4 }}>
+            {SECTIONS.map((k) => (
+              <button key={k} onClick={() => setSel(k)} aria-current={sel === k ? "true" : undefined} className="nv-sidebtn nv-press" style={sel === k ? { ...SELECTED, background: "var(--brandSoft)", color: "var(--brand)" } : undefined}>
+                {t(`settings.${k}`)}
+              </button>
+            ))}
+          </nav>
+        )}
+        <div>
 
-      <Label>{t("settings.account")}</Label>
+      <Sec k="account" {...sp}>
       <Card>
         {session.user ? (
           <>
@@ -99,8 +121,9 @@ export default function Settings({ t, locale, go }) {
           </>
         )}
       </Card>
+      </Sec>
 
-      <Label>{t("settings.profile")}</Label>
+      <Sec k="profile" {...sp}>
       <Card>
         <Field label={t("onb.nick.label")} value={profile.nickname} maxLength={24} onChange={(e) => update((s) => ({ ...s, profile: { ...s.profile, nickname: e.target.value.slice(0, 24) } }))} onBlur={() => session.user && setNickname(profile.nickname).catch(() => {})} placeholder={t("onb.nick.placeholder")} hint={t("onb.nick.hint")} />
         <div style={{ fontSize: 14, fontWeight: 650, color: "var(--mid)", marginBottom: 8 }}>{t("onb.avatar")}</div>
@@ -110,8 +133,9 @@ export default function Settings({ t, locale, go }) {
           ))}
         </div>
       </Card>
+      </Sec>
 
-      <Label>{t("settings.learning")}</Label>
+      <Sec k="learning" {...sp}>
       <Card>
         <div style={{ fontWeight: 650, marginBottom: 10 }}>{t("settings.daily_goal")}</div>
         <Segmented label={t("settings.daily_goal")} value={progress.dailyGoal} onChange={(v) => update((s) => ({ ...s, progress: { ...s.progress, dailyGoal: v } }))} options={DAILY_GOALS.map((g) => ({ value: g, label: t("goal.minutes", { n: g / 2 }) }))} />
@@ -135,8 +159,9 @@ export default function Settings({ t, locale, go }) {
           />
         </div>
       </Card>
+      </Sec>
 
-      <Label>{t("settings.language")}</Label>
+      <Sec k="language" {...sp}>
       <Card>
         <Segmented label={t("settings.language")} value={settings.lang} onChange={(v) => setSetting("lang", v)} options={Object.entries(LANGS).map(([value, label]) => ({ value, label }))} />
         <div style={{ height: 12 }} />
@@ -154,30 +179,33 @@ export default function Settings({ t, locale, go }) {
         )}
         <p style={{ fontSize: 13, color: "var(--low)", margin: "10px 0 0", lineHeight: 1.4 }}>{t("settings.country.how")}</p>
       </Card>
+      </Sec>
 
-      <Label>{t("settings.look")}</Label>
+      <Sec k="look" {...sp}>
       <Card>
         <LookPicker t={t} settings={settings} setSetting={setSetting} />
         {row(t("settings.motion"), t("settings.motion.sub"), <Switch label={t("settings.motion")} checked={settings.reduceMotion} onChange={(v) => setSetting("reduceMotion", v)} />)}
       </Card>
+      </Sec>
 
       {/* Rarely needed: tucked away so the settings stay short. */}
-      <button onClick={() => setMore(!more)} aria-expanded={more} className="nv-press" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", marginTop: 22, minHeight: 52, padding: "10px 16px", borderRadius: 18, border: "1px solid var(--line)", background: "var(--surface)", color: "var(--ink)", fontSize: 17, fontWeight: 700, cursor: "pointer", textAlign: "left" }}>
+      {!desk && <button onClick={() => setMore(!more)} aria-expanded={more} className="nv-press" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", marginTop: 22, minHeight: 52, padding: "10px 16px", borderRadius: 18, border: "1px solid var(--line)", background: "var(--surface)", color: "var(--ink)", fontSize: 17, fontWeight: 700, cursor: "pointer", textAlign: "left" }}>
         <span>
           {t("settings.more")}
           <span style={{ display: "block", fontSize: 13, fontWeight: 500, color: "var(--mid)" }}>{t("settings.more.sub")}</span>
         </span>
         <Icon name={more ? "minus" : "plus"} size={20} />
-      </button>
-      {more && (
+      </button>}
+      {(more || desk) && (
         <>
-      <Label>{t("settings.soundfeel")}</Label>
+      <Sec k="soundfeel" {...sp}>
       <Card>
         {row(t("settings.sound"), t("settings.sound.sub"), <Switch label={t("settings.sound")} checked={!!settings.sound} onChange={(v) => setSetting("sound", v)} />)}
         {canVibrate() && row(t("settings.vibrate"), t("settings.vibrate.sub"), <Switch label={t("settings.vibrate")} checked={settings.vibrate !== false} onChange={(v) => setSetting("vibrate", v)} />)}
       </Card>
+      </Sec>
 
-      <Label>{t("settings.privacy")}</Label>
+      <Sec k="privacy" {...sp}>
       <Card>
         <p style={{ fontSize: 15, lineHeight: 1.55, margin: 0 }}>{t("privacy.body")}</p>
         {row(t("settings.analytics"), t("settings.analytics.sub"), <Switch label={t("settings.analytics")} checked={analyticsOn()} onChange={(v) => setSetting("analytics", v)} />)}
@@ -190,8 +218,9 @@ export default function Settings({ t, locale, go }) {
           </Button>
         </div>
       </Card>
+      </Sec>
 
-      <Label>{t("settings.legal")}</Label>
+      <Sec k="legal" {...sp}>
       <Card pad={0}>
         {[
           ["privacy", t("legal.privacy")],
@@ -203,11 +232,15 @@ export default function Settings({ t, locale, go }) {
           </button>
         ))}
       </Card>
+      </Sec>
 
-      <Label>{t("settings.about")}</Label>
+      <Sec k="about" {...sp}>
       <Note icon="shield">{t("disclaimer.full")}</Note>
+      </Sec>
         </>
       )}
+        </div>
+      </div>
 
       <Sheet open={confirm === "reset"} onClose={() => setConfirm(null)} title={t("settings.reset")}>
         <p style={{ fontSize: 16, lineHeight: 1.5, marginTop: 0 }}>{t("settings.reset.body")}</p>

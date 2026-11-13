@@ -138,7 +138,8 @@ export default function Me({ t, locale, session, go, route }) {
     );
 
   return (
-    <div>
+    <div className="nv-cols">
+      <div>
       <div style={{ display: "flex", alignItems: "center", gap: 14, margin: "4px 0 16px" }}>
         <span style={{ width: 52, height: 52, borderRadius: 26, background: AVATARS[profile.avatar] || AVATARS[0], color: "#F7F2E8", fontSize: 22, fontWeight: 650, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{name[0].toUpperCase()}</span>
         <div style={{ flex: 1, minWidth: 0 }}>
@@ -188,7 +189,9 @@ export default function Me({ t, locale, session, go, route }) {
           })}
         </div>
       </Card>
+      </div>
 
+      <div>
       <FriendOffer t={t} session={session} />
       {leagueOpen(progress, session) && (
         <>
@@ -209,6 +212,7 @@ export default function Me({ t, locale, session, go, route }) {
         <ListRow icon="star" title={t("me.promise")} onClick={() => go("legal", { doc: "promise", from: "me" })} />
         <ListRow icon="shield" title={t("me.legal")} onClick={() => go("legal", { doc: "privacy", from: "me" })} />
       </List>
+      </div>
     </div>
   );
 }
