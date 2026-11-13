@@ -1,4 +1,4 @@
-// PRACTICE — try what you learned, pretend money only: Money Missions, the
+// PRACTICE — try what you learned, pretend money only: Real-life missions, the
 // practice portfolio, the tools from your lessons and News explained. Each
 // module adds itself (registry: practice: { order, Card, Row }). The tab is
 // there from day one so the bar never changes shape; until 3 lessons are
@@ -10,18 +10,18 @@ import { addStrings, money } from "./i18n.js";
 import { fact } from "./facts.js";
 import { allModules } from "./registry.js";
 import { dayKey } from "./progress.js";
-import { Button, Card, Icon, List, Progress, Sheet, Title } from "./ui.jsx";
+import { Button, Card, Icon, List, Progress, Scene, Sheet, Title } from "./ui.jsx";
 
 const S = (en, es) => ({ en, es });
 addStrings({
   "practice.sub": S("Try what you learned. Pretend money only.", "Prueba lo que aprendiste. Solo dinero de práctica."),
   "practice.locked.title": S("Opens after 3 lessons", "Se abre después de 3 lecciones"),
-  "practice.locked.body": S("Practice investing with {cash} of pretend money, plus Money Missions, calculators and news.", "Practica invertir con {cash} de dinero de práctica, además de Misiones de dinero, calculadoras y noticias."),
+  "practice.locked.body": S("Practice investing with {cash} of pretend money, plus real-life missions, calculators and news.", "Practica invertir con {cash} de dinero de práctica, además de misiones de la vida real, calculadoras y noticias."),
   "practice.locked.n": S("{n} of 3 lessons", "{n} de 3 lecciones"),
   "practice.locked.go": S("Continue learning", "Seguir aprendiendo"),
-  "practice.fine": S("New tools appear here as you finish the lessons that use them.", "Las herramientas nuevas aparecen aquí al terminar las lecciones que las usan."),
+  "practice.fine": S("New tools show up here as you finish the lessons that use them.", "Las herramientas nuevas aparecen aquí al terminar las lecciones que las usan."),
   "practice.intro.title": S("New: Practice", "Nuevo: Práctica"),
-  "practice.intro.body": S("You've finished 3 lessons, so Money Missions are open: small real-life tasks, like finding the fees on a bank account. You do them on your own; no money moves.", "Terminaste 3 lecciones, así que ya están abiertas las Misiones de dinero: pequeñas tareas de la vida real, como encontrar las comisiones de una cuenta. Las haces por tu cuenta; no se mueve dinero."),
+  "practice.intro.body": S("You've finished 3 lessons, so real-life missions are open: small tasks, like finding the fees on a bank account. You do them on your own; no money moves.", "Terminaste 3 lecciones, así que ya están abiertas las misiones de la vida real: pequeñas tareas, como encontrar las comisiones de una cuenta. Las haces por tu cuenta; no se mueve dinero."),
   "practice.intro.more": S("The practice portfolio opens with the investing lessons, and News after 5 lessons.", "El portafolio de práctica se abre con las lecciones de inversión, y las noticias después de 5 lecciones."),
   "practice.intro.go": S("Take a look", "Echar un vistazo"),
 });
@@ -52,11 +52,10 @@ export default function Practice(ctx) {
     return (
       <div>
         <Title sub={t("practice.sub")}>{t("nav.practice")}</Title>
-        <Card pad={22}>
-          <span style={{ width: 48, height: 48, borderRadius: 14, background: "var(--bg)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 14 }}>
-            <Icon name="lock" size={22} color="var(--mid)" />
-          </span>
-          <div style={{ fontSize: 20, fontWeight: 750, marginBottom: 6 }}>{t("practice.locked.title")}</div>
+        <Card pad={0} style={{ overflow: "hidden" }}>
+          <Scene name="harbor" w={358} h={170} />
+          <div style={{ padding: "18px 22px 22px" }}>
+          <div className="nv-disp" style={{ fontSize: 26, lineHeight: 1.15, color: "var(--head)", marginBottom: 6 }}>{t("practice.locked.title")}</div>
           <p style={{ margin: "0 0 16px", color: "var(--mid)", lineHeight: 1.5 }}>{t("practice.locked.body", { cash })}</p>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18 }}>
             <Progress value={n} max={3} height={6} label={t("practice.locked.n", { n })} />
@@ -65,6 +64,7 @@ export default function Practice(ctx) {
           <Button full onClick={() => ctx.go("lessons")}>
             {t("practice.locked.go")}
           </Button>
+          </div>
         </Card>
       </div>
     );

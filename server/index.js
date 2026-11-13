@@ -519,7 +519,7 @@ async function serveFile(req, res, path) {
       data = zipped.get(key);
     }
     // Screenshots and share images change rarely: a day in the cache.
-    res.writeHead(200, headers(req, { "Content-Type": TYPES[extname(file)] || "application/octet-stream", "Cache-Control": extname(file) === ".jpg" ? "public, max-age=86400" : "no-cache", ...(gzip ? { "Content-Encoding": "gzip", Vary: "Accept-Encoding" } : {}), ...(file.endsWith(".html") ? { "Content-Security-Policy": CSP } : {}) }));
+    res.writeHead(200, headers(req, { "Content-Type": TYPES[extname(file)] || "application/octet-stream", "Cache-Control": file.includes(`${sep}chunks${sep}`) ? "public, max-age=31536000, immutable" : extname(file) === ".jpg" ? "public, max-age=86400" : "no-cache", ...(gzip ? { "Content-Encoding": "gzip", Vary: "Accept-Encoding" } : {}), ...(file.endsWith(".html") ? { "Content-Security-Policy": CSP } : {}) }));
     res.end(data);
   } catch {
     send(req, res, 404, { error: { message: "Not found" } });

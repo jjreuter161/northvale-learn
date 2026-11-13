@@ -7,7 +7,7 @@ import { registerModule, service } from "../../core/registry.js";
 import { recordPractice } from "../../core/game.js";
 import { api } from "../../core/api.js";
 import { addStrings } from "../../core/i18n.js";
-import { Button, Card, Chip, Icon, ListRow, Note, Title } from "../../core/ui.jsx";
+import { Button, Card, Chip, Icon, ListRow, Loading, Note, Title } from "../../core/ui.jsx";
 import { useAppState } from "../../core/store.js";
 import { useSeen, markIntro, lessonsDone } from "../../core/Practice.jsx";
 
@@ -26,7 +26,7 @@ addStrings({
   "news.read_done": S("Read", "Leída"),
   "news.no_summary": S("Plain-words summaries appear here once the server's AI is turned on. For now: today's headlines and their sources.", "Los resúmenes en palabras sencillas aparecen aquí cuando el servidor tenga la IA activada. Por ahora: los titulares de hoy y sus fuentes."),
   "news.offline": S("News needs the Northvale Learn server, which isn't reachable right now.", "Las noticias necesitan el servidor de Northvale Learn, que no está disponible ahorita."),
-  "news.empty": S("No headlines right now. Check back later.", "No hay titulares ahorita. Vuelve más tarde."),
+  "news.empty": S("Quiet day: no headlines right now. Check back later.", "Día tranquilo: no hay titulares por ahora. Vuelve más tarde."),
   "news.loading": S("Loading today's headlines…", "Cargando los titulares de hoy…"),
   "news.disclaimer": S("Summaries are written by AI to explain the news simply — they can miss details, and they're not advice. Headlines link to the original publisher.", "Los resúmenes los escribe una IA para explicar la noticia de forma sencilla: pueden omitir detalles y no son recomendaciones. Los titulares llevan a la fuente original."),
   "news.from": S("From {source}", "De {source}"),
@@ -95,7 +95,7 @@ function Story({ item, t, onRead, read }) {
 function Feed({ t, locale, limit, onAnyRead }) {
   const news = useNews(locale);
   const [read, setRead] = useState({});
-  if (news.loading) return <p className="nv-pulse" style={{ color: "var(--mid)" }}>{t("news.loading")}</p>;
+  if (news.loading) return <Loading label={t("news.loading")} />;
   if (news.error) return <Note icon="info">{t("news.offline")}</Note>;
   if (!news.items || !news.items.length) return <Note icon="info">{t("news.empty")}</Note>;
   return (

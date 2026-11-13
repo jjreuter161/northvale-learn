@@ -1,5 +1,5 @@
 // UNIT — Taxes made simple. Its lessons and the concepts they teach (format in helpers.js).
-import { T, card, choice, tf, act, concept } from "./helpers.js";
+import { T, card, choice, tf, act, concept, match, number, spot, tap, scenario, fit } from "./helpers.js";
 
 export default {
   id: "taxes",
@@ -73,6 +73,7 @@ export default {
     {
       id: "taxes-1",
       title: T("What taxes are for", "Para qué sirven los impuestos"),
+      life: T("Next time you shop, check whether the price on the tag includes tax.", "La próxima vez que compres, fíjate si el precio de la etiqueta incluye el impuesto.", { en: "Next time you shop, find the IVA on your receipt.", es: "La próxima vez que compres, busca el IVA en tu ticket." }),
       steps: [
         card(T("What you get for them", "Lo que recibes a cambio"), T("Public schools, roads, emergency services, parks, public health. Taxes are how a country pays for what everyone uses together.", "Escuelas públicas, caminos, servicios de emergencia, parques, salud pública. Los impuestos son la forma en que un país paga lo que todos usamos juntos.")),
         card(T("Three you'll meet", "Tres que vas a conocer"), T("Income tax (on what you earn), payroll taxes (Social Security and Medicare), and sales tax on what you buy — usually added at the register, at rates that vary by state.", "El impuesto sobre la renta (sobre lo que ganas), los impuestos de nómina (Social Security y Medicare) y el sales tax sobre lo que compras, que normalmente se suma en la caja y cambia según el estado.", { en: "ISR (income tax, on what you earn), IMSS contributions on your salary, and IVA on what you buy — {@ivaRate} in most of the country, already included in shelf prices.", es: "El ISR (impuesto sobre lo que ganas), las cuotas del IMSS sobre tu salario y el IVA sobre lo que compras: {@ivaRate} en casi todo el país, ya incluido en los precios." })),
@@ -84,13 +85,24 @@ export default {
           T("Shared services like public schools are funded by taxes.", "Los servicios compartidos, como las escuelas públicas, se pagan con impuestos."),
           [null, T("Subscriptions are private purchases — you pay those yourself.", "Las suscripciones son compras privadas: las pagas tú."), T("Companies pay for their own ads.", "Las empresas pagan su propia publicidad.")]
         ),
-        tf("taxes_purpose", T("In most US states, the price tag doesn't include sales tax.", "En la mayoría de los estados de EE. UU., la etiqueta no incluye el sales tax.", { en: "In Mexico, prices for shoppers already include IVA.", es: "En México, los precios al público ya incluyen el IVA." }), true, T("It's added at the register, so the total is a bit more than the tag.", "Se suma en la caja, así que el total es un poco más que la etiqueta.", { en: "That's why the tag is what you pay.", es: "Por eso lo que dice la etiqueta es lo que pagas." })),
+        number("taxes_purpose", T("A {$20|200} shirt, with {@salesTaxExample} sales tax added at the register. What do you pay?", "Una camiseta de {$20|200}, con {@salesTaxExample} de impuesto sobre las ventas que se suma en la caja. ¿Cuánto pagas?", { en: "A price tag says $232, and IVA ({@ivaRate}) is already included. How much of that is IVA?", es: "Una etiqueta dice $232, con el IVA ({@ivaRate}) ya incluido. ¿Cuánto de eso es IVA?" }), { unit: "money", answer: [21.5, 32], tol: 0.05 }, [T("{@salesTaxExample} of $20 is $1.50.", "El {@salesTaxExample} de $20 es $1.50.", { en: "$232 ÷ 1.16 = $200 before IVA.", es: "$232 ÷ 1.16 = $200 antes del IVA." }), T("At the register: $21.50. In most states the tag doesn't include the tax.", "En la caja: $21.50. En la mayoría de los estados la etiqueta no incluye el impuesto.", { en: "IVA is $232 − $200 = $32. In Mexico the tag already includes it.", es: "El IVA es $232 − $200 = $32. En México la etiqueta ya lo incluye." })]),
+        match(
+          "taxes_purpose",
+          T("Match each tax to how you meet it.", "Une cada impuesto con cómo te lo encuentras."),
+          [
+            [T("Sales tax", "Impuesto sobre las ventas", { en: "IVA", es: "IVA" }), T("Added when you pay at the store", "Se suma cuando pagas en la tienda", { en: "Included in most prices", es: "Incluido en casi todos los precios" })],
+            [T("Income tax", "Impuesto sobre la renta", { en: "ISR", es: "ISR" }), T("A share of what you earn", "Una parte de lo que ganas")],
+            [T("Property tax", "Impuesto a la propiedad", { en: "Predial", es: "Predial" }), T("Paid by owners of homes and land", "Lo pagan los dueños de casas y terrenos")],
+          ],
+          T("Different taxes, the same idea: shared money for roads, schools and services.", "Impuestos distintos, la misma idea: dinero en común para calles, escuelas y servicios.")
+        ),
         act("goals.salestax", T("See how much tax is in a price.", "Mira cuánto impuesto hay en un precio.")),
       ],
     },
     {
       id: "taxes-2",
       title: T("How tax brackets work", "Cómo funcionan los tramos"),
+      life: T("When someone says a raise “puts you in a higher bracket”, remember: only the part above the line pays more.", "Cuando alguien diga que un aumento “te sube de tramo”, recuerda: solo la parte de arriba paga más."),
       steps: [
         card(T("A myth to drop", "Un mito que hay que soltar"), T("\"If I earn more, I'll move into a higher bracket and take home less.\" Not true. Higher rates apply only to the income inside the higher bracket.", "\"Si gano más, paso a un tramo más alto y me queda menos.\" No es cierto. Las tasas más altas solo se aplican al ingreso dentro de ese tramo.")),
         card(T("Marginal vs. effective", "Marginal vs. efectiva"), T("Your marginal rate is the rate on your last dollar. Your effective rate is your total tax divided by your income — always lower than your top rate.", "Tu tasa marginal es la tasa de tu último peso. Tu tasa efectiva es tu impuesto total entre tu ingreso, y siempre es menor que tu tasa más alta.")),
@@ -103,12 +115,14 @@ export default {
           [null, T("That's the myth. Only the slice above the line pays the higher rate.", "Ese es el mito. Solo la rebanada arriba del límite paga la tasa más alta."), T("The lower slices are still taxed at their lower rates.", "Las rebanadas bajas siguen pagando sus tasas bajas.")]
         ),
         tf("tax_brackets", T("Your effective tax rate is usually lower than your top bracket rate.", "Tu tasa efectiva suele ser menor que la tasa de tu tramo más alto."), true, T("Most of your income is taxed in the lower slices.", "La mayor parte de tu ingreso paga en las rebanadas bajas.")),
+        number("tax_brackets", T("A made-up tax: 10% on the first {$10000|100000} you earn and 20% on everything above. You earn {$15000|150000}. How much tax do you pay?", "Un impuesto inventado: 10% sobre los primeros {$10000|100000} que ganas y 20% sobre todo lo demás. Ganas {$15000|150000}. ¿Cuánto impuesto pagas?"), { unit: "money", answer: [2000, 20000] }, [T("The first {$10000|100000} at 10%: {$1000|10000}.", "Los primeros {$10000|100000} al 10%: {$1000|10000}."), T("The other {$5000|50000} at 20%: {$1000|10000}.", "Los otros {$5000|50000} al 20%: {$1000|10000}."), T("Total {$2000|20000}: about 13% of your pay, not 20%. Only the part above the line pays the higher rate.", "Total {$2000|20000}: cerca del 13% de lo que ganas, no el 20%. Solo la parte arriba del límite paga la tasa más alta.")]),
         act("goals.brackets", T("Move the income and watch each slice's tax.", "Mueve el ingreso y mira el impuesto de cada rebanada.")),
       ],
     },
     {
       id: "taxes-3",
       title: T("Filing your taxes", "Tu declaración de impuestos"),
+      life: T("If tax was withheld from a job, file to get back anything extra.", "Si te retuvieron impuestos en un trabajo, presenta la declaración para recuperar lo que pagaste de más.", { en: "If your tax return shows a refund (saldo a favor), file it to get the money back.", es: "Si tu declaración muestra saldo a favor, preséntala para recuperar el dinero." }),
       steps: [
         card(
           T("Once a year", "Una vez al año"),
@@ -124,24 +138,52 @@ export default {
           [null, T("A refund is your own money back, not extra pay.", "Una devolución es tu propio dinero de regreso, no un sueldo extra.", { en: "That's the opposite — a saldo a favor is money owed to you.", es: "Es lo contrario: un saldo a favor es dinero que te deben a ti." }), T("Taxes and your job are separate. Filing is about settling your taxes.", "Los impuestos y tu trabajo son cosas aparte. Declarar es para hacer cuentas.", { en: "It's a tax term, not a store promotion.", es: "Es un término fiscal, no una promoción." })]
         ),
         tf("tax_filing", T("Withholding during the year is only an estimate of what you owe.", "La retención durante el año es solo un cálculo aproximado de lo que debes."), true, T("Filing is when the real number is worked out.", "Al declarar es cuando se calcula el número real.")),
+        scenario(
+          "tax_filing",
+          T("Your summer job withheld $150 of federal tax, but you earned so little you probably owe nothing. What do you do?", "En tu trabajo de verano te retuvieron $150 de impuesto federal, pero ganaste tan poco que probablemente no debes nada. ¿Qué haces?", { en: "The SAT pre-filled your tax return and it shows a refund (saldo a favor) of $1,200. What do you do?", es: "El SAT prellenó tu declaración y muestra un saldo a favor de $1,200. ¿Qué haces?" }),
+          [
+            fit(T("File a return to get the $150 back", "Presentar la declaración para recuperar los $150", { en: "Check it and file to get the refund", es: "Revisarla y presentarla para recibir el saldo a favor" }), "good", T("The money is yours, and filing is how you get it back.", "El dinero es tuyo, y presentar la declaración es como lo recuperas.")),
+            fit(T("Ask a parent or a free tax-help program to check it first", "Pedirle a tu mamá, papá o a un programa gratuito que lo revise primero", { en: "Go over it with a parent first, then file", es: "Revisarla primero con tu mamá o papá y luego presentarla" }), "ok", T("Smart if you're unsure, as long as you still file.", "Buena idea si tienes dudas, siempre que sí la presentes.")),
+            fit(T("Skip it, it's too small to bother", "No hacer nada, es muy poco", { en: "Ignore it, it's not worth the time", es: "Ignorarla, no vale la pena" }), "poor", T("That money stays with the government.", "Ese dinero se queda con el gobierno.")),
+          ],
+          T("Filing compares what was withheld with what you owe. When too much came out, filing gets it back.", "La declaración compara lo que te retuvieron con lo que debes. Si te retuvieron de más, así lo recuperas.")
+        ),
         act("goals.brackets", T("See how total tax and the effective rate change as income rises.", "Mira cómo cambian el impuesto total y la tasa efectiva cuando sube el ingreso.")),
       ],
     },
     {
       id: "taxes-4",
       title: T("Your tax ID", "Tu identificación fiscal"),
+      life: T("Keep your Social Security card at home, not in your wallet, and never post a photo of it.", "Guarda tu tarjeta de Seguro Social en casa, no en la cartera, y nunca publiques una foto de ella.", { en: "Keep your RFC and SAT password private, and never send them by message.", es: "Mantén en privado tu RFC y tu contraseña del SAT, y nunca los mandes por mensaje." }),
       steps: [
-        card(T("Your number", "Tu número"), T("Your Social Security number is your tax ID in the US. Employers, banks and the IRS use it. People who need to pay US taxes but can't get a Social Security number use an ITIN from the IRS instead.", "Tu número de Seguro Social es tu identificación fiscal en EE. UU. Lo usan empleadores, bancos y el IRS. Quien tiene que pagar impuestos en EE. UU. pero no puede obtener un número de Seguro Social usa un ITIN del IRS.", { en: "Your RFC is your taxpayer ID — the SAT issues it for free with your CURP. You'll need it for a formal job, to issue invoices (facturas) if you work on your own, and to file a return.", es: "Tu RFC es tu clave de contribuyente: el SAT lo da gratis con tu CURP. Lo vas a necesitar para un trabajo formal, para emitir facturas si trabajas por tu cuenta y para declarar." })),
+        card(T("Your number", "Tu número"), T("Your Social Security number is your tax ID in the US. Employers, banks and the IRS use it. People who need to pay US taxes but can't get a Social Security number use an ITIN from the IRS instead.", "Tu número de Seguro Social es tu identificación fiscal; lo usan empleadores, bancos y el IRS. Quien debe pagar impuestos en EE. UU. y no puede obtenerlo usa un ITIN del IRS.", { en: "Your RFC is your taxpayer ID — the SAT issues it for free with your CURP. You'll need it for a formal job, to issue invoices (facturas) if you work on your own, and to file a return.", es: "Tu RFC es tu clave de contribuyente: el SAT lo da gratis con tu CURP. Lo vas a necesitar para un trabajo formal, para emitir facturas si trabajas por tu cuenta y para declarar." })),
         card(T("Guard it", "Cuídalo"), T("With your SSN, a thief can open credit in your name. Don't carry the card, don't post it, and give it only when it's truly required.", "Con tu SSN, un ladrón puede sacar créditos a tu nombre. No traigas la tarjeta, no la publiques y dala solo cuando de verdad te la pidan por ley.", { en: "Your e.firma (electronic signature) and SAT password let someone act in your name. Keep them private, and be wary of anyone offering to do SAT procedures for you for a fee.", es: "Tu e.firma y tu contraseña del SAT permiten actuar a tu nombre. Mantenlas en privado y desconfía de quien te ofrezca hacer trámites del SAT por un pago." })),
-        choice(
+        scenario(
           "tax_id",
-          T("Who usually needs your Social Security number?", "¿Quién suele necesitar tu número de Seguro Social?", { en: "What is the RFC?", es: "¿Qué es el RFC?" }),
-          [T("Your employer, your bank and the IRS", "Tu empleador, tu banco y el IRS", { en: "Your taxpayer ID from the SAT", es: "Tu clave de contribuyente del SAT" }), T("Any website that asks", "Cualquier sitio que lo pida", { en: "Your bank account number", es: "El número de tu cuenta bancaria" }), T("Your friends", "Tus amigos", { en: "A school ID", es: "Una credencial escolar" })],
-          0,
-          T("Those three have legal reasons to need it. Almost everyone else doesn't.", "Esos tres tienen razones legales para necesitarlo. Casi nadie más.", { en: "It identifies you for taxes, jobs and invoices.", es: "Te identifica para impuestos, trabajos y facturas." }),
-          [null, T("Most sites have no reason to need it — asking is a warning sign.", "La mayoría de los sitios no tiene por qué necesitarlo: pedirlo es señal de alerta.", { en: "Your bank account has its own number (CLABE).", es: "Tu cuenta bancaria tiene su propio número (CLABE)." }), T("Friends never need it.", "Tus amigos nunca lo necesitan.", { en: "School IDs are separate from taxes.", es: "Las credenciales escolares no tienen que ver con impuestos." })]
+          T("A website offers a free {$50|1000} gift card if you enter your Social Security number. What do you do?", "Un sitio web te ofrece una tarjeta de regalo de {$50|1000} si escribes tu número de Seguro Social. ¿Qué haces?", { en: "A website offers a free $1,000 gift card if you enter your RFC and CURP. What do you do?", es: "Un sitio web te ofrece una tarjeta de regalo de $1,000 si escribes tu RFC y tu CURP. ¿Qué haces?" }),
+          [
+            fit(T("Close it: only places like your job, your bank and the IRS need it", "Cerrarlo: solo lugares como tu trabajo, tu banco y el IRS lo necesitan", { en: "Close it: only places like your job, your bank and the SAT need them", es: "Cerrarlo: solo lugares como tu trabajo, tu banco y el SAT los necesitan" }), "good", T("A gift card site has no reason to ask. That's how identity theft starts.", "Un sitio de tarjetas de regalo no tiene por qué pedirlo. Así empieza el robo de identidad.")),
+            fit(T("Enter only the last 4 digits", "Escribir solo los últimos 4 dígitos", { en: "Enter only your CURP", es: "Escribir solo tu CURP" }), "poor", T("Even part of it helps someone piece your identity together.", "Hasta una parte ayuda a alguien a armar tu identidad.")),
+            fit(T("Enter it, since it's a big brand", "Escribirlo, porque es una marca conocida", { en: "Enter them, since it's a big brand", es: "Escribirlos, porque es una marca conocida" }), "poor", T("Scammers copy big brands' names and logos on purpose.", "Los estafadores copian a propósito los nombres y logos de marcas conocidas.")),
+          ],
+          T("Your number is the key to your identity. Share it only when there's a real reason: work, banking or taxes.", "Tu número es la llave de tu identidad. Compártelo solo cuando hay una razón real: trabajo, banco o impuestos.")
         ),
         tf("tax_id", T("Posting a photo of your Social Security card online is risky.", "Publicar una foto de tu tarjeta de Seguro Social en internet es riesgoso.", { en: "Your e.firma should be kept private, like a signature.", es: "Tu e.firma debe mantenerse privada, como una firma." }), true, T("Anyone could copy the number and use it.", "Cualquiera podría copiar el número y usarlo.", { en: "With it, someone can act in your name before the SAT.", es: "Con ella, alguien puede actuar a tu nombre ante el SAT." })),
+        spot(
+          "tax_id",
+          T("This email says you have a refund. Tap the 2 red flags.", "Este correo dice que tienes un reembolso. Toca las 2 señales de alerta."),
+          "email",
+          T("Email · Tax Refund Center <refunds@tax-help-now.net>", "Correo · Centro de Reembolsos <refunds@tax-help-now.net>", { en: "Email · SAT Refunds <devoluciones@sat-ayuda.net>", es: "Correo · Devoluciones SAT <devoluciones@sat-ayuda.net>" }),
+          [
+            T("You have a pending tax refund of {$412|3100}. To receive it, reply with ", "Tienes un reembolso de impuestos pendiente de {$412|3100}. Para recibirlo, responde con "),
+            tap(T("your full Social Security number", "tu número de Seguro Social completo", { en: "your RFC and your SAT password", es: "tu RFC y tu contraseña del SAT" }), true),
+            T(" and ", " y "),
+            tap(T("a photo of your ID", "una foto de tu identificación"), true),
+            T(". Thank you, ", ". Gracias, "),
+            tap(T("the Refund Team", "el Equipo de Reembolsos")),
+          ],
+          T("The IRS doesn't ask for your Social Security number or ID by email. Guard your number: it's the key to your identity.", "El IRS no pide tu número de Seguro Social ni tu identificación por correo. Cuida tu número: es la llave de tu identidad.", { en: "The SAT never asks for your password or ID by email, and its addresses end in sat.gob.mx. Your password is the key to your tax identity.", es: "El SAT nunca pide tu contraseña ni tu identificación por correo, y sus direcciones terminan en sat.gob.mx. Tu contraseña es la llave de tu identidad fiscal." })
+        ),
         act("goals.paycheck", T("Look again at what's taken out of a paycheck — now you know where it goes.", "Vuelve a ver lo que se descuenta de un sueldo; ahora sabes a dónde va."), { gross: [1800, 11000] }),
       ],
     },

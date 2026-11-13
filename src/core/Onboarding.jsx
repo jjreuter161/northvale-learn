@@ -6,7 +6,8 @@
 import { useState } from "react";
 import { update } from "./store.js";
 import { LANGS, REGIONS } from "./i18n.js";
-import { Button, Mark, Wordmark, Icon } from "./ui.jsx";
+import { Button, Scene, Wordmark, Icon, BetaTag } from "./ui.jsx";
+import { LATEST_NOTE } from "./whatsnew.jsx";
 import { AccountForm } from "./Settings.jsx";
 import { track } from "./analytics.js";
 import { allModules } from "./registry.js";
@@ -25,7 +26,8 @@ export default function Onboarding({ t, locale, onDone }) {
   const steps = extra.length;
   const setSetting = (k, v) => update((s) => ({ ...s, settings: { ...s.settings, [k]: v } }));
   const finish = (start) => {
-    update((s) => ({ ...s, profile: { ...s.profile, onboarded: true, reason }, progress: { ...s.progress, startUnit: start } }));
+    // Someone new doesn't need "What's new".
+    update((s) => ({ ...s, profile: { ...s.profile, onboarded: true, reason, seenNote: LATEST_NOTE }, progress: { ...s.progress, startUnit: start } }));
     track("onboarding", { reason });
     onDone(start);
   };
@@ -46,7 +48,7 @@ export default function Onboarding({ t, locale, onDone }) {
         </div>
         <span style={{ fontSize: 14, color: "var(--mid)", whiteSpace: "nowrap" }}>{t("onb.step", { n: step, total: steps })}</span>
       </div>
-      <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: -0.5, margin: "0 0 8px", lineHeight: 1.2 }}>{title}</h1>
+      <h1 className="nv-disp" style={{ fontSize: 29, margin: "0 0 8px", lineHeight: 1.15 }}>{title}</h1>
       {sub && <p style={{ fontSize: 16, color: "var(--mid)", margin: "0 0 22px", lineHeight: 1.45 }}>{sub}</p>}
     </>
   );
@@ -71,20 +73,25 @@ export default function Onboarding({ t, locale, onDone }) {
         <button onClick={() => setSigningIn(false)} aria-label={t("common.back")} style={{ border: "none", background: "transparent", color: "var(--ink)", width: 44, height: 44, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", marginBottom: 12 }}>
           <Icon name="back" />
         </button>
-        <h1 style={{ fontSize: 26, fontWeight: 700, margin: "0 0 16px" }}>{t("account.signin")}</h1>
+        <h1 className="nv-disp" style={{ fontSize: 29, margin: "0 0 16px" }}>{t("account.signin")}</h1>
         <AccountForm t={t} mode="signin" signinOnly onDone={() => update((s) => ({ ...s, profile: { ...s.profile, onboarded: true } }))} />
       </>
     );
 
   if (step === 0)
     return (
-      <div className="nv-in" style={{ maxWidth: 520, margin: "0 auto", minHeight: "100dvh", display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", padding: "calc(24px + env(safe-area-inset-top)) 22px calc(24px + env(safe-area-inset-bottom))" }}>
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: 10 }}>
-          <Mark size={72} />
-          <Wordmark size={52} />
-          <div style={{ fontSize: 13, fontWeight: 650, letterSpacing: 4, color: "var(--low)" }}>LEARN</div>
+      <div className="nv-in" style={{ maxWidth: 520, margin: "0 auto", minHeight: "100dvh", display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", padding: "0 22px calc(24px + env(safe-area-inset-bottom))" }}>
+        {/* The logo's boat out on open water (a picture; the name follows). */}
+        <div style={{ width: "calc(100% + 44px)", margin: "0 -22px", background: "var(--artSky)", paddingTop: "env(safe-area-inset-top)" }}>
+          <Scene name="welcome" w={390} h={280} style={{ height: "min(30dvh, 260px)", width: "100%" }} />
+        </div>
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: 10, paddingTop: 8 }}>
+          <Wordmark size={50} />
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ fontSize: 13, fontWeight: 650, letterSpacing: 4, color: "var(--low)" }}>LEARN</span> <BetaTag label={t("common.beta")} />
+          </div>
           <div style={{ fontSize: 15, color: "var(--mid)", marginTop: 2 }}>{t("brand.tagline")}</div>
-          <h1 style={{ fontSize: 30, fontWeight: 750, letterSpacing: -0.6, lineHeight: 1.15, margin: "48px 0 0" }}>{t("onb.tagline")}</h1>
+          <h1 className="nv-disp" style={{ fontSize: 33, lineHeight: 1.12, margin: "26px 0 0" }}>{t("onb.tagline")}</h1>
           <p style={{ fontSize: 17, color: "var(--mid)", maxWidth: 340, lineHeight: 1.45, margin: "4px 0 0" }}>{t("onb.tagline.sub")}</p>
         </div>
         <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 10 }}>
@@ -102,8 +109,9 @@ export default function Onboarding({ t, locale, onDone }) {
             ))}
             <span style={{ width: 1, background: "var(--line)", margin: "6px 4px" }} />
             {Object.entries(REGIONS).map(([k, r]) => (
-              <button key={k} onClick={() => setSetting("region", k)} aria-pressed={locale.region === k} aria-label={r.name[locale.lang]} style={chip(locale.region === k)}>
-                {r.flag} {r.currency}
+              <button key={k} onClick={() => setSetting("region", k)} aria-pressed={locale.region === k} style={chip(locale.region === k)}>
+                <span aria-hidden="true">{r.flag}</span> {r.currency}
+                <span className="nv-sr"> · {r.name[locale.lang]}</span>
               </button>
             ))}
           </div>

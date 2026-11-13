@@ -10,7 +10,7 @@
 // for thousands of learners on one server; move to a database (and add a
 // "bank" module's encrypted secrets) when it outgrows that.
 import { randomUUID } from "node:crypto";
-import { readFileSync, writeFileSync, existsSync, mkdirSync, renameSync, copyFileSync, readdirSync, unlinkSync, chmodSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync, mkdirSync, renameSync, copyFileSync, readdirSync, unlinkSync, chmodSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { persistence, dbFor } from "./pgstore.js";
 
@@ -18,6 +18,13 @@ const DIR = process.env.NORTHVALE_DATA || join(import.meta.dirname, "data");
 const FILE = join(DIR, "learn.json");
 const PG = !!process.env.DATABASE_URL || process.env.NORTHVALE_PGLITE === "1";
 if (!PG) mkdirSync(DIR, { recursive: true, mode: 0o700 });
+// A RESTORE (npm run restore) waits as learn.json.restore until this start,
+// so a running server can't save over it. The data it replaces is kept.
+// (With Postgres, the database's own backups and npm run db:move instead.)
+if (!PG && existsSync(`${FILE}.restore`)) {
+  if (existsSync(FILE)) renameSync(FILE, join(DIR, `learn.before-restore-${new Date().toISOString().replace(/[:.]/g, "-")}.json`));
+  renameSync(`${FILE}.restore`, FILE);
+}
 
 const data = { users: {}, sessions: {}, progress: {}, weeks: {}, usage: {}, ai: null, resets: {}, ...(!PG && existsSync(FILE) ? JSON.parse(readFileSync(FILE, "utf8")) : {}) };
 const pg = PG ? persistence(await dbFor(process.env.DATABASE_URL), data) : null;
@@ -59,6 +66,10 @@ export function backup(today = new Date().toISOString().slice(0, 10)) {
   chmodSync(target, 0o600);
   const old = readdirSync(BACKUPS).filter((f) => /^learn-\d{4}-\d{2}-\d{2}\.json$/.test(f)).sort().slice(0, -14);
   old.forEach((f) => unlinkSync(join(BACKUPS, f)));
+  // What a restore replaced is kept 14 days too, like the backups (so
+  // deleted accounts are gone from every copy within 14 days).
+  const cutoff = Date.parse(today) - 14 * 864e5;
+  readdirSync(DIR).filter((f) => /^learn\.before-restore-.*\.json$/.test(f) && statSync(join(DIR, f)).mtimeMs < cutoff).forEach((f) => unlinkSync(join(DIR, f)));
   return target;
 }
 

@@ -14,7 +14,7 @@ import { addStrings, text } from "../../core/i18n.js";
 import { stream } from "../../core/api.js";
 import { useSession } from "../../core/session.js";
 import { level } from "../../core/progress.js";
-import { Button, Chip, Icon, Note, Segmented, Sheet } from "../../core/ui.jsx";
+import { Button, Chip, Icon, Loading, Note, Segmented, Sheet } from "../../core/ui.jsx";
 import { lookup, suggestedWords, findLesson } from "./glossary.js";
 import { sessionNow } from "../../core/session.js";
 import { UNITS, ALL_LESSONS, unitDone, lessonState } from "../lessons/content.js";
@@ -50,9 +50,9 @@ addStrings({
   "tutor.glossary": S("From the glossary", "Del glosario"),
   "tutor.words": S("Words I can explain right now", "Palabras que te puedo explicar ya"),
   "tutor.disclaimer": S("Educational only — not financial advice. The AI can make mistakes.", "Solo educativo, no es asesoría financiera. La IA puede equivocarse."),
-  "tutor.error": S("Something went wrong. Try again.", "Algo salió mal. Intenta de nuevo."),
-  "tutor.limit": S("You've reached today's question limit. The tutor is available again tomorrow.", "Llegaste al límite de preguntas de hoy. El tutor vuelve a estar disponible mañana."),
-  "tutor.slow": S("That's a lot of questions at once — wait a minute, then ask again.", "Son muchas preguntas seguidas: espera un minuto y vuelve a preguntar."),
+  "tutor.error": S("That didn't go through. Check your connection and try again. Nothing you did was lost.", "No se envió. Revisa tu conexión e inténtalo de nuevo. No se perdió nada."),
+  "tutor.limit": S("That's today's questions used up. The tutor's back tomorrow.", "Ya usaste las preguntas de hoy. El tutor regresa mañana."),
+  "tutor.slow": S("That's a lot of questions at once. Give it a minute, then ask again.", "Son muchas preguntas seguidas. Dale un minuto y vuelve a preguntar."),
   "tutor.paused": S("The AI tutor is resting until next month. The glossary still works — try a single money word.", "El tutor con IA descansa hasta el próximo mes. El glosario sigue funcionando: prueba con una palabra."),
   "tutor.s1": S("What's an ETF?", "¿Qué es un ETF?"),
   "tutor.s2": S("Explain compound interest with an example", "Explícame el interés compuesto con un ejemplo"),
@@ -240,7 +240,7 @@ function Overlay({ t, locale, go }) {
               ) : m.text ? (
                 <Rich value={m.text} />
               ) : (
-                <span className="nv-pulse" style={{ color: "var(--low)" }}>{t("tutor.thinking")}</span>
+                <Loading label={t("tutor.thinking")} size={28} />
               )}
               {m.lesson && !m.error && (m.offline || m.text) && related(m.lesson)}
             </div>

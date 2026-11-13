@@ -1,6 +1,6 @@
 # Aviso de privacidad
 
-**BORRADOR para la beta: debe revisarlo un abogado antes del lanzamiento público.** Última actualización: octubre de 2026.
+**BORRADOR para la beta: debe revisarlo un abogado antes del lanzamiento público.** Última actualización: noviembre de 2026.
 
 Northvale Learn enseña de dinero e inversiones con dinero ficticio. Lo hicimos para recopilar lo mínimo posible sobre ti. Aquí explicamos qué guardamos, para qué y cómo borrarlo.
 
@@ -22,7 +22,9 @@ Si te unes a la lista de espera en nuestro sitio (/bienvenida), guardamos solo l
 
 ## Lo que se queda en tu dispositivo
 
-Tus lecciones, XP, racha, insignias, portafolio de práctica, metas, Misiones de dinero (y las notas que escribas en ellas), tu rango de edad si eliges uno, la conversación con el tutor, las clases en las que estás y tu enlace de invitación se guardan en el navegador de este dispositivo. No los vemos a menos que crees una cuenta (o te unas a una clase, abajo).
+Tus lecciones (incluido en qué paso vas de una que no has terminado), XP, racha, insignias, portafolio de práctica, metas, misiones de la vida real (y las notas que escribas en ellas), tus respuestas al mito del día, tu rango de edad si eliges uno, la conversación con el tutor, las clases en las que estás y tu enlace de invitación se guardan en el navegador de este dispositivo. No los vemos a menos que crees una cuenta (o te unas a una clase, abajo).
+
+**Tu apariencia** (Crema, Azul marino o Igual que mi dispositivo) es un ajuste de este dispositivo. Con Igual que mi dispositivo, la app revisa si tu dispositivo está en modo oscuro; eso nunca se envía a ningún lado. Las lecciones que ya abriste también se guardan en el dispositivo para que funcionen sin conexión.
 
 **Las tarjetas para compartir** (imágenes como "Racha de 12 días") se hacen en tu dispositivo. Nunca muestran nombres, ubicación ni tu clase, y solo muestran el nombre o las cantidades de una meta si lo activas para esa tarjeta (no es posible de 13 a 17 años). Solo contamos que se compartió o guardó una tarjeta de cierto tipo (racha, unidad, insignia, meta).
 
@@ -35,7 +37,7 @@ Tus lecciones, XP, racha, insignias, portafolio de práctica, metas, Misiones de
 - **Reportes de errores** cuando algo falla: el mensaje del error y en qué parte de la app pasó. No incluyen datos personales.
 - **Solicitudes de noticias y precios**, que no incluyen nada sobre ti.
 - **Recordatorios diarios, solo si los activas:** la dirección que el servicio de notificaciones de tu navegador le da a este dispositivo, la hora que elegiste, tu zona horaria e idioma, y unas palabras sobre lo que sigue (tu racha y los títulos de tu siguiente lección y de la misión de la semana), para que el recordatorio diga algo útil. Se guardan con un identificador aleatorio creado en tu dispositivo, no ligado a tu cuenta ni a las estadísticas de uso, y se borran cuando apagas los recordatorios o eliges "Borrar mis datos".
-- **Una clase, solo si te unes a una** (una función de prueba, activa solo para docentes invitados). No se necesita cuenta ni correo. Guardamos la clase en la que estás, el apodo que eliges para ella, tu rango de edad (para confirmar que tienes 13 años o más) y, desde el día en que te unes: qué lecciones terminas, cuántas Misiones de dinero terminas (nunca tus notas), cuántas preguntas respondiste y fallaste de cada tema, y tu XP de la semana. **Tu profe ve** tu apodo, las lecciones y unidades que terminaste desde que te uniste, cuántas misiones terminaste y tu avance en lo que asigna. Los resultados por tema le llegan solo como totales de todo el grupo, cuando ya respondieron 3 o más estudiantes. **Tu profe nunca ve** tus metas, cantidades, portafolio de práctica, notas de misiones, preguntas al tutor, edad ni correo, ni nada de antes de que te unieras (salvo que elijas contar para una tarea las lecciones que ya habías terminado). Tus compañeros ven tu apodo y tu XP de la semana en la tabla de la clase, salvo que te ocultes. No hay mensajes de ningún tipo.
+- **Una clase, solo si te unes a una** (una función de prueba, activa solo para docentes invitados). No se necesita cuenta ni correo. Guardamos la clase en la que estás, el apodo que eliges para ella, tu rango de edad (para confirmar que tienes 13 años o más) y, desde el día en que te unes: qué lecciones terminas, cuántas misiones de la vida real terminas (nunca tus notas), cuántas preguntas respondiste y fallaste de cada tema, y tu XP de la semana. **Tu profe ve** tu apodo, las lecciones y unidades que terminaste desde que te uniste, cuántas misiones terminaste y tu avance en lo que asigna. Los resultados por tema le llegan solo como totales de todo el grupo, cuando ya respondieron 3 o más estudiantes. **Tu profe nunca ve** tus metas, cantidades, portafolio de práctica, notas de misiones, preguntas al tutor, edad ni correo, ni nada de antes de que te unieras (salvo que elijas contar para una tarea las lecciones que ya habías terminado). Tus compañeros ven tu apodo y tu XP de la semana en la tabla de la clase, salvo que te ocultes. No hay mensajes de ningún tipo.
 - **Enlaces de invitación, solo si creas o abres uno.** Tu enlace es un código aleatorio. Cuando alguien lo abre y termina su primera lección, lo contamos con un identificador aleatorio creado solo para eso (no su identificador de estadísticas ni su cuenta), para que ambos reciban un protector de racha. Nunca leemos tus contactos ni enviamos nada por ti.
 
 **Si creas una cuenta, además guardamos:**
@@ -69,7 +71,7 @@ El servidor usa tu dirección IP unos minutos para frenar intentos de adivinar c
 
 ## Cuánto tiempo los guardamos
 
-- **Los datos de tu cuenta** se guardan hasta que la borres. Lo borrado puede seguir hasta 14 días en nuestros respaldos.
+- **Los datos de tu cuenta** se guardan hasta que la borres. Lo borrado puede seguir hasta 14 días en nuestros respaldos (y, si alguna vez restauramos un respaldo, en la copia de los datos que reemplazó, que también borramos a los 14 días).
 - **Las estadísticas** se guardan como conteos pequeños y se borran cuando eliges "Borrar mis datos".
 - **Los comentarios** se guardan hasta 2 años. Después de "Borrar mis datos", ya no quedan ligados a tu dispositivo.
 - **Los datos de una clase** se guardan hasta que te sales, tu profe te quita o se borra la clase. Una clase que el profe archiva se borra 90 días después, y si un profe borra su cuenta se borran sus clases. "Borrar mis datos" te saca de todas tus clases.

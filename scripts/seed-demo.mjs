@@ -1,7 +1,7 @@
 // npm run seed:demo — the demo people, for the preview or a local copy:
 //   Dani, the demo learner (18–25, English/US): two goals with money set
 //     aside, three weeks of lessons (five units done and Compound interest),
-//     a 6-day streak, a practice T-bill fund, a finished Money Mission;
+//     a 6-day streak, a practice T-bill fund, a finished real-life mission;
 //   this week's league around Dani: Maya, Leo and Ari (18+), and Sofía and
 //     Teo in the 13–17 league.
 // It works through a running server on this computer (default

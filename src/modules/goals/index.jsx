@@ -11,8 +11,9 @@ import { registerModule, service } from "../../core/registry.js";
 import { useSlice, setSlice, getState, useAppState } from "../../core/store.js";
 import { recordPractice, checkBadges } from "../../core/game.js";
 import { addStrings, makeT, money, shortDate, text } from "../../core/i18n.js";
-import { dayKey } from "../../core/progress.js";
-import { Button, Card, Field, Icon, Label, Legend, LineChart, List, ListRow, Note, Segmented, Sheet, Slider, Title, toast } from "../../core/ui.jsx";
+import { dayKey, addDays } from "../../core/progress.js";
+import { fact } from "../../core/facts.js";
+import { Button, Card, Field, Icon, Label, Legend, LineChart, List, ListRow, Mark, Note, Scene, Segmented, Sheet, Slider, Title, toast } from "../../core/ui.jsx";
 import { openShare } from "../../core/share.jsx";
 import { update } from "../../core/store.js";
 import { useSeen, markIntro } from "../../core/Practice.jsx";
@@ -39,6 +40,36 @@ addStrings({
   "tools.after": S("Opens after the lesson “{lesson}”", "Se abre después de la lección “{lesson}”"),
   "tools.row.sub": S("{n} of {total} open", "{n} de {total} abiertas"),
   "tools.row.none": S("Each one opens after the lesson that uses it", "Cada una se abre después de la lección que la usa"),
+  "mw.title": S("Your money week", "Tu semana de dinero"),
+  "mw.learned": S("You learned", "Aprendiste"),
+  "mw.learned.n": S("{n} {n|lesson|lessons}, mostly {unit}", "{n} {n|lección|lecciones}, sobre todo de {unit}"),
+  "mw.learned.none": S("No lessons last week. A fresh week starts now.", "Ninguna lección la semana pasada. Empieza una semana nueva."),
+  "mw.solid": S("Now solid", "Ya lo tienes firme"),
+  "mw.streak": S("{n}-day streak", "Racha de {n} {n|día|días}"),
+  "mw.best": S("Your best so far", "Tu mejor racha hasta ahora"),
+  "mw.going": S("Still going", "Sigue en pie"),
+  "mw.goal.sub": S("{pct}% of the way there", "{pct}% del camino"),
+  "mw.goal.same": S("{name}: {saved} so far", "{name}: {saved} por ahora"),
+  "mw.next": S("For next week", "Para la próxima semana"),
+  "mw.next.body": S("Next up: “{lesson}”, in {unit}. {why}", "Sigue: “{lesson}”, de {unit}. {why}"),
+  "rc.title": S("The real cost", "El costo real"),
+  "rc.pick": S("Small daily things add up. Pick one.", "Las cosas pequeñas de cada día se suman. Elige una."),
+  "rc.coffee": S("Coffee", "Café"),
+  "rc.snack": S("Snack", "Botana"),
+  "rc.ride": S("Ride", "Viaje en app"),
+  "rc.own": S("Your own", "La tuya"),
+  "rc.own.label": S("Price, each workday", "Precio, cada día entre semana"),
+  "rc.every.workday": S("every workday", "cada día entre semana"),
+  "rc.every.day": S("every day", "cada día"),
+  "rc.every.week": S("every week", "cada semana"),
+  "rc.line": S("{price} {every} is about {yearly} a year. Put toward an investment at an example {@indexExampleRate} for 10 years, it could grow to about {grow}.", "{price} {every} son unos {yearly} al año. Puestos en una inversión a un {@indexExampleRate} de ejemplo durante 10 años, podrían crecer a unos {grow}."),
+  "rc.choose": S("If it's the best part of your day, it may well be worth it. The point is choosing on purpose.", "Si es lo mejor de tu día, puede valer la pena. La idea es elegir a propósito."),
+  "rc.hidden": S("This week's hidden cost", "El costo escondido de esta semana"),
+  "rc.card": S("A {balance} card balance at 24% a year, paying {pay} a month, takes about {years} years and costs about {interest} in interest.", "Una deuda de {balance} en una tarjeta al 24% anual, pagando {pay} al mes, tarda unos {years} años y cuesta unos {interest} de intereses."),
+  "rc.fee": S("A {fee} monthly account fee is {yearly} a year, for an account that could be free.", "Una comisión mensual de {fee} son {yearly} al año, por una cuenta que podría ser gratis."),
+  "rc.subs": S("Two forgotten subscriptions at {each} a month are {yearly} a year.", "Dos suscripciones olvidadas de {each} al mes son {yearly} al año."),
+  "rc.lesson": S("Lesson: {title}", "Lección: {title}"),
+  "rc.fine": S("Example numbers, for learning. Not advice.", "Números de ejemplo, para aprender. No es asesoría."),
   "plan.ask.title": S("Make a plan for your goal?", "¿Hacemos un plan para tu meta?"),
   "plan.ask.sub": S("Optional. Say how much and by when, and see what to set aside each month.", "Opcional. Di cuánto y para cuándo, y ve cuánto apartar cada mes."),
   "plan.ask.yes": S("Make a plan", "Hacer un plan"),
@@ -79,8 +110,8 @@ addStrings({
   "home.your_goal": S("Your goal", "Tu meta"),
   "home.other_goals": S("Other goals", "Otras metas"),
   "home.new_goal": S("New goal", "Nueva meta"),
-  "home.empty.title": S("Set a goal", "Ponte una meta"),
-  "home.empty.sub": S("Pick what you're working toward. You'll get a monthly plan and lessons that help you reach it.", "Elige para qué estás trabajando. Tendrás un plan mensual y lecciones que te ayudan a lograrlo."),
+  "home.empty.title": S("No goal yet", "Todavía no tienes meta"),
+  "home.empty.sub": S("Most people start with an emergency fund. It's the one that saves you from everything else.", "Casi todos empiezan con un fondo de emergencia: es el que te salva de todo lo demás."),
   "home.next_lesson": S("Next lesson", "Siguiente lección"),
   "home.start": S("Start", "Empezar"),
   "home.all_done": S("You've finished every lesson. Review any of them from Learn.", "Terminaste todas las lecciones. Repasa las que quieras en Aprender."),
@@ -127,13 +158,13 @@ addStrings({
   "goal.record.which": S("For which goal?", "¿Para qué meta?"),
   "goal.record.note": S("This is your own log of money you've set aside in real life (or would). Northvale doesn't move or hold any money.", "Es tu propio registro del dinero que has apartado en la vida real (o apartarías). Northvale no mueve ni guarda dinero."),
   "goal.record.save": S("Record", "Registrar"),
-  "goal.record.done": S("Recorded", "Registrado"),
+  "goal.record.done": S("Recorded. Every bit counts.", "Anotado. Todo suma."),
   "goal.recent": S("Recent entries", "Movimientos recientes"),
   "goal.start_entry": S("Starting amount", "Monto inicial"),
   "goal.remove": S("Remove entry", "Quitar movimiento"),
   "goal.linked": S("Practice investments", "Inversiones de práctica"),
   "goal.linked.sub": S("Link holdings from your practice portfolio. They're shown on their own line next to what you've saved, so you can see how investing could get you there sooner. Their value moves with prices.", "Vincula posiciones de tu portafolio de práctica. Se muestran en su propia línea junto a lo que has ahorrado, para que veas cómo invertir podría acercarte antes. Su valor se mueve con los precios."),
-  "goal.linked.none": S("No practice investments yet.", "Todavía no tienes inversiones de práctica."),
+  "goal.linked.none": S("No practice investments linked yet.", "Todavía no hay inversiones de práctica vinculadas."),
   "goal.linked.open": S("Open the practice portfolio", "Abrir el portafolio de práctica"),
   "goal.linked.other": S("Linked to {name}", "Vinculada a {name}"),
   "goal.linked.total": S("Linked value", "Valor vinculado"),
@@ -160,7 +191,7 @@ addStrings({
   "edit.result.week": S("About {amount} a week, until {date}.", "Unos {amount} a la semana, hasta el {date}."),
   "edit.save": S("Save goal", "Guardar meta"),
   "edit.create": S("Create goal", "Crear meta"),
-  "edit.saved": S("Goal saved", "Meta guardada"),
+  "edit.saved": S("Goal saved. Future you says thanks.", "Meta guardada. Tu yo del futuro te lo agradece."),
   "edit.replan": S("Saving re-plans from today, keeping what you've set aside.", "Al guardar se vuelve a planear desde hoy, conservando lo que ya apartaste."),
 
   // Milestones
@@ -170,7 +201,7 @@ addStrings({
   "ms.100": S("Goal reached", "Meta lograda"),
   "ms.body": S("{amount} toward {name}.", "{amount} para {name}."),
   "ms.next": S("Next milestone: {pct}% at {amount}.", "Siguiente hito: {pct}% en {amount}."),
-  "ms.done": S("Take a moment — that took consistency. When you're ready, set the next one.", "Tómate un momento: eso requirió constancia. Cuando quieras, ponte la siguiente."),
+  "ms.done": S("Take a moment: that took consistency. When you're ready, set the next one.", "Tómate un momento: eso requirió constancia. Cuando quieras, pon la siguiente."),
   "ms.continue": S("Continue", "Continuar"),
   "ms.next_goal": S("Set the next goal", "Poner la siguiente meta"),
 
@@ -285,6 +316,28 @@ function Bar({ pct, pctWithInvest = pct, height }) {
     <div role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(pct)} style={{ position: "relative", height, borderRadius: height, background: "var(--surface2)", overflow: "hidden" }}>
       {pctWithInvest > pct && <div style={{ position: "absolute", top: 0, bottom: 0, left: 0, width: `${pctWithInvest}%`, background: "var(--accent)", opacity: 0.3 }} />}
       <div style={{ position: "absolute", top: 0, bottom: 0, left: 0, width: `${pct}%`, background: "var(--accent)", borderRadius: height, transition: "width .6s cubic-bezier(.2,.7,.2,1)" }} />
+    </div>
+  );
+}
+// The main goal's bar as a voyage: the boat at how far you've come, on a
+// route to an island with a flag.
+function VoyageBar({ pct, pctWithInvest = pct }) {
+  const p = Math.max(0, Math.min(100, pct));
+  const pi = Math.max(p, Math.min(100, pctWithInvest));
+  const ease = "cubic-bezier(.2,.7,.2,1)";
+  return (
+    <div role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(pct)} style={{ position: "relative", height: 42, margin: "4px 34px 0 6px" }}>
+      <div style={{ position: "absolute", left: 0, right: 0, top: 27, borderTop: "3px dotted var(--artSea2)" }} />
+      {pi > p && <div style={{ position: "absolute", left: 0, top: 26, height: 6, width: `${pi}%`, background: "var(--accent)", opacity: 0.3, borderRadius: 3 }} />}
+      <div style={{ position: "absolute", left: 0, top: 26, height: 6, width: `${p}%`, background: "var(--accent)", borderRadius: 3, transition: `width .6s ${ease}` }} />
+      <span aria-hidden="true" style={{ position: "absolute", top: 1, left: `calc(${p}% - 14px)`, transition: `left .6s ${ease}` }}>
+        <Mark size={28} color="var(--artInk)" />
+      </span>
+      <svg aria-hidden="true" width="40" height="34" viewBox="-20 -26 40 34" style={{ position: "absolute", right: -36, top: 2 }}>
+        <path d="M-16 6c4-11 28-11 32 0Z" fill="var(--artSand)" />
+        <path d="M1 -2V-22" stroke="var(--artInk)" strokeWidth="2.2" strokeLinecap="round" />
+        <path d="M2 -22L14 -18L2 -14Z" fill="var(--artSun)" />
+      </svg>
     </div>
   );
 }
@@ -508,13 +561,11 @@ function GoalCard({ t, locale, row, fx, big, onClick }) {
       </div>
       {big && <div style={{ fontSize: 13, color: "var(--mid)", marginTop: 16 }}>{t("goal.saved_so_far")}</div>}
       <div style={{ display: "flex", alignItems: "baseline", flexWrap: "wrap", gap: "0 8px", margin: big ? "2px 0 0" : "12px 0 0", ...NUM }}>
-        <span style={{ fontSize: big ? 34 : 22, fontWeight: 700, letterSpacing: big ? -0.8 : -0.3, lineHeight: 1.15 }}>{fmt(saved)}</span>
+        <span className={big ? "nv-disp" : undefined} style={{ fontSize: big ? 40 : 22, fontWeight: big ? undefined : 700, letterSpacing: big ? -0.8 : -0.3, lineHeight: 1.15, color: big ? "var(--head)" : undefined }}>{fmt(saved)}</span>
         <span style={{ fontSize: big ? 15 : 14, color: "var(--mid)" }}>{t("goal.of", { target: fmt(g.target) })}</span>
       </div>
       <Approx t={t} locale={locale} g={g} amount={saved} fx={fx} />
-      <div style={{ marginTop: big ? 12 : 8 }}>
-        <Bar pct={pct} pctWithInvest={pctWithInvest} height={big ? 8 : 6} />
-      </div>
+      <div style={{ marginTop: big ? 10 : 8 }}>{big ? <VoyageBar pct={pct} pctWithInvest={pctWithInvest} /> : <Bar pct={pct} pctWithInvest={pctWithInvest} height={6} />}</div>
       <InvestLine t={t} row={row} fmt={fmt} />
       {big && (
         <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8, fontSize: 14, color: "var(--mid)", ...NUM }}>
@@ -575,6 +626,9 @@ function Home({ t, locale, go, data, setOpen, sheets }) {
       <Title sub={t("goals.sub")}>{t("goals.nav")}</Title>
       {!leadRow ? (
         <>
+          <div style={{ borderRadius: 24, overflow: "hidden", boxShadow: "var(--lift)", marginBottom: 14 }}>
+            <Scene name="harbor" w={358} h={140} />
+          </div>
           <Label style={{ marginTop: 4 }}>{t("home.empty.title")}</Label>
           <p style={{ fontSize: 15, color: "var(--mid)", lineHeight: 1.45, margin: "-4px 0 14px" }}>{t("home.empty.sub")}</p>
           <TemplateGrid t={t} onPick={(id) => sheets.newGoal(id)} highlight={goalFor} />
@@ -988,6 +1042,175 @@ function Onboard({ t, header, option, onNext }) {
   );
 }
 
+// ---- Your money week (Today, when the Sunday check-in is due) -----------------
+
+// The week as a short story: what you learned, an idea that's now solid,
+// the streak, the goal's progress and one suggestion; then the usual
+// check-in question. Worked out on the device; nothing new is sent.
+function MoneyWeek({ t, locale, go, open, onClose }) {
+  return (
+    <Sheet open={open} onClose={onClose} title={t("mw.title")} tall>
+      {open && <WeekStory t={t} locale={locale} go={go} onClose={onClose} />}
+    </Sheet>
+  );
+}
+function WeekStory({ t, locale, go, onClose }) {
+  const progress = useAppState((s) => s.progress);
+  const data = useGoals(locale);
+  const sunday = P.lastSunday(today());
+  const from = addDays(sunday, -6);
+  const inWeek = (d) => !!d && d >= from && d <= sunday;
+  const units = service("lessons", "units")() || [];
+  const unitOf = Object.fromEntries(units.flatMap((u) => u.lessons.map((l) => [l.id, u])));
+  const learned = Object.entries(progress.lessons).filter(([id, l]) => l.done && unitOf[id] && inWeek(l.last || l.at));
+  const counts = {};
+  for (const [id] of learned) counts[unitOf[id].id] = (counts[unitOf[id].id] || 0) + 1;
+  const top = units.find((u) => u.id === Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0]);
+  const concepts = service("lessons", "conceptsNow")() || {};
+  const solid = Object.entries(concepts).filter(([, r]) => r && r.box >= 3 && inWeek(r.last)).map(([c]) => service("lessons", "conceptTitle")(c)).filter(Boolean);
+  const lead = P.primaryGoal(data.rows.map((r) => r.g));
+  const row = lead && data.rows.find((r) => r.g.id === lead.id);
+  const fmt = row && fmtFor(locale, row.g);
+  const change = row ? P.weekChange(row.g, sunday) : 0;
+  const next = service("lessons", "current")();
+  const nextUnit = next && units.find((u) => u.id === next.unit);
+  const done = () => save((s) => ({ ...s, checkIn: sunday }));
+  const line = (icon, title, sub) => (
+    <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px" }}>
+      <span style={{ width: 36, height: 36, borderRadius: 10, background: "var(--bg)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+        <Icon name={icon} size={19} />
+      </span>
+      <span style={{ flex: 1, minWidth: 0 }}>
+        <span style={{ display: "block", fontWeight: 650 }}>{title}</span>
+        {sub && <span style={{ display: "block", fontSize: 14, color: "var(--mid)" }}>{sub}</span>}
+      </span>
+    </div>
+  );
+  return (
+    <div>
+      <div style={{ fontSize: 14, color: "var(--low)", fontWeight: 600, marginBottom: 10 }}>
+        {shortDate(from, locale)} – {shortDate(sunday, locale)}
+      </div>
+      <List>
+        {line("book", t("mw.learned"), learned.length ? t("mw.learned.n", { n: learned.length, unit: text(top.title, locale) }) : t("mw.learned.none"))}
+        {solid.length > 0 && line("star", t("mw.solid"), solid.slice(0, 2).map((x) => text(x, locale)).join(" · "))}
+        {progress.streak.count > 0 && line("streak", t("mw.streak", { n: progress.streak.count }), progress.streak.count >= progress.streak.best ? t("mw.best") : t("mw.going"))}
+        {row && line(P.template(row.g.template).icon, change ? `${nameOf(row.g, t)}: ${fmt(row.saved - change)} → ${fmt(row.saved)}` : t("mw.goal.same", { name: nameOf(row.g, t), saved: fmt(row.saved) }), t("mw.goal.sub", { pct: Math.floor(row.pct) }))}
+      </List>
+      {next && nextUnit && (
+        <Card style={{ marginTop: 12, background: "var(--brandSoft)" }}>
+          <div style={{ fontSize: 14, fontWeight: 650, color: "var(--brand)", marginBottom: 4 }}>{t("mw.next")}</div>
+          <div style={{ fontSize: 16, lineHeight: 1.5 }}>{t("mw.next.body", { lesson: text(next.title, locale), unit: text(nextUnit.title, locale), why: t(`why.${next.unit}`) })}</div>
+        </Card>
+      )}
+      {row && (
+        <>
+          <p style={{ margin: "18px 0 10px", fontSize: 15, fontWeight: 650 }}>{t("week.q")}</p>
+          <div style={{ display: "flex", gap: 8 }}>
+            <Button size="md" style={{ flex: 1 }} onClick={() => (done(), onClose(), go("goals", { record: row.g.id }))}>
+              {t("week.record")}
+            </Button>
+            <Button size="md" kind="secondary" style={{ flex: 1 }} onClick={() => (done(), onClose())}>
+              {t("week.done")}
+            </Button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+// ---- The real cost (Practice) ------------------------------------------------
+
+// Alternates by week: an everyday choice (pick a thing and its price: what
+// it adds up to, and what it could grow to), or a hidden cost (card
+// interest at a fixed payment, a monthly fee, forgotten subscriptions),
+// each with its lesson. Never "skip the coffee": the point is choosing.
+const EVERYDAY = [
+  ["coffee", [5, 50], "workday", 260],
+  ["snack", [3, 30], "day", 365],
+  ["ride", [12, 120], "week", 52],
+];
+export const realCostKind = (day) => (Math.floor(Math.floor(Date.parse(`${day}T12:00:00Z`) / 864e5) / 7) % 2 ? "hidden" : "everyday");
+// Months and interest to pay off a balance at a fixed payment.
+export function payoff(balance, yearlyRate, payment) {
+  let b = balance;
+  let months = 0;
+  let interest = 0;
+  while (b > 0 && months < 600) {
+    const i = (b * yearlyRate) / 12;
+    interest += i;
+    b = b + i - payment;
+    months++;
+  }
+  return { months, interest };
+}
+const grow10 = (monthly) => {
+  const r = fact("indexExampleRate") / 100 / 12;
+  return (monthly * ((1 + r) ** 120 - 1)) / r;
+};
+function RealCostCard({ t, locale, go }) {
+  const R = locale.region === "MX" ? 1 : 0;
+  const cur = { ...locale, currency: R ? "MXN" : "USD" };
+  const m = (n) => money(n, cur);
+  const day = today();
+  const [pick, setPick] = useState("coffee");
+  const [own, setOwn] = useState(R ? "60" : "6");
+  if (realCostKind(day) === "hidden") {
+    const week = Math.floor(Math.floor(Date.parse(`${day}T12:00:00Z`) / 864e5) / 7);
+    const which = ["card", "fee", "subs"][Math.floor(week / 2) % 3];
+    const LESSON = { card: "credit-2", fee: "banking-2", subs: "budget-3" };
+    const lesson = service("lessons", "units")().flatMap((u) => u.lessons).find((l) => l.id === LESSON[which]);
+    let body;
+    if (which === "card") {
+      const [bal, pay] = R ? [10000, 250] : [1000, 25];
+      const p = payoff(bal, 0.24, pay);
+      body = t("rc.card", { balance: m(bal), pay: m(pay), years: Math.round(p.months / 12), interest: m(Math.round(p.interest / (R ? 100 : 10)) * (R ? 100 : 10)) });
+    } else if (which === "fee") body = t("rc.fee", { fee: m(R ? 150 : 12), yearly: m(R ? 1800 : 144) });
+    else body = t("rc.subs", { each: m(R ? 120 : 10), yearly: m(R ? 2880 : 240) });
+    return (
+      <Card style={{ marginBottom: 12 }} data-rc="hidden">
+        <div style={{ fontSize: 14, fontWeight: 650, color: "var(--mid)", marginBottom: 4 }}>{t("rc.hidden")}</div>
+        <p style={{ fontSize: 16, lineHeight: 1.5, margin: 0 }}>{body}</p>
+        {lesson && (
+          <button onClick={() => go("lessons", { lesson: lesson.id })} className="nv-press" style={{ display: "inline-flex", alignItems: "center", gap: 6, marginTop: 10, border: "none", background: "transparent", padding: "8px 0", color: "var(--brand)", fontWeight: 650, fontSize: 15, cursor: "pointer", font: "inherit" }}>
+            <Icon name="book" size={16} /> {t("rc.lesson", { title: text(lesson.title, locale) })}
+          </button>
+        )}
+        <p style={{ fontSize: 13, color: "var(--low)", margin: "8px 0 0" }}>{t("rc.fine")}</p>
+      </Card>
+    );
+  }
+  const item = EVERYDAY.find((x) => x[0] === pick);
+  const price = item ? item[1][R] : Math.max(0, Number(String(own).replace(/[^\d.]/g, "")) || 0);
+  const freq = item ? item[2] : "workday";
+  const yearly = price * (item ? item[3] : 260);
+  return (
+    <Card style={{ marginBottom: 12 }} data-rc="everyday">
+      <div style={{ fontSize: 14, fontWeight: 650, color: "var(--mid)", marginBottom: 4 }}>{t("rc.title")}</div>
+      <div style={{ fontSize: 18, fontWeight: 700, lineHeight: 1.35, color: "var(--head)" }}>{t("rc.pick")}</div>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, margin: "12px 0" }} role="radiogroup" aria-label={t("rc.pick")}>
+        {[...EVERYDAY.map((x) => [x[0], `${t(`rc.${x[0]}`)} · ${m(x[1][R])}`]), ["own", t("rc.own")]].map(([id, label]) => (
+          <button key={id} role="radio" aria-checked={pick === id} onClick={() => setPick(id)} className="nv-press" style={{ border: "none", borderRadius: 999, padding: "8px 14px", fontWeight: 650, fontSize: 15, cursor: "pointer", background: pick === id ? "var(--brand)" : "var(--bg)", color: pick === id ? "var(--onBrand)" : "var(--ink)", font: "inherit" }}>
+            {label}
+          </button>
+        ))}
+      </div>
+      {pick === "own" && (
+        <label style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10, fontSize: 14, color: "var(--mid)" }}>
+          {t("rc.own.label")}
+          <input inputMode="decimal" value={own} onChange={(e) => setOwn(e.target.value.slice(0, 8))} aria-label={t("rc.own.label")} style={{ width: 90, border: "1px solid var(--line)", borderRadius: 10, padding: "8px 10px", background: "var(--bg)", color: "var(--ink)", fontSize: 16 }} />
+        </label>
+      )}
+      <p style={{ fontSize: 16, lineHeight: 1.55, margin: 0 }} aria-live="polite">
+        {t("rc.line", { price: m(price), every: t(`rc.every.${freq}`), yearly: m(Math.round(yearly)), grow: m(Math.round(grow10(yearly / 12) / 10) * 10) })}
+      </p>
+      <p style={{ fontSize: 15, color: "var(--mid)", lineHeight: 1.5, margin: "10px 0 0" }}>{t("rc.choose")}</p>
+      <p style={{ fontSize: 13, color: "var(--low)", margin: "8px 0 0" }}>{t("rc.fine")}</p>
+    </Card>
+  );
+}
+
 // ---- services (for lessons, the portfolio, the tutor) ---------------------
 
 const leadNow = () => {
@@ -1060,12 +1283,13 @@ registerModule({
       return !!goalForNow() && (s.progress.counters.lessons || 0) >= 1 && !goalsNow().length && !(s.profile.seenIntros || {}).goalPlan;
     },
     PlanPrompt,
+    MoneyWeek,
     // The goal a practice holding is linked to (for its tag in the portfolio).
     linkedGoalFor: (symbol) => {
       const g = goalsNow().find((x) => x.linked.includes(symbol));
       return g ? nameOf(g, makeT(locNow())) : null;
     },
-    // For Money Missions: each active goal's kind and name, the main one first.
+    // For real-life missions: each active goal's kind and name, the main one first.
     goalKinds: () => {
       const goals = goalsNow().filter((g) => g.status !== "paused");
       const lead = P.primaryGoal(goals);
@@ -1095,5 +1319,5 @@ registerModule({
   id: "tools",
   nav: { tab: "practice", label: "goals.tools" },
   Screen: ToolsScreen,
-  practice: { order: 3, Row: ToolsRow },
+  practice: { order: 3, Row: ToolsRow, Card: RealCostCard },
 });

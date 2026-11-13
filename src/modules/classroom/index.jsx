@@ -13,7 +13,7 @@ import { addStrings, makeT, shortDate, text } from "../../core/i18n.js";
 import { api } from "../../core/api.js";
 import { dayKey } from "../../core/progress.js";
 import { sendVerify, acceptTeacherTerms, sessionNow, setLeague } from "../../core/session.js";
-import { Button, Card, Field, Icon, Label, Note, Sheet, Switch, Title, toast } from "../../core/ui.jsx";
+import { Button, Card, Field, Icon, Label, Loading, Note, Sheet, Switch, Title, toast } from "../../core/ui.jsx";
 import { classReport, conceptCounts } from "./report.js";
 
 const S = (en, es) => ({ en, es });
@@ -28,7 +28,7 @@ addStrings({
   "cls.sees.yes": S("Your teacher sees", "Tu profe ve"),
   "cls.sees.nick": S("The nickname you pick below", "El apodo que elijas abajo"),
   "cls.sees.lessons": S("Lessons and units you finish from now on", "Las lecciones y unidades que termines desde ahora"),
-  "cls.sees.missions": S("How many Money Missions you finish (never your notes)", "Cuántas Misiones de dinero terminas (nunca tus notas)"),
+  "cls.sees.missions": S("How many real-life missions you finish (never your notes)", "Cuántas misiones de la vida real terminas (nunca tus notas)"),
   "cls.sees.assign": S("Your progress on what your teacher assigns", "Tu avance en lo que asigne tu profe"),
   "cls.sees.concepts": S("Which topics the class finds hard, as class totals — never just yours", "Qué temas se le dificultan al grupo, en totales del grupo — nunca solo los tuyos"),
   "cls.sees.no": S("Your teacher never sees", "Tu profe nunca ve"),
@@ -53,7 +53,7 @@ addStrings({
   "cls.progress": S("{done} of {of} lessons", "{done} de {of} lecciones"),
   "cls.start": S("Start", "Empezar"),
   "cls.finished": S("Finished", "Terminada"),
-  "cls.assigned.none": S("No assignments right now.", "Por ahora no hay tareas."),
+  "cls.assigned.none": S("No assignments right now. Enjoy it.", "No hay tareas por ahora. Disfrútalo."),
   "cls.board": S("Class leaderboard", "Tabla de la clase"),
   "cls.board.show": S("Show me on the class leaderboard", "Mostrarme en la tabla de la clase"),
   "cls.board.hidden": S("Your row is hidden: only you see it.", "Tu fila está oculta: solo tú la ves."),
@@ -393,7 +393,7 @@ function Teaching({ t, locale, go, session }) {
         <div style={{ marginTop: 8 }}>{guide}</div>
       </Card>
     );
-  if (!data) return error ? <Note tone="bad">{error}</Note> : <Card><span className="nv-pulse">…</span></Card>;
+  if (!data) return error ? <Note tone="bad">{error}</Note> : <Card><Loading label={t("common.loading")} /></Card>;
   if (open) return <ClassAdmin t={t} locale={locale} id={open} onBack={() => (setOpen(null), load())} />;
   const r = data.ready;
   return (
@@ -470,7 +470,7 @@ function ClassAdmin({ t, locale, id, onBack }) {
       <Icon name="back" size={18} /> {t("cls.t.back")}
     </button>
   );
-  if (!v) return <div>{back}{error ? <Note tone="bad">{error}</Note> : <span className="nv-pulse">…</span>}</div>;
+  if (!v) return <div>{back}{error ? <Note tone="bad">{error}</Note> : <Loading label={t("common.loading")} />}</div>;
   const all = units();
   const unitTitle = (u) => text((all.find((x) => x.id === u) || { title: { en: u } }).title, locale);
   const link = `${location.origin}/?join=${v.code}`;

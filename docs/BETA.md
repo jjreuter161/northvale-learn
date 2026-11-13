@@ -18,10 +18,13 @@ Keep the beta closed: set `SIGNUP_CODE` and give the code only in your invite. P
 
 ## What to tell testers
 
-- It's a 5-minute-a-day app that teaches money and investing with pretend money.
+- It's a 5-minute-a-day app (version 1.0.0-rc1) that teaches money and investing with pretend money.
 - Try it for **one week**, ideally a little every day.
 - Nothing is real money. Nothing is financial advice.
-- **The bug reporting:** tap **"Send feedback"** at the bottom of any screen. In a lesson, the flag icon reports that exact step.
+- **The bug reporting:** **Me → Send feedback**. In a lesson, the flag icon at the top reports that exact step.
+- **Add it to your Home Screen** (Share → Add to Home Screen on iPhone; the install prompt on Android): it opens like an app, and lessons you've opened work without a connection.
+- A lesson you leave halfway picks up where you were. The look is Cream, Navy or Match my device (Me → Settings → Look).
+- It's labeled **Beta**: things will change, and a short "What's new" appears on Today after an update.
 - After a week you'll send them a few questions (5 minutes).
 
 ## The week

@@ -1,4 +1,4 @@
-// Money Missions: which ones fit (country, age, goal), their order (main
+// real-life missions: which ones fit (country, age, goal), their order (main
 // goal, then this week's units), the weekly suggestion, finishing with a
 // note, XP once (weekly for repeatable ones), and the achievements.
 import assert from "node:assert/strict";

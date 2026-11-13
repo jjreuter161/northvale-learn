@@ -2,15 +2,15 @@
 // its feedback (with why a wrong answer is wrong), the Review card, the
 // session-complete screen for reviews and challenges, the skills overview
 // on Me, and the placement test in onboarding. Rules in mastery.js.
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSlice, setSlice, getState, useAppState, update } from "../../core/store.js";
 import { addStrings, shortDate, text } from "../../core/i18n.js";
 import { dayKey } from "../../core/progress.js";
 import { track } from "../../core/analytics.js";
 import { service } from "../../core/registry.js";
-import { Button, Card, Icon, Label, Sheet } from "../../core/ui.jsx";
+import { Button, Card, Icon, Label, Loading, Sheet } from "../../core/ui.jsx";
 import * as M from "./mastery.js";
-import { UNITS, conceptsOfLesson, conceptsOfUnit } from "./content.js";
+import { UNITS, conceptsOfLesson, conceptsOfUnit, loadUnits } from "./content.js";
 import { CONCEPTS, PLACEMENT, conceptById } from "./concepts.js";
 
 const S = (en, es) => ({ en, es });
@@ -18,10 +18,10 @@ addStrings({
   "lessons.answer_is": S("The answer: {answer}.", "La respuesta: {answer}."),
   "review.title": S("Review", "Repaso"),
   "review.ready": S("{n} {n|concept|concepts} ready · 2–3 min", "{n} {n|concepto listo|conceptos listos} · 2–3 min"),
-  "review.caught_up": S("All caught up. Next review {date}.", "Todo al día. Siguiente repaso: {date}."),
+  "review.caught_up": S("Nothing to review. Your memory's in good shape until {date}.", "Nada que repasar. Tu memoria está en forma hasta el {date}."),
   "review.start": S("Review", "Repasar"),
   "review.anyway": S("Practice anyway", "Practicar de todos modos"),
-  "review.sub": S("Brings back what you missed or haven't seen in a while.", "Trae de vuelta lo que fallaste o no has visto en un tiempo."),
+  "review.sub": S("Brings back what you missed or haven't seen in a while, so it sticks.", "Trae de vuelta lo que fallaste o no has visto en un tiempo, para que se quede."),
   "review.done": S("Review complete", "Repaso completo"),
   "challenge.title": S("Challenge: {title}", "Reto: {title}"),
   "challenge.done": S("Challenge complete", "Reto completo"),
@@ -36,7 +36,7 @@ addStrings({
   "level.solid": S("Solid", "Sólido"),
   "level.mastered": S("Mastered", "Dominado"),
   "place.title": S("How do you want to start?", "¿Cómo quieres empezar?"),
-  "place.sub": S("Lessons take about 3 minutes.", "Las lecciones duran unos 3 minutos."),
+  "place.sub": S("Lessons take about 4 minutes.", "Las lecciones duran unos 4 minutos."),
   "place.new": S("From the beginning", "Desde el principio"),
   "place.new.sub": S("{unit}, lesson 1: {title}", "{unit}, lección 1: {title}"),
   "place.some": S("I know some basics", "Ya sé algo de lo básico"),
@@ -72,13 +72,14 @@ export function useConcepts() {
 
 // ---- a question and its feedback -----------------------------------------
 
-export function QuestionView({ t, locale, step, picked, setPicked, checked, label }) {
+// `bare`: just the options (the question types around it show the rest).
+export function QuestionView({ t, locale, step, picked, setPicked, checked, label, bare }) {
   const x = tx(locale);
   const opts = step.type === "tf" ? [{ v: true, label: t("lessons.true") }, { v: false, label: t("lessons.false") }] : step.options.map((o, i) => ({ v: i, label: x(o) }));
   return (
     <div>
-      <div style={{ fontSize: 14, fontWeight: 650, color: "var(--mid)", marginBottom: 8 }}>{label || t("lessons.question")}</div>
-      <h2 style={{ fontSize: 23, fontWeight: 700, margin: "0 0 20px", lineHeight: 1.3 }}>{x(step.q)}</h2>
+      {!bare && <div style={{ fontSize: 14, fontWeight: 650, color: "var(--mid)", marginBottom: 8 }}>{label || t("lessons.question")}</div>}
+      {!bare && <h2 className="nv-disp" style={{ fontSize: 26, margin: "0 0 20px", lineHeight: 1.2 }}>{x(step.q)}</h2>}
       <div role="radiogroup" style={{ display: "flex", flexDirection: step.type === "tf" ? "row" : "column", gap: 10 }}>
         {opts.map((o, i) => {
           const sel = picked === o.v;
@@ -105,22 +106,31 @@ export function QuestionView({ t, locale, step, picked, setPicked, checked, labe
 }
 
 // Right: why. Wrong: why that choice is wrong, then the answer and why.
-// Amber, not red — a miss is part of learning.
-export function Feedback({ t, locale, step, picked, checked, note }) {
+// Amber, not red — a miss is part of learning. Other question types add
+// their own heading ("Close: within 15%") and detail (the right order…);
+// `why` can be a list of steps, one per line.
+export function Feedback({ t, locale, step, picked, checked, note, heading, extra }) {
   const x = tx(locale);
   const right = checked === "right";
   const miss = !right && step.type === "choice" && step.miss && step.miss[picked];
+  const why = Array.isArray(step.why) ? step.why : [step.why];
   return (
-    <div className="nv-in" role="status" style={{ background: right ? "var(--rightSoft)" : "var(--warnSoft)", borderRadius: 14, padding: "14px 16px", marginBottom: 12 }}>
-      <div style={{ fontWeight: 700, fontSize: 18, color: right ? "var(--right)" : "var(--warn)", display: "flex", alignItems: "center", gap: 8 }}>
-        <Icon name={right ? "check" : "info"} size={22} stroke={right ? 3 : 2.2} />
-        {right ? t("lessons.correct") : t("lessons.wrong")}
+    <div className="nv-in" role="status" data-right={right} style={{ background: right ? "var(--rightSoft)" : "var(--warnSoft)", borderRadius: 20, padding: "14px 16px", marginBottom: 12 }}>
+      <div className="nv-disp" style={{ fontSize: 22, color: right ? "var(--right)" : "var(--warn)", display: "flex", alignItems: "center", gap: 8 }}>
+        {/* A right answer: a soft ripple around the check, once. */}
+        <span className={right ? "nv-ripple" : undefined} style={{ display: "inline-flex", borderRadius: "50%" }}>
+          <Icon name={right ? "check" : "info"} size={22} stroke={right ? 3 : 2.2} />
+        </span>
+        {heading || (right ? t("lessons.correct") : t("lessons.wrong"))}
       </div>
       {miss && <p style={{ margin: "6px 0 0", fontSize: 16, lineHeight: 1.5, fontWeight: 600 }}>{x(miss)}</p>}
-      <p style={{ margin: "6px 0 0", fontSize: 16, lineHeight: 1.5 }}>
-        {!right && step.type === "choice" && `${t("lessons.answer_is", { answer: x(step.options[step.answer]) })} `}
-        {x(step.why)}
-      </p>
+      {extra && <div style={{ fontSize: 15, lineHeight: 1.5 }}>{extra}</div>}
+      {why.map((w, i) => (
+        <p key={i} style={{ margin: "6px 0 0", fontSize: 16, lineHeight: 1.5 }}>
+          {i === 0 && !right && step.type === "choice" && `${t("lessons.answer_is", { answer: x(step.options[step.answer]) })} `}
+          {x(w)}
+        </p>
+      ))}
       {note && <p style={{ margin: "6px 0 0", fontSize: 14, color: "var(--mid)" }}>{note}</p>}
     </div>
   );
@@ -286,6 +296,12 @@ export function Placement({ t, locale, header, startUnit, onNext }) {
   const [results, setResults] = useState([]);
   const [picked, setPicked] = useState(null);
   const [checked, setChecked] = useState(null);
+  // The test's questions come with their units: fetched as soon as this
+  // screen opens, so they're ready when the learner picks the check.
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    loadUnits(PLACEMENT_UNITS).then(() => setReady(true), () => setReady("error"));
+  }, []);
   const step = conceptById(PLACEMENT[results.length] || PLACEMENT[0]).challenge;
   const first = UNITS.find((u) => u.id === startUnit) || UNITS[0];
   const plan = service("goals", "startPlan")();
@@ -344,6 +360,15 @@ export function Placement({ t, locale, header, startUnit, onNext }) {
       </>
     );
   }
+  if (ready !== true)
+    return (
+      <>
+        {header}
+        <div role="status" style={{ padding: "48px 0", display: "flex", justifyContent: "center", textAlign: "center" }}>
+          {ready === "error" ? <p style={{ color: "var(--mid)" }}>{t("common.load_error")}</p> : <Loading label={t("common.loading")} />}
+        </div>
+      </>
+    );
   const check = () => setChecked(picked === step.answer ? "right" : "wrong");
   const next = () => {
     const res = [...results, checked === "right"];

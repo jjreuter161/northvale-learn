@@ -96,6 +96,16 @@ You get three layers:
    fly ssh sftp get /data/learn.json ./backup-learn.json
    ```
 
+**Restoring a daily copy** (tested by `test/data.test.mjs`): pick the day, then restart.
+
+```bash
+fly ssh console -C "ls /data/backups"
+fly ssh console -C "node scripts/restore.mjs /data/backups/learn-2026-11-12.json"
+fly apps restart
+```
+
+The restore checks the file first and refuses anything that isn't a backup. The data it replaces is kept as `/data/learn.before-restore-<time>.json`. On your own computer: `npm run restore -- server/data/backups/learn-2026-11-12.json`, then stop and start the server.
+
 ## Knowing when something breaks
 
 - **Errors from phones and from the server** appear on `/admin`, with counts.

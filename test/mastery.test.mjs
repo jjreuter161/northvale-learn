@@ -4,7 +4,7 @@
 // test/content.test.mjs.)
 import assert from "node:assert/strict";
 import * as M from "../src/modules/lessons/mastery.js";
-import { conceptsOfLesson, conceptPool, lessonState, nextLesson, nextFor } from "../src/modules/lessons/content.js";
+import { conceptsOfLesson, conceptPool, lessonState, nextLesson, nextFor, loadAll, unitLoaded } from "../src/modules/lessons/content.js";
 import { newProgress, completeReview } from "../src/core/progress.js";
 
 const day = "2026-03-02";
@@ -44,8 +44,13 @@ assert.deepEqual(M.pickReview(concepts, day), { ids: ["b", "d", "a"], due: 3 }, 
 assert.deepEqual(M.pickReview({ c: concepts.c }, day).ids, ["c"], "nothing due: practice the longest-unseen anyway");
 assert.equal(M.pickReview({}, day).ids.length, 0);
 assert.equal(M.nextDue({ c: concepts.c, a: concepts.a }), "2026-03-01");
+// Units load on demand: before, a unit's questions aren't there; after, they are.
+assert.equal(unitLoaded("compound"), false, "units start unloaded (the app fetches them when needed)");
+await loadAll();
+assert.equal(unitLoaded("compound"), true);
 const pool = conceptPool("compound_interest");
-assert.equal(pool.lesson.length, 2);
+assert.equal(pool.lesson.length, 3);
+assert.ok(pool.lesson.some((q) => q.type === "estimate"), "the new kinds of question join reviews too");
 assert.equal(M.pickQuestion(pool, undefined), pool.easy, "new or weak: the easier question first");
 assert.equal(M.pickQuestion(pool, { box: 5, seen: 0 }), pool.challenge, "strong: the challenge");
 assert.ok(pool.lesson.includes(M.pickQuestion(pool, { box: 2, seen: 0 })), "in between: a lesson question");

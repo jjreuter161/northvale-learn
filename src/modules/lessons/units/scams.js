@@ -1,5 +1,5 @@
 // UNIT — Scams and fraud. Its lessons and the concepts they teach (format in helpers.js).
-import { T, card, choice, tf, act, concept } from "./helpers.js";
+import { T, card, choice, tf, act, concept, match, number, spot, tap, estimate, scenario, fit } from "./helpers.js";
 
 export default {
   id: "scams",
@@ -67,6 +67,7 @@ export default {
     {
       id: "scams-1",
       title: T("Phishing", "Phishing"),
+      life: T("If a message asks you to log in, open the company's app yourself instead of tapping the link.", "Si un mensaje te pide entrar a tu cuenta, abre tú la app de la empresa en lugar de tocar el enlace."),
       steps: [
         card(T("It looks official", "Parece oficial"), T("Phishing messages copy logos, names and the tone of real companies. They arrive by text, email, social media or phone calls, and they all want the same thing: to get you to tap, log in or share something.", "Los mensajes de phishing copian logos, nombres y el tono de empresas reales. Llegan por mensaje, correo, redes sociales o llamada, y todos quieren lo mismo: que toques, entres o compartas algo.")),
         card(T("Slow down, go direct", "Ve despacio y ve directo"), T("Urgency is the trick. Don't use links or numbers from the message. Open the company's app, or type its address yourself, and check there.", "La urgencia es el truco. No uses enlaces ni números del mensaje. Abre la app de la empresa o escribe tú la dirección, y revisa ahí.")),
@@ -79,33 +80,60 @@ export default {
           [null, T("Logos are easy to copy. They prove nothing.", "Los logos son fáciles de copiar. No prueban nada."), T("Timing doesn't matter — what it asks for does.", "La hora no importa; lo que pide, sí.")]
         ),
         tf("phishing", T("If a message looks official, it's safe to use its link.", "Si un mensaje se ve oficial, es seguro usar su enlace."), false, T("Looking official is exactly what phishing does. Go to the app or website yourself.", "Verse oficial es justo lo que hace el phishing. Entra tú a la app o al sitio.")),
+        spot(
+          "phishing",
+          T("This text just arrived. Tap the 2 biggest red flags.", "Te acaba de llegar este mensaje. Toca las 2 señales de alerta más grandes."),
+          "sms",
+          T("Text message · +1 (555) 013-2291", "Mensaje de texto · +1 (555) 013-2291", { en: "Text message · 55 1234 0987", es: "SMS · 55 1234 0987" }),
+          [
+            tap(T("YourBank", "TuBanco")),
+            T(": Your account is LOCKED. ", ": Tu cuenta está BLOQUEADA. "),
+            tap(T("Verify within 1 hour", "Verifícala en menos de 1 hora"), true),
+            T(" at ", " en "),
+            tap(T("yourbank-secure-login.co", "tubanco-acceso-seguro.co"), true),
+            T(" or it will be closed.", " o será cancelada."),
+          ],
+          T("The link isn't your bank's real address, and the deadline is there to rush you. Your bank never asks you to log in from a text link: open its app instead.", "El enlace no es la dirección real de tu banco, y el plazo está para apresurarte. Tu banco nunca te pide entrar desde un enlace en un mensaje: abre su app.")
+        ),
         act("goals.scam", T("Spot the red flags in this message.", "Encuentra las señales de alerta en este mensaje."), { set: "phishing" }),
       ],
     },
     {
       id: "scams-2",
       title: T("Fake investments", "Inversiones falsas"),
+      life: T("When an investment promises a lot, look it up on FINRA BrokerCheck first.", "Cuando una inversión promete mucho, búscala primero en FINRA BrokerCheck.", { en: "When an investment promises a lot, check it with CONDUSEF first.", es: "Cuando una inversión promete mucho, revísala primero con la CONDUSEF." }),
       steps: [
         card(T("The pitch", "La promesa"), T("\"Guaranteed\" returns, \"risk-free\", \"only a few spots left\", screenshots of big profits. Fake investments often start with a friendly stranger online and end with a request to send money — usually as crypto or a transfer to a person.", "Rendimientos \"garantizados\", \"sin riesgo\", \"quedan pocos lugares\", capturas de ganancias enormes. Las inversiones falsas suelen empezar con un desconocido amable en internet y terminar pidiendo que mandes dinero, casi siempre en cripto o por transferencia a una persona.")),
         card(
           T("How to check", "Cómo revisar"),
           T("Look up the firm on FINRA's BrokerCheck or the SEC's website. If it isn't registered, or you can't find it, don't send money. Report scams to the FTC at ReportFraud.ftc.gov.", "Busca la empresa en BrokerCheck de FINRA o en el sitio de la SEC. Si no está registrada o no la encuentras, no mandes dinero. Reporta los fraudes a la FTC en ReportFraud.ftc.gov.", { en: "Check that the firm is authorized: the CNBV and CONDUSEF publish lists, including warnings about firms that aren't. If you can't confirm it, don't send money. You can report fraud to CONDUSEF.", es: "Revisa que la empresa esté autorizada: la CNBV y la CONDUSEF publican listas, incluso alertas sobre las que no lo están. Si no lo puedes confirmar, no mandes dinero. Puedes reportar fraudes a la CONDUSEF." })
         ),
-        choice(
-          "fake_investments",
-          T("An app promises 2% a day, guaranteed. That's about…", "Una app promete 2% diario, garantizado. Eso es más o menos…"),
-          [T("A sign it's almost certainly a scam", "Una señal de que casi seguro es un fraude"), T("A normal savings rate", "Una tasa de ahorro normal"), T("What index funds usually pay", "Lo que suelen pagar los fondos indexados")],
-          0,
-          T("2% a day would multiply money more than a thousand times in a year. No real investment can promise that.", "Un 2% diario multiplicaría el dinero más de mil veces en un año. Ninguna inversión real puede prometer eso."),
-          [null, T("Savings accounts pay a few percent a year, not per day.", "Las cuentas de ahorro pagan unos cuantos puntos al año, no al día."), T("Even the US stock market has averaged roughly {@marketAvgNominal} a year before inflation, or about {@marketAvgReal} after inflation, over long periods — a year, not a day, and with no guarantee.", "Incluso la bolsa de EE. UU. ha promediado más o menos {@marketAvgNominal} al año antes de inflación, o cerca de {@marketAvgReal} después de inflación, en periodos largos: al año, no al día, y sin garantía.")]
-        ),
+        estimate("fake_investments", T("An app promises 2% a day. If that were real, about what would {$100|1000} grow to in one year?", "Una app promete 2% diario. Si fuera cierto, ¿en cuánto se convertirían {$100|1000} en un año, más o menos?"), { unit: "money", min: [100, 1000], max: [500000, 5000000], step: [100, 1000], answer: [137700, 1377000], tol: 0.25 }, T("2% a day compounds to about 1,377 times your money in a year: about {$137700|1377000}. No real investment does that, which is how you know it's a scam.", "El 2% diario se compone a unas 1,377 veces tu dinero en un año: unos {$137700|1377000}. Ninguna inversión real hace eso, y así sabes que es un fraude.")),
         tf("fake_investments", T("Checking whether a firm is registered takes only a few minutes.", "Revisar si una empresa está registrada toma solo unos minutos."), true, T("A quick search on the regulator's site can save you from losing everything.", "Una búsqueda rápida en el sitio del regulador te puede salvar de perderlo todo.")),
+        spot(
+          "fake_investments",
+          T("A stranger messages you. Tap the 3 red flags.", "Un desconocido te escribe. Toca las 3 señales de alerta."),
+          "offer",
+          T("Message from @wealth.coach.daily", "Mensaje de @wealth.coach.daily"),
+          [
+            T("Hey! I turned {$500|7500} into {$9000|135000} in a month with my trading group. ", "¡Hola! Convertí {$500|7500} en {$9000|135000} en un mes con mi grupo de trading. "),
+            tap(T("Guaranteed 20% a week", "20% semanal garantizado"), true),
+            T(". ", ". "),
+            tap(T("Only 3 spots left", "Solo quedan 3 lugares"), true),
+            T(", so ", ", así que "),
+            tap(T("send the fee with a gift card", "manda la cuota con una tarjeta de regalo"), true),
+            T(" today. ", " hoy. "),
+            tap(T("Here's my profile", "Aquí está mi perfil")),
+          ],
+          T("Guaranteed high returns, a rush, and payment by gift card are three classic scam signs. A real investment never asks for gift cards.", "Rendimientos altos garantizados, prisa y pago con tarjeta de regalo son tres señales clásicas de fraude. Una inversión real nunca pide tarjetas de regalo.")
+        ),
         act("goals.scam", T("Spot the red flags in this investment pitch.", "Encuentra las señales de alerta en esta oferta de inversión."), { set: "investment" }),
       ],
     },
     {
       id: "scams-3",
       title: T("Pyramid schemes", "Esquemas piramidales"),
+      life: T("If you'd be paid mostly for recruiting people, walk away.", "Si te pagarían sobre todo por reclutar personas, aléjate."),
       steps: [
         card(T("Follow the money", "Sigue el dinero"), T("Ask one question: where does the money come from? If it comes from customers buying something they want, it's a business. If it comes mainly from new members paying to join, it's a pyramid.", "Hazte una pregunta: ¿de dónde sale el dinero? Si sale de clientes que compran algo que quieren, es un negocio. Si sale sobre todo de miembros nuevos que pagan por entrar, es una pirámide.")),
         card(T("The math doesn't work", "Las cuentas no dan"), T("If each person must recruit six, the 13th level alone would need more people than live on Earth. Long before that, recruiting stalls — and the people who joined last lose their money.", "Si cada persona debe reclutar a seis, solo el nivel 13 necesitaría más gente de la que vive en la Tierra. Mucho antes, el reclutamiento se frena, y quienes entraron al final pierden su dinero.")),
@@ -118,15 +146,17 @@ export default {
           [null, T("Normal sales jobs pay you for selling to customers, not for signing up other sellers.", "Los trabajos de ventas normales te pagan por venderle a clientes, no por inscribir a otros vendedores."), T("A savings plan keeps your money yours. Here it flows up to others.", "Un plan de ahorro mantiene tu dinero como tuyo. Aquí se va hacia los de arriba.")]
         ),
         tf("pyramid_schemes", T("Most people who join pyramid schemes lose money.", "La mayoría de quienes entran a esquemas piramidales pierde dinero."), true, T("Only those near the top earn — paid by everyone below them.", "Solo ganan los de arriba, con el dinero de todos los de abajo.")),
+        number("pyramid_schemes", T("In a pyramid, each member must bring in 6 new people. Level 1 is 1 person, level 2 needs 6, level 3 needs 36. How many does level 4 need?", "En una pirámide, cada miembro debe traer a 6 personas nuevas. El nivel 1 es 1 persona, el nivel 2 necesita 6 y el nivel 3 necesita 36. ¿Cuántas necesita el nivel 4?"), { unit: "number", answer: 216 }, [T("Each level is 6 times the one before: 36 × 6 = 216.", "Cada nivel es 6 veces el anterior: 36 × 6 = 216."), T("By level 14 it would take more people than live on Earth, so most people join too late to earn anything.", "Para el nivel 14 harían falta más personas de las que viven en la Tierra, así que casi todos entran demasiado tarde para ganar algo.")]),
         act("goals.scam", T("Spot the red flags in this \"business opportunity.\"", "Encuentra las señales de alerta en esta \"oportunidad de negocio\"."), { set: "pyramid" }),
       ],
     },
     {
       id: "scams-4",
       title: T("Protect your accounts", "Protege tus cuentas"),
+      life: T("Turn on two-step verification for your email today. It protects everything else.", "Activa hoy la verificación en dos pasos en tu correo. Protege todo lo demás."),
       steps: [
         card(T("Locks that work", "Candados que sí funcionan"), T("Different passwords for important accounts, two-step verification turned on, and the phone's own lock screen. These three stop most account takeovers.", "Contraseñas distintas para las cuentas importantes, verificación en dos pasos activada y el bloqueo de pantalla del teléfono. Estos tres frenan la mayoría de los robos de cuenta.")),
-        card(T("If something goes wrong", "Si algo sale mal"), T("See a charge you don't recognize? Lock the card in your bank's app and call the bank right away. Banks have rules for disputes, and the faster you report, the more you're protected.", "¿Ves un cargo que no reconoces? Bloquea la tarjeta en la app del banco y llama de inmediato. Los bancos tienen reglas para aclaraciones, y entre más rápido reportes, más protegido estás.", { en: "See a charge you don't recognize? Lock the card in your bank's app, call the bank right away and file a clarification (\"aclaración\"). If it isn't resolved, you can go to CONDUSEF.", es: "¿Ves un cargo que no reconoces? Bloquea la tarjeta en la app del banco, llama de inmediato y presenta una aclaración. Si no se resuelve, puedes acudir a la CONDUSEF." })),
+        card(T("If something goes wrong", "Si algo sale mal"), T("See a charge you don't recognize? Lock the card in your bank's app and call the bank right away. Banks have rules for disputes, and the faster you report, the more you're protected.", "¿Ves un cargo que no reconoces? Bloquea la tarjeta en la app y llama al banco de inmediato. Hay reglas para aclaraciones: entre más rápido reportes, más protegido estás.", { en: "See a charge you don't recognize? Lock the card in your bank's app, call the bank right away and file a clarification (\"aclaración\"). If it isn't resolved, you can go to CONDUSEF.", es: "¿Ves un cargo que no reconoces? Bloquea la tarjeta en la app del banco, llama de inmediato y presenta una aclaración. Si no se resuelve, puedes acudir a la CONDUSEF." })),
         choice(
           "account_security",
           T("Which habit protects your accounts best?", "¿Qué hábito protege mejor tus cuentas?"),
@@ -135,7 +165,18 @@ export default {
           T("Unique passwords limit the damage of a leak; the second step stops most break-ins.", "Las contraseñas únicas limitan el daño de una filtración, y el segundo paso frena la mayoría de los accesos."),
           [null, T("However strong, one leaked password then opens everything.", "Por más fuerte que sea, una contraseña filtrada abre todo."), T("Plain notes aren't protected. A password manager is built for this.", "Las notas comunes no están protegidas. Un administrador de contraseñas está hecho para eso.")]
         ),
-        tf("account_security", T("It's fine to share a login code with a friend if they ask nicely.", "Está bien compartir un código de acceso con un amigo si te lo pide con amabilidad."), false, T("Never share codes. The \"friend\" may be someone who took over their account.", "Nunca compartas códigos. El \"amigo\" puede ser alguien que se robó su cuenta.")),
+        scenario("account_security", T("A friend texts: “I sent a code to your phone by mistake, can you send it to me?”", "Un amigo te escribe: “Te mandé un código por error, ¿me lo pasas?”"), [fit(T("Don't send it, and call your friend another way to check", "No mandarlo y llamarle a tu amigo por otro medio para confirmar"), "good", T("Their account may be hacked. That code is the key to yours.", "Su cuenta puede estar hackeada. Ese código es la llave de la tuya.")), fit(T("Just ignore the message", "Solo ignorar el mensaje"), "ok", T("Safe, though your friend may not know they've been hacked.", "Es seguro, aunque tu amigo quizá no sepa que lo hackearon.")), fit(T("Send it: it's your friend", "Mandarlo: es tu amigo"), "poor", T("This is one of the most common ways accounts get stolen.", "Esta es una de las formas más comunes de robar cuentas."))], T("Never share a login code, with anyone. Real friends and real companies never need it.", "Nunca compartas un código de acceso, con nadie. Ni los amigos ni las empresas de verdad lo necesitan.")),
+        match(
+          "account_security",
+          T("Match each lock to what it does.", "Une cada protección con lo que hace."),
+          [
+            [T("Two-step verification", "Verificación en dos pasos"), T("A second check besides your password", "Una segunda revisión además de tu contraseña")],
+            [T("Password manager", "Administrador de contraseñas"), T("Keeps a different strong password for every site", "Guarda una contraseña fuerte distinta para cada sitio")],
+            [T("Software updates", "Actualizaciones"), T("Fix security holes in your phone and apps", "Tapan huecos de seguridad en tu celular y tus apps")],
+            [T("Card freeze", "Bloqueo de tarjeta"), T("Stops new charges if your card goes missing", "Frena cargos nuevos si pierdes tu tarjeta")],
+          ],
+          T("Each one is small. Together, they stop most attacks.", "Cada una es pequeña. Juntas detienen la mayoría de los ataques.")
+        ),
         act("goals.scam", T("Which of these tips are risky?", "¿Cuáles de estos consejos son riesgosos?"), { set: "security" }),
       ],
     },

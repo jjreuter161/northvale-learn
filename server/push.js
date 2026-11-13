@@ -87,23 +87,37 @@ async function deliver(device, message) {
 }
 
 // WHAT TO SAY — the first that applies on `today` (the learner's date),
-// or nothing. Calm and short; no guilt, no exclamation marks.
+// or nothing. Calm and short; no guilt, no exclamation marks. A streak
+// reminder rotates through a few lines (by date), so it doesn't nag.
+const turn = (today, lines) => lines[Number(today.slice(8)) % lines.length];
 const WORDS = {
   en: {
     title: "Northvale Learn",
-    streak: (s) => `Your ${s.streak.count}-day streak is waiting. One short lesson keeps it going.`,
+    streak: (s, today) =>
+      turn(today, [
+        (n) => `Your ${n}-day streak is still on. One short lesson keeps it that way.`,
+        (n) => `${n} days in a row. Today's lesson takes about 4 minutes.`,
+        (n) => `Your streak would like a word: one short lesson keeps it at ${n} days.`,
+        (n) => `Still time today: one short lesson keeps your ${n}-day streak going.`,
+      ])(s.streak.count),
     checkin: () => "It's Sunday check-in: a minute to record what you set aside this week.",
     review: () => "A quick review is ready: about 2 minutes on what you learned before.",
     mission: (s) => (s.mission.started ? `Still on your mission, "${s.mission.title}"? Mark it done when you've finished.` : `This week's mission: ${s.mission.title}.`),
-    next: (s) => `Next up: ${s.next}. About 3 minutes.`,
+    next: (s) => `Next up: ${s.next}. About 4 minutes.`,
   },
   es: {
     title: "Northvale Learn",
-    streak: (s) => `Tu racha de ${s.streak.count} días te espera. Una lección corta la mantiene.`,
+    streak: (s, today) =>
+      turn(today, [
+        (n) => `Tu racha de ${n} días sigue en pie. Una lección corta la mantiene.`,
+        (n) => `${n} días seguidos. La lección de hoy toma unos 4 minutos.`,
+        (n) => `Tu racha quiere decirte algo: una lección corta la mantiene en ${n} días.`,
+        (n) => `Todavía hay tiempo hoy: una lección corta mantiene tu racha de ${n} días.`,
+      ])(s.streak.count),
     checkin: () => "Es domingo de revisión: un minuto para anotar lo que apartaste esta semana.",
     review: () => "Hay un repaso listo: unos 2 minutos sobre lo que ya aprendiste.",
     mission: (s) => (s.mission.started ? `¿Sigues con tu misión, "${s.mission.title}"? Márcala como hecha cuando termines.` : `La misión de esta semana: ${s.mission.title}.`),
-    next: (s) => `Sigue: ${s.next}. Unos 3 minutos.`,
+    next: (s) => `Sigue: ${s.next}. Unos 4 minutos.`,
   },
 };
 export function pick(s, today, lang = "en") {
@@ -118,7 +132,7 @@ export function pick(s, today, lang = "en") {
     null;
   if (!kind) return null;
   const w = WORDS[lang] || WORDS.en;
-  return { kind, title: w.title, body: w[kind](s), url: `/?from=push&kind=${kind}`, tag: "northvale-daily" };
+  return { kind, title: w.title, body: w[kind](s, today), url: `/?from=push&kind=${kind}`, tag: "northvale-daily" };
 }
 
 // The learner's date and minutes past midnight, in their time zone.

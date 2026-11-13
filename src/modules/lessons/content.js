@@ -1,37 +1,49 @@
 // THE PATH — the course's units (one file each in ./units), in order, and
 // the rules for what's open and what's next. The content format is in
 // units/helpers.js; scripts/validate-content.mjs checks it.
-import { UNITS } from "./units/index.js";
+import { UNITS, LOADERS } from "./units/index.js";
 import { CONCEPTS, conceptById } from "./concepts.js";
+import { QUESTION_TYPES, isQuestion } from "./units/time.js";
 
-export { UNITS };
-export const ALL_LESSONS = UNITS.flatMap((u) => u.lessons.map((l, i) => ({ ...l, unit: u.id, index: i })));
+export { UNITS, QUESTION_TYPES, isQuestion };
+export const ALL_LESSONS = UNITS.flatMap((u) => u.lessons);
 export const lessonById = (id) => ALL_LESSONS.find((l) => l.id === id) || null;
-export const isQuestion = (s) => s.type === "choice" || s.type === "tf";
+// How long a lesson takes (worked out from its steps by the index: units/time.js).
+export const minutes = (lesson) => lesson.minutes;
 
-// How long a lesson takes, roughly: reading on a phone (~150 words a
-// minute), about 25 seconds per question with its feedback, and a minute
-// and a half for the hands-on action. ponytail: a model, not a
-// measurement — check it against real step timings once testers arrive.
-const words = (x) => (x && x.en ? x.en.split(/\s+/).filter(Boolean).length : 0);
-export function minutes(lesson) {
-  let w = 0;
-  let q = 0;
-  for (const s of lesson.steps) {
-    if (s.type === "card") w += words(s.title) + words(s.body);
-    if (isQuestion(s)) (q++, (w += words(s.q) + words(s.why) + (s.options || []).reduce((t, o) => t + words(o), 0)));
-    if (s.type === "action") w += words(s.prompt);
-  }
-  return w / 150 + q * 0.4 + (lesson.steps.some((s) => s.type === "action") ? 1.5 : 0);
-}
-
-// CONCEPTS — which a lesson tests, and every question there is for one.
-export const conceptsOfLesson = (id) => [...new Set((lessonById(id) || { steps: [] }).steps.filter(isQuestion).map((s) => s.c))];
+// CONCEPTS — which a lesson tests, and every question there is for one
+// (the questions of units loaded so far).
+export const conceptsOfLesson = (id) => (lessonById(id) || { concepts: [] }).concepts;
 export const conceptsOfUnit = (unitId) => CONCEPTS.filter((c) => c.unit === unitId).map((c) => c.id);
 export function conceptPool(id) {
   const c = conceptById(id);
-  return { easy: c && c.easy, challenge: c && c.challenge, lesson: ALL_LESSONS.flatMap((l) => l.steps.filter((s) => isQuestion(s) && s.c === id)) };
+  return { easy: c && c.easy, challenge: c && c.challenge, lesson: ALL_LESSONS.flatMap((l) => (l.steps || []).filter((s) => isQuestion(s) && s.c === id)) };
 }
+
+// LOADING — a unit's cards and questions (and its concepts' extra card,
+// easier and harder questions) arrive the first time they're needed: a
+// lesson, a review, a challenge, the placement test. Each unit is loaded
+// once; a failed load (offline, not cached yet) can be tried again.
+const loading = new Map();
+export function loadUnits(ids) {
+  const want = [...new Set(ids)].filter((id) => LOADERS[id]);
+  return Promise.all(
+    want.map((id) => {
+      if (!loading.has(id)) loading.set(id, LOADERS[id]().then((m) => hydrate(m.default)).catch((e) => (loading.delete(id), Promise.reject(e))));
+      return loading.get(id);
+    }),
+  );
+}
+function hydrate(full) {
+  const u = UNITS.find((x) => x.id === full.id);
+  full.lessons.forEach((l, i) => (u.lessons[i].steps = l.steps));
+  for (const c of full.concepts) Object.assign(conceptById(c.id), { explain: c.explain, easy: c.easy, challenge: c.challenge });
+  // A concept from another unit used here (its extra card after a miss) loads too.
+  const others = [...new Set(full.lessons.flatMap((l) => l.steps.map((s) => s.c)).filter(Boolean).map((c) => (conceptById(c) || {}).unit).filter((x) => x && x !== full.id))];
+  return others.length ? loadUnits(others) : null;
+}
+export const loadAll = () => loadUnits(UNITS.map((u) => u.id));
+export const unitLoaded = (id) => !!(UNITS.find((u) => u.id === id) || { lessons: [{}] }).lessons[0].steps;
 // THE ORDER. Learners start in the unit their goal points to (onboarding);
 // that unit and every unit before it are open, later units open one by one
 // as the previous unit is finished — or tested out of in the placement

@@ -27,6 +27,8 @@ const TEXT = [
   ["onBrand", "brand"], ["onBrand", "bad"], ["bg", "ink"],
   ["brand", "bg"], ["brand", "surface"], ["brand", "brandSoft"],
   ["right", "rightSoft"], ["right", "surface"], ["warn", "warnSoft"], ["warn", "surface"], ["bad", "badSoft"], ["bad", "surface"],
+  // the playful look: text over pictures' sky (Today's card, the sea map), the warm tint, the coral's text shade
+  ["head", "artSky"], ["mid", "artSky"], ["low", "artSky"], ["mid", "warmSoft"], ["head", "warmSoft"], ["warmInk", "bg"], ["warmInk", "surface"],
 ];
 for (const [name, L] of Object.entries(looks)) {
   for (const [fg, bg] of TEXT) {
@@ -34,6 +36,7 @@ for (const [name, L] of Object.entries(looks)) {
     const r = ratio(L[fg], L[bg]);
     assert.ok(r >= 4.5, `${name}: --${fg} on --${bg} is ${r.toFixed(2)}:1 (needs 4.5)`);
   }
-  for (const [ui, bg] of [["brand", "bg"], ["brand", "surface2"], ["focus", "bg"]]) assert.ok(ratio(L[ui], L[bg]) >= 3, `${name}: --${ui} stands out from --${bg}`);
+  // The boat, the route and the ring on the sea map stand out from its sky.
+  for (const [ui, bg] of [["brand", "bg"], ["brand", "surface2"], ["focus", "bg"], ["artInk", "artSky"], ["brand", "artSky"]]) assert.ok(ratio(L[ui], L[bg]) >= 3, `${name}: --${ui} stands out from --${bg}`);
 }
 console.log(`ok: the look (navy and cream, Light and Dark): ${TEXT.length} text pairs meet WCAG AA in both`);

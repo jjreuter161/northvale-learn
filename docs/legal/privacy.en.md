@@ -1,6 +1,6 @@
 # Privacy Policy
 
-**DRAFT — for the beta. A lawyer must review this before a public launch.** Last updated: October 2026.
+**DRAFT — for the beta. A lawyer must review this before a public launch.** Last updated: November 2026.
 
 Northvale Learn teaches money and investing with pretend money. We built it to collect as little about you as possible. This page says exactly what we keep, why, and how to delete it.
 
@@ -22,7 +22,9 @@ If you join the waitlist on our website (/welcome), we keep only what the form a
 
 ## What stays on your device
 
-Your lessons, XP, streak, badges, practice portfolio, goals, Money Missions (and any notes you write for them), your age range if you choose one, tutor chat, the classes you're in and your invite link are saved in your browser on this device. We can't see them unless you create an account (or join a class, below).
+Your lessons (including where you are in one you haven't finished), XP, streak, badges, practice portfolio, goals, real-life missions (and any notes you write for them), your answers to the daily myth, your age range if you choose one, tutor chat, the classes you're in and your invite link are saved in your browser on this device. We can't see them unless you create an account (or join a class, below).
+
+**Your look** (Cream, Navy or Match my device) is a setting on this device. With Match my device, the app checks whether your device is in dark mode; that's never sent anywhere. Lessons you've opened are also kept on the device so they work offline.
 
 **Share cards** (images like "12-day streak") are made on your device. They never show names, location or your class, and they show a goal's name or amounts only if you turn that on for that one card (not possible for ages 13–17). We only count that a card of a certain kind (streak, unit, badge, goal) was shared or saved.
 
@@ -35,7 +37,7 @@ Your lessons, XP, streak, badges, practice portfolio, goals, Money Missions (and
 - **Error reports** when something breaks: the error message and where in the app it happened. These contain no personal information.
 - **Requests for news and prices.** These don't include anything about you.
 - **Daily reminders, only if you turn them on.** The address your browser's push service gives this device, the time you picked, your time zone and language, and a few words about what's next (your streak, and the titles of your next lesson and this week's mission), so the reminder can say something useful. They're kept under a random ID made on your device, not linked to your account or usage stats, and deleted when you turn reminders off or choose "Delete my data".
-- **A class, only if you join one** (a test feature that's on only for invited teachers). No account or email is needed. We keep the class you're in, the nickname you pick for it, your age range (to check you're 13 or older) and, from the day you join: which lessons you finish, how many Money Missions you finish (never your notes), how many questions you answered and missed on each topic, and this week's XP. **Your teacher sees** your nickname, the lessons and units you've finished since joining, how many missions you've finished, and your progress on what they assign. Topic results reach the teacher only as totals for the whole class, once 3 or more students have answered. **Your teacher never sees** your goals, amounts, practice portfolio, mission notes, tutor questions, age or email, or anything from before you joined (unless you choose to count lessons you'd already finished toward an assignment). Classmates see your nickname and weekly XP on the class leaderboard, unless you hide yourself. There are no messages of any kind.
+- **A class, only if you join one** (a test feature that's on only for invited teachers). No account or email is needed. We keep the class you're in, the nickname you pick for it, your age range (to check you're 13 or older) and, from the day you join: which lessons you finish, how many real-life missions you finish (never your notes), how many questions you answered and missed on each topic, and this week's XP. **Your teacher sees** your nickname, the lessons and units you've finished since joining, how many missions you've finished, and your progress on what they assign. Topic results reach the teacher only as totals for the whole class, once 3 or more students have answered. **Your teacher never sees** your goals, amounts, practice portfolio, mission notes, tutor questions, age or email, or anything from before you joined (unless you choose to count lessons you'd already finished toward an assignment). Classmates see your nickname and weekly XP on the class leaderboard, unless you hide yourself. There are no messages of any kind.
 - **Invite links, only if you make or open one.** Your link is a random code. When someone opens it and finishes a first lesson, we count it under a random ID made just for that (not their usage-stats ID or account), so both of you get a streak freeze. We never read your contacts or send anything for you.
 
 **If you create an account, we also keep:**
@@ -69,7 +71,7 @@ The server uses your IP address for a few minutes to stop password-guessing and 
 
 ## How long we keep it
 
-- **Account data** stays until you delete the account. Deleted data can stay in our backups for up to 14 days.
+- **Account data** stays until you delete the account. Deleted data can stay in our backups for up to 14 days (and, if we ever restore a backup, in the copy of the data it replaced, which we also delete after 14 days).
 - **Usage stats** are kept as small counts and deleted when you choose "Delete my data".
 - **Feedback** is kept for up to 2 years. After "Delete my data" it's no longer linked to your device.
 - **Class data** stays until you leave the class, your teacher removes you, or the class is deleted. A class the teacher archives is deleted 90 days later, and deleting a teacher's account deletes their classes. "Delete my data" takes you out of every class.

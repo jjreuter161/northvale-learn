@@ -25,7 +25,7 @@ addStrings({
   "remind.quiet.sub": S("No reminders between 9 pm and 8 am.", "Nada de recordatorios entre las 9 pm y las 8 am."),
   "remind.saved": S("Reminder set for {time}", "Recordatorio a las {time}"),
   "remind.denied": S("Notifications are blocked for Northvale Learn. You can allow them in your browser's or phone's settings.", "Las notificaciones están bloqueadas para Northvale Learn. Puedes permitirlas en los ajustes de tu navegador o celular."),
-  "remind.failed": S("Couldn't turn on reminders. Check your connection and try again.", "No se pudieron activar los recordatorios. Revisa tu conexión e intenta de nuevo."),
+  "remind.failed": S("Reminders didn't turn on. Check your connection and try again.", "No se activaron los recordatorios. Revisa tu conexión e inténtalo de nuevo."),
   "remind.ios": S("On iPhone or iPad, add Northvale Learn to your Home Screen first (Share → Add to Home Screen), then turn reminders on from there.", "En iPhone o iPad, primero agrega Northvale Learn a tu pantalla de inicio (Compartir → Agregar a inicio) y activa los recordatorios desde ahí."),
   "remind.unsupported": S("This browser can't show reminders. You can still add one to your calendar.", "Este navegador no puede mostrar recordatorios. Aún puedes agregar uno a tu calendario."),
   "remind.calendar": S("Or add it to your calendar", "O agrégalo a tu calendario"),

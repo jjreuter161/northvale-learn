@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useAppState, update, on } from "./store.js";
 import { makeT } from "./i18n.js";
 import { allModules, getModule } from "./registry.js";
-import { LOOKS, GLOBAL_CSS, Icon, Wordmark, Toasts, Sheet, toast, Button } from "./ui.jsx";
+import { LOOKS, GLOBAL_CSS, Icon, Wordmark, BetaTag, StreakStar, Toasts, Sheet, toast, Button, useLook } from "./ui.jsx";
 import { useSession, refreshSession, schedulePush, verifyEmail } from "./session.js";
 import { settleOnOpen } from "./game.js";
 import { OpenNotice, RepairOffer, COMEBACK_DAYS } from "./Comeback.jsx";
@@ -73,14 +73,15 @@ export default function App() {
 
   // The look's colors live on the page root, so layers opened at the top of
   // the page (sheets, lessons) use them too.
+  const lookNow = useLook(settings.look);
   useEffect(() => {
     const root = document.documentElement;
     root.lang = settings.lang;
-    for (const [k, v] of Object.entries(LOOKS[settings.look] || LOOKS.white)) root.style.setProperty(k, v);
+    for (const [k, v] of Object.entries(LOOKS[lookNow])) root.style.setProperty(k, v);
+    root.style.colorScheme = lookNow === "navy" ? "dark" : "light";
     root.classList.toggle("nv-reduce", !!settings.reduceMotion);
-    const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute("content", LOOKS[settings.look]["--bg"]);
-  }, [settings.lang, settings.look, settings.reduceMotion]);
+    for (const meta of document.querySelectorAll('meta[name="theme-color"]')) meta.setAttribute("content", LOOKS[lookNow]["--bg"]);
+  }, [settings.lang, lookNow, settings.reduceMotion]);
   useEffect(() => {
     refreshSession();
   }, []);
@@ -133,7 +134,7 @@ export default function App() {
     window.scrollTo(0, 0);
   };
 
-  const look = LOOKS[settings.look] || LOOKS.white;
+  const look = LOOKS[lookNow];
   const rootStyle = { ...look, background: "var(--bg)", color: "var(--ink)", minHeight: "100dvh", fontFamily: "'Inter', system-ui, sans-serif" };
 
   if (legalPage) {
@@ -189,14 +190,21 @@ export default function App() {
           <Icon name="back" /> <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t(back)}</span>
         </button>
       )}
-      <div style={{ flex: 1, minWidth: 0 }}>{isRoot && <Wordmark size={25} mark />}</div>
+      {/* The logo's sails fill as the day's XP goal fills. */}
+      <div className="nv-hdr" style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "center", gap: 8 }}>
+        {isRoot && (
+          <>
+            <Wordmark size={25} mark play fill={Math.min(1, ((progress.days || {})[today] || 0) / (progress.dailyGoal || 20))} /> <BetaTag label={t("common.beta")} />
+          </>
+        )}
+      </div>
       <button onClick={() => setStreakOpen(true)} aria-label={t("streak.aria", { n: progress.streak.count })} className="nv-press" style={{ ...chip, color: "var(--mid)" }}>
-        <Icon name="flame" size={18} color={progress.streak.last === today ? "var(--flame)" : "var(--low)"} />
+        <StreakStar count={progress.streak.count} size={18} color={progress.streak.last === today ? "var(--flame)" : "var(--low)"} />
         <span style={{ fontWeight: 650, fontSize: 15, fontVariantNumeric: "tabular-nums" }}>{progress.streak.count}</span>
       </button>
       {getModule("tutor") && (
-        <button onClick={() => getModule("tutor").services.open({})} className="nv-press" style={{ display: "inline-flex", alignItems: "center", gap: 6, border: "none", background: "var(--surface)", color: "var(--ink)", borderRadius: 999, height: 38, padding: "0 14px", fontSize: 15, fontWeight: 650, cursor: "pointer", flexShrink: 0 }}>
-          <Icon name="chat" size={17} /> {t("nav.ask")}
+        <button onClick={() => getModule("tutor").services.open({})} aria-label={t("nav.ask")} className="nv-press" style={{ display: "inline-flex", alignItems: "center", gap: 6, border: "none", background: "var(--surface)", color: "var(--ink)", borderRadius: 999, height: 38, padding: "0 14px", fontSize: 15, fontWeight: 650, cursor: "pointer", flexShrink: 0 }}>
+          <Icon name="chat" size={17} /> <span className="nv-word">{t("nav.ask")}</span>
         </button>
       )}
     </header>
@@ -206,8 +214,10 @@ export default function App() {
     <nav aria-label={t("nav.menu")} style={{ position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 30, background: "var(--bg)", borderTop: "1px solid var(--line)", paddingBottom: "env(safe-area-inset-bottom)" }}>
       <div style={{ display: "flex", maxWidth: 640, margin: "0 auto" }}>
         {TABS.map((x) => (
-          <button key={x.id} onClick={() => openTab(x)} aria-current={tab.id === x.id ? "page" : undefined} className="nv-press" style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 3, border: "none", background: "transparent", color: tab.id === x.id ? "var(--brand)" : "var(--low)", padding: "8px 4px 6px", minHeight: 58, fontSize: 12, fontWeight: 650, cursor: "pointer" }}>
-            <Icon name={x.icon} size={24} />
+          <button key={x.id} onClick={() => openTab(x)} aria-current={tab.id === x.id ? "page" : undefined} className="nv-press" style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 3, border: "none", background: "transparent", color: tab.id === x.id ? "var(--brand)" : "var(--low)", padding: "8px 2px 6px", minHeight: 58, fontSize: 12, lineHeight: 1.15, fontWeight: 650, cursor: "pointer", textAlign: "center", hyphens: "auto", overflowWrap: "anywhere" }}>
+            <span style={{ width: "100%", maxWidth: 60, height: 32, borderRadius: 999, display: "flex", alignItems: "center", justifyContent: "center", background: tab.id === x.id ? "var(--brandSoft)" : "transparent", transition: "background .2s" }}>
+              <Icon name={x.icon} size={23} />
+            </span>
             {t(x.label)}
           </button>
         ))}
@@ -248,9 +258,9 @@ function StreakSheet({ open, onClose, t, progress, today }) {
   return (
     <Sheet open={open} onClose={onClose} title={t("streak.title")}>
       <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 16 }}>
-        <Icon name="flame" size={54} color="var(--flame)" />
+        <StreakStar count={s.count} size={54} />
         <div>
-          <div style={{ fontSize: 34, fontWeight: 750, lineHeight: 1 }}>{t("streak.days", { n: s.count })}</div>
+          <div className="nv-disp" style={{ fontSize: 36, lineHeight: 1 }}>{t("streak.days", { n: s.count })}</div>
           <div style={{ fontSize: 14, color: "var(--mid)", marginTop: 4 }}>{t("streak.best", { n: s.best })}</div>
         </div>
       </div>

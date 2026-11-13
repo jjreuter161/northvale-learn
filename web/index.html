@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Northvale Learn</title>
     <meta name="description" content="Learn money and investing by doing — 5 minutes a day. Practice with pretend money. Educational only." />
-    <meta name="theme-color" content="#F7F2E8" />
+    <meta name="theme-color" content="#F7F2E8" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0D1A2D" media="(prefers-color-scheme: dark)" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Northvale" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -15,16 +16,19 @@
     <link rel="preload" href="/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
     <style>
       /* Fonts are served from here (not Google Fonts), so opening the app
-         sends nothing to a third party. Both are SIL Open Font License. */
+         sends nothing to a third party. All are SIL Open Font License. */
       @font-face { font-family: "Inter"; font-style: normal; font-display: swap; font-weight: 100 900; src: url(/fonts/inter-latin-wght-normal.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
       @font-face { font-family: "Inter"; font-style: normal; font-display: swap; font-weight: 100 900; src: url(/fonts/inter-latin-ext-wght-normal.woff2) format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
       @font-face { font-family: "EB Garamond"; font-style: normal; font-display: swap; font-weight: 600 700; src: url(/fonts/eb-garamond-latin-600-normal.woff2) format("woff2"); }
+      @font-face { font-family: "Fraunces"; font-style: normal; font-display: swap; font-weight: 100 900; src: url(/fonts/fraunces-latin-soft-normal.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
       html,body{margin:0;background:#F7F2E8}#root{min-height:100dvh}
+      /* New learners match the phone: navy from the first frame when it's dark. */
+      @media (prefers-color-scheme: dark){html,body{background:#0D1A2D}}
     </style>
   </head>
   <body>
     <div id="root"></div>
     <noscript>Northvale Learn needs JavaScript.</noscript>
-    <script src="/app.js"></script>
+    <script type="module" src="/app.js"></script>
   </body>
 </html>

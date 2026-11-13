@@ -1,5 +1,5 @@
 // UNIT — Risk & diversification. Its lessons and the concepts they teach (format in helpers.js).
-import { T, card, choice, tf, act, concept } from "./helpers.js";
+import { T, card, choice, tf, act, concept, order, number, scenario, fit } from "./helpers.js";
 
 export default {
   id: "risk",
@@ -53,6 +53,7 @@ export default {
     {
       id: "risk-1",
       title: T("Risk and reward", "Riesgo y recompensa"),
+      life: T("Match money to time: safe for soon, invested for years away.", "Ajusta el dinero al tiempo: seguro para lo cercano, invertido para lo que está a años."),
       steps: [
         card(T("No free lunch", "Nadie regala nada"), T("Investments that can grow more can also drop more. Safe ones (like T-bills) barely move; stocks can jump or fall a lot. Higher possible reward comes with higher risk.", "Las inversiones que pueden crecer más también pueden caer más. Las seguras (como los T-bills) casi no se mueven; las acciones pueden subir o bajar mucho. Más recompensa posible viene con más riesgo.", { en: "Investments that can grow more can also drop more. Safe ones (like CETES) barely move; stocks can jump or fall a lot. Higher possible reward comes with higher risk.", es: "Las inversiones que pueden crecer más también pueden caer más. Las seguras (como los CETES) casi no se mueven; las acciones pueden subir o bajar mucho. Más recompensa posible viene con más riesgo." })),
         card(T("Time changes risk", "El tiempo cambia el riesgo"), T("Over one year, stocks can lose a lot. Over 20 years, they've historically done much better than cash — but there are no guarantees.", "En un año, las acciones pueden perder mucho. En 20 años, históricamente les ha ido mucho mejor que al efectivo, pero no hay garantías.")),
@@ -64,43 +65,52 @@ export default {
           T("High return + no risk = a red flag. Real investments don't work that way.", "Mucha ganancia + cero riesgo = foco rojo. Las inversiones reales no funcionan así."),
           [T("Real investments can't promise 30% a month with no risk. That pitch is a classic scam.", "Ninguna inversión real puede prometer 30% al mes sin riesgo. Esa promesa es un fraude clásico."), null, T("Savings accounts pay a few percent a year, not 30% a month.", "Las cuentas de ahorro pagan unos cuantos puntos al año, no 30% al mes.")]
         ),
-        tf("risk_reward", T("A higher possible return usually means higher risk.", "Una ganancia posible más alta normalmente significa más riesgo."), true, T("That's the trade-off at the heart of investing.", "Ese es el intercambio que está en el centro de invertir.")),
+        scenario("risk_reward", T("You'll need {$3000|45000} in two years for school. Where does it fit best?", "Vas a necesitar {$3000|45000} en dos años para la escuela. ¿Dónde queda mejor?"), [fit(T("Something safe that earns a little, like Treasury bills", "Algo seguro que gane un poco, como letras del Tesoro", { en: "Something safe that earns a little, like CETES", es: "Algo seguro que gane un poco, como CETES" }), "good", T("Lower return, but it will be there on time.", "Menos rendimiento, pero estará ahí a tiempo.")), fit(T("Half safe, half in a stock fund", "La mitad en algo seguro y la mitad en un fondo de acciones"), "ok", T("Some growth, but the stock half could be down when school starts.", "Algo de crecimiento, pero la mitad en acciones podría estar abajo cuando empiece la escuela.")), fit(T("A fund that could earn 20% a year, or lose 30%", "Un fondo que podría ganar 20% al año, o perder 30%"), "poor", T("Higher possible return means higher risk, and two years isn't long enough to wait out a drop.", "Más ganancia posible significa más riesgo, y dos años no alcanzan para esperar a que se recupere.")) ], T("Match the risk to the time: short goals need safe places.", "Ajusta el riesgo al tiempo: las metas cercanas necesitan lugares seguros.")),
+        order("risk_reward", T("Order these from safest to riskiest.", "Ordena del más seguro al más riesgoso."), [T("An insured savings account", "Una cuenta de ahorro asegurada", { en: "A savings account protected by IPAB", es: "Una cuenta de ahorro protegida por el IPAB" }), T("Treasury bills", "Letras del Tesoro", { en: "CETES", es: "CETES" }), T("A fund of the whole stock market", "Un fondo de todo el mercado de acciones"), T("One company's stock", "La acción de una sola empresa"), T("A brand-new cryptocurrency", "Una criptomoneda recién creada")], T("More possible reward comes with more possible loss. Safe things grow slowly; risky ones can grow fast or vanish.", "Más ganancia posible viene con más pérdida posible. Lo seguro crece despacio; lo riesgoso puede crecer rápido o desaparecer.")),
         act("goals.invest", T("Compare the safe path and the stock-market path for a 5-year goal.", "Compara el camino seguro y el de la bolsa para una meta a 5 años."), {monthly: [100,1500],years: 5,compareSafe: true}),
       ],
     },
     {
       id: "risk-2",
       title: T("Don't put all your eggs in one basket", "No pongas todos los huevos en una canasta"),
+      life: T("If you own investments, count how many companies and industries they cover.", "Si tienes inversiones, cuenta cuántas empresas y sectores abarcan."),
       steps: [
         card(T("Diversification", "Diversificación"), T("Spreading money across many different investments means one bad one can't sink you. Different kinds — companies, countries, bonds — tend to have bad years at different times.", "Repartir tu dinero en muchas inversiones distintas hace que una mala no te hunda. Los distintos tipos —empresas, países, bonos— suelen tener años malos en momentos diferentes.")),
-        choice(
-          "diversification",
-          T("Which portfolio is most diversified?", "¿Cuál portafolio está más diversificado?"),
-          [T("All in one company you love", "Todo en una empresa que te encanta"), T("A total-market fund + an international fund + a bond fund", "Un fondo de todo el mercado + uno internacional + uno de bonos"), T("Three tech companies", "Tres empresas de tecnología")],
-          1,
-          T("Different kinds of investments, many companies, more than one country.", "Distintos tipos de inversión, muchas empresas, más de un país."),
-          [T("One company is the opposite of diversified.", "Una sola empresa es lo contrario de diversificar."), null, T("Three companies in the same industry tend to rise and fall together.", "Tres empresas del mismo sector suelen subir y bajar juntas.")]
-        ),
+        order("diversification", T("Order these from least to most diversified.", "Ordena del menos al más diversificado."), [T("All in one company you love", "Todo en una empresa que te encanta"), T("Three tech companies", "Tres empresas de tecnología"), T("A fund of the whole stock market", "Un fondo de todo el mercado de acciones"), T("A whole-market fund + an international fund + a bond fund", "Un fondo de todo el mercado + uno internacional + uno de bonos")], T("More companies, more industries, more countries and more kinds of investment each spread the risk further.", "Más empresas, más sectores, más países y más tipos de inversión reparten cada vez más el riesgo.")),
         card(T("Know what you own", "Conoce lo que tienes"), T("Owning five funds that all hold the same big companies isn't real variety. Check what's inside.", "Tener cinco fondos que tienen las mismas grandes empresas no es variedad de verdad. Revisa qué hay adentro.")),
         tf("diversification", T("Diversification can remove all risk.", "Diversificar puede eliminar todo el riesgo."), false, T("It lowers the risk of one investment ruining you, but the whole market can still fall.", "Reduce el riesgo de que una sola inversión te arruine, pero todo el mercado puede caer igual.")),
+        scenario(
+          "diversification",
+          T("A friend owns four stocks, all video game companies. What would spread their risk best?", "Un amigo tiene cuatro acciones, todas de empresas de videojuegos. ¿Qué repartiría mejor su riesgo?"),
+          [
+            fit(T("Moving part of it into a whole-market fund", "Pasar una parte a un fondo de todo el mercado"), "good", T("Hundreds of companies in many industries, so one bad year for games hurts less.", "Cientos de empresas de muchas industrias, así un mal año para los videojuegos duele menos.")),
+            fit(T("Adding a few companies from other industries", "Agregar algunas empresas de otras industrias"), "ok", T("A real improvement, though still a small basket.", "Mejora de verdad, aunque sigue siendo una canasta pequeña.")),
+            fit(T("Adding a fifth video game company", "Agregar una quinta empresa de videojuegos"), "poor", T("More companies, same risk: one bad year for games hits all five.", "Más empresas, el mismo riesgo: un mal año para los videojuegos les pega a las cinco.")),
+          ],
+          T("Diversifying means owning things that don't all fall for the same reason.", "Diversificar es tener cosas que no caen todas por la misma razón.")
+        ),
         act("portfolio.diversify", T("Get at least 3 different investments in your practice portfolio.", "Ten al menos 3 inversiones distintas en tu portafolio de práctica."), {min: 3}),
       ],
     },
     {
       id: "risk-3",
       title: T("Picking stocks is hard", "Escoger acciones es difícil"),
+      life: T("If you buy single stocks, keep them a small slice of what you invest.", "Si compras acciones sueltas, que sean una parte pequeña de lo que inviertes."),
       steps: [
         card(T("Why it's hard", "Por qué es difícil"), T("When you buy a single stock, someone is selling it to you — often a professional with more information. Even experts pick losers all the time.", "Cuando compras una acción, alguien te la está vendiendo, muchas veces un profesional con más información. Hasta los expertos escogen perdedoras todo el tiempo.")),
         card(T("Keep it small", "Que sea poquito"), T("If you want to own a few companies for fun or to learn, many people keep it to a small slice — like 5–10% — and keep the rest in broad funds.", "Si quieres tener algunas empresas para aprender o por gusto, mucha gente lo limita a una parte pequeña —como 5 a 10%— y deja el resto en fondos amplios.")),
-        choice(
+        scenario(
           "stock_picking",
-          T("You love a brand. Is that enough reason to put most of your money in its stock?", "Te encanta una marca. ¿Es suficiente razón para poner casi todo tu dinero en su acción?"),
-          [T("Yes, I know it's good", "Sí, sé que es buena"), T("No — a great product doesn't mean a great investment at any price", "No: un gran producto no significa una gran inversión a cualquier precio")],
-          1,
-          T("Loving a product is a start for research, not a full plan. Price and risk matter too.", "Que te guste un producto es un punto de partida para investigar, no un plan completo. El precio y el riesgo también importan."),
-          [T("Loving the product doesn't tell you if the stock's price is a good deal — or protect you if it falls.", "Que te encante el producto no te dice si el precio de la acción conviene, ni te protege si cae."), null]
+          T("You love a sneaker brand and want to put most of your savings into its stock. What would you do?", "Te encanta una marca de tenis y quieres poner casi todo tu ahorro en su acción. ¿Qué harías?"),
+          [
+            fit(T("Put a small part in it and the rest in a whole-market fund", "Poner una parte pequeña y el resto en un fondo de todo el mercado"), "good", T("You can root for the brand without betting your savings on it.", "Puedes apoyar a la marca sin apostar tu ahorro.")),
+            fit(T("Read its financial reports first, then decide how much", "Leer primero sus reportes financieros y luego decidir cuánto"), "ok", T("Good homework, but even great companies' stocks can fall hard.", "Buena tarea, pero hasta las acciones de empresas muy buenas pueden caer mucho.")),
+            fit(T("Put most of it in: you know it's good", "Poner casi todo: sabes que es buena"), "poor", T("A great product doesn't mean a great investment, and one company is a lot of risk.", "Un gran producto no significa una gran inversión, y una sola empresa es mucho riesgo.")),
+          ],
+          T("Keep single stocks small and let a fund do the heavy lifting.", "Que las acciones sueltas sean una parte pequeña; deja que un fondo haga el trabajo pesado.")
         ),
         tf("stock_picking", T("In this app you're unlocking individual stocks. Real stock trading usually needs an adult's help until you're 18.", "En esta app desbloqueas acciones individuales. En la vida real, comprar acciones normalmente requiere ayuda de un adulto hasta que tengas 18."), true, T("In real life, under-18s usually invest through an account an adult opens for them (a custodial account).", "En la vida real, los menores de 18 normalmente invierten con una cuenta que abre un adulto por ellos.")),
+        number("stock_picking", T("You put {$1000|10000} into one stock. It falls 50%, then rises 50%. How much do you have now?", "Pones {$1000|10000} en una acción. Baja 50% y luego sube 50%. ¿Cuánto tienes ahora?"), { unit: "money", answer: [750, 7500] }, [T("After the fall: {$500|5000}.", "Después de la caída: {$500|5000}."), T("50% of {$500|5000} is {$250|2500}, so {$750|7500}. The rise is figured on a smaller amount.", "El 50% de {$500|5000} son {$250|2500}, así que {$750|7500}. La subida se calcula sobre una cantidad menor.")]),
         act("portfolio.buy", T("Stocks are unlocked! Practice: buy a small slice of one company — under 10% of your portfolio.", "¡Acciones desbloqueadas! Práctica: compra una parte pequeña de una empresa, menos del 10% de tu portafolio."), {type: "stock",maxShare: 0.1}),
       ],
     },

@@ -1,6 +1,6 @@
 // UNIT — Crypto and risky investments. Strictly educational: no coins are
 // recommended. Its lessons and the concepts they teach (format in helpers.js).
-import { T, card, choice, tf, act, concept } from "./helpers.js";
+import { T, card, choice, tf, act, concept, estimate, match, number, spot, tap } from "./helpers.js";
 
 export default {
   id: "crypto",
@@ -68,6 +68,7 @@ export default {
     {
       id: "crypto-1",
       title: T("What crypto is", "Qué son las criptomonedas"),
+      life: T("Before buying any crypto, find out who runs it and what protects you if it fails.", "Antes de comprar cualquier cripto, averigua quién la maneja y qué te protege si falla."),
       steps: [
         card(T("A digital token", "Una ficha digital"), T("Bitcoin and other cryptocurrencies are tokens recorded on a blockchain. You can buy them on apps and exchanges. Unlike pesos or dollars, they aren't issued by a central bank.", "Bitcoin y otras criptomonedas son fichas registradas en una blockchain. Puedes comprarlas en apps y plataformas. A diferencia del peso o el dólar, no las emite un banco central.")),
         card(T("What protects you — and what doesn't", "Qué te protege y qué no"), T("Crypto on an exchange isn't covered by deposit insurance, and transfers usually can't be reversed. If an exchange fails or you send to the wrong address, the money may be gone.", "La cripto en una plataforma no está cubierta por el seguro de depósitos, y las transferencias normalmente no se pueden revertir. Si la plataforma quiebra o mandas a una dirección equivocada, el dinero puede perderse.", { en: "Crypto isn't legal tender in Mexico, and Banxico has warned about its risks. It isn't covered by IPAB, and transfers usually can't be reversed.", es: "La cripto no es moneda de curso legal en México, y Banxico ha advertido sobre sus riesgos. No está cubierta por el IPAB, y las transferencias normalmente no se pueden revertir." })),
@@ -80,12 +81,24 @@ export default {
           [null, T("Central banks issue pesos and dollars, not Bitcoin.", "Los bancos centrales emiten pesos y dólares, no Bitcoin."), T("Banks may let you buy crypto, but they don't create it.", "Los bancos pueden dejarte comprar cripto, pero no la crean.")]
         ),
         tf("crypto_basics", T("A crypto transfer to the wrong address can usually be reversed.", "Una transferencia de cripto a una dirección equivocada normalmente se puede revertir."), false, T("Most crypto transfers are final. That's one reason scammers like it.", "La mayoría de las transferencias de cripto son definitivas. Esa es una razón por la que les gusta a los estafadores.")),
+        match(
+          "crypto_basics",
+          T("Match each crypto word to what it means.", "Une cada palabra de cripto con lo que significa."),
+          [
+            [T("Blockchain", "Blockchain"), T("A shared record of every transfer", "Un registro compartido de cada transferencia")],
+            [T("Exchange", "Exchange (casa de cambio de cripto)"), T("A company where you buy and sell crypto", "Una empresa donde compras y vendes cripto")],
+            [T("Seed phrase", "Frase semilla"), T("Secret words that control a wallet: never share them", "Palabras secretas que controlan una cartera: nunca las compartas")],
+            [T("Wallet", "Cartera (wallet)"), T("An app or device that holds your crypto keys", "Una app o dispositivo que guarda tus llaves de cripto")],
+          ],
+          T("Crypto isn't issued by a central bank, and on an exchange it isn't covered by deposit insurance.", "Las criptomonedas no las emite un banco central, y en un exchange no las cubre el seguro de depósitos.")
+        ),
         act("goals.swing", T("Watch a very volatile (made-up) asset next to a broad fund.", "Mira un activo muy volátil (inventado) junto a un fondo amplio.")),
       ],
     },
     {
       id: "crypto-2",
       title: T("Why it swings so much", "Por qué se mueve tanto"),
+      life: T("Only put into crypto what you could watch fall 80% without needing it.", "Pon en cripto solo lo que podrías ver caer 80% sin necesitarlo."),
       steps: [
         card(T("Nothing to anchor the price", "Nada que ancle el precio"), T("A stock's price is tied, in the long run, to a company's profits. Most coins have no profits or cash flows behind them, so price moves with demand, news and mood — and can move a lot.", "El precio de una acción, a largo plazo, está ligado a las ganancias de una empresa. La mayoría de las monedas no tiene ganancias ni flujos detrás, así que el precio se mueve con la demanda, las noticias y el ánimo, y se puede mover mucho.")),
         card(T("The math of a drop", "Las matemáticas de una caída"), T("After a 50% fall, you need a 100% rise just to get back to even. Big drops are much harder to recover from than they look.", "Después de una caída de 50%, necesitas una subida de 100% solo para volver al punto de partida. Las caídas grandes cuestan mucho más recuperarlas de lo que parece.")),
@@ -97,13 +110,15 @@ export default {
           T("Half of {$100|1000} is {$50|500}; doubling {$50|500} — a 100% rise — gets back to {$100|1000}.", "La mitad de {$100|1000} son {$50|500}; duplicar {$50|500} —subir 100%— regresa a {$100|1000}."),
           [null, T("A 50% rise on {$50|500} only reaches {$75|750}.", "Subir 50% sobre {$50|500} solo llega a {$75|750}."), T("A 25% rise on {$50|500} reaches about {$63|625}.", "Subir 25% sobre {$50|500} llega a unos {$63|625}.")]
         ),
-        tf("crypto_volatility", T("Most cryptocurrencies have company profits behind their price, like stocks.", "La mayoría de las criptomonedas tiene ganancias de una empresa detrás de su precio, como las acciones."), false, T("Most don't — which is part of why prices swing so much.", "La mayoría no, y eso es parte de por qué los precios se mueven tanto.")),
+        match("crypto_volatility", T("Match each investment to what's behind its price.", "Une cada inversión con lo que respalda su precio."), [[T("A stock", "Una acción"), T("A company's profits", "Las ganancias de una empresa")], [T("A bond", "Un bono"), T("Promised interest payments", "Pagos de interés prometidos")], [T("Most cryptocurrencies", "La mayoría de las criptomonedas"), T("Only what the next buyer will pay", "Solo lo que pague el siguiente comprador")]], T("With nothing like profits or interest to anchor it, a coin's price can swing much further.", "Sin ganancias ni intereses que lo anclen, el precio de una moneda puede moverse mucho más.")),
+        estimate("crypto_volatility", T("A coin drops 80%. How much does it then have to rise to get back to where it started?", "Una moneda baja 80%. ¿Cuánto tiene que subir después para volver a donde empezó?"), { unit: "percent", min: 0, max: 1000, step: 10, answer: 400 }, T("{$100|1000} falls to {$20|200}. Getting back to {$100|1000} means growing five times over: a 400% rise.", "{$100|1000} baja a {$20|200}. Volver a {$100|1000} significa crecer cinco veces: subir 400%.")),
         act("goals.swing", T("Run a few made-up years and compare the biggest drops.", "Corre unos cuantos años inventados y compara las mayores caídas.")),
       ],
     },
     {
       id: "crypto-3",
       title: T("Spotting hype", "Cómo detectar el hype"),
+      life: T("When a post promises fast, huge gains, look for who's selling.", "Cuando una publicación prometa ganancias enormes y rápidas, busca quién está vendiendo."),
       steps: [
         card(T("What hype sounds like", "Cómo suena el hype"), T("\"It'll 100×!\", \"get in early\", \"everyone's buying\", \"never sell.\" Urgency plus big promises plus social proof — the same tactics as ads and scams.", "\"¡Se va a multiplicar 100 veces!\", \"entra temprano\", \"todos están comprando\", \"nunca vendas\". Urgencia más promesas grandes más prueba social: las mismas tácticas que los anuncios y los fraudes.")),
         card(T("What information sounds like", "Cómo suena la información"), T("Who runs it, how it works, what problem it solves, what could go wrong. If you can't find these, that tells you something.", "Quién lo dirige, cómo funciona, qué problema resuelve, qué podría salir mal. Si no encuentras esto, eso ya te dice algo.")),
@@ -116,12 +131,29 @@ export default {
           [null, T("Followers aren't evidence. Popular can still crash.", "Los seguidores no son evidencia. Lo popular también se puede desplomar."), T("Rushing is exactly what hype wants.", "Apresurarte es justo lo que quiere el hype.")]
         ),
         tf("hype", T("If you can't find who runs a crypto project, that's a warning sign.", "Si no encuentras quién dirige un proyecto de cripto, eso es una señal de alerta."), true, T("Anonymous projects make it easy to disappear with the money.", "Los proyectos anónimos hacen fácil desaparecer con el dinero.")),
+        spot(
+          "hype",
+          T("A post about a new coin. Tap the 2 signs of hype.", "Una publicación sobre una moneda nueva. Toca las 2 señales de exageración."),
+          "offer",
+          T("Post · @moon.signals", "Publicación · @moon.signals"),
+          [
+            tap(T("This coin will go up 100× by Friday", "Esta moneda va a subir 100× para el viernes"), true),
+            T(". ", ". "),
+            tap(T("Get in before it's too late", "Entra antes de que sea tarde"), true),
+            T(". ", ". "),
+            tap(T("Total supply: 1 billion tokens", "Oferta total: mil millones de tokens")),
+            T(". ", ". "),
+            tap(T("Code published on GitHub", "Código publicado en GitHub")),
+          ],
+          T("Promises of huge, fast gains and pressure to hurry are hype. A token count and published code are information you can check, though they don't make it a good investment.", "Las promesas de ganancias enormes y rápidas y la prisa son exageración. La cantidad de tokens y el código publicado son información que puedes revisar, aunque no la hacen una buena inversión.")
+        ),
         act("goals.scam", T("Find the hype in this post.", "Encuentra el hype en esta publicación."), { set: "hype" }),
       ],
     },
     {
       id: "crypto-4",
       title: T("Other risky bets", "Otras apuestas riesgosas"),
+      life: T("If you ever try a risky bet, set a small limit first and stick to it.", "Si alguna vez pruebas una apuesta riesgosa, pon primero un límite pequeño y respétalo."),
       steps: [
         card(T("Leverage, options, meme stocks, betting", "Apalancamiento, opciones, acciones de moda, apuestas"), T("Borrowing to invest, short-term options trading, chasing whatever stock is trending, and sports-betting or gambling apps can all lose money fast. Many are designed to feel like games.", "Pedir prestado para invertir, operar opciones a corto plazo, perseguir la acción de moda y las apps de apuestas pueden hacer perder dinero rápido. Muchas están diseñadas para sentirse como juegos.")),
         card(T("Keep it small, if at all", "Pequeño, si acaso"), T("A common approach: keep anything this risky to a small amount you could lose completely without touching your goals or emergency fund. In this app, risky bets stay out of the practice portfolio.", "Un enfoque común: mantener cualquier cosa así de riesgosa en una cantidad pequeña que podrías perder por completo sin tocar tus metas ni tu fondo de emergencia. En esta app, las apuestas riesgosas se quedan fuera del portafolio de práctica.")),
@@ -133,7 +165,8 @@ export default {
           T("Leverage magnifies both directions — but the loan doesn't shrink when you lose.", "El apalancamiento agranda las dos direcciones, pero el préstamo no se achica cuando pierdes."),
           [null, T("It's legal in many forms — just very risky.", "Es legal en muchas formas; solo es muy riesgoso."), T("It can win too. The problem is how much it can lose.", "También puede ganar. El problema es cuánto puede perder.")]
         ),
-        tf("risky_bets", T("Gambling-style apps are often designed to keep you playing.", "Las apps tipo apuesta suelen estar diseñadas para que sigas jugando."), true, T("Streaks, near-misses and rewards keep you coming back — the house still wins on average.", "Las rachas, los \"casi gano\" y las recompensas te hacen volver; en promedio, la casa gana.")),
+        spot("risky_bets", T("A betting app's home screen. Tap the 2 lines built to keep you playing.", "La pantalla de inicio de una app de apuestas. Toca las 2 frases hechas para que sigas jugando."), "offer", T("App · LuckyLine", "App · LuckyLine"), [tap(T("Bet again to win back your losses!", "¡Apuesta otra vez para recuperar lo que perdiste!"), true), T(" · ", " · "), tap(T("Free spins expire in 10:00", "Los giros gratis vencen en 10:00"), true), T(" · ", " · "), tap(T("Set a deposit limit", "Pon un límite de depósito")), T(" · ", " · "), tap(T("Take a break", "Tomar un descanso"))], T("Chasing losses and a ticking clock are there to keep you betting. Limits and breaks are the tools that protect you.", "Perseguir lo perdido y un reloj corriendo están para que sigas apostando. Los límites y los descansos son las herramientas que te protegen.")),
+        number("risky_bets", T("You put in {$100|1000} with 5× leverage, so you control {$500|5000}. The price drops 20%. How much of your money is left?", "Pones {$100|1000} con apalancamiento de 5×, así que controlas {$500|5000}. El precio baja 20%. ¿Cuánto de tu dinero queda?"), { unit: "money", answer: 0 }, [T("20% of {$500|5000} is {$100|1000}.", "El 20% de {$500|5000} son {$100|1000}."), T("That's all of your own money: nothing left. With leverage, a small drop can wipe you out.", "Es todo tu dinero: no queda nada. Con apalancamiento, una caída pequeña te puede dejar en cero.")]),
         act("portfolio.diversify", T("Spread your practice money so no single bet can sink it.", "Reparte tu dinero de práctica para que ninguna apuesta sola lo hunda."), {}),
       ],
     },

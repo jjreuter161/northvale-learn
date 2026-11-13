@@ -29,10 +29,15 @@ export const FACTS = {
   retirementAge: { value: 65, kind: "number", check: "an example retirement age", review: "rarely" },
   // Retirement accounts: limits set by law
   iraLimit: { value: 7500, kind: "usd", check: "irs.gov — yearly IRA contribution limit under age 50 (2026: IRS Notice 2025-67); a custodial IRA can't exceed the child's earned income", review: "yearly (announced each November)" },
+  rothRule: { value: { en: "age 59½ and a 5-year rule", es: "59½ años y regla de 5 años" }, kind: "text", check: "irs.gov — Roth IRA qualified distributions (Publication 590-B)", review: "rarely (set by law)" },
   umaAnnual: { value: 42794.64, kind: "mxn", check: "inegi.org.mx — UMA anual (2026 value: $42,794.64, in force from Feb 1, 2026)", review: "yearly (published each January)" },
   pprDeductionPct: { value: 10, kind: "pct", check: "LISR art. 151 fracc. V — share of yearly accumulable income", review: "rarely (set by law)" },
   pprDeductionUmas: { value: 5, kind: "number", check: "LISR art. 151 fracc. V — cap, in annual UMAs; one limit shared by PPRs and long-term voluntary AFORE contributions", review: "rarely (set by law)" },
   pprAge: { value: 65, kind: "number", check: "LISR art. 151 fracc. V — withdrawing before this age (without a disability) makes it taxable income", review: "rarely (set by law)" },
+  // Credit
+  ficoRange: { value: { en: "300 to 850", es: "300 a 850" }, kind: "text", check: "myfico.com — the FICO Score range (VantageScore uses the same range)", review: "rarely" },
+  ficoFactors: { value: { en: "payment history (~35%), amounts owed (~30%), length of history (~15%), new credit (~10%) and credit mix (~10%)", es: "historial de pagos (~35%), montos que debes (~30%), antigüedad (~15%), crédito nuevo (~10%) y mezcla de créditos (~10%)" }, kind: "text", check: "myfico.com — \"What's in my FICO Scores\" (the published weights)", review: "rarely" },
+  buroFreeReportMonths: { value: 12, kind: "number", check: "Ley para Regular las Sociedades de Información Crediticia, art. 40, and burodecredito.com.mx — one free Reporte de Crédito Especial every this many months", review: "rarely (set by law)" },
   // Paychecks and taxes — US
   socialSecurityRate: { value: 6.2, kind: "pct", check: "ssa.gov — employee share of Social Security tax (up to the yearly wage base)", review: "yearly" },
   medicareRate: { value: 1.45, kind: "pct", check: "irs.gov — employee share of Medicare tax", review: "yearly" },

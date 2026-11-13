@@ -1,5 +1,5 @@
 // UNIT — Reading financial news. Its lessons and the concepts they teach (format in helpers.js).
-import { T, card, choice, tf, act, concept } from "./helpers.js";
+import { T, card, choice, tf, act, concept, estimate, match, scenario, fit, order, number } from "./helpers.js";
 
 export default {
   id: "news",
@@ -53,6 +53,7 @@ export default {
     {
       id: "news-1",
       title: T("Headlines decoded", "Titulares sin misterio"),
+      life: T("Read one market headline this week and say it in plain words.", "Lee un titular de la bolsa esta semana y dilo con palabras sencillas."),
       steps: [
         card(T("The words you'll see", "Las palabras que vas a ver"), T("A \"bull market\" is a long stretch of rising prices; a \"bear market\" is a drop of 20% or more. A \"rally\" is a quick rise; a \"sell-off\" is a quick fall.", "Un \"mercado alcista\" (bull market) es una racha larga de precios al alza; un \"mercado bajista\" (bear market) es una caída de 20% o más. Un \"rally\" es una subida rápida; un \"sell-off\", una caída rápida.")),
         card(T("Indexes are the scoreboard", "Los índices son el marcador"), T("When the news says \"the market,\" it usually means an index like the S&P 500 or the Dow.", "Cuando las noticias dicen \"el mercado\", casi siempre hablan de un índice como el S&P 500 o el Dow.", { en: "In Mexico, \"the market\" usually means the S&P/BMV IPC — the main index of the Mexican Stock Exchange.", es: "En México, \"la bolsa\" casi siempre se refiere al S&P/BMV IPC, el índice principal de la Bolsa Mexicana de Valores." })),
@@ -64,31 +65,38 @@ export default {
           T("Bear = down 20%+. Scary headline, normal event — it has happened many times before.", "Bajista = 20% abajo o más. Titular que asusta, evento normal: ha pasado muchas veces."),
           [null, T("A record high is the opposite — that's bull territory.", "Un máximo histórico es lo contrario: eso es territorio alcista."), T("A bear market is about falling prices, not trading hours.", "Un mercado bajista se trata de precios que caen, no de horarios.")]
         ),
-        tf("news_reactions", T("A scary headline is a reason to sell everything.", "Un titular que da miedo es razón para vender todo."), false, T("Headlines are written to grab attention. Your plan should be built for bad days too.", "Los titulares están hechos para llamar la atención. Tu plan debe estar hecho también para los días malos.")),
+        number("market_terms", T("“Stocks PLUNGE!” The index fell from 5,000 to 4,850. By what percent did it fall?", "“¡Se DESPLOMAN las acciones!” El índice bajó de 5,000 a 4,850. ¿Qué porcentaje bajó?"), { unit: "percent", answer: 3 }, [T("It fell 150 points.", "Bajó 150 puntos."), T("150 ÷ 5,000 = 3%. A normal bad day sounds a lot scarier in a headline.", "150 ÷ 5,000 = 3%. Un día malo normal suena mucho peor en un titular.")]),
+        match(
+          "market_terms",
+          T("Match each headline word to what it means.", "Une cada palabra de los titulares con lo que significa."),
+          [
+            [T("Bull market", "Mercado alcista"), T("Prices rising for a long stretch", "Precios subiendo por mucho tiempo")],
+            [T("Correction", "Corrección"), T("Prices down about 10% from a high", "Precios cerca de 10% abajo de un máximo")],
+            [T("Index", "Índice"), T("A scoreboard for a group of stocks", "Un marcador para un grupo de acciones")],
+            [T("Recession", "Recesión"), T("The economy shrinking for a while", "La economía achicándose por un tiempo")],
+          ],
+          T("Knowing the words makes the headlines a lot less dramatic.", "Conocer las palabras hace los titulares mucho menos dramáticos.")
+        ),
         act("news.read", T("Read one of today's headlines, explained.", "Lee uno de los titulares de hoy, explicado."), {}),
       ],
     },
     {
       id: "news-2",
       title: T("Rates and inflation", "Tasas e inflación"),
+      life: T("Check whether your savings earn more than inflation.", "Revisa si tu ahorro gana más que la inflación."),
       steps: [
         card(T("Inflation", "Inflación"), T("Inflation means prices rise over time, so each dollar buys a bit less. The US central bank aims for about {@fedInflationTarget} a year.", "La inflación significa que los precios suben con el tiempo, así que cada peso compra un poco menos. El banco central de EE. UU. busca alrededor de {@fedInflationTarget} al año.", { en: "Inflation means prices rise over time, so each peso buys a bit less. Mexico's central bank, Banxico, aims for about {@banxicoInflationTarget} a year.", es: "La inflación significa que los precios suben con el tiempo, así que cada peso compra un poco menos. Banxico, el banco central de México, busca alrededor de {@banxicoInflationTarget} al año." })),
         card(T("Why rates matter", "Por qué importan las tasas"), T("To fight high inflation, the Federal Reserve (the Fed) raises interest rates. Loans get pricier and savings pay more. When it cuts rates, the opposite happens.", "Para frenar la inflación alta, la Reserva Federal (la Fed) sube las tasas de interés. Los préstamos se encarecen y el ahorro paga más. Cuando las baja, pasa lo contrario.", { en: "To fight high inflation, Banxico raises its interest rate. Loans get pricier and CETES pay more. When it cuts rates, the opposite happens.", es: "Para frenar la inflación alta, Banxico sube su tasa de interés. Los préstamos se encarecen y los CETES pagan más. Cuando la baja, pasa lo contrario." })),
-        choice(
-          "inflation_rates",
-          T("The central bank raises interest rates. What usually happens?", "El banco central sube las tasas de interés. ¿Qué suele pasar?"),
-          [T("Borrowing gets more expensive", "Pedir prestado se vuelve más caro"), T("Everything gets cheaper right away", "Todo se abarata al instante"), T("Savings accounts pay less", "Las cuentas de ahorro pagan menos")],
-          0,
-          T("Higher rates = pricier loans, and usually better rates on savings.", "Tasas más altas = préstamos más caros, y normalmente mejores rendimientos para el ahorro."),
-          [null, T("Higher rates can slow price rises over time, but prices don't drop right away.", "Tasas más altas pueden frenar la subida de precios con el tiempo, pero los precios no bajan de inmediato."), T("It's usually the opposite: savings rates tend to rise when the central bank's rate goes up.", "Suele ser lo contrario: las tasas de ahorro tienden a subir cuando sube la tasa del banco central.")]
-        ),
+        order("inflation_rates", T("Put the chain in order: what usually follows a rate rise.", "Ordena la cadena: lo que suele pasar después de una subida de tasas."), [T("The central bank raises interest rates", "El banco central sube las tasas de interés"), T("Loans and credit cards get more expensive", "Los préstamos y las tarjetas se encarecen"), T("People and companies borrow and spend less", "Las personas y las empresas piden prestado y gastan menos"), T("Prices rise more slowly", "Los precios suben más despacio")], T("Higher rates cool borrowing and spending, which slows inflation. Savings accounts usually pay more, too.", "Las tasas más altas enfrían el crédito y el gasto, y eso frena la inflación. Las cuentas de ahorro también suelen pagar más.")),
         tf("inflation_rates", T("If your savings earn less than inflation, your money loses buying power.", "Si tu ahorro gana menos que la inflación, tu dinero pierde poder de compra."), true, T("Earning 1% while prices rise 4% means you can buy less next year.", "Ganar 1% mientras los precios suben 4% significa que el próximo año puedes comprar menos.")),
+        estimate("inflation_rates", T("If prices rise 3% a year, about what will {$100|1000} of groceries cost in 10 years?", "Si los precios suben 3% al año, ¿cuánto costará más o menos en 10 años el súper que hoy cuesta {$100|1000}?"), { unit: "money", min: [100, 1000], max: [300, 3000], step: [1, 10], answer: [134, 1340], tol: 0.1 }, T("Prices compound too: {$100|1000} × 1.03 ten times is about {$134|1340}. That's why savings need to earn something.", "Los precios también se componen: {$100|1000} × 1.03 diez veces son unos {$134|1340}. Por eso el ahorro tiene que ganar algo.")),
         act("portfolio.review", T("Check how your practice portfolio did since you started.", "Revisa cómo le ha ido a tu portafolio de práctica desde que empezaste."), {}),
       ],
     },
     {
       id: "news-3",
       title: T("Don't trade on headlines", "No inviertas por titulares"),
+      life: T("Next time a scary headline appears, read past the headline before doing anything.", "La próxima vez que veas un titular alarmante, lee más allá del titular antes de hacer nada."),
       steps: [
         card(T("News is already in the price", "La noticia ya está en el precio"), T("By the time you read a headline, millions of people and computers have already acted on it. Trading on news is a race you're late to.", "Para cuando lees un titular, millones de personas y computadoras ya actuaron. Invertir por noticias es una carrera a la que llegas tarde.")),
         card(T("Use news to learn, not to react", "Usa las noticias para aprender, no para reaccionar"), T("Good questions: What does this mean for my long-term plan? Does it change why I own this? Usually the answer is: nothing to do.", "Buenas preguntas: ¿qué significa esto para mi plan a largo plazo? ¿Cambia la razón por la que tengo esta inversión? Casi siempre la respuesta es: no hay que hacer nada.")),
@@ -101,6 +109,16 @@ export default {
           [T("By the time you read it, the price has usually already moved. Selling in a rush often means selling low.", "Cuando lo lees, el precio casi siempre ya se movió. Vender con prisa suele significar vender barato."), null, T("Posting doesn't change your investment — understanding the news does.", "Publicarlo no cambia tu inversión; entender la noticia, sí.")]
         ),
         tf("news_reactions", T("Checking your investments every hour usually leads to better results.", "Revisar tus inversiones cada hora suele dar mejores resultados."), false, T("Checking constantly makes normal swings feel scary and tempts you to trade too much.", "Revisar todo el tiempo hace que los movimientos normales den miedo y te tienta a mover tus inversiones de más.")),
+        scenario(
+          "news_reactions",
+          T("A headline says “Stocks plunge 3% on rate fears.” You invest in an index fund every month for the long run. What do you do?", "Un titular dice “Las acciones se desploman 3% por miedo a las tasas”. Inviertes en un fondo indexado cada mes a largo plazo. ¿Qué haces?"),
+          [
+            fit(T("Read why it happened, and keep your plan", "Leer por qué pasó y seguir con tu plan"), "good", T("You learn something, and your plan was made for days like this.", "Aprendes algo, y tu plan está hecho para días así.")),
+            fit(T("Pause new money for a few months", "Pausar las aportaciones unos meses"), "ok", T("Not a disaster, but you'd skip buying while prices are lower.", "No es grave, pero dejarías de comprar justo cuando los precios están más bajos.")),
+            fit(T("Sell everything before it falls further", "Vender todo antes de que baje más"), "poor", T("By the time a headline is out, the news is already in the price.", "Para cuando sale el titular, la noticia ya está en el precio.")),
+          ],
+          T("Use news to learn, not to react.", "Usa las noticias para aprender, no para reaccionar.")
+        ),
         act("portfolio.review", T("Look at your portfolio and make a calm decision: hold, or adjust with a reason.", "Mira tu portafolio y toma una decisión con calma: mantener, o ajustar con una razón."), {decide: true}),
       ],
     },

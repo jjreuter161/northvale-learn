@@ -1,4 +1,4 @@
-// MONEY MISSIONS — small real-life tasks that put a lesson to work. Nothing
+// REAL-LIFE MISSIONS — small real-life tasks that put a lesson to work. Nothing
 // moves real money and nothing is collected: people do them on their own
 // and mark them done. Text uses the lesson format (T, {$US|MX}, {@fact});
 // scripts/validate-content.mjs checks these too.
@@ -154,8 +154,8 @@ export const MISSIONS = [
     adult: true,
     title: T("Check your credit report for free", "Revisa tu reporte de crédito gratis"),
     how: T("Get your free credit report at AnnualCreditReport.com — the official site; skip look-alikes. Check that every account on it is yours. No accounts yet? That's normal.", "Consigue tu reporte de crédito gratis en AnnualCreditReport.com, el sitio oficial; evita imitaciones. Revisa que cada cuenta sea tuya. ¿Aún no tienes cuentas? Es normal.", {
-      en: "Request your free Reporte de Crédito Especial from Buró de Crédito (burodecredito.com.mx) — you can get one free every 12 months. Check that every account on it is yours. No credit yet? That's normal.",
-      es: "Pide tu Reporte de Crédito Especial gratis en Buró de Crédito (burodecredito.com.mx); puedes obtener uno gratis cada 12 meses. Revisa que cada cuenta sea tuya. ¿Aún no tienes créditos? Es normal.",
+      en: "Request your free Reporte de Crédito Especial from Buró de Crédito (burodecredito.com.mx) — you can get one free every {@buroFreeReportMonths} months. Check that every account on it is yours. No credit yet? That's normal.",
+      es: "Pide tu Reporte de Crédito Especial gratis en Buró de Crédito (burodecredito.com.mx); puedes obtener uno gratis cada {@buroFreeReportMonths} meses. Revisa que cada cuenta sea tuya. ¿Aún no tienes créditos? Es normal.",
     }),
     ask: T("Did anything look unfamiliar?", "¿Algo se veía desconocido?"),
   }),

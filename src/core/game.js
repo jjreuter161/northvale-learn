@@ -43,7 +43,7 @@ export function recordReview({ kind = "review", mistakes = 0 }) {
   return out;
 }
 
-// A finished Money Mission. Only the mission and whether there's a note
+// A finished real-life mission. Only the mission and whether there's a note
 // are counted — never the note itself.
 export function recordMission({ id, first, note }) {
   const today = dayKey();

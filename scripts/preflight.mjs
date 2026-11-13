@@ -1,7 +1,7 @@
 // npm run preflight — everything to check before going live, as one
 // pass/fail list (the exit code is 0 only when all of it passes). It never
 // prints a setting's value, only whether it's there and looks right.
-//   npm run preflight             runs the whole test suite too (~3 minutes)
+//   npm run preflight             runs the whole test suite too (~6 minutes)
 //   npm run preflight -- --quick  skips the tests
 // (npm run check-setup is the other half: it tries each key for real.)
 import { existsSync, readFileSync } from "node:fs";
@@ -57,7 +57,7 @@ note(C, "The live server starts with it off; the builder checks /admin → Featu
 const T = "Tests";
 if (quick) note(T, "skipped (--quick)");
 else {
-  process.stdout.write("Running every test, including the browser click-through (about 3 minutes)…\n");
+  process.stdout.write("Running every test, including every lesson played through in a browser (about 6 minutes)…\n");
   const r = spawnSync("npm", ["test"], { cwd: ROOT, encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
   const out = `${r.stdout}\n${r.stderr}`;
   const oks = (out.match(/^ok: /gm) || []).length;

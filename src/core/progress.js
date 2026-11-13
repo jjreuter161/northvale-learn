@@ -13,7 +13,7 @@
 //   between count like freeze days).
 // - XP: 10 a lesson (+5 if perfect), 5 for replaying a finished lesson,
 //   and a little for doing things in the practice tools (once a day each).
-// - Money Missions: 20 XP the first time you finish each one. They don't
+// - real-life missions: 20 XP the first time you finish each one. They don't
 //   count for the streak (that's for learning in the app).
 
 export const dayKey = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -34,7 +34,7 @@ export const START_UNITS = { save: "save", invest: "compound", debt: "credit", c
 
 export const MAX_FREEZES = 2;
 export const DAILY_GOALS = [10, 20, 30, 50];
-export const XP = { lesson: 10, perfect: 5, replay: 5, practice: 5, review: 10, mission: 20 };
+export const XP = { lesson: 10, perfect: 5, replay: 5, practice: 5, review: 10, mission: 20, myth: 2 };
 
 export function newProgress() {
   return { xp: 0, days: {}, streak: { count: 0, last: null, best: 0, frozen: [] }, freezes: 1, dailyGoal: 20, lessons: {}, lessonDays: [], badges: {}, counters: {}, practiced: {}, startUnit: null, placed: [] };
@@ -127,7 +127,7 @@ export function completeReview(p, { kind = "review" }, today) {
   return { p: extended.p, gained: XP.review, streakUp: extended.up, freezeEarned: extended.freezeEarned };
 }
 
-// A finished Money Mission: XP if it's the first time (see missions/pick.js).
+// A finished real-life mission: XP if it's the first time (see missions/pick.js).
 export function completeMission(p, { first }, today) {
   const gained = first ? XP.mission : 0;
   const next = gained ? addXp(p, gained, today) : p;
@@ -149,7 +149,8 @@ export function practiced(p, kind, today) {
   const days = p.practiced[kind] || [];
   const first = !days.includes(today);
   const next = { ...p, counters, practiced: { ...p.practiced, [kind]: first ? [...days, today].slice(-60) : days } };
-  return first ? { p: addXp(next, XP.practice, today), gained: XP.practice } : { p: next, gained: 0 };
+  const xp = kind === "myth" ? XP.myth : XP.practice;
+  return first ? { p: addXp(next, xp, today), gained: xp } : { p: next, gained: 0 };
 }
 
 export const goalMet = (p, today) => xpOn(p, today) >= p.dailyGoal;
@@ -159,7 +160,7 @@ export const goalMet = (p, today) => xpOn(p, today) >= p.dailyGoal;
 export const BADGES = [
   { id: "first_lesson", icon: "book", test: (p) => (p.counters.lessons || 0) >= 1 },
   { id: "perfect", icon: "target", test: (p) => (p.counters.perfect || 0) >= 1 },
-  { id: "streak_3", icon: "flame", test: (p) => p.streak.best >= 3 },
+  { id: "streak_3", icon: "streak", test: (p) => p.streak.best >= 3 },
   { id: "streak_7", icon: "calendar", test: (p) => p.streak.best >= 7 },
   { id: "streak_30", icon: "trophy", test: (p) => p.streak.best >= 30 },
   { id: "unit", icon: "compass", test: (p, f) => (f.unitsDone || 0) >= 1 },
@@ -170,7 +171,7 @@ export const BADGES = [
   { id: "news_5", icon: "news", test: (p) => (p.practiced.news || []).length >= 5 },
   { id: "curious", icon: "chat", test: (p) => (p.counters.tutor || 0) >= 5 },
   { id: "level_5", icon: "star", test: (p) => level(p.xp).level >= 5 },
-  // Money Missions (real-life practice).
+  // real-life missions (real-life practice).
   { id: "mission_1", icon: "flag", test: (p, f) => (f.missionsDone || 0) >= 1 },
   { id: "mission_5", icon: "star", test: (p, f) => (f.missionsDone || 0) >= 5 },
   { id: "mission_weeks_4", icon: "calendar", test: (p, f) => (f.missionWeeks || 0) >= 4 },

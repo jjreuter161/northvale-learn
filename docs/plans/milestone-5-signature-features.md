@@ -1,4 +1,6 @@
-# Milestone 5 — "Signature features" (queued, not started)
+# Milestone 5 — "Signature features" (Step 1 done; waiting for approval)
+
+**Step 1 (2026-11-12):** the research is in `docs/COMPETITION.md`; the plan, the mockups and the decisions are in `docs/design/next/PLAN.md`.
 
 **When to start:** only after the clarity rebuild (Step 2) is finished and committed, and ideally after the first testers have used the app for a week, so their feedback can cut features they wouldn't use. Received 2026-11-05 from the advisor; kept here so it isn't lost.
 

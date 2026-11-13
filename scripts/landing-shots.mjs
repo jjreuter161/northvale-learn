@@ -1,9 +1,10 @@
 // The landing page's pictures, taken from the real app (so they never
 // show anything the app doesn't do): Today, a lesson, the practice
-// portfolio, Money Missions and a goal, in English and Spanish, plus the
+// portfolio, real-life missions, a goal and the course (in Navy), in English
+// and Spanish, plus the
 // share-preview image for each page. Re-run after the app's look changes:
 //   npm run build && node scripts/landing-shots.mjs
-// Writes web/shots/{en,es}-{1..5}.jpg and web/og-{en,es}.jpg.
+// Writes web/shots/{en,es}-{1..6}.jpg and web/og-{en,es}.jpg.
 import { spawn } from "node:child_process";
 import { mkdtempSync, mkdirSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -60,7 +61,7 @@ try {
     for (let i = 0; i < 10 && !(await page.getByRole("radio").count()); i++) await page.getByRole("dialog").getByRole("button", { name: /^(Continue|Continuar)$/ }).click();
     await page.waitForTimeout(300);
     await jpeg(page, `${lang}-2.jpg`);
-    await page.getByRole("button", { name: /^(Close|Cerrar)$/ }).first().click();
+    await page.getByRole("dialog").last().getByRole("button", { name: /^(Close|Cerrar)$/ }).first().click();
     await page.getByRole("button", { name: /^(Leave|Salir)$/ }).click();
     // The practice portfolio, after a practice buy.
     await menu(es ? "Práctica" : "Practice", es ? "Portafolio de práctica" : "Practice portfolio");
@@ -72,12 +73,24 @@ try {
     await page.evaluate(() => window.scrollTo(0, 0));
     await page.waitForTimeout(4000);
     await jpeg(page, `${lang}-3.jpg`);
-    // Money Missions, and the goal.
-    await menu(es ? "Práctica" : "Practice", es ? "Misiones de dinero" : "Money Missions");
+    // real-life missions, and the goal.
+    await menu(es ? "Práctica" : "Practice", es ? "Misiones de la vida real" : "Real-life missions");
     await jpeg(page, `${lang}-4.jpg`);
     await menu(es ? "Metas" : "Goals");
     await jpeg(page, `${lang}-5.jpg`);
     await ctx.close();
+    // The course as a sea chart, in Navy (the other look).
+    const navy = await browser.newContext({ viewport: { width: 390, height: 780 }, deviceScaleFactor: 1.5, locale: lang === "es" ? "es-MX" : "en-US", serviceWorkers: "block", reducedMotion: "reduce", colorScheme: "dark" });
+    const seed = learner(lang, region);
+    await navy.addInitScript((s) => localStorage.getItem("northvale-learn-v1") || localStorage.setItem("northvale-learn-v1", s), JSON.stringify({ ...seed, settings: { ...seed.settings, look: "navy" } }));
+    const sea = await navy.newPage();
+    await sea.goto(BASE);
+    await sea.addStyleTag({ content: "*,*::before,*::after{animation:none!important;transition:none!important}" });
+    await sea.waitForTimeout(4000); // achievement toasts come and go
+    await sea.locator('[aria-expanded="true"]').first().evaluate((e) => e.scrollIntoView({ block: "center" }));
+    await sea.waitForTimeout(400);
+    await jpeg(sea, `${lang}-6.jpg`);
+    await navy.close();
   }
 
   // Share previews (1200×630): the wordmark, one honest line, and Home.

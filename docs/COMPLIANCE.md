@@ -50,7 +50,7 @@ Laws that can apply once a school uses it:
 
 - **Teachers:** an account, 18+ (self-declared at sign-up), a **confirmed email** (a one-time link, 24 hours), and the **teacher terms** accepted ([docs/legal/teacher.en.md](legal/teacher.en.md), Spanish too). The date of each is kept.
 - **Students:** join with a class code or the teacher's link. **No account or email**: only a nickname for the class and an age range (13+). A screen before joining says exactly what the teacher will and won't see.
-- **The teacher sees only:** nicknames; lessons and units finished since the student joined; how many Money Missions they finished; progress on assigned units (which counts earlier lessons only if the student ticks "Count lessons I already finished for class assignments" — off by default, changeable any time, and only lessons in assigned units); and **class-wide** totals for topics the class misses (only once 3+ students have answered on a topic). Never goals, amounts, savings, the practice portfolio, mission notes, tutor questions, age, email, or anything from before joining. The server builds the teacher's view field by field (`server/classes.js teacherView`), and the student's device only ever sends those fields (`src/modules/classroom/report.js`). Tests check that private data never reaches the teacher.
+- **The teacher sees only:** nicknames; lessons and units finished since the student joined; how many real-life missions they finished; progress on assigned units (which counts earlier lessons only if the student ticks "Count lessons I already finished for class assignments" — off by default, changeable any time, and only lessons in assigned units); and **class-wide** totals for topics the class misses (only once 3+ students have answered on a topic). Never goals, amounts, savings, the practice portfolio, mission notes, tutor questions, age, email, or anything from before joining. The server builds the teacher's view field by field (`server/classes.js teacherView`), and the student's device only ever sends those fields (`src/modules/classroom/report.js`). Tests check that private data never reaches the teacher.
 - **Codes:** 6 characters (no look-alikes), changeable by the teacher (the old one stops working), and the teacher can close the class to new students. Wrong codes are throttled per network address; joins are capped per address.
 - **No messaging of any kind.**
 - **Class leaderboard:** nicknames and this week's XP only. Any student can hide.
@@ -99,7 +99,7 @@ Laws that can apply once a school uses it:
 - **Deleting everything:** Settings → Privacy → **Delete my data** removes the account, this device's usage stats and the device's data. Backups age out within 14 days.
 - **Turning analytics off:** analytics can be switched off, and they're off automatically with Global Privacy Control or Do Not Track.
 - **Legal drafts in both languages:** a privacy policy and terms in English and Spanish, marked as drafts.
-- **Money Missions (real-world tasks):**
+- **Real-life missions (real-world tasks):**
   - nothing is collected: people do them on their own and mark them done;
   - notes are optional, capped at 280 characters, stored with the learner's progress, and never sent with usage stats (only "finished, with or without a note");
   - the note box says to leave out account numbers, passwords and other private details;
@@ -126,6 +126,12 @@ Laws that can apply once a school uses it:
   - the confirmation email (once Gmail is approved) is a transactional notice with a take-me-off link that asks before removing (so mail scanners can't); the admin page exports (CSV) and deletes entries;
   - **lawyer:** whether waitlist emails to 13–17 need anything more in Mexico (LFPDPPP) or in US states with teen privacy laws; the same mailing-address question as the recap.
 
+- **Release Candidate 1 (2026-11-12):**
+  - **nothing new leaves the device:** the look (Cream, Navy, Match my device: the device's dark-mode setting is read on the device only), the place in an unfinished lesson, and the lessons kept for offline use all stay in the browser; with an account, the lesson place syncs like the rest of the progress;
+  - **backups:** a tested restore (`npm run restore`); the data a restore replaces is kept 14 days, like the backups, so deleted accounts are gone from every copy within 14 days;
+  - **accessibility:** WCAG 2.2 AA checked by axe-core on every main screen in both looks and languages (`test/a11y.test.mjs`), which matters for school use (US Section 508 / ADA, Mexico's accessibility rules for public services);
+  - the privacy policy (EN/ES) says all of this (updated November 2026).
+
 ## Still open — your decisions or a lawyer's
 
 1. **Who is the data controller?** Your name or a company, the contact email, and a postal address are needed in both legal documents.
@@ -141,3 +147,7 @@ Laws that can apply once a school uses it:
    - confirm who is responsible for student data in Mexico (school, teacher or Northvale);
    - confirm 90 days is the right deletion time for archived classes.
 8. **Recap mailing address.** Set `MAIL_POSTAL_ADDRESS` (P.O. box or virtual mailbox) before the public launch, and confirm with the lawyer whether CAN-SPAM requires it for an opted-in progress recap.
+9. **Names (lawyer, before the public launch):**
+   - **"Real-life missions" / "Misiones de la vida real"** replaced "Money Missions", which GoHenry has used for its lessons since 2021 (BBVA México also calls its teen challenges "misiones"). Confirm the new name is clear in the US and Mexico (COMPETITION.md);
+   - "Northvale Learn", the logo and the taglines: the clearance search and filing in BRAND-CHECK.md.
+10. **Coming with Milestone 5 (lawyer, before each ships):** "Explain this" (text first; photos only after your review), certificates (for 13–17 the public page shows only the track and the date), and the cross-border facts.

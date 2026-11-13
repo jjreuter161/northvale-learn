@@ -1,11 +1,21 @@
-// Offline: the app (which carries every lesson), its fonts and icons come
+// Offline: the app, its fonts and icons, and each unit once it has been
+// opened (units load on demand, in web/chunks), come
 // from the cache when there's no connection, so lessons, the practice
 // portfolio (sample prices) and the goal simulator work offline; progress
 // syncs when the connection is back. /api always goes to the network.
 // Also shows the daily reminder (server/push.js) and opens the app on tap.
-const CACHE = "northvale-learn-v3";
-const SHELL = ["/", "/app.js", "/manifest.webmanifest", "/icon.svg", "/icon-192.png", "/icon-512.png", "/icon-180.png", "/fonts/inter-latin-wght-normal.woff2", "/fonts/inter-latin-ext-wght-normal.woff2", "/fonts/eb-garamond-latin-600-normal.woff2"];
-self.addEventListener("install", (e) => e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting())));
+const CACHE = "northvale-learn-v7";
+const SHELL = ["/", "/app.js", "/manifest.webmanifest", "/icon.svg", "/icon-192.png", "/icon-512.png", "/icon-180.png", "/fonts/inter-latin-wght-normal.woff2", "/fonts/inter-latin-ext-wght-normal.woff2", "/fonts/eb-garamond-latin-600-normal.woff2", "/fonts/fraunces-latin-soft-normal.woff2"];
+// The shell, plus the files the app imports to start (web/precache.json,
+// written by the build), so it opens offline from the first visit.
+self.addEventListener("install", (e) =>
+  e.waitUntil(
+    caches
+      .open(CACHE)
+      .then(async (c) => c.addAll([...new Set([...SHELL, ...(await fetch("/precache.json").then((r) => (r.ok ? r.json() : [])).then((l) => (Array.isArray(l) ? l : [])).catch(() => []))])]))
+      .then(() => self.skipWaiting())
+  )
+);
 self.addEventListener("activate", (e) => e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim())));
 self.addEventListener("fetch", (e) => {
   const url = new URL(e.request.url);
@@ -14,8 +24,11 @@ self.addEventListener("fetch", (e) => {
   e.respondWith(
     fetch(e.request)
       .then((r) => {
-        const copy = r.clone();
-        caches.open(CACHE).then((c) => c.put(e.request, copy));
+        // Only what loaded fine (an error page must never be what shows offline).
+        if (r.ok) {
+          const copy = r.clone();
+          caches.open(CACHE).then((c) => c.put(e.request, copy));
+        }
         return r;
       })
       .catch(() => caches.match(e.request).then((r) => r || caches.match("/")))
