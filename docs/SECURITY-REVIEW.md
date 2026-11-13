@@ -107,7 +107,7 @@
 ## Known limits (accepted for the beta)
 
 - **Sign-up reveals whether an email has an account.** That's common and low risk here. Sign-in doesn't reveal it.
-- **No password reset.** It needs an email service; see COMPLIANCE.md.
+- **No password reset.** It needs an email service; see the private compliance notes.
 - **Guardian consent is a checkbox,** not a verification (a legal question more than a security one).
 - **Rate limits live in memory,** so a server restart resets them. That's fine with one server; move them to a shared store if you run more than one.
 - **One JSON data file.** It's fine for hundreds or a few thousand testers. Move to a database (for example SQLite or Postgres) before growing past that or running more than one server.

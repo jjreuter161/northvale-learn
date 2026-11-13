@@ -1,5 +1,5 @@
 // CLASSROOM MODE — a teacher's class, joined by students with a code and
-// a nickname. Built around student privacy (docs/COMPLIANCE.md):
+// a nickname. Built around student privacy (the private compliance notes):
 // - Behind the "classroom" flag (flags.js): only teachers it's on for can
 //   make classes, and a class works only while its teacher still has it.
 // - Teachers: an account, 18+, email confirmed, teacher terms accepted.

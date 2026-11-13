@@ -4,7 +4,7 @@
 import { store } from "./store.js";
 
 export const FLAGS = {
-  classroom: "Classroom mode: teachers' classes and their students. Keep it to testers until a lawyer has reviewed it (docs/COMPLIANCE.md).",
+  classroom: "Classroom mode: teachers' classes and their students. Keep it to testers until a lawyer has reviewed it (the private compliance notes).",
 };
 const of = (flag) => (store.section("flags", () => ({}))[flag] ||= { all: false, accounts: [] });
 

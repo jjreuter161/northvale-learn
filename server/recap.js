@@ -4,7 +4,7 @@
 // After 4 weeks without a lesson it pauses itself (one short note says
 // so, then nothing — no nagging), and the link at the bottom turns it off
 // without signing in. MAIL_POSTAL_ADDRESS, when set, goes in the footer
-// (docs/COMPLIANCE.md: a lawyer question before the public launch).
+// (the private compliance notes: a lawyer question before the public launch).
 import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import { store } from "./store.js";
 import { sendMail, mailMode } from "./mail.js";

@@ -83,7 +83,7 @@ Everything works without keys. To turn on the AI tutor, real prices and reset em
 | `SIGNUP_CODE` | Accounts need this code (for a closed beta). |
 | `SMTP_USER`, `SMTP_PASS`, `PUBLIC_URL` | Password reset emails and the weekly recap, sent from a dedicated Gmail with an app password (docs/SETUP-KEYS.md §4). Reminders need no key: the server makes its own (VAPID) on first start. |
 | `CONTACT_EMAIL` | Shown to testers who need help, and in the legal pages. Also how browsers' push services can reach you about reminders (or `PUBLIC_URL`). |
-| `MAIL_POSTAL_ADDRESS` | A mailing address for the weekly recap's footer (a P.O. box or virtual mailbox, not a home address). Leave empty until the public launch (docs/COMPLIANCE.md). |
+| `MAIL_POSTAL_ADDRESS` | A mailing address for the weekly recap's footer (a P.O. box or virtual mailbox, not a home address). Leave empty until the public launch (the private compliance notes). |
 | `PORT`, `HOST`, `ALLOWED_HOSTS`, `TRUST_PROXY`, `NORTHVALE_DATA` | Server and hosting settings. |
 | `NORTHVALE_DOTENV` | `0` makes the server ignore `.env` (the tests and demo servers use it). |
 
@@ -101,7 +101,6 @@ Everything works without keys. To turn on the AI tutor, real prices and reset em
 | [docs/FACTS.md](docs/FACTS.md) | Every number that changes over time, and the one file where it lives |
 | [docs/CONTENT-REVIEW.md](docs/CONTENT-REVIEW.md) | What the content review fixed, what could read as advice, and facts to verify |
 | [docs/CONTENT-STYLE.md](docs/CONTENT-STYLE.md) | How lessons are written: voice, reading level, numbers, two countries, never advice |
-| [docs/COMPLIANCE.md](docs/COMPLIANCE.md) | COPPA, state laws, Mexico's data law, financial-advice rules, open decisions |
 | [docs/SECURITY-REVIEW.md](docs/SECURITY-REVIEW.md) | The security review, what was fixed, known limits |
 | [docs/legal/](docs/legal) | Privacy policy, terms and teacher terms (English/Spanish) — **drafts for a lawyer**. The app shows these same files. |
 | [web/teacher-guide.html](web/teacher-guide.html), [web/guia-docente.html](web/guia-docente.html) | The printable teacher guide (PDFs in docs/design/m4-phase5/) |
@@ -175,7 +174,7 @@ The core and the other modules don't change. Goals are already built for this: a
   - the tutor never recommends buying or selling anything;
   - sample prices and rates are always labeled.
 
-See COMPLIANCE.md and SECURITY-REVIEW.md for details.
+See docs/SECURITY-REVIEW.md for details.
 
 ## Tests
 
@@ -213,3 +212,7 @@ See COMPLIANCE.md and SECURITY-REVIEW.md for details.
   - deleting data and accounts.
 
 `node scripts/tutor-check.mjs --yes` checks the real AI's answers. It costs money, so it only runs when you ask for it.
+
+## License
+
+Copyright (c) 2026. All rights reserved. The source is public so it can be viewed, but copying, reuse, or redistribution of the code, lessons, or design isn't allowed without written permission. See [LICENSE](LICENSE).

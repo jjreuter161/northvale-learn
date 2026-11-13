@@ -24,7 +24,7 @@ Everything built so far, in one release for the first testers. Numbers and check
 - `npm run restore` brings back a daily backup; `npm run load-check` (50 simulated testers); `npm run deploy:dry-run` (the Dockerfile's steps, without Docker).
 - `/admin` opens with the first week against its targets.
 - `docs/VERIFY-BEFORE-LAUNCH.md`: every fact, number and rule to check, written from the code. Every changeable number lives in `src/core/facts.js`, and worked examples are re-checked when a fact changes.
-- Security review 2 (`docs/SECURITY-REVIEW.md`); privacy policy (EN/ES) and `docs/COMPLIANCE.md` updated; the lawyer's list has the new names.
+- Security review 2 (`docs/SECURITY-REVIEW.md`); privacy policy (EN/ES) and `the private compliance notes` updated; the lawyer's list has the new names.
 - The repository is public on GitHub, with a private author email in every commit.
 
 **Tests:** 122 checks in `npm test`, including every lesson played through in English and Spanish, saved learners from every milestone, a crash mid-lesson, backup restore, install and offline.

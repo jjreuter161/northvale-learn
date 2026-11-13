@@ -140,7 +140,7 @@ const routes = {
       }
       // 13 and up only (the app asks first; this is the rule, not the UI).
       if (!AGE_BANDS.includes(c.body.ageBand)) throw fail(400, "Northvale Learn accounts are for ages 13 and up.", "AGE");
-      // Under 18: a parent or guardian says yes first (see docs/COMPLIANCE.md).
+      // Under 18: a parent or guardian says yes first (see the private compliance notes).
       if (c.body.ageBand === "13-17" && c.body.guardian !== true) throw fail(400, "Ask a parent or guardian, then tick the box to say they agreed.", "GUARDIAN");
       const email = auth.normalEmail(c.body.email);
       if (!auth.validEmail(email)) throw fail(400, "Enter a real email address.");

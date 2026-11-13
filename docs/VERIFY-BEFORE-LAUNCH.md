@@ -208,6 +208,6 @@ Added after the advisor's review, so none has been checked by a person yet. Each
 
 - ☐ **Your name or company, contact email and postal address** in `docs/legal/privacy.*.md` and `terms.*.md` (now **[your name / company, address, email]**), and `CONTACT_EMAIL` in .env.
 - ☐ **`MAIL_POSTAL_ADDRESS`** before any email goes out.
-- ☐ **The lawyer's list** in `docs/COMPLIANCE.md` ("Still open", items 1–10), including the names "Northvale Learn" and **"Real-life missions" / "Misiones de la vida real"** **new**.
+- ☐ **The lawyer's list** in `the private compliance notes` ("Still open", items 1–10), including the names "Northvale Learn" and **"Real-life missions" / "Misiones de la vida real"** **new**.
 - ☐ **The name and logo:** the clearance search and filing in `docs/BRAND-CHECK.md`.
 - ☐ **Every outside link** in lessons and missions opens the official page (last checked: see `docs/RC1-RESULTS.md`).
