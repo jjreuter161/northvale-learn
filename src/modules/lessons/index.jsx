@@ -394,7 +394,7 @@ function SeaChart({ t, tx, go, progress, ci, next, all, setAll, opened, toggle, 
     const s = i === ci ? 1.18 : 1;
     const flag = done ? `<path d="M${x + 96} ${y + 60}V${y + 34}" stroke="var(--artInk)" stroke-width="2.2" stroke-linecap="round"/><path d="M${x + 97} ${y + 34}L${x + 110} ${y + 38.5}L${x + 97} ${y + 43}Z" fill="var(--artSun)"/>` : "";
     const halo = i === ci ? `<ellipse cx="${x + 60}" cy="${y + 58}" rx="78" ry="54" fill="var(--artPaper)" opacity=".55"/>` : "";
-    return `${halo}<g transform="translate(${x + 60 - 60 * s} ${y + 4 - 12 * (s - 1)}) scale(${s})" opacity="${i > ci ? 0.42 : 1}">${LANDMARK[u.id] || ""}</g>${flag}`;
+    return `${halo}<g transform="translate(${x + 60 - 60 * s} ${y + 4 - 12 * (s - 1)}) scale(${s})" opacity="${i > ci ? 0.42 : 1}">${LANDMARK[u.id] || ""}</g>${i === ci ? spark(x + 86, y + 6) : ""}${flag}`;
   }).join("");
   const mistTop = ci + 1 < list.length ? Y[ci + 1] - 10 : H;
   const boatAt = ci < UNITS.length ? [ctr(here)[0] + (here % 2 ? -98 : 58), ctr(here)[1] - 6] : [W / 2 - 16, H - 150];
@@ -646,6 +646,8 @@ function Moment({ t, locale, result, unit, onDone }) {
 // "reduce motion"), then the streak and the day's total.
 // The ring rises like a sun over the sea, with a few small stars (no
 // confetti). The waves drift for a few seconds, then stop.
+// The one red spark on the sea chart: a small pennant on the island you're on.
+const spark = (x, y) => `<path d="M${x} ${y + 26}V${y}" stroke="var(--artInk)" stroke-width="2.4" stroke-linecap="round"/><path d="M${x + 1.2} ${y}L${x + 17} ${y + 6}L${x + 1.2} ${y + 12}Z" fill="var(--spark)"/>`;
 const SUNRISE = `<defs><linearGradient id="nvsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--bg)"/><stop offset="1" stop-color="var(--warmSoft)"/></linearGradient></defs><rect width="390" height="250" fill="url(#nvsky)"/>${[[60, 64, 7], [326, 76, 9], [40, 142, 4], [352, 132, 5], [92, 34, 3]].map(([x, y, r]) => star(x, y, r, "var(--warm)")).join("")}<g class="nv-drift"><path d="${wave(440, 250, 7, 5, 196)}" fill="var(--artSea)"/><path d="${wave(440, 250, 6, 4, 218)}" fill="var(--artSea2)" opacity=".7"/></g>${boat(296, 156, 0.42)}<path d="${wave(390, 250, 8, 5, 240)}" fill="var(--bg)"/>`;
 function Sunrise({ children }) {
   return (

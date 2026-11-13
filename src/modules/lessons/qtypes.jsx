@@ -53,7 +53,7 @@ const at = (v, region) => (Array.isArray(v) ? v[region === "MX" ? 1 : 0] : v);
 const tx = (locale) => (x, vars) => text(x, locale, vars);
 const btn = { textAlign: "left", display: "flex", alignItems: "center", gap: 12, width: "100%", borderRadius: 14, padding: "14px 16px", fontSize: 16, fontWeight: 650, minHeight: 56, color: "var(--ink)", font: "inherit" };
 const tone = (state) =>
-  state === "right" ? { border: "2px solid var(--right)", background: "var(--rightSoft)" } : state === "wrong" ? { border: "2px solid var(--warn)", background: "var(--warnSoft)" } : state === "on" ? { border: "2px solid var(--brand)", background: "var(--brandSoft)" } : { border: "2px solid transparent", background: "var(--surface)" };
+  state === "right" ? { border: "2px solid var(--right)", background: "var(--rightSoft)" } : state === "wrong" ? { border: "2px dashed var(--warn)", background: "var(--warnSoft)" } : state === "on" ? { border: "2px solid var(--brand)", background: "var(--brandSoft)" } : { border: "2px solid transparent", background: "var(--surface)" };
 const Badge = ({ n, on }) => (
   <span aria-hidden style={{ width: 28, height: 28, borderRadius: 14, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 750, background: on ? "var(--brand)" : "var(--bg)", color: on ? "var(--onBrand)" : "var(--low)", border: on ? "none" : "1.5px solid var(--line)" }}>{n || ""}</span>
 );
@@ -267,7 +267,7 @@ function SpotView({ step, value, setValue, checked, t, locale }) {
             const state = checked ? (p.flag && on ? "right" : p.flag || on ? "wrong" : null) : on ? "on" : null;
             const border = state === "right" ? "var(--right)" : state === "wrong" ? "var(--warn)" : state === "on" ? "var(--brand)" : "var(--line)";
             return (
-              <button key={i} data-q="spot-part" data-i={i} disabled={!!checked} aria-pressed={on} aria-label={`${x(p.tap)}${checked && p.flag ? `, ${t("q.spot.flag")}` : ""}`} onClick={() => tap(i)} style={{ font: "inherit", color: "var(--ink)", background: state === "right" ? "var(--rightSoft)" : state === "wrong" ? "var(--warnSoft)" : state === "on" ? "var(--brandSoft)" : "transparent", border: `2px ${checked && p.flag && !on ? "dashed" : "solid"} ${lines && !state ? "transparent" : border}`, borderRadius: lines ? 10 : 6, padding: lines ? "8px 10px" : "0 3px", margin: lines ? 0 : "0 1px", textAlign: "left", width: lines ? "100%" : undefined, cursor: checked ? "default" : "pointer", lineHeight: 1.5, fontVariantNumeric: "tabular-nums" }}>
+              <button key={i} data-q="spot-part" data-i={i} disabled={!!checked} aria-pressed={on} aria-label={`${x(p.tap)}${checked && p.flag ? `, ${t("q.spot.flag")}` : ""}`} onClick={() => tap(i)} style={{ font: "inherit", color: "var(--ink)", background: state === "right" ? "var(--rightSoft)" : state === "wrong" ? "var(--warnSoft)" : state === "on" ? "var(--brandSoft)" : "transparent", border: `2px ${(checked && p.flag && !on) || state === "wrong" ? "dashed" : "solid"} ${lines && !state ? "transparent" : border}`, borderRadius: lines ? 10 : 6, padding: lines ? "8px 10px" : "0 3px", margin: lines ? 0 : "0 1px", textAlign: "left", width: lines ? "100%" : undefined, cursor: checked ? "default" : "pointer", lineHeight: 1.5, fontVariantNumeric: "tabular-nums" }}>
                 {x(p.tap)}
               </button>
             );

@@ -204,7 +204,7 @@ function AssetPanel({ t, locale, symbol, pf, prices, quotes, onTraded, compact, 
       {q && (
         <div style={{ margin: "12px 0 4px", display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
           <span style={{ fontSize: 30, fontWeight: 750 }}>{fmtA(q.price)}</span>
-          <span style={{ fontWeight: 650, color: q.change >= 0 ? "var(--good)" : "var(--bad)" }}>
+          <span style={{ fontWeight: 650, color: "var(--ink)" }}>
             {q.change >= 0 ? "▲" : "▼"} {percent(Math.abs(q.changePct), { ...locale, digits: 2 })} {t("pf.today")}
           </span>
           {quotes && <span style={{ fontSize: 12, fontWeight: 650, color: "var(--mid)", background: "var(--surface2)", borderRadius: 6, padding: "3px 7px" }}>{quotes.source === "sample" ? t("pf.sample_badge") : t("pf.delayed_badge")}</span>}
@@ -214,11 +214,11 @@ function AssetPanel({ t, locale, symbol, pf, prices, quotes, onTraded, compact, 
         <div style={{ margin: "8px 0 4px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, fontWeight: 650, color: "var(--mid)", marginBottom: 6 }}>
             <span>
-              {t("pf.year")}: <span style={{ color: yearChange >= 0 ? "var(--good)" : "var(--bad)" }}>{yearChange >= 0 ? "+" : ""}{yearChange.toFixed(1)}%</span>
+              {t("pf.year")}: <span style={{ color: "var(--ink)" }}>{yearChange >= 0 ? "▲ +" : "▼ "}{yearChange.toFixed(1)}%</span>
             </span>
             <span>{t("pf.price_in", { cur: a.currency })}</span>
           </div>
-          <LineChart points={pts} height={140} color={yearChange >= 0 ? "var(--good)" : "var(--bad)"} label={`${symbol} ${t("pf.year")}`} markers={[{ value: hi[1], color: "var(--good)" }, { value: lo[1], color: "var(--bad)" }]} />
+          <LineChart points={pts} height={140} color="var(--ink)" label={`${symbol} ${t("pf.year")}`} markers={[{ value: hi[1], color: "var(--good)" }, { value: lo[1], color: "var(--bad)" }]} />
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--low)", marginTop: 6 }}>
             <span>{shortDate(pts[0][0], { ...locale, year: true })}</span>
             <span>{t("pf.high_low", { high: fmtA(hi[1]), low: fmtA(lo[1]) })}</span>
@@ -292,7 +292,7 @@ function AssetRow({ t, locale, a, price, q, pf, onClick, right, tag, first }) {
       {right || (
         <span style={{ textAlign: "right", flexShrink: 0 }}>
           <span style={{ display: "block", fontWeight: 650 }}>{q ? money(q.price, { ...locale, currency: a.currency, cents: true }) : "—"}</span>
-          {q && <span style={{ display: "block", fontSize: 13, fontWeight: 650, color: q.change >= 0 ? "var(--good)" : "var(--bad)" }}>{q.change >= 0 ? "+" : "−"}{Math.abs(q.changePct).toFixed(2)}%</span>}
+          {q && <span style={{ display: "block", fontSize: 13, fontWeight: 650, color: "var(--ink)" }}>{q.change >= 0 ? "▲ +" : "▼ −"}{Math.abs(q.changePct).toFixed(2)}%</span>}
         </span>
       )}
     </button>
@@ -338,12 +338,12 @@ function Screen({ t, locale, go }) {
           <span style={{ fontSize: 12, fontWeight: 650, background: "var(--surface2)", color: "var(--mid)", borderRadius: 999, padding: "4px 10px", whiteSpace: "nowrap" }}>{t("pf.pretend")}</span>
         </div>
         <div style={{ fontSize: 36, fontWeight: 700, letterSpacing: -0.8, lineHeight: 1.15, fontVariantNumeric: "tabular-nums" }}>{fmt(v.total)}</div>
-        <div style={{ fontWeight: 650, fontSize: 15, color: v.change >= 0 ? "var(--good)" : "var(--bad)", fontVariantNumeric: "tabular-nums" }}>
-          {v.change >= 0 ? "+" : "−"}{fmt(Math.abs(v.change))} ({percent(Math.abs(v.changePct), { ...locale, digits: 2 })}) <span style={{ color: "var(--mid)", fontWeight: 500 }}>{t("pf.since_start")}</span>
+        <div style={{ fontWeight: 650, fontSize: 15, color: "var(--ink)", fontVariantNumeric: "tabular-nums" }}>
+          {v.change >= 0 ? "▲ +" : "▼ −"}{fmt(Math.abs(v.change))} ({percent(Math.abs(v.changePct), { ...locale, digits: 2 })}) <span style={{ color: "var(--mid)", fontWeight: 500 }}>{t("pf.since_start")}</span>
         </div>
         {pf.snapshots.length > 1 ? (
           <div style={{ marginTop: 12 }}>
-            <LineChart points={pf.snapshots} height={110} color={v.change >= 0 ? "var(--good)" : "var(--bad)"} label={t("pf.value_chart")} markers={[{ value: pf.start }]} minSpan={pf.start * 0.02} />
+            <LineChart points={pf.snapshots} height={110} color="var(--ink)" label={t("pf.value_chart")} markers={[{ value: pf.start }]} minSpan={pf.start * 0.02} />
           </div>
         ) : (
           <p style={{ fontSize: 13, color: "var(--low)", margin: "8px 0 0" }}>{t("pf.value_chart.wait")}</p>
@@ -375,8 +375,8 @@ function Screen({ t, locale, go }) {
                 right={
                   <span style={{ textAlign: "right", flexShrink: 0 }}>
                     <span style={{ display: "block", fontWeight: 650 }}>{fmt(x.value)}</span>
-                    <span style={{ display: "block", fontSize: 13, fontWeight: 650, color: x.gain >= 0 ? "var(--good)" : "var(--bad)" }}>
-                      {x.gain >= 0 ? "+" : "−"}{Math.abs(x.gainPct).toFixed(2)}% · {Math.round(x.share * 100)}%
+                    <span style={{ display: "block", fontSize: 13, fontWeight: 650, color: "var(--ink)" }}>
+                      {x.gain >= 0 ? "▲ +" : "▼ −"}{Math.abs(x.gainPct).toFixed(2)}% · {Math.round(x.share * 100)}%
                     </span>
                   </span>
                 }
@@ -624,11 +624,11 @@ function ReviewAction({ params, t, locale, onDone, done }) {
   return (
     <Card>
       <div style={{ fontSize: 30, fontWeight: 750 }}>{fmt(v.total)}</div>
-      <p style={{ fontWeight: 650, color: v.change >= 0 ? "var(--good)" : "var(--bad)", margin: "4px 0 10px" }}>{t("pf.act.review", { change: `${v.change >= 0 ? "+" : "−"}${fmt(Math.abs(v.change))}`, pct: `${v.change >= 0 ? "+" : "−"}${Math.abs(v.changePct).toFixed(2)}%` })}</p>
+      <p style={{ fontWeight: 650, color: "var(--ink)", margin: "4px 0 10px" }}>{t("pf.act.review", { change: `${v.change >= 0 ? "▲ +" : "▼ −"}${fmt(Math.abs(v.change))}`, pct: `${v.change >= 0 ? "+" : "−"}${Math.abs(v.changePct).toFixed(2)}%` })}</p>
       {v.positions.slice(0, 5).map((x) => (
         <div key={x.symbol} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderTop: "1px solid var(--line)", fontSize: 15 }}>
           <span style={{ fontWeight: 650 }}>{x.symbol}</span>
-          <span style={{ color: x.gain >= 0 ? "var(--good)" : "var(--bad)", fontWeight: 650 }}>{x.gain >= 0 ? "+" : "−"}{Math.abs(x.gainPct).toFixed(2)}%</span>
+          <span style={{ fontWeight: 650 }}>{x.gain >= 0 ? "▲ +" : "▼ −"}{Math.abs(x.gainPct).toFixed(2)}%</span>
         </div>
       ))}
       {params.decide && (

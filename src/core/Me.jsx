@@ -68,7 +68,7 @@ function League({ t, session, go }) {
       {league.standings.map((r, i) => (
         <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 16px", background: r.you ? "var(--brandSoft)" : "transparent", borderTop: "1px solid var(--line)" }}>
           <span style={{ width: 22, textAlign: "center", fontWeight: 650, color: i < 3 ? "var(--ink)" : "var(--low)", fontVariantNumeric: "tabular-nums" }}>{i + 1}</span>
-          <span style={{ width: 32, height: 32, borderRadius: 16, background: AVATARS[r.avatar % AVATARS.length] || AVATARS[0], color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 650, fontSize: 14 }}>{(r.nickname || "?")[0].toUpperCase()}</span>
+          <span style={{ width: 32, height: 32, borderRadius: 16, background: AVATARS[r.avatar % AVATARS.length] || AVATARS[0], color: "#F7F2E8", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 650, fontSize: 14 }}>{(r.nickname || "?")[0].toUpperCase()}</span>
           <span style={{ flex: 1, fontWeight: r.you ? 650 : 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.you ? t("league.you", { name: r.nickname || t("league.anon") }) : r.nickname || t("league.anon")}</span>
           <span style={{ fontWeight: 600, color: "var(--mid)", fontVariantNumeric: "tabular-nums" }}>{r.xp} XP</span>
           {r.link && (
@@ -140,7 +140,7 @@ export default function Me({ t, locale, session, go, route }) {
   return (
     <div>
       <div style={{ display: "flex", alignItems: "center", gap: 14, margin: "4px 0 16px" }}>
-        <span style={{ width: 52, height: 52, borderRadius: 26, background: AVATARS[profile.avatar] || AVATARS[0], color: "#fff", fontSize: 22, fontWeight: 650, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{name[0].toUpperCase()}</span>
+        <span style={{ width: 52, height: 52, borderRadius: 26, background: AVATARS[profile.avatar] || AVATARS[0], color: "#F7F2E8", fontSize: 22, fontWeight: 650, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{name[0].toUpperCase()}</span>
         <div style={{ flex: 1, minWidth: 0 }}>
           <h1 className="nv-disp" style={{ fontSize: 30, margin: 0, lineHeight: 1.1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{name}</h1>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 6 }}>

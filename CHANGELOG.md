@@ -1,6 +1,13 @@
 # Changelog
 
-## Unreleased — Milestone 5: Explain this, Your Money Year, certificates
+## Unreleased — navy, cream and signal red
+
+- **New colors:** navy, cream and signal red, with tints for depth; the sunrise coral, green and amber are gone. Red is a spark: the main button (one per screen, with a cream edge on navy) and the current island on the sea chart. Wrong answers are never red: a neutral card with a dashed edge, a hint icon and "Not quite". Right answers: a check icon and a solid edge. Gains and losses in the practice portfolio use ▲ ▼ and signs; chart lines differ by dash. A real scam warning in Explain this gets a flag mark and a soft panel (the words stay in the text color).
+- **Settings → Look:** four ready-made looks, Match my device, or your own colors (background, text and icons, main buttons and highlights). Only readable combinations (WCAG AA) are offered: five of the 27; a red background is marked bold. Saved looks migrate untouched ("white" is Cream, "navy" is Navy).
+- Share cards, certificates, the app icon, the landing pages, the public check pages and the avatars use the new palette (the internal /admin page is unchanged).
+- "What's new" tells existing learners once. Tests: every readable combination's contrast (`test/colors.test.mjs`), accessibility on all looks, a picker test.
+
+## Earlier in this version — Milestone 5: Explain this, Your Money Year, certificates
 
 - **Explain this** (Ask → Explain this): paste a pay stub, offer, ad, message or headline; the tutor explains it in four parts (what it is, the numbers that matter, what to watch out for, questions to ask), flags red flags and links the lessons. Card, account and ID numbers are hidden on the phone and again on the server; the text is used for that one answer and is never stored, logged or counted in analytics. Offline it says it needs the AI and offers the glossary. Its own daily limit (`EXPLAIN_DAILY_LIMIT`, default 8) and its cost per use on /admin. Text only: photos wait for a lawyer. 13 safety cases added to `scripts/tutor-check.mjs` (written, not run: the check costs money). Privacy policy updated (English and Spanish).
 - **Your Money Year** (Practice): a one-year simulation, one month and one choice at a time, with four starting situations in the US and Mexico versions. Choices carry forward (interest grows a balance, savings grow, an emergency hurts more without a cushion). Each event links its lesson; the end screen compares your year with the steady path and names the months that mattered most. 32,000 random paths tested for sensible numbers.

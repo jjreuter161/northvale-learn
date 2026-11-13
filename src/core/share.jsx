@@ -57,15 +57,17 @@ function wrap(ctx, text, width) {
   }
   return lines;
 }
-// A 1080×1080 PNG: navy, the logo and wordmark in cream, the line, a sand rule, the fine print.
+// The look's colors, read from the page (so a card matches the colors you chose).
+const cv = (name, fallback) => (typeof document === "undefined" ? "" : getComputedStyle(document.documentElement).getPropertyValue(name).trim()) || fallback;
+// A 1080×1080 PNG: the background color, the logo and wordmark in cream, the line, a sand rule, the fine print.
 async function draw([big, sub], footer) {
   await document.fonts.ready.catch(() => {});
   const c = document.createElement("canvas");
   c.width = c.height = 1080;
   const x = c.getContext("2d");
-  x.fillStyle = "#13315C";
+  x.fillStyle = cv("--bg", "#1B3560");
   x.fillRect(0, 0, 1080, 1080);
-  x.fillStyle = "#F7F2E8";
+  x.fillStyle = cv("--ink", "#F7F2E8");
   x.textBaseline = "alphabetic";
   x.save();
   x.translate(92, 104);
@@ -82,9 +84,9 @@ async function draw([big, sub], footer) {
   const lines = wrap(x, big, 888).slice(0, 4);
   let y = 560 - (lines.length - 1) * 58;
   for (const l of lines) (x.fillText(l, 96, y), (y += 116));
-  x.fillStyle = "#E3CFA4";
+  x.fillStyle = cv("--mid", "#E3CFA4");
   x.fillRect(96, y - 70, 120, 10);
-  x.fillStyle = "#F7F2E8";
+  x.fillStyle = cv("--ink", "#F7F2E8");
   x.font = `500 46px ${FONT}`;
   x.globalAlpha = 0.9;
   for (const l of wrap(x, sub, 888).slice(0, 3)) (x.fillText(l, 96, y + 10), (y += 60));
@@ -137,7 +139,7 @@ export function ShareHost({ t }) {
     );
   return (
     <Sheet open onClose={() => setCard(null)} title={t("share.title")}>
-      <div style={{ aspectRatio: "1", borderRadius: 16, overflow: "hidden", background: "#13315C", marginBottom: 12 }}>{image && <img src={image.url} alt={lines.join(" — ")} style={{ width: "100%", height: "100%", display: "block" }} />}</div>
+      <div style={{ aspectRatio: "1", borderRadius: 16, overflow: "hidden", background: "var(--bg)", marginBottom: 12 }}>{image && <img src={image.url} alt={lines.join(" — ")} style={{ width: "100%", height: "100%", display: "block" }} />}</div>
       {card.kind === "goal" && adult(ageBand) ? (
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
           <div style={{ flex: 1 }}>

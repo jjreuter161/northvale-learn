@@ -26,6 +26,9 @@ function fit(ctx, text, width, size, min, weight, family) {
   return min;
 }
 
+// The look's colors, read from the page: the certificate is drawn in the colors you chose.
+const cv = (name, fallback) => getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
+
 // lines: { heading, certifies, name (or null), finished, title, issued, code, verify, fine }
 export async function drawCertificate(lines, type = "image/png", quality = 0.92) {
   await (document.fonts && document.fonts.ready).catch(() => {});
@@ -33,9 +36,9 @@ export async function drawCertificate(lines, type = "image/png", quality = 0.92)
   c.width = CERT_W;
   c.height = CERT_H;
   const x = c.getContext("2d");
-  const NAVY = "#13315C";
-  const CREAM = "#F7F2E8";
-  const SAND = "#E3CFA4";
+  const NAVY = cv("--ink", "#1B3560"); // the text color
+  const CREAM = cv("--bg", "#F7F2E8"); // the paper
+  const SAND = cv("--line", "#E3CFA4"); // the quiet rules
   x.fillStyle = CREAM;
   x.fillRect(0, 0, CERT_W, CERT_H);
   x.strokeStyle = NAVY;

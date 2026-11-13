@@ -1,117 +1,27 @@
 // DESIGN SYSTEM — the look (navy and cream, Light and Dark) as CSS variables,
 // and the small set of pieces every module builds with. Phone first: 44pt
 // tap targets, 16px inputs (so iPhones don't zoom), one column.
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { lookFrom, specFor } from "./colors.js";
 import { MARK_PATHS, UNIT_ART, BADGE_ART, SCENE, wave } from "./art.js";
 import { createPortal } from "react-dom";
 
-// Navy and cream. Light: a soft cream page, lighter cream cards, deep navy
-// for headings, the main button, progress, the active tab, links and the
-// logo, and dark grey-navy body text. Dark: a deep navy page with cream
-// text and cream accents. Green (--right) is only for a correct answer in
-// a lesson; amber only for "not quite" or "behind"; red only for a loss or
-// an error. One card style: a fill and a soft lift, no border. One warm
-// accent, sunrise coral (--warm), only for pictures, celebrations and
-// highlights; it never means right, behind or wrong. --art* are the
-// pictures' colors (art.js). Every text pair meets WCAG AA
-// (test/look.test.mjs checks). The saved names stay "white" (Light) and
-// "navy" (Dark), so nobody's setting changes.
-export const LOOKS = {
-  white: {
-    "--bg": "#F7F2E8",
-    "--surface": "#FFFDF8",
-    "--surface2": "#EFE7D8",
-    "--ink": "#22303F",
-    "--head": "#13315C",
-    "--mid": "#4C5866",
-    "--low": "#5C6573",
-    "--line": "#E6DCCB",
-    "--brand": "#13315C",
-    "--onBrand": "#FFFDF8",
-    "--brandSoft": "#E3E7EE",
-    "--accent": "#13315C",
-    "--accentSoft": "#E3E7EE",
-    "--good": "#13315C",
-    "--goodSoft": "#E3E7EE",
-    "--right": "#1B6F54",
-    "--rightSoft": "#E1EFE6",
-    "--warn": "#8C520E",
-    "--warnSoft": "#F7E9D2",
-    "--bad": "#A8231A",
-    "--badSoft": "#F9E7E2",
-    "--flame": "#13315C",
-    "--gold": "#13315C",
-    "--sky": "#13315C",
-    "--level1": "#CBD3E0",
-    "--level2": "#6F89B3",
-    "--level3": "#13315C",
-    "--focus": "#2B5CB3",
-    "--shadow": "none",
-    "--lift": "0 1px 0 rgba(19,49,92,.04), 0 12px 26px -16px rgba(19,49,92,.28)",
-    "--edge": "#071833",
-    "--warm": "#E9805F",
-    "--warmSoft": "#FBE4D9",
-    "--warmInk": "#A8462A",
-    "--artInk": "#13315C",
-    "--artPaper": "#FFFDF8",
-    "--artSky": "#E8EDF4",
-    "--artSea": "#D3DDEA",
-    "--artSea2": "#A9BBD5",
-    "--artSand": "#EFE0C2",
-    "--artSun": "#E9805F",
-    "--artSun2": "#F5C2AC",
-  },
-  navy: {
-    "--bg": "#0D1A2D",
-    "--surface": "#15253C",
-    "--surface2": "#1F3150",
-    "--ink": "#F2EBDC",
-    "--head": "#F7F1E6",
-    "--mid": "#CFC7B7",
-    "--low": "#B3AC9E",
-    "--line": "#2A3C58",
-    "--brand": "#F0E3C6",
-    "--onBrand": "#0D1A2D",
-    "--brandSoft": "#24344F",
-    "--accent": "#F0E3C6",
-    "--accentSoft": "#24344F",
-    "--good": "#F0E3C6",
-    "--goodSoft": "#24344F",
-    "--right": "#63C9A2",
-    "--rightSoft": "#123A33",
-    "--warn": "#EBB663",
-    "--warnSoft": "#3A2E19",
-    "--bad": "#F4907F",
-    "--badSoft": "#3B2224",
-    "--flame": "#F0E3C6",
-    "--gold": "#F0E3C6",
-    "--sky": "#F0E3C6",
-    "--level1": "#2E4568",
-    "--level2": "#7F9CC9",
-    "--level3": "#F0E3C6",
-    "--focus": "#A9C4F0",
-    "--shadow": "none",
-    "--lift": "0 12px 26px -16px rgba(0,0,0,.7)",
-    "--edge": "#B3A07A",
-    "--warm": "#F29B7D",
-    "--warmSoft": "#3D2C30",
-    "--warmInk": "#F6B39C",
-    "--artInk": "#F0E3C6",
-    "--artPaper": "#15253C",
-    "--artSky": "#16294A",
-    "--artSea": "#22395B",
-    "--artSea2": "#3A5784",
-    "--artSand": "#2F4263",
-    "--artSun": "#F29B7D",
-    "--artSun2": "#A35F4C",
-  },
-};
+// THE LOOK — three colors (navy, cream, signal red; colors.js): the app's CSS
+// variables come from `lookFrom(background, text, highlight)`. Words, icons and
+// borders use --brand (the text color); only the main button's fill is the
+// highlight (--fill), and red is a spark, never a text color on navy and never
+// a wrong answer. One card style: a fill and a soft lift. --art* are the
+// pictures' colors (art.js). Every readable combination is tested
+// (test/colors.test.mjs). Saved settings.look stays "white" (Cream), "navy",
+// "auto" or "custom".
+export { lookFrom, specFor };
 
-// The look to show: "white" (Cream), "navy" (Navy), or "auto" (Match my
-// device: Navy when the phone is in dark mode), kept up to date.
-export function useLook(look) {
+// The three colors to show: the saved look, with "auto" following the device
+// (Navy when the phone is dark, Cream when it's light), kept up to date.
+export function useLookSpec(settings) {
   const dark = () => typeof matchMedia === "function" && matchMedia("(prefers-color-scheme: dark)").matches;
   const [deviceDark, setDeviceDark] = useState(dark);
+  const look = settings.look;
   useEffect(() => {
     if (look !== "auto" || typeof matchMedia !== "function") return undefined;
     const m = matchMedia("(prefers-color-scheme: dark)");
@@ -120,11 +30,12 @@ export function useLook(look) {
     m.addEventListener("change", on);
     return () => m.removeEventListener("change", on);
   }, [look]);
-  return look === "auto" ? (deviceDark ? "navy" : "white") : LOOKS[look] ? look : "white";
+  const colors = settings.colors;
+  return useMemo(() => specFor({ look, colors }, deviceDark), [look, colors && colors.bg, colors && colors.text, colors && colors.hi, deviceDark]);
 }
 
 // Profile colors (the avatar is the nickname's first letter on one).
-export const AVATARS = ["#3D5A80", "#2B5CB3", "#1E7A5F", "#7A5C2E", "#5B4B8A", "#8A3B4B"];
+export const AVATARS = ["#1B3560", "#2D4D86", "#46679F", "#10223F", "#A21A22", "#8B141B"]; // navy and red tints, with a cream letter
 
 export const FONT = "'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif";
 export const SERIF = "'EB Garamond', Georgia, serif";
@@ -142,8 +53,8 @@ input,select,textarea{font-family:inherit;font-size:16px}
 :focus-visible{outline:3px solid var(--focus);outline-offset:2px}
 h1,h2{color:var(--head)}
 .nv-disp{font-family:${DISPLAY};font-variation-settings:"SOFT" 100,"WONK" 0;font-weight:620;letter-spacing:-.3px}
-.nv-btn{box-shadow:0 3px 0 var(--btn-edge,transparent);transition:transform .12s ease-out,box-shadow .12s ease-out}
-.nv-btn:active:not(:disabled){transform:translateY(2px);box-shadow:0 1px 0 var(--btn-edge,transparent)}
+.nv-btn{box-shadow:0 0 0 var(--ring,0px) var(--ringc,transparent),0 3px 0 var(--btn-edge,transparent);transition:transform .12s ease-out,box-shadow .12s ease-out}
+.nv-btn:active:not(:disabled){transform:translateY(2px);box-shadow:0 0 0 var(--ring,0px) var(--ringc,transparent),0 1px 0 var(--btn-edge,transparent)}
 .nv-ripple{border-radius:50%;animation:nvRipple .8s ease-out 1}
 .nv-bob{animation:nvBob 1.6s ease-in-out infinite;transform-origin:50% 90%}
 .nv-drift{animation:nvDrift 2.4s ease-in-out 2 alternate}
@@ -249,12 +160,16 @@ export function Icon({ name, size = 22, color = "currentColor", stroke = 2, fill
 
 // Buttons have a pressable edge underneath; tapping pushes them in.
 const BUTTON = {
-  primary: { background: "var(--brand)", color: "var(--onBrand)", "--btn-edge": "var(--edge)" },
+  // The one main button per screen: the highlight color's fill (red by default), its label, and on navy an edge in the text color.
+  primary: { background: "var(--fill)", color: "var(--onFill)", "--btn-edge": "var(--edge)", "--ring": "var(--ringW)", "--ringc": "var(--ringC)" },
   good: { background: "var(--good)", color: "var(--onBrand)", "--btn-edge": "var(--edge)" },
-  bad: { background: "var(--bad)", color: "var(--onBrand)", "--btn-edge": "rgba(0,0,0,.28)" },
+  // The final confirm of something that can't be undone: the only place red fills a button besides the main one.
+  bad: { background: "var(--red)", color: "var(--onRed)", "--btn-edge": "rgba(0,0,0,.28)", "--ring": "var(--ringBad)", "--ringc": "var(--ringC)" },
   secondary: { background: "var(--surface)", color: "var(--ink)", border: "1.5px solid var(--line)", "--btn-edge": "var(--line)" },
-  ghost: { background: "transparent", color: "var(--brand)" },
+  ghost: { background: "transparent", color: "var(--link)" },
 };
+// A button that can't be pressed yet is quiet and neutral (never a faded red).
+const QUIET = { background: "var(--surface2)", color: "var(--low)", "--ring": "0px", "--btn-edge": "transparent", opacity: 1 };
 export function Button({ kind = "primary", size = "lg", full, disabled, onClick, children, style, type = "button", ...rest }) {
   const pad = size === "lg" ? "16px 22px" : size === "md" ? "11px 18px" : "8px 14px";
   return (
@@ -263,7 +178,7 @@ export function Button({ kind = "primary", size = "lg", full, disabled, onClick,
       className="nv-press nv-btn"
       onClick={disabled ? undefined : onClick}
       disabled={disabled}
-      style={{ border: "none", borderRadius: size === "lg" ? 18 : 15, padding: pad, minHeight: size === "sm" ? 36 : size === "lg" ? 52 : 44, fontSize: size === "lg" ? 17 : 15, fontWeight: 700, letterSpacing: -0.1, cursor: disabled ? "default" : "pointer", width: full ? "100%" : undefined, maxWidth: "100%", textAlign: "center", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, opacity: disabled ? 0.45 : 1, ...BUTTON[kind], ...style }}
+      style={{ border: "none", borderRadius: size === "lg" ? 18 : 15, padding: pad, minHeight: size === "sm" ? 36 : size === "lg" ? 52 : 44, fontSize: size === "lg" ? 17 : 15, fontWeight: 700, letterSpacing: -0.1, cursor: disabled ? "default" : "pointer", width: full ? "100%" : undefined, maxWidth: "100%", textAlign: "center", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, opacity: disabled ? 0.45 : 1, ...BUTTON[kind], ...(disabled && (kind === "primary" || kind === "bad" || kind === "good") ? QUIET : {}), ...style }}
       {...rest}
     >
       {children}
@@ -556,7 +471,7 @@ export function Toasts() {
   return createPortal(
     <div aria-live="polite" style={{ position: "fixed", top: "calc(10px + env(safe-area-inset-top))", left: 0, right: 0, zIndex: 80, display: "flex", flexDirection: "column", alignItems: "center", gap: 8, pointerEvents: "none" }}>
       {items.map((t) => (
-        <div key={t.id} className="nv-in" style={{ background: t.tone === "good" ? "var(--brand)" : t.tone === "bad" ? "var(--bad)" : "var(--ink)", color: t.tone === "good" || t.tone === "bad" ? "var(--onBrand)" : "var(--bg)", borderRadius: 999, padding: "10px 18px", fontWeight: 650, fontSize: 15, boxShadow: "var(--shadow)", maxWidth: "90vw" }}>
+        <div key={t.id} className="nv-in" style={{ background: "var(--ink)", color: "var(--bg)", borderRadius: 999, padding: "10px 18px", fontWeight: 650, fontSize: 15, boxShadow: "var(--shadow)", maxWidth: "90vw" }}>
           {t.message}
         </div>
       ))}
@@ -590,7 +505,7 @@ export function LineChart({ points, lines = [], band, height = 160, color = "var
         <line key={i} x1={0} x2={w} y1={y(m.value)} y2={y(m.value)} stroke={m.color || "var(--low)"} strokeDasharray="4 4" strokeWidth={1} vectorEffect="non-scaling-stroke" />
       ))}
       {all.map((l, i) => (
-        <path key={i} d={path(l.points)} fill="none" stroke={l.color} strokeWidth={2.5} strokeDasharray={l.dash ? "6 5" : undefined} vectorEffect="non-scaling-stroke" strokeLinejoin="round" />
+        <path key={i} d={path(l.points)} fill="none" stroke={l.color} strokeWidth={2.5} strokeDasharray={l.dash === true ? "6 5" : l.dash || undefined} vectorEffect="non-scaling-stroke" strokeLinejoin="round" />
       ))}
     </svg>
   );
@@ -613,7 +528,7 @@ export function Legend({ items }) {
     <div style={{ display: "flex", flexWrap: "wrap", gap: "6px 14px", marginTop: 8 }}>
       {items.map((it) => (
         <span key={it.label} style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 650, color: "var(--mid)" }}>
-          <span style={{ width: 14, height: 4, borderRadius: 2, background: it.color }} />
+          <span style={{ width: 18, height: 0, borderTop: `4px ${it.dash ? "dotted" : "solid"} ${it.color}` }} />
           {it.label}
         </span>
       ))}

@@ -93,7 +93,7 @@ export function QuestionView({ t, locale, step, picked, setPicked, checked, labe
               disabled={!!checked}
               onClick={() => setPicked(o.v)}
               className="nv-press"
-              style={{ flex: step.type === "tf" ? 1 : undefined, textAlign: "left", display: "flex", alignItems: "center", gap: 12, border: `2px solid ${isAnswer ? "var(--right)" : isWrongPick ? "var(--warn)" : sel ? "var(--brand)" : "transparent"}`, background: isAnswer ? "var(--rightSoft)" : isWrongPick ? "var(--warnSoft)" : sel ? "var(--brandSoft)" : "var(--surface)", color: "var(--ink)", borderRadius: 14, padding: "15px 16px", fontSize: 17, fontWeight: 650, cursor: checked ? "default" : "pointer", minHeight: 58 }}
+              style={{ flex: step.type === "tf" ? 1 : undefined, textAlign: "left", display: "flex", alignItems: "center", gap: 12, border: `2px ${isWrongPick ? "dashed" : "solid"} ${isAnswer ? "var(--right)" : isWrongPick ? "var(--warn)" : sel ? "var(--brand)" : "transparent"}`, background: isAnswer ? "var(--rightSoft)" : isWrongPick ? "var(--warnSoft)" : sel ? "var(--brandSoft)" : "var(--surface)", color: "var(--ink)", borderRadius: 14, padding: "15px 16px", fontSize: 17, fontWeight: 650, cursor: checked ? "default" : "pointer", minHeight: 58 }}
             >
               <span style={{ width: 28, height: 28, borderRadius: 8, border: "1px solid var(--line)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 650, color: "var(--low)", flexShrink: 0 }}>{i + 1}</span>
               <span>{o.label}</span>
@@ -115,7 +115,7 @@ export function Feedback({ t, locale, step, picked, checked, note, heading, extr
   const miss = !right && step.type === "choice" && step.miss && step.miss[picked];
   const why = Array.isArray(step.why) ? step.why : [step.why];
   return (
-    <div className="nv-in" role="status" data-right={right} style={{ background: right ? "var(--rightSoft)" : "var(--warnSoft)", borderRadius: 20, padding: "14px 16px", marginBottom: 12 }}>
+    <div className="nv-in" role="status" data-right={right} style={{ background: right ? "var(--rightSoft)" : "var(--warnSoft)", border: right ? "2px solid var(--right)" : "2px dashed var(--warn)", borderRadius: 20, padding: "14px 16px", marginBottom: 12 }}>
       <div className="nv-disp" style={{ fontSize: 22, color: right ? "var(--right)" : "var(--warn)", display: "flex", alignItems: "center", gap: 8 }}>
         {/* A right answer: a soft ripple around the check, once. */}
         <span className={right ? "nv-ripple" : undefined} style={{ display: "inline-flex", borderRadius: "50%" }}>

@@ -1,5 +1,7 @@
 # Navy, cream and signal red — plan and mockups (Step 1)
 
+> **Built (Step 2):** approved and built on `design/navy-cream-red` with the recommended answers to the ten decisions below (header streak star in the text color; a small red pennant on the sea chart's current island; gains and losses with arrows and signs; delete and leave as plain text with red only on the final confirm; red background kept as a bold option; the four presets; the old "What's new" replaced). Screenshots of the built app: `build/index.html`. The mockups below are the plan's.
+
 Nothing in the app has changed yet. This is the plan, the numbers, and mockups drawn from the real app with the new colors laid over it. Build happens on `design/navy-cream-red` after you approve.
 
 - **Mockups:** [`mockups/index.html`](mockups/index.html) shows everything; each preset has an overview sheet: [Navy](mockups/overview-navy.jpg) · [Cream](mockups/overview-cream.jpg) · [Navy & cream (no red)](mockups/overview-navy-cream.jpg) · [Spanish, Navy](mockups/overview-navy-es.jpg). Single screens are `mockups/{preset}-{screen}.jpg`.

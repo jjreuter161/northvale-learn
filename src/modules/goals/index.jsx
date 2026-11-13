@@ -925,7 +925,7 @@ function GoalPage({ t, locale, go, row, data, onBack, sheets }) {
             {g.status === "paused" ? t("goal.resume") : t("goal.pause")}
           </Button>
         )}
-        <Button size="md" kind="ghost" style={{ flex: 1, color: "var(--bad)" }} onClick={() => setConfirm(true)}>
+        <Button size="md" kind="ghost" style={{ flex: 1 }} onClick={() => setConfirm(true)}>
           {t("goal.delete")}
         </Button>
       </div>

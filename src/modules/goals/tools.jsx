@@ -232,7 +232,7 @@ export function DebtTool({ params = {}, t, locale, onDone, done }) {
         <>
           <div style={{ fontSize: 18, fontWeight: 750, lineHeight: 1.35 }}>{t("debt.result", { time: dur(t, r.months), interest: fmt(r.interest) })}</div>
           <div style={{ margin: "10px 0" }}>
-            <LineChart lines={[{ points: toPts(r.path), color: "var(--bad)" }, ...(dbl && !dbl.never ? [{ points: toPts(dbl.path), color: "var(--good)" }] : []), ...(ext && !ext.never ? [{ points: toPts(ext.path), color: "var(--good)" }] : [])]} height={100} label={t("debt.balance")} />
+            <LineChart lines={[{ points: toPts(r.path), color: "var(--ink)" }, ...(dbl && !dbl.never ? [{ points: toPts(dbl.path), color: "var(--ink)", dash: true }] : []), ...(ext && !ext.never ? [{ points: toPts(ext.path), color: "var(--ink)", dash: "2 4" }] : [])]} height={100} label={t("debt.balance")} />
           </div>
         </>
       )}

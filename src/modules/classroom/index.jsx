@@ -347,7 +347,7 @@ function ClassCard({ t, locale, go, m }) {
         <Button size="md" kind="secondary" onClick={() => setSheet("sees")}>
           {t("cls.what")}
         </Button>
-        <Button size="md" kind="ghost" style={{ color: "var(--bad)" }} onClick={() => setSheet("leave")}>
+        <Button size="md" kind="ghost" onClick={() => setSheet("leave")}>
           {t("cls.leave")}
         </Button>
       </div>
@@ -487,7 +487,7 @@ function ClassAdmin({ t, locale, id, onBack }) {
             <Button size="md" kind="secondary" onClick={() => patch({ archived: false })}>
               {t("cls.t.restore")}
             </Button>
-            <Button size="md" kind="ghost" style={{ color: "var(--bad)" }} onClick={() => setConfirm("delete")}>
+            <Button size="md" kind="ghost" onClick={() => setConfirm("delete")}>
               {t("cls.t.delete")}
             </Button>
           </div>
@@ -587,7 +587,7 @@ function ClassAdmin({ t, locale, id, onBack }) {
                       </td>
                     ))}
                     <td style={cell}>
-                      <Button size="sm" kind="ghost" style={{ color: "var(--bad)" }} onClick={() => setConfirm({ student: s })}>
+                      <Button size="sm" kind="ghost" onClick={() => setConfirm({ student: s })}>
                         {t("cls.t.remove")}
                       </Button>
                     </td>

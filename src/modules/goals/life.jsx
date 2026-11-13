@@ -328,7 +328,7 @@ export function ScamTool({ params = {}, t, locale, onDone, done }) {
           const verdict = checked && (l.flag ? (on ? "flag" : "missed") : on ? "fine" : null);
           const tone = verdict === "flag" ? ["var(--accent)", "var(--accentSoft)"] : verdict === "missed" || verdict === "fine" ? ["var(--warn)", "var(--warnSoft)"] : on ? ["var(--brand)", "var(--brandSoft)"] : ["var(--line)", "var(--surface)"];
           return (
-            <button key={i} disabled={checked} onClick={() => setPicked((p) => p.map((v, j) => (j === i ? !v : v)))} aria-pressed={on} className="nv-press" style={{ textAlign: "left", border: `1px solid ${tone[0]}`, background: tone[1], color: "var(--ink)", borderRadius: 12, padding: "12px 14px", fontSize: 15, lineHeight: 1.4, cursor: checked ? "default" : "pointer", minHeight: 48 }}>
+            <button key={i} disabled={checked} onClick={() => setPicked((p) => p.map((v, j) => (j === i ? !v : v)))} aria-pressed={on} className="nv-press" style={{ textAlign: "left", border: `${verdict === "flag" ? 2 : 1}px ${verdict === "missed" || verdict === "fine" ? "dashed" : "solid"} ${tone[0]}`, background: tone[1], color: "var(--ink)", borderRadius: 12, padding: "12px 14px", fontSize: 15, lineHeight: 1.4, cursor: checked ? "default" : "pointer", minHeight: 48 }}>
               <span style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
                 <span style={{ flexShrink: 0, marginTop: 2, color: tone[0] }}>
                   <Icon name={on ? "flag" : "plus"} size={16} />
@@ -402,8 +402,8 @@ export function SwingTool({ t, locale, onDone, done }) {
         {t("sw.invest")}: <strong style={{ color: "var(--ink)" }}>{fmt(start)}</strong>
       </div>
       <div style={{ marginTop: 10 }}>
-        <LineChart lines={[{ points: toPts(a.pts), color: "var(--warn)" }, { points: toPts(b.pts), color: "var(--accent)" }]} markers={[{ value: start }]} height={130} label={t("sw.volatile")} />
-        <Legend items={[{ label: t("sw.volatile"), color: "var(--warn)" }, { label: t("sw.fund"), color: "var(--accent)" }]} />
+        <LineChart lines={[{ points: toPts(a.pts), color: "var(--ink)", dash: true }, { points: toPts(b.pts), color: "var(--ink)" }]} markers={[{ value: start }]} height={130} label={t("sw.volatile")} />
+        <Legend items={[{ label: t("sw.volatile"), color: "var(--ink)", dash: true }, { label: t("sw.fund"), color: "var(--ink)" }]} />
       </div>
       <p style={{ margin: "10px 0", lineHeight: 1.5 }}>{t("sw.result", { a: fmt(a.end), b: fmt(b.end), da: `${Math.round(a.maxDrop)}%`, db: `${Math.round(b.maxDrop)}%` })}</p>
       <Button full kind="secondary" style={{ border: "1px solid var(--line)" }} onClick={() => (setSeed((s) => s + 7), touch())}>

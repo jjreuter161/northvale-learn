@@ -758,6 +758,58 @@ try {
     await app.close();
   }
 
+  // --- Colors: ready-made looks, your own colors (only readable ones), saved between visits, Match my device ---
+  {
+    const app = await open(learner({ ageBand: "18-25" }));
+    const { page, button, clean, menu } = app;
+    const vars = async () => (await page.waitForTimeout(450), page.evaluate(() => ({ bg: getComputedStyle(document.documentElement).getPropertyValue("--bg").trim(), fill: getComputedStyle(document.documentElement).getPropertyValue("--fill").trim(), ink: getComputedStyle(document.documentElement).getPropertyValue("--ink").trim(), saved: JSON.parse(localStorage.getItem("northvale-learn-v1")).settings })));
+    await menu("Me");
+    await button(/^Settings/).click();
+    const look = page.getByRole("radiogroup", { name: "Look" });
+    await look.waitFor();
+    // Cream is where learners start (the seed saved "white"), with the red spark.
+    assert.deepEqual([(await vars()).bg, (await vars()).fill], ["#F7F2E8", "#C8202A"]);
+    assert.equal(await look.getByRole("radio", { name: /^Cream(?! &)/ }).getAttribute("aria-checked"), "true");
+    await look.getByRole("radio", { name: /^Navy(?! &)/ }).click();
+    assert.deepEqual([(await vars()).bg, (await vars()).ink, (await vars()).fill, (await vars()).saved.look], ["#1B3560", "#F7F2E8", "#C8202A", "navy"]);
+    await look.getByRole("radio", { name: /^Navy & cream/ }).click();
+    assert.deepEqual([(await vars()).fill, (await vars()).saved.look], ["#F7F2E8", "navy-cream"], "no red at all");
+    await clean("settings, colors");
+    // Your own colors: the readable ones.
+    await button(/^Choose your own colors/).click();
+    const bg = page.getByRole("radiogroup", { name: "Background" });
+    const text = page.getByRole("radiogroup", { name: "Text and icons" });
+    const hi = page.getByRole("radiogroup", { name: "Main buttons and highlights" });
+    assert.equal(await text.getByRole("radio", { name: /^Navy/ }).getAttribute("aria-disabled"), "true", "navy text on a navy page isn't offered");
+    assert.equal(await text.getByRole("radio", { name: /^Signal red/ }).getAttribute("aria-disabled"), "true", "red text isn't offered");
+    assert.equal(await hi.getByRole("radio", { name: /^Navy/ }).getAttribute("aria-disabled"), "true", "a navy button on a navy page isn't offered");
+    await text.getByRole("radio", { name: /^Navy/ }).click({ force: true });
+    assert.equal((await vars()).bg, "#1B3560", "clicking something that isn't offered changes nothing");
+    await hi.getByRole("radio", { name: /^Signal red/ }).click();
+    assert.equal((await vars()).saved.look, "navy", "navy, cream text, red button is the Navy preset");
+    await bg.getByRole("radio", { name: /^Signal red/ }).click();
+    assert.deepEqual([(await vars()).bg, (await vars()).saved.look, (await vars()).saved.colors.text], ["#C8202A", "custom", "cream"], "a red page: bold, with cream text");
+    await page.getByText("Bold: not for long sessions").first().waitFor();
+    await clean("settings, a red background");
+    await bg.getByRole("radio", { name: /^Cream/ }).click();
+    assert.deepEqual([(await vars()).bg, (await vars()).ink], ["#F7F2E8", "#1B3560"], "a cream page: the text follows to navy");
+    // Saved: it's still there after a reload.
+    await look.getByRole("radio", { name: /^Navy & cream/ }).click();
+    await page.reload();
+    assert.deepEqual([(await vars()).bg, (await vars()).fill], ["#1B3560", "#F7F2E8"]);
+    await menu("Me");
+    await button(/^Settings/).click();
+    assert.equal(await page.getByRole("radiogroup", { name: "Look" }).getByRole("radio", { name: /^Navy & cream/ }).getAttribute("aria-checked"), "true");
+    // Match my device: Navy at night, Cream by day.
+    await page.getByRole("radiogroup", { name: "Look" }).getByRole("radio", { name: /^Match my device/ }).click();
+    await page.emulateMedia({ colorScheme: "dark" });
+    await page.waitForFunction(() => getComputedStyle(document.documentElement).getPropertyValue("--bg").trim() === "#1B3560");
+    await page.emulateMedia({ colorScheme: "light" });
+    await page.waitForFunction(() => getComputedStyle(document.documentElement).getPropertyValue("--bg").trim() === "#F7F2E8");
+    console.log("ok: colors: ready-made looks, only readable own colors are on offer (others are faded and do nothing), red background is marked bold, saved between visits, Match my device follows the phone");
+    await app.close();
+  }
+
   // --- Certificates: a finished track earns one (checked on the server); adults choose a name, under 18 never has one on the public page ---
   for (const [who, ageBand, nick] of [["adult", "18-25", "Ada"], ["teen", "13-17", "Tito"]]) {
     const track = ["borders-1", "borders-2", "borders-3", "borders-4"];

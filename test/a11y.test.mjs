@@ -27,7 +27,7 @@ const done = ["budget-1", "budget-2", "budget-3", "save-1", "save-2", "save-3", 
 const learner = (lang, region, look) => ({
   version: 1, updatedAt: 1,
   profile: { onboarded: true, nickname: "Dani", ageBand: "18-25", avatar: 0, ageAsked: true, remindAsked: true, seenIntros: { practice: true, portfolio: true, tools: true, news: true } },
-  settings: { lang, region, look, reduceMotion: true },
+  settings: { lang, region, look: look === "custom-red" ? "custom" : look, ...(look === "custom-red" ? { colors: { bg: "red", text: "cream", hi: "cream" } } : {}), reduceMotion: true },
   progress: { xp: 200, days: Object.fromEntries(days.map((x) => [x, 20])), streak: { count: 6, last: d(1), best: 6, frozen: [] }, freezes: 1, dailyGoal: 20, lessons: Object.fromEntries(done.map((id) => [id, { done: true, at: d(8), last: d(2), best: 0, times: 1 }])), lessonDays: days, badges: { first_lesson: d(9) }, counters: { lessons: 10 }, practiced: {}, startUnit: "budget", placed: [] },
   modules: { feedback: { pending: [], survey: "skipped" } },
 });
@@ -57,9 +57,9 @@ const L = {
 };
 
 try {
-  for (const [lang, region, look] of [["en", "US", "white"], ["en", "US", "navy"], ["es", "MX", "white"], ["es", "MX", "navy"]]) {
+  for (const [lang, region, look] of [["en", "US", "white"], ["en", "US", "navy"], ["es", "MX", "white"], ["es", "MX", "navy"], ["en", "US", "navy-cream"], ["en", "US", "cream-navy"], ["en", "US", "custom-red"]]) {
     const w = L[lang];
-    const tag = `${lang}/${look === "navy" ? "Navy" : "Cream"}`;
+    const tag = `${lang}/${{ white: "Cream", navy: "Navy", "navy-cream": "Navy & cream", "cream-navy": "Cream & navy", "custom-red": "Red (bold)" }[look]}`;
     // Welcome, for someone new.
     {
       const { ctx, page } = await open({ ...learner(lang, region, look), profile: { onboarded: false, nickname: "", avatar: 0 } }, lang);
@@ -103,6 +103,8 @@ try {
     await tab(page, w.me);
     await page.getByRole("button", { name: w.settings }).first().click();
     await axe(page, `${tag} Settings`);
+    await page.getByRole("button", { name: w.ask === "Ask" ? /^Choose your own colors/ : /^Elige tus propios colores/ }).click();
+    await axe(page, `${tag} Settings, own colors`);
     await tab(page, w.learn);
     await page.locator("header").getByRole("button").filter({ hasText: /^\d+$/ }).first().click();
     await axe(page, `${tag} streak sheet`);

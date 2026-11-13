@@ -233,7 +233,7 @@ export default function CertSheet({ t, locale, go, onClose }) {
             <input value={realName} onChange={(e) => setRealName(e.target.value)} placeholder={t("cert.name.real.ph")} aria-label={t("cert.name.real.ph")} maxLength={60} autoComplete="name" style={{ width: "100%", boxSizing: "border-box", marginTop: 10, minHeight: 48, borderRadius: 14, border: "1px solid var(--line)", background: "var(--surface)", color: "var(--ink)", padding: "0 14px", fontSize: 16 }} />
           )}
           <Note icon="shield" style={{ marginTop: 12 }}>{t(isAdult ? "cert.name.adult" : "cert.name.teen")}</Note>
-          {error && <p role="alert" style={{ color: "var(--bad)", margin: "10px 0 0" }}>{error}</p>}
+          {error && <p role="alert" style={{ color: "var(--ink)", fontWeight: 650, margin: "10px 0 0" }}>{error}</p>}
           <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 14 }}>
             <Button full onClick={create} disabled={busy || (isAdult && choice === "real" && realName.trim().length < 2)}>{t("cert.create")}</Button>
             <Button full kind="ghost" onClick={() => setView({ id: "list" })}>{t("cert.back")}</Button>
@@ -244,12 +244,12 @@ export default function CertSheet({ t, locale, go, onClose }) {
       {view.id === "cert" && !cert && <Loading label={t("cert.title")} size={30} />}
       {view.id === "cert" && cert && (
         <>
-          <div style={{ aspectRatio: "1600 / 1131", borderRadius: 12, overflow: "hidden", background: "#F7F2E8", border: "1px solid var(--line)", marginBottom: 12 }}>
+          <div style={{ aspectRatio: "1600 / 1131", borderRadius: 12, overflow: "hidden", background: "var(--bg)", border: "1px solid var(--line)", marginBottom: 12 }}>
             {img ? <img src={img.url} alt={t("cert.img.alt", { title: text(tr.title, locale), date: dateText })} style={{ width: "100%", height: "100%", display: "block" }} /> : <Loading label={t("cert.title")} size={30} />}
           </div>
           <p style={{ margin: "0 0 2px", fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>{t("cert.code", { code: pretty(cert.code) })}</p>
           <p style={{ margin: "0 0 12px", fontSize: 14, color: "var(--mid)" }}>{t("cert.verify", { url: verifyUrl })}</p>
-          {error && <p role="alert" style={{ color: "var(--bad)" }}>{error}</p>}
+          {error && <p role="alert" style={{ color: "var(--ink)", fontWeight: 650 }}>{error}</p>}
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             <Button full disabled={!img} onClick={() => (download(img.url, `northvale-learn-${cert.track}.png`), logEvent("share", { kind: "cert-image" }))}>{t("cert.save.img")}</Button>
             <Button full kind="secondary" disabled={!img} onClick={savePdf}>{t("cert.save.pdf")}</Button>

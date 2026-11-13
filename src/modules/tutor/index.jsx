@@ -123,6 +123,38 @@ function learnerSnapshot() {
 
 const stripTopics = (x) => x.replace(/\n?\[Topics:[^\]]*\]?\s*$/i, "");
 
+// The four parts of an Explain this answer ("**Label** — text"). The warning part gets a flag mark and a soft panel:
+// the only place the app uses red for meaning, and the words stay in the text color.
+const WARN = /^(watch out for|ojo con esto)/i;
+function Sections({ value }) {
+  const parts = [];
+  for (const raw of value.split("\n")) {
+    const m = /^\s*\*\*([^*]+)\*\*\s*[—:-]?\s*(.*)$/.exec(raw);
+    if (m) parts.push({ label: m[1].trim(), lines: m[2] ? [m[2]] : [] });
+    else if (parts.length) parts[parts.length - 1].lines.push(raw);
+    else parts.push({ label: null, lines: [raw] });
+  }
+  return parts.map((p, i) => {
+    const body = p.lines.join("\n");
+    if (p.label && WARN.test(p.label))
+      return (
+        <div key={i} style={{ display: "flex", gap: 10, margin: "0 0 10px", padding: "10px 12px 10px 10px", borderRadius: 14, background: "var(--badSoft)", borderLeft: "5px solid var(--bad)" }}>
+          <span style={{ paddingTop: 1, color: "var(--bad)" }}><Icon name="flag" size={20} stroke={2.2} /></span>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontWeight: 750 }}>{p.label}</div>
+            <Rich value={body} />
+          </div>
+        </div>
+      );
+    return (
+      <div key={i} style={{ margin: "0 0 8px" }}>
+        {p.label && <div style={{ fontWeight: 700 }}>{p.label}</div>}
+        <Rich value={body} />
+      </div>
+    );
+  });
+}
+
 // EXPLAIN THIS — paste money text, get it explained. Everything lives in this
 // component's own state: nothing goes into the saved store, so it's gone when
 // the sheet closes. Private numbers are hidden here before sending (redact.js).
@@ -184,7 +216,7 @@ function ExplainPanel({ t, locale, mode, aiReady, session, go, onGlossary, relat
       )}
       {showing && (
         <div style={{ background: "var(--surface)", borderRadius: "18px 18px 18px 4px", padding: "12px 14px", fontSize: 16, lineHeight: 1.5 }}>
-          {error ? <p style={{ margin: 0 }}>{error}</p> : out ? <Rich value={stripTopics(out)} /> : <Loading label={t("tutor.thinking")} size={28} />}
+          {error ? <p style={{ margin: 0 }}>{error}</p> : out ? <Sections value={stripTopics(out)} /> : <Loading label={t("tutor.thinking")} size={28} />}
           {!busy && lessonIds.map((id) => <div key={id}>{related(id)}</div>)}
           {sent !== null && (
             <details style={{ marginTop: 10, fontSize: 13, color: "var(--mid)" }}>
@@ -340,7 +372,7 @@ function Overlay({ t, locale, go }) {
               <div style={{ background: "var(--brand)", color: "var(--onBrand)", borderRadius: "18px 18px 4px 18px", padding: "11px 14px", fontSize: 16, lineHeight: 1.45 }}>{m.text}</div>
             </div>
           ) : (
-            <div key={m.id} style={{ alignSelf: "flex-start", maxWidth: "94%", background: "var(--surface)", borderRadius: "18px 18px 18px 4px", padding: "12px 14px", fontSize: 16, lineHeight: 1.5, color: m.error ? "var(--bad)" : "var(--ink)", overflowWrap: "anywhere" }}>
+            <div key={m.id} style={{ alignSelf: "flex-start", maxWidth: "94%", background: "var(--surface)", borderRadius: "18px 18px 18px 4px", padding: "12px 14px", fontSize: 16, lineHeight: 1.5, color: "var(--ink)", fontWeight: m.error ? 650 : undefined, overflowWrap: "anywhere" }}>
               {m.offline ? (
                 <>
                   <p style={{ margin: "0 0 8px", color: "var(--mid)", fontSize: 14 }}>{m.glossary ? t("tutor.offline") : m.lesson ? t("tutor.offline.lesson") : t("tutor.offline.none")}</p>

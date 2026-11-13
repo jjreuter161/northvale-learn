@@ -4,7 +4,8 @@ import { useState } from "react";
 import { useAppState, update, resetState } from "./store.js";
 import { LANGS, REGIONS } from "./i18n.js";
 import { DAILY_GOALS } from "./progress.js";
-import { AVATARS, LOOKS, Button, Card, Field, Label, Note, Segmented, Sheet, Switch, Title, toast } from "./ui.jsx";
+import { COLORS, PRESETS, specFor, snap, optionOk, whyNot, lookValueFor } from "./colors.js";
+import { AVATARS, lookFrom, Icon, Button, Card, Field, Label, Note, Segmented, Sheet, Switch, Title, toast } from "./ui.jsx";
 import { useSession, signIn, signUp, signOut, changePassword, deleteAccount, setNickname, setRecap, forgotPassword, resetPassword } from "./session.js";
 import { analyticsOn, installId, forgetInstall } from "./analytics.js";
 import { api } from "./api.js";
@@ -258,7 +259,7 @@ export default function Settings({ t, locale, go }) {
               <Button kind="secondary" size="md" onClick={() => (setErr(null), setConfirm("password"))}>
                 {t("account.change_pw")}
               </Button>
-              <Button kind="ghost" size="md" style={{ color: "var(--bad)" }} onClick={() => (setErr(null), setConfirm("delete"))}>
+              <Button kind="ghost" size="md" onClick={() => (setErr(null), setConfirm("delete"))}>
                 {t("account.delete")}
               </Button>
             </div>
@@ -328,7 +329,7 @@ export default function Settings({ t, locale, go }) {
 
       <Label>{t("settings.look")}</Label>
       <Card>
-        <LookPicker t={t} value={settings.look} onChange={(v) => setSetting("look", v)} />
+        <LookPicker t={t} settings={settings} setSetting={setSetting} />
         {row(t("settings.motion"), t("settings.motion.sub"), <Switch label={t("settings.motion")} checked={settings.reduceMotion} onChange={(v) => setSetting("reduceMotion", v)} />)}
         {row(t("settings.sound"), t("settings.sound.sub"), <Switch label={t("settings.sound")} checked={!!settings.sound} onChange={(v) => setSetting("sound", v)} />)}
         {canVibrate() && row(t("settings.vibrate"), t("settings.vibrate.sub"), <Switch label={t("settings.vibrate")} checked={settings.vibrate !== false} onChange={(v) => setSetting("vibrate", v)} />)}
@@ -342,7 +343,7 @@ export default function Settings({ t, locale, go }) {
           <Button kind="secondary" size="md" onClick={() => setConfirm("reset")}>
             {t("settings.reset")}
           </Button>
-          <Button kind="ghost" size="md" style={{ color: "var(--bad)" }} onClick={() => (setErr(null), setConfirm("wipe"))}>
+          <Button kind="ghost" size="md" onClick={() => (setErr(null), setConfirm("wipe"))}>
             {t("settings.delete_data")}
           </Button>
         </div>
@@ -431,41 +432,85 @@ export default function Settings({ t, locale, go }) {
   );
 }
 
-// LOOK — Cream, Navy, or Match my device, each with a small preview.
-function LookPicker({ t, value, onChange }) {
+// LOOK — four ready-made looks and Match my device, each with a small preview, and
+// "Choose your own colors": three groups (background, text and icons, main buttons
+// and highlights) where only readable combinations are on offer (colors.js).
+function LookPicker({ t, settings, setSetting }) {
+  const [own, setOwn] = useState(settings.look === "custom");
+  const spec = specFor(settings, false);
   const mini = (L) => (
     <span style={{ flex: 1, display: "block", background: L["--bg"], padding: 7 }}>
       <span style={{ display: "block", height: 5, width: "55%", borderRadius: 3, background: L["--head"] }} />
       <span style={{ display: "block", height: 20, marginTop: 6, borderRadius: 6, background: L["--surface"] }} />
-      <span style={{ display: "block", height: 9, marginTop: 5, borderRadius: 5, background: L["--brand"] }} />
+      <span style={{ display: "block", height: 9, marginTop: 5, borderRadius: 5, background: L["--fill"], boxShadow: `0 0 0 ${L["--ringW"]} ${L["--ringC"]}` }} />
     </span>
   );
+  const previews = Object.fromEntries(PRESETS.map((p) => [p.value, lookFrom(p.bg, p.text, p.hi)]));
+  const pick = (next) => {
+    setSetting("look", lookValueFor(next));
+    setSetting("colors", next);
+  };
+  const keys = [...PRESETS.map((p) => p.value), "auto"];
+  const group = (g) => (
+    <div key={g} style={{ marginTop: 16 }}>
+      <div id={`look-g-${g}`} style={{ fontSize: 15, fontWeight: 700, marginBottom: 8 }}>{t(`look.group.${g}`)}</div>
+      <div role="radiogroup" aria-labelledby={`look-g-${g}`} style={{ display: "flex", gap: 6 }}>
+        {["navy", "cream", "red"].map((id) => {
+          const ok = optionOk(spec, g, id);
+          const on = spec[g] === id;
+          const note = !ok ? t(`look.why.${whyNot(spec, g, id)}`) : g === "bg" && id === "red" ? t("look.note.bold") : g === "hi" && id === "red" && spec.bg === "navy" ? t("look.note.edge") : "";
+          return (
+            <button key={id} role="radio" aria-checked={on} aria-disabled={!ok} aria-describedby={note ? `look-n-${g}-${id}` : undefined} onClick={() => ok && pick(snap(spec, g, id))} className="nv-press" style={{ flex: 1, minWidth: 0, background: "transparent", border: "none", padding: 0, textAlign: "center", opacity: ok ? 1 : 0.45, cursor: ok ? "pointer" : "default", color: "var(--ink)" }}>
+              <span aria-hidden="true" style={{ display: "block", width: 48, height: 48, borderRadius: 24, margin: "0 auto", background: COLORS[id].hex, border: `3px solid ${on ? "var(--ink)" : "var(--line)"}`, boxShadow: on ? "0 0 0 3px var(--bg), 0 0 0 5px var(--ink)" : "none" }} />
+              <span style={{ display: "block", fontSize: 14, fontWeight: 650, marginTop: 6 }}>{t(`look.c.${id}`)}</span>
+              <span id={`look-n-${g}-${id}`} style={{ display: "block", fontSize: 12, color: "var(--mid)", lineHeight: 1.25, minHeight: 30, marginTop: 2 }}>{note}</span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
   return (
-    <div role="radiogroup" aria-label={t("settings.look")} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 10, marginBottom: 6 }}>
-      {["white", "navy", "auto"].map((k) => {
-        const on = value === k;
-        return (
-          <button key={k} role="radio" aria-checked={on} onClick={() => onChange(k)} className="nv-press" style={{ gridColumn: k === "auto" ? "1 / -1" : undefined, textAlign: "left", border: "none", borderRadius: 20, padding: 10, background: "var(--surface)", boxShadow: on ? "0 0 0 2.5px var(--brand)" : "0 0 0 1.5px var(--line)", color: "var(--ink)", font: "inherit", cursor: "pointer" }}>
-            <span aria-hidden="true" style={{ display: "flex", height: k === "auto" ? 64 : 80, borderRadius: 14, overflow: "hidden" }}>
-              {k === "auto" ? (
-                <>
-                  {mini(LOOKS.white)}
-                  {mini(LOOKS.navy)}
-                </>
-              ) : (
-                mini(LOOKS[k])
-              )}
-            </span>
-            <span style={{ display: "flex", alignItems: "center", gap: 7, marginTop: 8, fontWeight: 700, color: "var(--head)" }}>
-              <span aria-hidden="true" style={{ width: 18, height: 18, borderRadius: 9, border: "2px solid var(--brand)", display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                {on && <span style={{ width: 9, height: 9, borderRadius: 5, background: "var(--brand)" }} />}
+    <div style={{ marginBottom: 6 }}>
+      <div role="radiogroup" aria-label={t("settings.look")} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 10 }}>
+        {keys.map((k) => {
+          const on = settings.look === k;
+          return (
+            <button key={k} role="radio" aria-checked={on} onClick={() => (setSetting("look", k), k !== "auto" && setSetting("colors", { bg: PRESETS.find((p) => p.value === k).bg, text: PRESETS.find((p) => p.value === k).text, hi: PRESETS.find((p) => p.value === k).hi }))} className="nv-press" style={{ gridColumn: k === "auto" ? "1 / -1" : undefined, textAlign: "left", border: "none", borderRadius: 20, padding: 10, background: "var(--surface)", boxShadow: on ? "0 0 0 2.5px var(--brand)" : "var(--lift)", cursor: "pointer", color: "var(--ink)" }}>
+              <span aria-hidden="true" style={{ display: "flex", height: k === "auto" ? 64 : 80, borderRadius: 14, overflow: "hidden" }}>
+                {k === "auto" ? (
+                  <>
+                    {mini(previews.white)}
+                    {mini(previews.navy)}
+                  </>
+                ) : (
+                  mini(previews[k])
+                )}
               </span>
-              {t(`look.${k}`)}
-            </span>
-            <span style={{ display: "block", fontSize: 13, color: "var(--low)", marginTop: 2, lineHeight: 1.35 }}>{t(`look.${k}.sub`)}</span>
-          </button>
-        );
-      })}
+              <span style={{ display: "flex", alignItems: "center", gap: 7, marginTop: 8, fontWeight: 700, color: "var(--head)" }}>
+                <span aria-hidden="true" style={{ width: 18, height: 18, borderRadius: 9, border: "2px solid var(--brand)", display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  {on && <span style={{ width: 9, height: 9, borderRadius: 5, background: "var(--brand)" }} />}
+                </span>
+                {t(`look.${k}`)}
+              </span>
+              <span style={{ display: "block", fontSize: 13, color: "var(--low)", marginTop: 2, lineHeight: 1.35 }}>{t(`look.${k}.sub`)}</span>
+            </button>
+          );
+        })}
+      </div>
+      <button onClick={() => setOwn(!own)} aria-expanded={own} className="nv-press" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", marginTop: 12, minHeight: 48, padding: "10px 14px", borderRadius: 16, border: "1px solid var(--line)", background: "transparent", color: "var(--ink)", fontSize: 16, fontWeight: 650, cursor: "pointer", textAlign: "left" }}>
+        <span>
+          {t("look.own")}
+          {settings.look === "custom" && <span style={{ display: "block", fontSize: 13, color: "var(--mid)", fontWeight: 500 }}>{[spec.bg, spec.text, spec.hi].map((id) => t(`look.c.${id}`)).join(" · ")}</span>}
+        </span>
+        <Icon name={own ? "minus" : "plus"} size={18} />
+      </button>
+      {own && (
+        <div>
+          <p style={{ fontSize: 13, color: "var(--mid)", margin: "10px 2px 0", lineHeight: 1.4 }}>{t("look.own.sub")}</p>
+          {["bg", "text", "hi"].map(group)}
+        </div>
+      )}
     </div>
   );
 }

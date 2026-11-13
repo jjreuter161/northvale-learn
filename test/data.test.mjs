@@ -185,7 +185,7 @@ try {
     await settle(p);
     await p.getByRole("button", { name: w.settings }).first().click();
     await settle(p);
-    const look = await p.getByRole("radio", { name: new RegExp(`^${w.look[before.settings.look]}`) }).getAttribute("aria-checked");
+    const look = await p.getByRole("radio", { name: new RegExp(`^${w.look[before.settings.look]}(?! &| y )`) }).getAttribute("aria-checked");
     assert.equal(look, "true", `${when}: "${before.settings.look}" still shows as ${w.look[before.settings.look]}`);
     await p.evaluate(() => dispatchEvent(new Event("pagehide")));
     const after = await saved(p);
@@ -212,7 +212,7 @@ try {
     for (let i = 0; i < 60 && !(await btn(p, w.done).count()); i++) await step(p, w);
     await p.evaluate(() => dispatchEvent(new Event("pagehide")));
     assert.ok((await saved(p)).progress.xp > xp, `${when}: a new lesson adds XP`);
-    assert.equal((await saved(p)).profile.seenNote, "1.0.0-rc1", `${when}: "What's new" stays read`);
+    assert.equal((await saved(p)).profile.seenNote, "1.1.0-colors", `${when}: "What's new" stays read`);
     assert.deepEqual(app.errors, [], `${when}: console errors in a lesson`);
     await app.ctx.close();
   }

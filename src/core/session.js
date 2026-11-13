@@ -52,7 +52,7 @@ async function pull({ signingIn = false } = {}) {
     const r = await api("/api/progress");
     const local = getState();
     const serverWins = r.state && (signingIn ? ((r.state.progress && r.state.progress.xp) || 0) >= (local.progress.xp || 0) : r.updatedAt > (local.updatedAt || 0));
-    if (serverWins) replaceState({ ...r.state, settings: { ...r.state.settings, look: local.settings.look } });
+    if (serverWins) replaceState({ ...r.state, settings: { ...r.state.settings, look: local.settings.look, colors: local.settings.colors } });
     else await push();
   } catch {
     // Offline for now; the next change tries again.
