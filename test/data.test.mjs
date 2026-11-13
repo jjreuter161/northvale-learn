@@ -160,6 +160,12 @@ const crash = async (p) => {
   await p.close().catch(() => {});
 };
 
+// Today suggests one best next step: the lesson, or a review when many ideas are due (then the lesson is its own row).
+const startLesson = async (p, w) => {
+  if (await p.getByRole("button", { name: w.cont }).count()) await p.getByRole("button", { name: w.cont }).first().click();
+  else await p.getByRole("button", { name: /^(Next lesson|Siguiente lección)/ }).first().click();
+};
+
 try {
   // ---- 2 (the app): a learner saved by every milestone ----
   const MILESTONES = [["saved-early.json", "before Milestone 4"], ["saved-m4-launch-prep.json", "Milestone 4 (launch prep)"], ["saved-clarity.json", "Clarity"], ["saved-m4.5.json", "Milestone 4.5"], ["saved-playful.json", "the playful design"]];
@@ -207,7 +213,7 @@ try {
     await p.getByRole("button", { name: before.settings.lang === "es" ? "Entendido" : "Got it", exact: true }).click();
     assert.equal(await news.count(), 0, `${when}: "What's new" goes once it's read`);
     const xp = after.progress.xp;
-    await p.getByRole("button", { name: w.cont }).first().click();
+    await startLesson(p, w);
     await p.locator('[aria-busy="true"]').waitFor({ state: "detached", timeout: 10000 });
     for (let i = 0; i < 60 && !(await btn(p, w.done).count()); i++) await step(p, w);
     await p.evaluate(() => dispatchEvent(new Event("pagehide")));
@@ -236,7 +242,7 @@ try {
     const app = await open(before, { locale: "en-US" });
     let p = await app.page();
     await settle(p);
-    await p.getByRole("button", { name: w.cont }).first().click();
+    await startLesson(p, w);
     await p.locator('[aria-busy="true"]').waitFor({ state: "detached", timeout: 10000 });
     const title = await top(p).getAttribute("aria-label");
     const lesson = UNITS.flatMap((u) => u.lessons).find((l) => l.title.en === title);
@@ -248,7 +254,7 @@ try {
     await crash(p);
     p = await app.page();
     await settle(p);
-    await p.getByRole("button", { name: w.cont }).first().click();
+    await startLesson(p, w);
     await p.locator('[aria-busy="true"]').waitFor({ state: "detached", timeout: 10000 });
     assert.equal(await top(p).getAttribute("aria-label"), title, "the same lesson opens");
     assert.equal(await atStep(p), at, "it picks up at the same step");
@@ -258,7 +264,7 @@ try {
     await step(p, w);
     await btn(p, w.close).click();
     await p.getByRole("dialog").getByRole("button", { name: w.leave, exact: true }).click();
-    await p.getByRole("button", { name: w.cont }).first().click();
+    await startLesson(p, w);
     await p.locator('[aria-busy="true"]').waitFor({ state: "detached", timeout: 10000 });
     assert.equal(await atStep(p), at + 1, "after Leave, it picks up where it was left");
     // Finished, then shut a moment later: the lesson is kept.

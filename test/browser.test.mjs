@@ -862,6 +862,38 @@ try {
     await app.close();
   }
 
+  // --- Smart: after three perfect lessons in a row the finish screen offers a 2-minute check to skip what's known ---
+  {
+    const lessons = Object.fromEntries(["budget-1", "budget-2"].map((id) => [id, { done: true, at: day(-3), last: day(-3), best: 0, times: 1 }]));
+    const app = await open(learner({ ageBand: "18-25" }, { lessons, counters: { lessons: 2 } }, { lessons: { cleanRun: 2 } }));
+    const { page, top, button } = app;
+    await button(/^Start|^Continue/).first().click();
+    await page.locator('[aria-busy="true"]').waitFor({ state: "detached" });
+    // "Small leaks", every answer right: a card, a choice (3rd), a card, a spot-the-flags (parts 2 and 4), an estimate (1,040), then skip the tool.
+    const next = () => button(/^Continue$/, top()).click();
+    const check = () => button(/^Check$/, top()).click();
+    await next();
+    await top().getByRole("radio").nth(2).click();
+    await check();
+    await next();
+    await next();
+    for (const i of [1, 3]) await top().locator(`[data-q="spot-part"][data-i="${i}"]`).click();
+    await check();
+    await next();
+    await slide(top().locator('[data-q="estimate"]'), 1040);
+    await check();
+    await next();
+    await button(/^(Skip for now|Done — continue)$/, top()).click();
+    if (await top().locator("[data-moment]").count()) await next();
+    await top().getByText("You're moving fast").waitFor().catch(async (e) => { console.log("FINISH SHOWS:", (await top().innerText()).slice(0, 500)); throw e; });
+    await top().getByText("Three perfect lessons in a row. A 2-minute check can skip what you already know.").waitFor();
+    await button("Take the 2-minute check", top()).click();
+    await page.getByRole("dialog", { name: "Skip what you know" }).waitFor();
+    await page.getByText(/^Question 1 of up to/).waitFor();
+    console.log("ok: after three perfect lessons in a row the finish screen offers a 2-minute check to skip what you know");
+    await app.close();
+  }
+
   // --- Certificates: a finished track earns one (checked on the server); adults choose a name, under 18 never has one on the public page ---
   for (const [who, ageBand, nick] of [["adult", "18-25", "Ada"], ["teen", "13-17", "Tito"]]) {
     const track = ["borders-1", "borders-2", "borders-3", "borders-4"];

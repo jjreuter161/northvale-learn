@@ -1,6 +1,6 @@
 // CLASSROOM MODE — registration (the screen and the join sheet live in Main.jsx, loaded when needed: a join link,
 // a class this device is in, or the Classes screen). See Main.jsx for what it does.
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, useState } from "react";
 import { registerModule } from "../../core/registry.js";
 import { slice as sliceOf, useSlice } from "../../core/store.js";
 import { addStrings } from "../../core/i18n.js";
@@ -28,7 +28,8 @@ function Screen(ctx) {
 // Nothing loads unless there's a join link in the address or this device is in a class.
 function Overlay(ctx) {
   const n = useSlice("classroom", DEFAULTS).memberships.length;
-  const link = typeof location !== "undefined" && new URLSearchParams(location.search).get("join");
+  // Read once: the join sheet removes ?join= from the address, and that must not unload it.
+  const [link] = useState(() => typeof location !== "undefined" && new URLSearchParams(location.search).get("join"));
   return n || link ? (
     <Suspense fallback={null}>
       <MainOverlay {...ctx} />

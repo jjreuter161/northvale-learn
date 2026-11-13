@@ -316,7 +316,8 @@ function AdaptCard({ t, locale, go, mistakes, nextUnit }) {
   const [open, setOpen] = useState(false);
   const today = dayKey();
   const due = M.pickReview(concepts, today).due;
-  const offer = adaptOffer({ mistakes, cleanRun: lessons.cleanRun || 0, placed: (progress.placed || []).length, offeredAt: lessons.skipOfferedAt, today, due, hasNext: !!nextUnit });
+  // Decided once, when the finish screen opens: marking the offer as made must not take it away again.
+  const [offer] = useState(() => adaptOffer({ mistakes, cleanRun: lessons.cleanRun || 0, placed: (progress.placed || []).length, offeredAt: lessons.skipOfferedAt, today, due, hasNext: !!nextUnit }));
   const skip = offer === "skip";
   const slow = offer === "review";
   useEffect(() => {
