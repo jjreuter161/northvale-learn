@@ -2,7 +2,7 @@
 // screen for the current route, and a bottom tab bar with 4 tabs: Learn
 // (opens on Today), Goals, Practice, Me. Every screen belongs to one tab
 // (a module says which in nav.tab); screens below a tab get a back button.
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, lazy, useEffect, useMemo, useState } from "react";
 import { useAppState, update, on } from "./store.js";
 import { makeT } from "./i18n.js";
 import { allModules, getModule } from "./registry.js";
@@ -16,10 +16,12 @@ import { arrived, claimRewards } from "./invites.jsx";
 import { api } from "./api.js";
 import { dayKey, addDays, MAX_FREEZES, BADGES } from "./progress.js";
 import Onboarding from "./Onboarding.jsx";
-import Me from "./Me.jsx";
+// The bigger screens load when they're opened (the first screen needs none of them).
+const Me = lazy(() => import("./Me.jsx"));
 import Practice from "./Practice.jsx";
-import Settings, { ResetPassword } from "./Settings.jsx";
-import Legal from "./Legal.jsx";
+import { ResetPassword } from "./Account.jsx";
+const Settings = lazy(() => import("./Settings.jsx"));
+const Legal = lazy(() => import("./Legal.jsx"));
 import "./strings.js";
 import { track } from "./analytics.js";
 import { Boundary } from "./errors.jsx";
@@ -144,7 +146,9 @@ export default function App() {
       <div style={rootStyle}>
         <style>{GLOBAL_CSS}</style>
         <main lang={legalPage.lang} style={{ maxWidth: 720, margin: "0 auto", padding: "calc(16px + env(safe-area-inset-top)) 18px 40px" }}>
-          <Legal route={{ params: { doc: legalPage.doc, from: "back" } }} locale={{ ...locale, lang: legalPage.lang }} t={lt} go={() => (history.length > 1 ? history.back() : location.assign(legalPage.lang === "es" ? "/bienvenida" : "/welcome"))} />
+          <Suspense fallback={null}>
+            <Legal route={{ params: { doc: legalPage.doc, from: "back" } }} locale={{ ...locale, lang: legalPage.lang }} t={lt} go={() => (history.length > 1 ? history.back() : location.assign(legalPage.lang === "es" ? "/bienvenida" : "/welcome"))} />
+          </Suspense>
         </main>
       </div>
     );
@@ -232,7 +236,7 @@ export default function App() {
       <div style={{ maxWidth: wide ? 720 : 640, margin: "0 auto" }}>
         {header}
         <main key={`${route.id}:${visit}`} className="nv-in" style={{ padding: "8px 16px calc(96px + env(safe-area-inset-bottom))" }}>
-          <Boundary t={t} screen={route.id}>{Screen ? <Screen {...ctx} /> : null}</Boundary>
+          <Boundary t={t} screen={route.id}><Suspense fallback={<div style={{ minHeight: "60dvh" }} />}>{Screen ? <Screen {...ctx} /> : null}</Suspense></Boundary>
         </main>
       </div>
       {tabBar}

@@ -10,7 +10,7 @@ import { update } from "./store.js";
 import { LANGS, REGIONS } from "./i18n.js";
 import { Button, Scene, Wordmark, Icon, BetaTag, SELECTED, Chosen } from "./ui.jsx";
 import { LATEST_NOTE } from "./whatsnew.jsx";
-import { AccountForm } from "./Settings.jsx";
+import { AccountForm } from "./Account.jsx";
 import { track } from "./analytics.js";
 import { allModules } from "./registry.js";
 

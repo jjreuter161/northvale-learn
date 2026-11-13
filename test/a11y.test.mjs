@@ -52,7 +52,7 @@ async function open(seed, lang, extra = {}) {
 }
 const tab = (page, name) => page.getByRole("navigation").getByRole("button", { name, exact: true }).click();
 const L = {
-  en: { learn: "Learn", goals: "Goals", practice: "Practice", me: "Me", cont: /^(Continue|Start)$/, check: "Check", next: "Continue", ach: /^Achievements/, settings: /^Settings/, ask: "Ask", close: "Close", start: "Get started" },
+  en: { learn: "Learn", goals: "Goals", practice: "Practice", me: "Me", cont: /^(Continue|Start|Start review)$/, check: "Check", next: "Continue", ach: /^Achievements/, settings: /^Settings/, ask: "Ask", close: "Close", start: "Get started" },
   es: { learn: "Aprender", goals: "Metas", practice: "Práctica", me: "Yo", cont: /^(Continuar|Empezar)$/, check: "Comprobar", next: "Continuar", ach: /^Logros/, settings: /^Ajustes/, ask: "Preguntar", close: "Cerrar", start: "Empezar" },
 };
 
@@ -163,6 +163,13 @@ try {
     await page.goto(`${BASE}${path}?code=ZZZZZZZZZZZZ`);
     await page.locator("#result:not([hidden])").waitFor();
     await axe(page, `/${path} result`);
+    await ctx.close();
+  }
+  // The internal admin page (its login), in the same palette.
+  {
+    const { ctx, page } = await open(null, "en");
+    await page.goto(`${BASE}admin`);
+    await axe(page, "/admin");
     await ctx.close();
   }
   assert.deepEqual(problems, [], `accessibility problems (WCAG 2.2 AA):\n  ${problems.join("\n  ")}`);

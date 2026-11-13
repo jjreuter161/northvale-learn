@@ -8,7 +8,7 @@ import { join } from "node:path";
 import { gzipSync } from "node:zlib";
 
 const WEB = join(import.meta.dirname, "../web");
-const BUDGET = { start: 245 * 1024, unit: 14 * 1024 };
+const BUDGET = { start: 220 * 1024, unit: 14 * 1024 };
 const gz = (f) => gzipSync(readFileSync(join(WEB, f))).length;
 const app = readFileSync(join(WEB, "app.js"), "utf8");
 const first = [...new Set([...app.matchAll(/from"\.\/(chunks\/[^"]+\.js)"/g)].map((m) => m[1]))];

@@ -15,13 +15,17 @@ import { stream } from "../../core/api.js";
 import { useSession } from "../../core/session.js";
 import { level } from "../../core/progress.js";
 import { Button, Chip, Icon, Loading, Note, Segmented, Sheet } from "../../core/ui.jsx";
-import { lookup, suggestedWords, findLesson } from "./glossary.js";
 import { redact } from "../../core/redact.js";
 import { sessionNow } from "../../core/session.js";
 import { UNITS, ALL_LESSONS, unitDone, lessonState } from "../lessons/content.js";
 import { conceptById } from "../lessons/concepts.js";
 
-const lessonFor = (q) => findLesson(q, ALL_LESSONS, (id) => (conceptById(id) || {}).name);
+// The glossary (words, definitions and the lesson each points to) is big and isn't needed to show the first
+// screen: it loads when the browser is idle, or at the first use.
+let GL = null;
+const glossary = () => (GL ? Promise.resolve(GL) : import("./glossary.js").then((m) => (GL = m)));
+if (typeof window !== "undefined") (window.requestIdleCallback || ((f) => setTimeout(f, 1500)))(() => glossary(), { timeout: 2500 });
+const lessonFor = (G, q) => G.findLesson(q, ALL_LESSONS, (id) => (conceptById(id) || {}).name);
 
 const S = (en, es) => ({ en, es });
 addStrings({
@@ -273,9 +277,10 @@ function Overlay({ t, locale, go }) {
     track("tutor_ask", { mode: slice.mode, ai: !!aiReady });
     const id = Date.now();
     const userMsg = { id: `u${id}`, role: "user", text: question, about: ctx ? ctx.context.slice(0, 120) : null };
-    const lesson = lessonFor(ctx ? `${question} ${ctx.context}` : question);
+    const G = await glossary();
+    const lesson = lessonFor(G, ctx ? `${question} ${ctx.context}` : question);
     if (!aiReady) {
-      const g = lookup(question, locale.region, { loose: true }) || (ctx && lookup(`${ctx.question || ""} ${ctx.context || ""}`, locale.region));
+      const g = G.lookup(question, locale.region, { loose: true }) || (ctx && G.lookup(`${ctx.question || ""} ${ctx.context || ""}`, locale.region));
       const answer = g ? text(slice.mode === "expert" ? g.expert : g.simple, locale) : null;
       save((s) => ({ ...s, messages: [...s.messages, userMsg, { id: `a${id}`, role: "assistant", offline: true, text: answer, glossary: !!g, lesson: lesson && lesson.id }].slice(-60) }));
       return;
@@ -311,7 +316,11 @@ function Overlay({ t, locale, go }) {
   const suggestions = about
     ? [t("tutor.c.simpler"), t("tutor.c.example"), t("tutor.c.why")]
     : [...(now ? [t("tutor.c.lesson", { title: text(now.title, locale) }), t("tutor.c.example2", { title: text(now.title, locale) })] : []), ...(goalName ? [t("tutor.c.goal", { name: goalName })] : []), ...["tutor.s1", "tutor.s2", locale.region === "MX" ? "tutor.s4.MX" : "tutor.s4"].map((k) => t(k))].slice(0, 5);
-  const glossaryWords = suggestedWords(locale.lang, locale.region);
+  const [loadedGlossary, setLoadedGlossary] = useState(GL);
+  useEffect(() => {
+    if (open && !GL) glossary().then(setLoadedGlossary);
+  }, [open]);
+  const glossaryWords = loadedGlossary ? loadedGlossary.suggestedWords(locale.lang, locale.region) : [];
   const last = slice.messages[slice.messages.length - 1];
   const missed = last && last.offline && !last.text && !last.lesson;
   const related = (id) => {
@@ -440,13 +449,15 @@ registerModule({
     // (and say there's nothing to explain otherwise — the button hides).
     canExplain: (text) => {
       const s = sessionNow();
-      return !!((s.online && s.ai && s.user) || lookup(text, getState().settings.region));
+      return !!((s.online && s.ai && s.user) || (GL && GL.lookup(text, getState().settings.region)));
     },
     explain: ({ question, context }) => {
       const s = sessionNow();
       if (s.online && s.ai && s.user) return openFn && openFn({ question, context });
-      const g = lookup(`${question} ${context}`, getState().settings.region);
-      if (g && openFn) openFn({ question: g.keys[0] });
+      glossary().then((G) => {
+        const g = G.lookup(`${question} ${context}`, getState().settings.region);
+        if (g && openFn) openFn({ question: g.keys[0] });
+      });
     },
   },
 });

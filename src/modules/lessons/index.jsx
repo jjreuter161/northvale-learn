@@ -7,14 +7,13 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { registerModule, actionWidget, service } from "../../core/registry.js";
 import { useAppState, useSlice, getState, setSlice, saveNow } from "../../core/store.js";
 import { recordLesson, recordReview, recordPractice } from "../../core/game.js";
-import { mythOf } from "./myths.js";
 import { openShare } from "../../core/share.jsx";
 import { track } from "../../core/analytics.js";
 import { text, addStrings } from "../../core/i18n.js";
 import { xpOn, dayKey, addDays } from "../../core/progress.js";
 import { Button, Card, Icon, Layer, List, ListRow, Loading, Mark, Progress, Ring, Scene, Sheet, UnitArt, WaveEdge, toast } from "../../core/ui.jsx";
 import { star, wave, boat, LANDMARK } from "../../core/art.js";
-import { AgeCard } from "../../core/Settings.jsx";
+import { AgeCard } from "../../core/Account.jsx";
 import { ReminderCard } from "../../core/reminders.jsx";
 import { WhatsNewCard } from "../../core/whatsnew.jsx";
 import { practiceOpen, markIntro } from "../../core/Practice.jsx";
@@ -341,7 +340,12 @@ function AdaptCard({ t, locale, go, mistakes, nextUnit }) {
 // it shrinks to one line until tomorrow.
 function MythCard({ t, locale }) {
   const day = dayKey();
-  const myth = mythOf(day, locale.region);
+  // The statements (myths.js) load when this card shows, not with the first screen.
+  const [list, setList] = useState(null);
+  useEffect(() => {
+    import("./myths.js").then(setList);
+  }, []);
+  const myth = list && list.mythOf(day, locale.region);
   const tx = useLocaleText(locale);
   const saved = useAppState((s) => (s.modules.lessons || {}).myth);
   const answered = saved && saved.day === day ? saved : null;
@@ -357,6 +361,7 @@ function MythCard({ t, locale }) {
         <Icon name="check" size={16} /> {t("myth.done")}
       </div>
     );
+  if (!myth) return null;
   const right = answered && answered.picked === myth.answer;
   const btn = { flex: 1, minHeight: 46, borderRadius: 15, border: "1.5px solid var(--line)", background: "var(--surface)", color: "var(--ink)", fontWeight: 700, fontSize: 16, cursor: "pointer", font: "inherit", "--btn-edge": "var(--line)" };
   return (

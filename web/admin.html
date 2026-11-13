@@ -7,7 +7,8 @@
     <title>Northvale Learn · Admin</title>
     <link rel="icon" href="/icon.svg" type="image/svg+xml" />
     <style>
-      :root { --bg: #f5f7fb; --card: #fff; --ink: #0e1b2e; --mid: #4a5568; --low: #8792a6; --line: #e2e7ef; --good: #0fa968; --bad: #e0484d; --brand: #13315c; }
+      :root { --bg: #F7F2E8; --card: #FFFDF8; --ink: #1B3560; --mid: #3e5376; --low: #546683; --line: #E3D9C6; --good: #1B3560; --bad: #A21A22; --brand: #C8202A; }
+      @media (prefers-color-scheme: dark) { :root { --bg: #1B3560; --card: #233F70; --ink: #F7F2E8; --mid: #d4d4d2; --low: #bec1c5; --line: #46679F; --good: #F7F2E8; --bad: #FF8E8B; --brand: #F7F2E8; } }
       * { box-sizing: border-box }
       body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.45 Inter, system-ui, -apple-system, "Segoe UI", sans-serif; font-variant-numeric: tabular-nums }
       main { max-width: 1040px; margin: 0 auto; padding: 24px 16px 48px }
@@ -20,10 +21,10 @@
       .label { font-size: 13px; color: var(--mid) }
       table { width: 100%; border-collapse: collapse; background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden }
       th, td { text-align: left; padding: 9px 12px; border-top: 1px solid var(--line); vertical-align: top; font-size: 14px }
-      th { background: #fafbfd; font-weight: 600; color: var(--mid); border-top: none }
+      th { background: var(--bg); font-weight: 600; color: var(--mid); border-top: none }
       form { display: flex; gap: 8px; margin: 24px 0 }
       input { flex: 1; font: inherit; padding: 11px 12px; border: 1px solid var(--line); border-radius: 10px }
-      button { font: inherit; font-weight: 600; padding: 11px 16px; border: 0; border-radius: 10px; background: var(--brand); color: #fff; cursor: pointer }
+      button { font: inherit; font-weight: 600; padding: 11px 16px; border: 0; border-radius: 10px; background: var(--brand); color: var(--card); cursor: pointer }
       .err { color: var(--bad) }
       .bar { height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; margin-top: 8px }
       .bar > div { height: 100%; background: var(--good) }
