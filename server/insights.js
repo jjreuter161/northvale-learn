@@ -7,7 +7,7 @@
 // screen, streak repair, the weekly email) and whether it works.
 import { store } from "./store.js";
 
-const EVENTS = new Set(["app_open", "onboarding", "lesson_step", "lesson_complete", "review_complete", "challenge_complete", "placement", "tutor_ask", "explain_use", "practice", "account_created", "mission_start", "mission_done", "comeback", "comeback_start", "streak_lost", "streak_repair", "push_on", "push_off", "push_open", "recap_open", "share"]);
+const EVENTS = new Set(["app_open", "onboarding", "lesson_step", "lesson_complete", "review_complete", "challenge_complete", "placement", "tutor_ask", "explain_use", "year_start", "year_done", "practice", "account_created", "mission_start", "mission_done", "comeback", "comeback_start", "streak_lost", "streak_repair", "push_on", "push_off", "push_open", "recap_open", "share"]);
 const ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const DAY = /^\d{4}-\d{2}-\d{2}$/;
 const str = (x, n = 64) => String(x == null ? "" : x).replace(/[\u0000-\u001f]/g, " ").slice(0, n);
@@ -75,6 +75,9 @@ export function record({ installId, events }, ip) {
     if (e.name === "tutor_ask") inst.tutor++;
     // Explain this: only that it was used; what was pasted never leaves the phone except for the one answer.
     if (e.name === "explain_use") inst.explain = (inst.explain || 0) + 1;
+    // Your Money Year: that it was started and finished, nothing about the choices.
+    if (e.name === "year_start") inst.yearStart = true;
+    if (e.name === "year_done") inst.yearDone = true;
     if (e.name === "practice") a.practice[str(p.kind, 16)] = (a.practice[str(p.kind, 16)] || 0) + 1;
     if (e.name === "account_created") inst.account = true;
     // real-life missions: which mission, and whether a note was written — the
@@ -252,6 +255,7 @@ export function stats(today, titles = {}, missionTitles = {}) {
       }),
     streaks: { median: median(streaks), max: Math.max(0, ...streaks), atLeast3: streaks.filter((s) => s >= 3).length, atLeast7: streaks.filter((s) => s >= 7).length },
     tutor: { questions: installs.reduce((t, i) => t + i.tutor, 0), learnersAsking: installs.filter((i) => i.tutor > 0).length },
+    year: { started: installs.filter((i) => i.yearStart).length, finished: installs.filter((i) => i.yearDone).length },
     explain: { uses: installs.reduce((t, i) => t + (i.explain || 0), 0), learners: installs.filter((i) => i.explain > 0).length },
     reasons: installs.reduce((m, i) => (i.reason ? { ...m, [i.reason]: (m[i.reason] || 0) + 1 } : m), {}),
     practice: a.practice,

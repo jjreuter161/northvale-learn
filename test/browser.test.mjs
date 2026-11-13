@@ -758,6 +758,49 @@ try {
     await app.close();
   }
 
+  // --- Your Money Year: pick a start, 12 months of choices, the end screen, play again; saved between visits ---
+  for (const [lang, region] of [["en", "US"], ["es", "MX"]]) {
+    const es = lang === "es";
+    const W = es
+      ? { tab: "Práctica", row: /^Tu Año de Dinero/, start: /^Tu primer trabajo de tiempo completo/, pick: "Elige una", next: "Siguiente mes", see: "Ver tu año", end: "Viaje completado", compare: "Tu año y el camino constante", again: "Jugar otra vez con otras decisiones", past: "Viajes anteriores", resume: /^Tu Año de Dinero[\s\S]*Seguir: mes 4 de 12/, lesson: /Lección:/ }
+      : { tab: "Practice", row: /^Your Money Year/, start: /^Your first full-time job/, pick: "Choose one", next: "Next month", see: "See your year", end: "Voyage complete", compare: "Your year and the steady path", again: "Play again with different choices", past: "Past voyages", resume: /^Your Money Year[\s\S]*Continue: month 4 of 12/, lesson: /Lesson:/ };
+    const seed = { ...learner({ ageBand: "18-25" }, { counters: { lessons: 3 } }), settings: { lang, region, look: "white", reduceMotion: true } };
+    const app = await open(seed);
+    const { page, button, clean, menu } = app;
+    await menu(W.tab);
+    await button(W.row).click();
+    await clean(`year, pick a start (${lang})`);
+    await button(W.start).click();
+    const choices = () => page.getByRole("group", { name: W.pick }).getByRole("button");
+    for (let m = 0; m < 12; m++) {
+      await choices().first().waitFor();
+      assert.equal(await choices().count(), 3, `month ${m + 1} has three choices`);
+      if (m === 0 || m === 5 || m === 11) await clean(`year, month ${m + 1} (${lang})`);
+      await choices().nth(m % 3).click();
+      await button(m === 11 ? W.see : W.next).waitFor();
+      if (m === 3) await clean(`year, what changed (${lang})`);
+      if (m === 2) {
+        // Leave and come back: the year is saved where it was.
+        await page.reload();
+        await menu(W.tab);
+        await button(W.resume).waitFor();
+        await button(W.row).click();
+        await choices().first().waitFor();
+        continue;
+      }
+      await button(m === 11 ? W.see : W.next).click();
+    }
+    await page.getByText(W.end).first().waitFor();
+    await page.getByText(W.compare).waitFor();
+    await clean(`year, the end (${lang})`);
+    assert.doesNotMatch(await page.evaluate(() => document.body.innerText), /NaN|undefined|Infinity/);
+    await button(W.again).click();
+    await page.getByText(W.past).waitFor();
+    await clean(`year, play again (${lang})`);
+    console.log(`ok: Your Money Year (${lang}): pick a start, 12 months of three choices, saved when you leave, the end screen against the steady path, play again`);
+    await app.close();
+  }
+
   // --- back after 5 days away, with a 4-day streak that ended ---
   {
     const day = (n) => new Date(Date.now() + n * 864e5).toLocaleDateString("en-CA", { timeZone: "America/Mexico_City" });

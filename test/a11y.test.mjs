@@ -112,6 +112,23 @@ try {
     await page.getByRole("dialog").last().getByRole("radio", { name: w.ask === "Ask" ? "Explain this" : "Explícame esto" }).click();
     await page.getByRole("dialog").last().getByRole("textbox").fill("Card 4111 1111 1111 1111");
     await axe(page, `${tag} Explain this`);
+    await page.keyboard.press("Escape");
+    // Your Money Year: the start screen, a month, what changed, the end.
+    const es = w.ask !== "Ask";
+    await tab(page, w.practice);
+    await page.getByRole("button", { name: es ? /^Tu Año de Dinero/ : /^Your Money Year/ }).first().click();
+    await page.getByRole("button", { name: es ? /^Tu primer trabajo/ : /^Your first full-time job/ }).waitFor();
+    await axe(page, `${tag} Money Year, start`);
+    await page.getByRole("button", { name: es ? /^Tu primer trabajo/ : /^Your first full-time job/ }).click();
+    const opts = page.getByRole("group", { name: es ? "Elige una" : "Choose one" }).getByRole("button");
+    await opts.first().waitFor();
+    await axe(page, `${tag} Money Year, a month`);
+    for (let m = 0; m < 12; m++) {
+      await opts.nth(1).click();
+      if (m === 0) await axe(page, `${tag} Money Year, what changed`);
+      await page.getByRole("button", { name: es ? (m === 11 ? "Ver tu año" : "Siguiente mes") : m === 11 ? "See your year" : "Next month" }).click();
+    }
+    await axe(page, `${tag} Money Year, the end`);
     await ctx.close();
     // The privacy policy, on its own page.
     {
