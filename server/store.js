@@ -90,7 +90,19 @@ export const store = {
     data.users[id].passwordHash = passwordHash;
     save();
   },
+  // Certificates (certs.js): by code; only the code, track, date, owner and, for adults who chose it, a name.
+  certByCode: (code) => (data.certs && data.certs[code]) || null,
+  certsOf: (userId) => Object.values(data.certs || {}).filter((c) => c.user === userId),
+  setCert(rec) {
+    (data.certs ||= {})[rec.code] = rec;
+    save();
+  },
+  removeCert(code) {
+    if (data.certs) delete data.certs[code];
+    save();
+  },
   removeUser(id) {
+    for (const c of Object.values(data.certs || {})) if (c.user === id) delete data.certs[c.code];
     delete data.users[id];
     delete data.progress[id];
     delete data.usage[id];

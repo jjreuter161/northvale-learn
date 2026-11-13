@@ -188,7 +188,7 @@ addStrings({
   "me.week_total": S("{xp} XP this week", "{xp} XP esta semana"),
   "me.badges": S("Achievements", "Logros"),
   "me.badges.n": S("{n} of {total} earned", "{n} de {total} obtenidos"),
-  "me.skills.sub": S("What you know well, and what to refresh", "Lo que ya dominas y lo que conviene repasar"),
+  "me.skills.sub": S("What you know well, what to refresh, and your certificates", "Lo que ya dominas, lo que conviene repasar y tus certificados"),
   "me.invite.sub": S("Learn with a friend, with a private link", "Aprende con alguien, con un enlace privado"),
   "me.legal": S("Privacy & terms", "Privacidad y términos"),
   "me.promise": S("Our promise", "Nuestra promesa"),

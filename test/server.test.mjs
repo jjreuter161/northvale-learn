@@ -401,6 +401,60 @@ try {
   assert.ok(!(await call("/api/league", { cookie: S })).json.standings.some((s) => s.nickname === "Dani script"), "…and the teen league");
   assert.deepEqual((await call("/api/league?with=friends", { cookie: B })).json.standings.map((s) => s.nickname), ["Leo"], "and its friend links");
   console.log("ok: deleting an account removes it, its sessions and its league spot");
+  // --- certificates ---
+  const mk = async (email, nickname, ageBand, extra = {}) => (await call("/api/auth/signup", { method: "POST", body: { email, password: "a good long password", nickname, ageBand, ...extra } })).headers.get("set-cookie").split(";")[0];
+  const E = await mk("ela@example.com", "Ela", "18-25");
+  const T = await mk("tess@example.com", "Tess", "13-17", { guardian: true });
+  const O = await mk("omar@example.com", "Omar", "26+");
+  const done = (ids) => ({ progress: { xp: 0, days: {}, lessons: Object.fromEntries(ids.map((id) => [id, { done: true }])) } });
+  const BORDERS = ["borders-1", "borders-2", "borders-3", "borders-4"];
+  const issue = (body, cookie) => call("/api/cert/issue", { method: "POST", body, cookie });
+  const verify = (code) => call(`/api/cert/verify?code=${encodeURIComponent(code)}`);
+  assert.equal((await issue({ track: "borders" }, null)).status, 401);
+  assert.equal((await issue({ track: "nope" }, E)).status, 400);
+  assert.equal((await issue({ track: "borders" }, E)).json.error.code, "NOT_FINISHED", "nothing finished yet");
+  await call("/api/progress", { method: "PUT", body: { state: done(BORDERS.slice(0, 3)), updatedAt: 7000 }, cookie: E });
+  assert.equal((await issue({ track: "borders" }, E)).json.error.code, "NOT_FINISHED", "three of four lessons isn't a track");
+  await call("/api/progress", { method: "PUT", body: { state: done(BORDERS), updatedAt: 7100 }, cookie: E });
+  const c1 = (await issue({ track: "borders", name: "nickname" }, E)).json;
+  assert.match(c1.code, /^[A-HJ-KM-NP-Z2-9]{12}$/, "a 12-character code without look-alike letters");
+  assert.deepEqual([c1.track, c1.date, c1.name], ["borders", today, "Ela"], "an adult can show their nickname");
+  assert.deepEqual((await call("/api/cert/mine", { cookie: E })).json.certs.map((c) => c.track), ["borders"]);
+  const v1 = (await verify(c1.code.toLowerCase().replace(/(.{4})/g, "$1-"))).json;
+  assert.deepEqual([v1.valid, v1.track, v1.date, v1.name, v1.title.en, v1.title.es], [true, "borders", today, "Ela", "Money Across Borders", "Dinero entre fronteras"], "found by the code, any case, with or without dashes");
+  assert.deepEqual(Object.keys(v1).sort(), ["date", "name", "title", "track", "valid"], "the public answer holds nothing else");
+  assert.deepEqual((await verify("AAAAAAAAAAAA")).json, { valid: false });
+  const c2 = (await issue({ track: "borders", name: "real", realName: "Ana María López" }, E)).json;
+  assert.deepEqual([c2.code, c2.name], [c1.code, "Ana María López"], "changing the name keeps the code");
+  assert.equal((await verify(c1.code)).json.name, "Ana María López");
+  for (const bad of ["Ana2", "<b>x</b>", "a@b.co", "x", "https://x.co"]) assert.equal((await issue({ track: "borders", name: "real", realName: bad }, E)).json.error.code, "NAME", bad);
+  assert.equal((await issue({ track: "borders", name: "none" }, E)).json.name, null);
+  assert.equal((await verify(c1.code)).json.name, null, "no name: only the track and date");
+  // Under 18: never a name, however it's asked for.
+  await call("/api/progress", { method: "PUT", body: { state: done(BORDERS), updatedAt: 7200 }, cookie: T });
+  for (const body of [{ track: "borders", name: "nickname" }, { track: "borders", name: "real", realName: "Sofia Ruiz" }]) {
+    const teen = (await issue(body, T)).json;
+    assert.equal(teen.name, null, "a certificate for someone under 18 keeps no name");
+    assert.equal((await verify(teen.code)).json.name, null);
+  }
+  assert.doesNotMatch(JSON.stringify((await call("/api/cert/mine", { cookie: T })).json), /Sofia|Tess/);
+  // Someone else's certificate can't be deleted; their own can, and the code stops working.
+  const teenCode = (await call("/api/cert/mine", { cookie: T })).json.certs[0].code;
+  assert.equal((await call("/api/cert/delete", { method: "POST", body: { code: teenCode }, cookie: E })).status, 404);
+  assert.equal((await call("/api/cert/delete", { method: "POST", body: { code: teenCode }, cookie: T })).status, 200);
+  assert.deepEqual((await verify(teenCode)).json, { valid: false });
+  // Deleting the account removes its certificates.
+  await call("/api/progress", { method: "PUT", body: { state: done(BORDERS), updatedAt: 7300 }, cookie: O });
+  const mo = (await issue({ track: "borders", name: "nickname" }, O)).json;
+  assert.equal((await verify(mo.code)).json.valid, true);
+  assert.equal((await call("/api/me", { method: "DELETE", body: { password: "a good long password" }, cookie: O })).status, 200);
+  assert.deepEqual((await verify(mo.code)).json, { valid: false }, "the account's certificates went with it");
+  // Guessing is slowed down.
+  let slowed = false;
+  for (let i = 0; i < 25 && !slowed; i++) slowed = (await verify("BBBBBBBBBBBB")).status === 429;
+  assert.equal(slowed, true, "too many checks from one place are refused for a minute");
+  console.log("ok: certificates: issued only for finished tracks, by code; adults choose a name, anyone under 18 never has one; the public check shows only track, date and that name; deleting works, with the account too; guessing is rate-limited");
+
   // --- the monthly AI budget stops the AI when it's spent ---
   const port2 = port + 1;
   const data2 = mkdtempSync(join(tmpdir(), "nvlearn-test-"));

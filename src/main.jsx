@@ -8,6 +8,7 @@ import "./modules/portfolio/index.jsx";
 import "./modules/goals/index.jsx";
 import "./modules/missions/index.jsx";
 import "./modules/year/index.jsx";
+import "./modules/certs/index.jsx";
 import "./modules/news/index.jsx";
 import "./modules/tutor/index.jsx";
 import "./modules/classroom/index.jsx";

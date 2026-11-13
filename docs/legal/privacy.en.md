@@ -60,6 +60,10 @@ When you ask the tutor a question, your question is sent to Anthropic, the compa
 
 In Ask, "Explain this" lets you paste money text (a pay stub, an offer, an ad, a message) to have it explained. Before anything is sent, your phone hides card numbers, account numbers, ID numbers (like a Social Security number, CURP or RFC) and other long numbers, and our server hides them again. The text that is left goes to Anthropic for that one answer, with nothing about you: not your email, nickname, level or age range. **We do not store it, log it or keep it in our analytics, feedback or classroom data, and the app does not save it on your phone either**; it disappears when you close the screen. We keep only a count of how many times you used it today (a limit that keeps the service fair) and what the answer cost. Please remove any private number we might not recognize before you paste. Photos and files can't be pasted. **[Lawyer to confirm: wording for pasted text that may contain other people's information, and Anthropic's handling of it.]**
 
+### Certificates
+
+If you finish every lesson in a track, you can claim a certificate. We check the lessons your account has finished, then keep: a code, the track, the date and, if you are 18 or older and choose it, the name you want shown (your nickname, or a name you type). If you are 13–17 (or haven't given an age), we never keep or show a name. Anyone who has the code can check it on a public page, which shows only the track, the date and that chosen name, nothing else. The image or PDF you download is drawn on your phone and can carry your nickname if you choose, even under 18. You can delete a certificate at any time and its code stops working, and deleting your account deletes your certificates. A Northvale Learn certificate marks finishing lessons in the app: it isn't a school credit or a professional qualification.
+
 ## Your IP address
 
 The server uses your IP address for a few minutes to stop password-guessing and spam. We don't store it with your data. Our hosting provider may keep it in short-term technical logs.

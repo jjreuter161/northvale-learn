@@ -758,6 +758,66 @@ try {
     await app.close();
   }
 
+  // --- Certificates: a finished track earns one (checked on the server); adults choose a name, under 18 never has one on the public page ---
+  for (const [who, ageBand, nick] of [["adult", "18-25", "Ada"], ["teen", "13-17", "Tito"]]) {
+    const track = ["borders-1", "borders-2", "borders-3", "borders-4"];
+    const cookie = await account({ email: `cert-${who}@example.test`, nickname: nick, ageBand, ...(ageBand === "13-17" ? { guardian: true } : {}) });
+const lessons = Object.fromEntries(track.map((id) => [id, { done: true, at: day(-1), last: day(-1), best: 0, times: 1 }]));
+    const seed = learner({ ageBand, nickname: nick }, { lessons });
+    // The account's saved progress is the same learner, so the app keeps it as it is.
+    await fetch(`${BASE}api/progress`, { method: "PUT", headers: { "X-Northvale": "1", "Content-Type": "application/json", Cookie: cookie }, body: JSON.stringify({ state: seed, updatedAt: seed.updatedAt }) });
+    const app = await open(seed, { cookie });
+    const { page, top, button, clean, menu } = app;
+    await menu("Me");
+    await button(/^Skills/).click();
+    await button(/^Certificates/).click();
+    await top().getByText("Money Across Borders").first().waitFor();
+    await top().getByText("Money Foundations").waitFor();
+    await clean(`certificates, list (${who})`);
+    await top().getByRole("button", { name: "Get your certificate" }).click();
+    await top().getByText("What name goes on it?").waitFor();
+    if (who === "adult") {
+      await top().getByRole("radio", { name: "My name" }).click();
+      await top().getByRole("textbox", { name: "First and last name" }).fill("Ada Lovelace");
+    } else {
+      assert.equal(await top().getByRole("radio", { name: "My name" }).count(), 0, "under 18: no real-name option");
+      await top().getByText("The public check page never shows a name for anyone under 18.").waitFor();
+    }
+    await clean(`certificates, name (${who})`);
+    await top().getByRole("button", { name: "Create certificate" }).click();
+    const code = (await top().getByText(/^Code [A-Z2-9]{4}-[A-Z2-9]{4}-[A-Z2-9]{4}$/).innerText()).replace("Code ", "");
+    await top().getByRole("img", { name: /^Certificate: Money Across Borders, issued / }).waitFor();
+    await clean(`certificates, the certificate (${who})`);
+    // The image and the PDF download.
+    const [png] = await Promise.all([page.waitForEvent("download"), top().getByRole("button", { name: "Save image" }).click()]);
+    assert.equal(png.suggestedFilename(), "northvale-learn-borders.png");
+    const [pdf] = await Promise.all([page.waitForEvent("download"), top().getByRole("button", { name: "Save PDF" }).click()]);
+    assert.equal(pdf.suggestedFilename(), "northvale-learn-borders.pdf");
+    assert.equal((await readFileSync(await pdf.path())).subarray(0, 5).toString(), "%PDF-");
+    // Anyone can check the code (no sign-in): the track and date, and an adult's chosen name.
+    const checker = await app.page.context().newPage();
+    await checker.goto(`${BASE}verify?code=${code}`);
+    await checker.getByText("Valid certificate").waitFor();
+    await checker.getByText("Money Across Borders").waitFor();
+    const shown = await checker.locator("#result").innerText();
+    if (who === "adult") assert.match(shown, /Ada Lovelace/);
+    else assert.doesNotMatch(shown, /Tito|Name|Awarded/, "under 18: the public page shows no name");
+    await checker.goto(`${BASE}verificar?code=${code}`);
+    await checker.getByText("Certificado válido").waitFor();
+    await checker.getByText("Dinero entre fronteras").waitFor();
+    await checker.goto(`${BASE}verify?code=ZZZZZZZZZZZZ`);
+    await checker.getByText("We couldn't find that code.").waitFor();
+    await checker.close();
+    // Delete it: the code stops working.
+    await top().getByRole("button", { name: "Delete this certificate" }).click();
+    await top().getByRole("button", { name: "Yes, delete" }).click();
+    await top().getByText("Money Across Borders").first().waitFor();
+    const gone = await (await fetch(`${BASE}api/cert/verify?code=${code}`, { headers: { "X-Northvale": "1" } })).json();
+    assert.equal(gone.valid, false);
+    console.log(`ok: certificates (${who}): earned for a finished track, name choice${who === "teen" ? " (no real name under 18)" : ""}, image and PDF download, the public page shows ${who === "teen" ? "only the track and date" : "the track, date and chosen name"} in English and Spanish, deleting works`);
+    await app.close();
+  }
+
   // --- Your Money Year: pick a start, 12 months of choices, the end screen, play again; saved between visits ---
   for (const [lang, region] of [["en", "US"], ["es", "MX"]]) {
     const es = lang === "es";

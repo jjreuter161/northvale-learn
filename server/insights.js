@@ -7,7 +7,7 @@
 // screen, streak repair, the weekly email) and whether it works.
 import { store } from "./store.js";
 
-const EVENTS = new Set(["app_open", "onboarding", "lesson_step", "lesson_complete", "review_complete", "challenge_complete", "placement", "tutor_ask", "explain_use", "year_start", "year_done", "practice", "account_created", "mission_start", "mission_done", "comeback", "comeback_start", "streak_lost", "streak_repair", "push_on", "push_off", "push_open", "recap_open", "share"]);
+const EVENTS = new Set(["app_open", "onboarding", "lesson_step", "lesson_complete", "review_complete", "challenge_complete", "placement", "tutor_ask", "explain_use", "year_start", "year_done", "cert_issue", "practice", "account_created", "mission_start", "mission_done", "comeback", "comeback_start", "streak_lost", "streak_repair", "push_on", "push_off", "push_open", "recap_open", "share"]);
 const ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const DAY = /^\d{4}-\d{2}-\d{2}$/;
 const str = (x, n = 64) => String(x == null ? "" : x).replace(/[\u0000-\u001f]/g, " ").slice(0, n);

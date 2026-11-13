@@ -129,6 +129,13 @@ try {
       await page.getByRole("button", { name: es ? (m === 11 ? "Ver tu año" : "Siguiente mes") : m === 11 ? "See your year" : "Next month" }).click();
     }
     await axe(page, `${tag} Money Year, the end`);
+    // Certificates (the sheet from Me → Skills), without an account: the tracks and the note.
+    await tab(page, w.me);
+    await page.getByRole("button", { name: es ? /^Habilidades/ : /^Skills/ }).first().click();
+    await page.getByRole("button", { name: es ? /^Certificados/ : /^Certificates/ }).first().click();
+    await page.getByRole("dialog").last().getByText(es ? "Fundamentos del dinero" : "Money Foundations").waitFor();
+    await axe(page, `${tag} Certificates`);
+    await page.keyboard.press("Escape");
     await ctx.close();
     // The privacy policy, on its own page.
     {
@@ -144,6 +151,16 @@ try {
     const { ctx, page } = await open(null, path === "welcome" ? "en" : "es");
     await page.goto(`${BASE}${path}`);
     await axe(page, `landing /${path}`);
+    await ctx.close();
+  }
+  // The public certificate check, empty and with a valid-looking result (a code that isn't found shows the message).
+  for (const [path, lang] of [["verify", "en"], ["verificar", "es"]]) {
+    const { ctx, page } = await open(null, lang);
+    await page.goto(`${BASE}${path}`);
+    await axe(page, `/${path}`);
+    await page.goto(`${BASE}${path}?code=ZZZZZZZZZZZZ`);
+    await page.locator("#result:not([hidden])").waitFor();
+    await axe(page, `/${path} result`);
     await ctx.close();
   }
   assert.deepEqual(problems, [], `accessibility problems (WCAG 2.2 AA):\n  ${problems.join("\n  ")}`);

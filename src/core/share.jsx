@@ -33,7 +33,7 @@ addStrings({
 
 const adult = (ageBand) => ageBand === "18-25" || ageBand === "26+";
 const listeners = new Set();
-// card: { kind: "streak", n } | { kind: "unit", title } | { kind: "badge", name }
+// card: { kind: "streak", n } | { kind: "unit", title } | { kind: "cert", title } | { kind: "badge", name }
 //       | { kind: "goal", pct, name, saved, target } (name/saved/target
 //         only appear when the learner turns them on)
 export const openShare = (card) => listeners.forEach((l) => l(card));
@@ -42,6 +42,7 @@ export const openShare = (card) => listeners.forEach((l) => l(card));
 export function cardLines(t, card, details) {
   if (card.kind === "streak") return [t("share.streak", { n: card.n }), t("share.streak.sub")];
   if (card.kind === "unit") return [t("share.unit"), card.title];
+  if (card.kind === "cert") return [t("share.cert"), card.title];
   if (card.kind === "badge") return [card.name, t("share.badge.sub")];
   return [t("share.goal", { pct: card.pct }), details ? t("share.goal.named", { name: card.name, saved: card.saved, target: card.target }) : t("share.goal.sub")];
 }

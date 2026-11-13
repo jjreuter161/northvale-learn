@@ -1,6 +1,12 @@
 # Changelog
 
-## Unreleased — built for life between the US and Mexico, and a home test
+## Unreleased — Milestone 5: Explain this, Your Money Year, certificates
+
+- **Explain this** (Ask → Explain this): paste a pay stub, offer, ad, message or headline; the tutor explains it in four parts (what it is, the numbers that matter, what to watch out for, questions to ask), flags red flags and links the lessons. Card, account and ID numbers are hidden on the phone and again on the server; the text is used for that one answer and is never stored, logged or counted in analytics. Offline it says it needs the AI and offers the glossary. Its own daily limit (`EXPLAIN_DAILY_LIMIT`, default 8) and its cost per use on /admin. Text only: photos wait for a lawyer. 13 safety cases added to `scripts/tutor-check.mjs` (written, not run: the check costs money). Privacy policy updated (English and Spanish).
+- **Your Money Year** (Practice): a one-year simulation, one month and one choice at a time, with four starting situations in the US and Mexico versions. Choices carry forward (interest grows a balance, savings grow, an emergency hurts more without a cushion). Each event links its lesson; the end screen compares your year with the steady path and names the months that mattered most. 32,000 random paths tested for sensible numbers.
+- **Certificates** (Me → Skills → Certificates): five tracks cover the course; finishing every lesson in one earns a certificate with a code, checked on the server against the lessons the account has finished. Adults choose the name shown; under 18 (or no age) no name is ever kept or shown on the public check page (`/verify`, `/verificar`), which answers a code with only the track, the date and that name. Image and PDF are drawn on the phone; Share uses the share cards (no names). Deleting a certificate or the account removes it. Privacy policy updated.
+
+## Earlier in this version — built for life between the US and Mexico, and a home test
 
 - **"Both"** (a third choice beside USD and MXN, in onboarding and Me → Settings → Country): for someone with ties to both countries. The other currency shows where it helps, and the new unit opens after Banking and comes up in "what's next" (for everyone else it's the last unit). Pick which currency shows first.
 - **A new unit, "Money across borders"** (4 lessons, its own landmark on the sea chart, each at most 4.5 minutes in both languages): exchange rates, what sending money really costs, accounts and cards in two countries, credit and work when you move.

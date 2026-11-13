@@ -33,6 +33,7 @@ const news = await import("./news.js");
 const push = await import("./push.js");
 const recap = await import("./recap.js");
 const flags = await import("./flags.js");
+const certs = await import("./certs.js");
 const classes = await import("./classes.js");
 const invites = await import("./invites.js");
 const waitlist = await import("./waitlist.js");
@@ -89,7 +90,7 @@ function tooFast(userId) {
 const HOSTS = new Set([`localhost:${PORT}`, `127.0.0.1:${PORT}`, `[::1]:${PORT}`, ...(process.env.ALLOWED_HOSTS || "").split(",").map((h) => h.trim()).filter(Boolean)]);
 const TYPES = { ".woff2": "font/woff2", ".txt": "text/plain; charset=utf-8", ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".map": "application/json", ".json": "application/json", ".webmanifest": "application/manifest+json", ".svg": "image/svg+xml", ".png": "image/png", ".jpg": "image/jpeg", ".ico": "image/x-icon" };
 // Pages by a friendlier address: the admin page and the landing page.
-const PAGES = { "/admin": "/admin.html", "/welcome": "/welcome.html", "/bienvenida": "/bienvenida.html" };
+const PAGES = { "/admin": "/admin.html", "/welcome": "/welcome.html", "/bienvenida": "/bienvenida.html", "/verify": "/verify.html", "/verificar": "/verificar.html" };
 // The landing pages name their own address in share previews.
 const TEMPLATED = new Set(["welcome.html", "bienvenida.html"]);
 // Text files go out gzipped when the browser accepts it (the app's script
@@ -411,6 +412,14 @@ const routes = {
       c.sse("done", { text: turn.text, topics: turn.topics, stop_reason: turn.stop_reason });
     },
   },
+
+  // CERTIFICATES (certs.js): claim one for a finished track, list, delete; and a
+  // public check of a code that answers with the track, the date and (adults who
+  // chose it) a name, nothing else.
+  "GET /api/cert/mine": { run: async (c) => certs.mine(c.user) },
+  "POST /api/cert/issue": { limit: 2000, run: async (c) => certs.issue(c.user, c.body, dayKey()) },
+  "POST /api/cert/delete": { limit: 500, run: async (c) => certs.remove(c.user, c.body.code) },
+  "GET /api/cert/verify": { open: true, run: async (c) => certs.verify(c.query.get("code"), c.ip) },
 
   // TESTER INSIGHTS — usage events, the survey, feedback, app errors.
   "POST /api/events": { open: true, limit: 32000, run: async (c) => insights.record(c.body, c.ip) },
