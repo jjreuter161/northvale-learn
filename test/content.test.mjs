@@ -5,6 +5,7 @@ import assert from "node:assert/strict";
 import { validateContent } from "../scripts/validate-content.mjs";
 
 import { spawnSync } from "node:child_process";
+import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
 const { problems, stats } = validateContent();
@@ -15,5 +16,8 @@ assert.equal(index.status, 0, index.stderr);
 const verify = spawnSync(process.execPath, [join(import.meta.dirname, "../scripts/verify-list.mjs"), "--check"], { encoding: "utf8" });
 assert.equal(verify.status, 0, verify.stderr);
 assert.deepEqual(problems, [], `content problems:\n  ${problems.join("\n  ")}`);
+// Error reports carry the release's version.
+const version = JSON.parse(readFileSync(join(import.meta.dirname, "../package.json"), "utf8")).version;
+assert.ok(readFileSync(join(import.meta.dirname, "../src/core/errors.jsx"), "utf8").includes(`const VERSION = "${version}";`), `src/core/errors.jsx's VERSION should be ${version}`);
 const m = stats.minutes;
 console.log(`ok: ${stats.units} units, ${stats.lessons} lessons (${Math.min(...m).toFixed(1)}–${Math.max(...m).toFixed(1)} min), ${stats.concepts} concepts, ${stats.questions} questions — all in English and Spanish, US and Mexico, tagged, explained, ending in one of ${stats.actions} real actions`);

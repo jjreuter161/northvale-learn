@@ -138,7 +138,7 @@ That message is also your OK for:
 
 The builder works in your Terminal, signed in to your Fly.io account. Your keys are never shown.
 
-1. **Preflight again**, so everything passes on the code that goes live.
+1. **Preflight again**, so everything passes on the code that goes live, then **`npm run deploy:dry-run`**: it does what the Dockerfile does, in a clean folder, starts the result in production mode and checks it serves (17 checks, about 10 seconds). You don't need Docker on your computer: `fly deploy` uploads the project to one of Fly's own build machines, which builds the Dockerfile there.
 2. **Create the app and its disk:**
    - `fly launch --no-deploy --copy-config --name northvale-learn`;
    - `fly volumes create northvale_data --size 1 --region dfw`. That's 1 GB, with daily snapshots kept 14 days.
@@ -168,6 +168,13 @@ The builder works in your Terminal, signed in to your Fly.io account. Your keys 
 8. **The report:** the links, what passed, and anything to fix.
 
 Updating later is the same: the builder runs `fly deploy`, and the data stays on the disk.
+
+**Each new release** (the builder's checklist):
+1. Bump the version in `package.json` (`npm version x.y.z --no-git-tag-version`) and `VERSION` in `src/core/errors.jsx` (npm test checks they match).
+2. Add the release to `CHANGELOG.md`, and a note at the top of `NOTES` in `src/core/whatsnew.jsx` (people from the last version see it once on Today).
+3. Change `CACHE` in `web/sw.js` (so phones drop the last release's offline files).
+4. If any fact changed: `src/core/facts.js`, then `node scripts/verify-list.mjs` (npm test names any lesson to rewrite).
+5. `npm run preflight`, `npm run deploy:dry-run`, then commit, tag (`git tag vx.y.z`), push, and `fly deploy`.
 
 ---
 
@@ -221,7 +228,7 @@ Questions 1–4 are the standard "would you miss it" survey. Read question 2's a
 
 ## Part 4 — the first week on /admin
 
-Open `https://northvale-learn.fly.dev/admin` with the admin token. Spend 5 minutes a day.
+Open `https://northvale-learn.fly.dev/admin` with the admin token. Spend 5 minutes a day. The page opens on **"First week of the beta"**: testers, next-day and day-7 return, "very disappointed", 3+ lessons, and this week's feedback and errors, each with a plain verdict against the targets below ("On track", "Watch it", "Needs work", or "Not enough people yet" under 5).
 
 ### Every day
 

@@ -1,6 +1,6 @@
 {
   "name": "northvale-learn",
-  "version": "0.1.0",
+  "version": "1.0.0-rc1",
   "private": true,
   "type": "module",
   "description": "Northvale Learn — learn money and investing by doing. Simulated only: no real money, trades or bank connections.",
@@ -16,6 +16,7 @@
     "seed:demo": "node scripts/seed-demo.mjs",
     "restore": "node scripts/restore.mjs",
     "load-check": "node scripts/load-check.mjs",
+    "deploy:dry-run": "node scripts/deploy-dry-run.mjs",
     "preflight": "node scripts/preflight.mjs"
   },
   "dependencies": {

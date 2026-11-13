@@ -3,7 +3,7 @@
 // (and, with a webhook set, in your chat). No personal data is included.
 import { Component } from "react";
 
-const VERSION = "1.1";
+const VERSION = "1.0.0-rc1"; // = package.json (npm test checks)
 let sent = 0;
 export function report(err, screen) {
   if (sent++ > 20) return; // a broken loop shouldn't flood the server

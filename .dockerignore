@@ -4,3 +4,8 @@ server/data
 web/app.js
 web/app.js.map
 .git
+# Built inside the image; design pictures and tests aren't needed to run it.
+web/chunks
+web/precache.json
+docs/design
+test-results
