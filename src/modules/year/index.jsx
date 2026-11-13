@@ -5,7 +5,7 @@
 import { Suspense, lazy } from "react";
 import { registerModule } from "../../core/registry.js";
 import { addStrings } from "../../core/i18n.js";
-import { useSlice } from "../../core/store.js";
+import { useSlice, slice as sliceOf } from "../../core/store.js";
 import { ListRow, Loading } from "../../core/ui.jsx";
 import { MONTHS } from "./engine.js";
 
@@ -40,4 +40,12 @@ registerModule({
   nav: { tab: "practice", label: "yr.nav" },
   practice: { order: 1.5, Row },
   Screen,
+  // For Today's suggestion: is a year in progress (and which month), and how many were finished.
+  services: {
+    status: () => {
+      const s = sliceOf("year", DEFAULTS);
+      const run = s && s.run;
+      return { running: !!(run && run.month < MONTHS), month: run ? Math.min(run.month + 1, MONTHS) : 0, finished: ((s && s.history) || []).length };
+    },
+  },
 });

@@ -22,6 +22,7 @@ export function snapshot() {
     tz,
     lessonDay: (p.lessonDays || [])[(p.lessonDays || []).length - 1] || null,
     streak: { count: p.streak.count, last: p.streak.last },
+    lessonsDone: Object.values(p.lessons || {}).filter((l) => l && l.done).length,
     reviewDue: service("lessons", "reviewDueOn")() || null,
     goals,
     checkIn: service("goals", "checkInDone")() || null,

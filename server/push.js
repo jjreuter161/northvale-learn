@@ -103,7 +103,7 @@ const WORDS = {
     checkin: () => "It's Sunday check-in: a minute to record what you set aside this week.",
     review: () => "A quick review is ready: about 2 minutes on what you learned before.",
     mission: (s) => (s.mission.started ? `Still on your mission, "${s.mission.title}"? Mark it done when you've finished.` : `This week's mission: ${s.mission.title}.`),
-    next: (s) => `Next up: ${s.next}. About 4 minutes.`,
+    next: (s) => `Next up: ${s.next}. About 4 minutes.${s.lessonsDone ? ` You've finished ${s.lessonsDone} so far.` : ""}`,
   },
   es: {
     title: "Northvale Learn",
@@ -117,7 +117,7 @@ const WORDS = {
     checkin: () => "Es domingo de revisión: un minuto para anotar lo que apartaste esta semana.",
     review: () => "Hay un repaso listo: unos 2 minutos sobre lo que ya aprendiste.",
     mission: (s) => (s.mission.started ? `¿Sigues con tu misión, "${s.mission.title}"? Márcala como hecha cuando termines.` : `La misión de esta semana: ${s.mission.title}.`),
-    next: (s) => `Sigue: ${s.next}. Unos 4 minutos.`,
+    next: (s) => `Sigue: ${s.next}. Unos 4 minutos.${s.lessonsDone ? ` Ya terminaste ${s.lessonsDone}.` : ""}`,
   },
 };
 export function pick(s, today, lang = "en") {
@@ -167,7 +167,7 @@ export async function tick(now = new Date(), send = deliver) {
 function cleanSummary(s) {
   if (!s || typeof s !== "object") return {};
   const m = s.mission && typeof s.mission === "object" && s.mission.title ? { title: str(s.mission.title, 120), started: day(s.mission.started) } : null;
-  return { lessonDay: day(s.lessonDay), streak: { count: int(s.streak && s.streak.count), last: day(s.streak && s.streak.last) }, reviewDue: day(s.reviewDue), goals: Array.isArray(s.goals) ? s.goals.length : int(s.goals), checkIn: day(s.checkIn), mission: m, missionWeek: day(s.missionWeek), next: s.next ? str(s.next, 120) : null };
+  return { lessonsDone: int(s.lessonsDone), lessonDay: day(s.lessonDay), streak: { count: int(s.streak && s.streak.count), last: day(s.streak && s.streak.last) }, reviewDue: day(s.reviewDue), goals: Array.isArray(s.goals) ? s.goals.length : int(s.goals), checkIn: day(s.checkIn), mission: m, missionWeek: day(s.missionWeek), next: s.next ? str(s.next, 120) : null };
 }
 function validTz(tz) {
   try {

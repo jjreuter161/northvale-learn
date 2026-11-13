@@ -5,7 +5,7 @@
 // goals, news), found through the registry.
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { registerModule, actionWidget, service } from "../../core/registry.js";
-import { useAppState, getState, setSlice, saveNow } from "../../core/store.js";
+import { useAppState, useSlice, getState, setSlice, saveNow } from "../../core/store.js";
 import { recordLesson, recordReview, recordPractice } from "../../core/game.js";
 import { mythOf } from "./myths.js";
 import { openShare } from "../../core/share.jsx";
@@ -22,14 +22,28 @@ import { feel, reducedMotion } from "../../core/feel.js";
 import { UNITS, ALL_LESSONS, lessonById, lessonState, nextLesson, nextFor, unitDone, isQuestion, conceptPool, loadUnits, unitLoaded, conceptsOfLesson, conceptsOfUnit, minutes, setBothMode } from "./content.js";
 import { conceptById } from "./concepts.js";
 import * as M from "./mastery.js";
+import { bestNext, adaptOffer } from "./today.js";
 import { Question, QTYPES, startValue } from "./qtypes.jsx";
-import { Feedback, ReviewCard, SessionDone, SkillsCard, Placement, conceptsNow, saveConcepts, reviewStatus, useConcepts } from "./practice.jsx";
+import { Feedback, ReviewCard, SessionDone, SkillsCard, Placement, Warmup, SkipAhead, conceptsNow, saveConcepts, reviewStatus, useConcepts } from "./practice.jsx";
 
 const S = (en, es) => ({ en, es });
 addStrings({
   "lessons.nav": S("Learn", "Aprender"),
   "lessons.next_up": S("Next up", "Lo que sigue"),
   "lessons.start": S("Start", "Empezar"),
+  "best.eyebrow": S("Best next step", "Mejor siguiente paso"),
+  "best.first": S("Your first lesson. It takes about {min} minutes.", "Tu primera lección. Dura unos {min} minutos."),
+  "best.goal": S("Next for your goal: {name}.", "Lo que sigue para tu meta: {name}."),
+  "best.course": S("The next step in your course.", "El siguiente paso de tu curso."),
+  "best.more": S("You've learned today. One more keeps the momentum.", "Ya aprendiste hoy. Otra más mantiene el ritmo."),
+  "best.review": S("You have {n} {n|idea|ideas} to refresh. A quick review makes them stick.", "Tienes {n} {n|idea|ideas} por repasar. Un repaso rápido ayuda a que se queden."),
+  "best.mission": S("You've learned today. Try something real: this week's mission.", "Ya aprendiste hoy. Prueba algo real: la misión de esta semana."),
+  "best.year_new": S("Try a year of money choices in about 10 minutes. Example numbers, no risk.", "Prueba un año de decisiones de dinero en unos 10 minutos. Números de ejemplo, sin riesgo."),
+  "best.year_go": S("You're in month {m} of 12. Pick up where you left off.", "Vas en el mes {m} de 12. Sigue donde te quedaste."),
+  "best.cta.review": S("Start review", "Empezar repaso"),
+  "best.cta.mission": S("See the mission", "Ver la misión"),
+  "best.cta.year_new": S("Start the year", "Empezar el año"),
+  "best.next_lesson": S("Next lesson", "Siguiente lección"),
   "lessons.continue": S("Continue learning", "Seguir aprendiendo"),
   "lessons.overall": S("Course progress", "Avance del curso"),
   "lessons.overall_n": S("{done} of {total} lessons", "{done} de {total} lecciones"),
@@ -178,6 +192,14 @@ function Today({ t, locale, go, openStreak }) {
   const due = M.pickReview(concepts, dayKey()).due;
   const doneToday = progress.streak.last === dayKey();
   const mission = practiceOpen(progress) && (service("missions", "status")(locale) || {}).mission;
+  // The one best next step, and why (today.js): the lesson, or a review, the mission or Your Money Year when that fits better.
+  const year = service("year", "status")();
+  const best = bestNext({ lessonsDone: progress.counters.lessons || 0, hasLesson: !!next, due, mission, year, goal: toward, doneToday });
+  const heroIsLesson = !!next && (!best || best.kind === "lesson");
+  const heroIsAction = !!next && !heroIsLesson; // a review, the mission or Your Money Year; with no lesson left the course-done card shows instead
+  const heroTitle = best && { review: t("review.title"), mission: mission && mission.title, year: t("yr.title") }[best.kind];
+  const heroGo = () => (best.kind === "review" ? go("lessons", { review: true }) : best.kind === "mission" ? go("practice") : go("year"));
+  const heroCta = best && { review: t("best.cta.review"), mission: t("best.cta.mission"), year: best.reason === "year_go" ? t("common.continue") : t("best.cta.year_new") }[best.kind];
   const checkIn = service("goals", "checkInDue")();
   const PlanPrompt = service("goals", "PlanPrompt");
   const planDue = service("goals", "planPromptDue")();
@@ -197,7 +219,22 @@ function Today({ t, locale, go, openStreak }) {
       <div style={{ fontSize: 14, color: "var(--mid)", fontWeight: 600, margin: "4px 2px 0" }}>{todayLine(locale)}</div>
       <h1 className="nv-disp" style={{ fontSize: 36, lineHeight: 1.08, margin: "2px 0 14px" }}>{t("today.title")}</h1>
       <Card pad={0} style={{ overflow: "hidden" }}>
-        {next ? (
+        {heroIsAction ? (
+          <>
+            <Scene name="harbor" w={358} h={110} />
+            <div style={{ padding: "14px 20px 20px" }}>
+              <div style={{ fontSize: 13, fontWeight: 650, color: "var(--low)" }}>{t("best.eyebrow")}</div>
+              <div className="nv-disp" style={{ fontSize: 28, lineHeight: 1.12, margin: "5px 0 6px", color: "var(--head)" }}>{heroTitle}</div>
+              <p style={{ fontSize: 15, lineHeight: 1.5, margin: "0 0 16px" }}>{t(`best.${best.reason}`, { n: Math.min(due, M.REVIEW_SIZE), m: year ? year.month : 1 })}</p>
+              <Button full onClick={heroGo}>{heroCta}</Button>
+              {toward && (
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 14, fontSize: 14, color: "var(--mid)" }}>
+                  <Icon name="target" size={16} /> {t("today.toward", { name: toward })}
+                </div>
+              )}
+            </div>
+          </>
+        ) : next ? (
           <>
             <div style={{ position: "relative", background: "var(--artSky)", minHeight: 136 }}>
               <svg viewBox="0 0 390 40" preserveAspectRatio="none" width="100%" height="40" aria-hidden="true" style={{ position: "absolute", left: 0, bottom: 0, display: "block" }}>
@@ -216,7 +253,7 @@ function Today({ t, locale, go, openStreak }) {
               <WaveEdge style={{ position: "absolute", left: 0, right: 0, bottom: -1 }} />
             </div>
             <div style={{ padding: "2px 20px 20px" }}>
-              <p style={{ fontSize: 15, lineHeight: 1.5, margin: "6px 0 16px" }}>{t(`why.${unit.id}`)}</p>
+              <p style={{ fontSize: 15, lineHeight: 1.5, margin: "6px 0 16px" }}>{best && best.kind === "lesson" ? t(`best.${best.reason}`, { name: toward, min: Math.round(minutes(next)) }) : t(`why.${unit.id}`)}</p>
               <Button full onClick={() => go("lessons", { lesson: next.id })}>
                 {progress.counters.lessons ? t("common.continue") : t("lessons.start")}
               </Button>
@@ -244,9 +281,11 @@ function Today({ t, locale, go, openStreak }) {
       </Card>
       <List style={{ marginTop: 12 }}>
         {[
-          due > 0 && <ListRow key="review" icon="refresh" title={t("review.title")} sub={t("today.review.sub", { n: Math.min(due, M.REVIEW_SIZE) })} onClick={() => go("lessons", { review: true })} />,
+          heroIsAction && <ListRow key="lesson" icon="book" title={t("best.next_lesson")} sub={tx(next.title)} onClick={() => go("lessons", { lesson: next.id })} />,
+          due > 0 && !(heroIsAction && best.kind === "review") && <ListRow key="review" icon="refresh" title={t("review.title")} sub={t("today.review.sub", { n: Math.min(due, M.REVIEW_SIZE) })} onClick={() => go("lessons", { review: true })} />,
           checkIn && <ListRow key="checkin" icon="calendar" title={t("today.week")} sub={t("today.week.sub")} onClick={() => setWeekOpen(true)} />,
-          mission && <ListRow key="mission" icon="flag" title={t("today.mission")} sub={mission.title} onClick={() => go("practice")} />,
+          best && !next && best.kind === "year" && <ListRow key="year" icon="compass" title={t("yr.title")} sub={t(`best.${best.reason}`, { m: year ? year.month : 1 })} onClick={() => go("year")} />,
+          mission && !(heroIsAction && best.kind === "mission") && <ListRow key="mission" icon="flag" title={t("today.mission")} sub={mission.title} onClick={() => go("practice")} />,
           <ListRow key="streak" icon="streak" title={progress.streak.count ? t("lessons.streak", { n: progress.streak.count }) : t("today.streak.none")} sub={doneToday ? t("today.streak.done") : progress.streak.count ? t("today.streak.keep") : t("today.streak.start")} onClick={openStreak} />,
         ]
           .filter(Boolean)
@@ -265,6 +304,35 @@ function Today({ t, locale, go, openStreak }) {
       )}
       {MoneyWeek && <MoneyWeek t={t} locale={locale} go={go} open={weekOpen} onClose={() => setWeekOpen(false)} />}
     </div>
+  );
+}
+
+// ADAPTING TO THE LEARNER — on the finish screen: after three perfect lessons in a
+// row, offer to skip what's known (once in a while); after a tricky one, offer a
+// quick review first. Worked out here from this lesson and the last few.
+function AdaptCard({ t, locale, go, mistakes, nextUnit }) {
+  const lessons = useSlice("lessons", { cleanRun: 0 });
+  const progress = useAppState((s) => s.progress);
+  const concepts = useConcepts();
+  const [open, setOpen] = useState(false);
+  const today = dayKey();
+  const due = M.pickReview(concepts, today).due;
+  const offer = adaptOffer({ mistakes, cleanRun: lessons.cleanRun || 0, placed: (progress.placed || []).length, offeredAt: lessons.skipOfferedAt, today, due, hasNext: !!nextUnit });
+  const skip = offer === "skip";
+  const slow = offer === "review";
+  useEffect(() => {
+    if (skip) setSlice("lessons", (s) => ({ ...s, skipOfferedAt: today }));
+  }, [skip]);
+  if (!skip && !slow) return null;
+  return (
+    <Card>
+      <div style={{ fontWeight: 700 }}>{t(skip ? "skip.offer" : "slow.offer")}</div>
+      <p style={{ fontSize: 14, color: "var(--mid)", margin: "4px 0 12px", lineHeight: 1.45 }}>{t(skip ? "skip.offer.sub" : "slow.offer.sub")}</p>
+      <Button full size="md" kind="secondary" onClick={() => (skip ? setOpen(true) : go("lessons", { review: true }))}>
+        {t(skip ? "skip.offer.go" : "slow.offer.go")}
+      </Button>
+      {open && <SkipAhead t={t} locale={locale} startUnit={nextUnit} onClose={() => setOpen(false)} go={go} />}
+    </Card>
   );
 }
 
@@ -766,7 +834,8 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
     const allDone = () => UNITS.every((u) => unitDone(getState().progress, u));
     const wasAllDone = allDone();
     const r = recordLesson({ id: lesson.id, perfect: mistakes === 0, mistakes });
-    setSlice("lessons", (s) => ({ ...s, open: null }));
+    // A run of perfect lessons (to offer skipping ahead); any miss resets it.
+    setSlice("lessons", (s) => ({ ...s, open: null, cleanRun: mistakes === 0 ? ((s && s.cleanRun) || 0) + 1 : 0 }));
     saveNow();
     const unitJustDone = !wasUnitDone && unitDone(getState().progress, unit);
     const moment = momentShown ? null : unitJustDone ? "unit" : r.streakUp && STREAKS.includes(r.streak) ? "streak" : null;
@@ -859,6 +928,7 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
               <span>{result.levelUps.map((x) => t(x.level === "mastered" ? "finish.mastered" : "finish.solid", { name: tx(conceptById(x.c).name) })).join("  ·  ")}</span>
             </div>
           )}
+          <AdaptCard t={t} locale={locale} go={go} mistakes={mistakes} nextUnit={nl && nl.unit} />
           {practiceOpen(progress) && <TryCard t={t} locale={locale} go={go} unit={lesson.unit} />}
           {(result.unitJustDone || result.freezeEarned || result.badges.length > 0) && (
             <div style={{ fontSize: 14, color: "var(--mid)", lineHeight: 1.6, textAlign: "center" }}>
@@ -1111,7 +1181,7 @@ registerModule({
   id: "lessons",
   nav: { tab: "learn", label: "lessons.nav" },
   Screen,
-  Onboard: Placement,
+  Onboard: Warmup,
   // Me → Skills: a review any time (Today shows it only when ideas are due),
   // and how well each idea is known.
   MeCard: (p) => (

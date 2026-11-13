@@ -64,6 +64,10 @@ let current = null; // on a failure, what the page showed
 // `cookie`: signed in to that account.
 async function open(seed, { cookie, motion } = {}) {
   const context = await browser.newContext({ viewport: { width: 390, height: 800 }, locale: "en-US", timezoneId: "America/Mexico_City", serviceWorkers: "block", reducedMotion: motion ? "no-preference" : "reduce" });
+  await context.addInitScript(() => {
+    window.__taps = 0;
+    addEventListener("click", (e) => e.isTrusted && window.__taps++, true);
+  });
   if (cookie) await context.addCookies([{ name: "nvl_session", value: cookie.split("=")[1], url: BASE }]);
   if (seed) await context.addInitScript((s) => localStorage.getItem("northvale-learn-v1") || localStorage.setItem("northvale-learn-v1", s), JSON.stringify(seed));
   const page = await context.newPage();
@@ -159,8 +163,8 @@ const noRepeatedTitle = async (page, where) => {
   assert.ok(!h1 || !bar.includes(h1.trim()), `${where}: the top bar repeats the title "${h1}"`);
 };
 const lessonDays3 = () => [1, 2, 3].map((n) => new Date(Date.now() - n * 864e5).toLocaleDateString("en-CA", { timeZone: "America/Mexico_City" }));
-// The welcome screen, "what for" and "how to start" (from the beginning).
-const onboard = async ({ button }) => (await button("Get started").click(), await button(/^Car/).click(), await button(/^From the beginning/).click());
+// The welcome screen, the warm-up question (answered right), then "what for" (a car).
+const onboard = async ({ page, button }) => (await button("Get started").click(), await page.getByRole("radio").first().click(), await button("Check").click(), await button("Continue").click(), await button(/^Car/).click());
 
 try {
   // --- a new learner ---
@@ -169,16 +173,26 @@ try {
     const { page, top, button, clean, menu, shut } = app;
     await clean("welcome");
     await page.getByText("Find your open water", { exact: true }).waitFor();
+    // THE 60-SECOND TEST: from opening the app to answering the first question, in at most 3 taps.
+    const t0 = Date.now();
     await button("Get started").click();
+    await page.getByRole("heading", { name: "Try one question" }).waitFor();
+    await clean("warm-up question");
+    await page.getByRole("radio").first().click();
+    await button("Check").click();
+    await top().getByText("Correct", { exact: true }).or(page.getByText("Correct", { exact: true })).first().waitFor();
+    const taps = await page.evaluate(() => window.__taps);
+    const seconds = (Date.now() - t0) / 1000;
+    assert.ok(taps <= 3, `opening the app to the first answer took ${taps} taps (the limit is 3)`);
+    assert.ok(seconds < 60, `opening the app to the first answer took ${seconds.toFixed(1)}s (the limit is 60)`);
+    await clean("warm-up answered");
+    await button("Continue").click();
     await page.getByRole("heading", { name: "What do you want to learn money skills for?" }).waitFor();
     await clean("what for");
     await button(/^Car/).click();
-    await page.getByText(/^For your goal \(Car\), these come first: Budgeting, Saving/).waitFor();
-    await button(/^From the beginning\s*Budgeting, lesson 1: What's a budget\?/).waitFor();
-    await clean("how to start");
-    await button(/^From the beginning/).click();
     await page.getByRole("dialog", { name: "What's a budget?" }).waitFor();
-    console.log("ok: onboarding in 3 screens (welcome, what for, how to start) opens the first lesson");
+    console.log(`ok: the 60-second test: opening the app to the first answered question took ${taps} taps and ${seconds.toFixed(1)} seconds (limits: 3 taps, 60 seconds), no account`);
+    console.log("ok: onboarding is three screens (welcome, one warm-up question, what for) and opens the first lesson");
 
     await play(app);
     await top().getByText("Lesson complete").waitFor();
@@ -190,7 +204,8 @@ try {
     await button("Done", top()).click();
     await page.getByRole("heading", { name: "Today" }).waitFor();
     await page.getByText("Building toward: Car").first().waitFor();
-    await page.getByText("Lesson 2 of 3", { exact: false }).waitFor();
+    await page.getByText("Lesson 2 of 3", { exact: false }).waitFor().catch(async (e) => { console.log("TODAY SHOWS:", (await page.evaluate(() => document.body.innerText)).slice(0, 700)); throw e; });
+    await page.getByText("You've learned today. One more keeps the momentum.").waitFor(); // why this is suggested, in one line
     assert.equal(await page.getByText("Myth or fact?").count(), 0, "day 1 is just the first lesson: no myth card");
     assert.equal(await page.getByRole("heading", { name: "What's new" }).count(), 0, "someone new doesn't get \"What's new\"");
     assert.equal(await page.locator("header").getByText("Beta", { exact: true }).count(), 1, "a small Beta label in the header");
@@ -415,18 +430,18 @@ try {
     await app.close();
   }
 
-  // --- Today for a long-time learner: the lesson on top, at most 2 small rows, no reminder offer competing ---
+  // --- Today for a long-time learner: the one best next step on top, at most 2 small rows, no reminder offer competing ---
   {
     const app = await open({ ...daniState(dayKey()), updatedAt: 1 });
     const { page, clean } = app;
     await page.getByRole("heading", { name: "Today" }).waitFor();
     const order = await page.evaluate(() => {
       const main = document.querySelector("main");
-      const lesson = [...main.querySelectorAll("button")].find((b) => b.innerText.trim() === "Continue");
+      const lesson = [...main.querySelectorAll("button")].find((b) => ["Continue", "Start review"].includes(b.innerText.trim())); // the one main action: the lesson, or a review when many ideas are due
       const list = main.querySelector(".nv-list");
-      return { rows: list.children.length, lessonFirst: !!(lesson.compareDocumentPosition(list) & Node.DOCUMENT_POSITION_FOLLOWING), review: list.innerText.includes("Review") };
+      return { rows: list.children.length, lessonFirst: !!(lesson.compareDocumentPosition(list) & Node.DOCUMENT_POSITION_FOLLOWING), review: list.innerText.includes("Review") || main.innerText.includes("Start review") };
     });
-    assert.ok(order.lessonFirst, "the lesson button comes first");
+    assert.ok(order.lessonFirst, "the one main action comes first");
     assert.ok(order.rows <= 2, `at most 2 small rows (saw ${order.rows})`);
     assert.ok(order.review, "a due review is one of them");
     assert.equal(await page.getByText("Want a daily reminder?").count(), 0, "no reminder offer while something else needs doing");
@@ -450,6 +465,7 @@ try {
     await top().getByText(/· 7-day streak$/).waitFor();
     await button("Done", top()).click();
     await menu("Settings");
+    await button(/^More/).click(); // sound is tucked under More
     const sound = page.getByRole("switch", { name: "Sounds" });
     assert.equal(await sound.getAttribute("aria-checked"), "false", "sounds are off by default");
     assert.equal(await page.getByRole("switch", { name: "Vibration" }).getAttribute("aria-checked"), "true", "vibration is on by default where it works");
@@ -765,7 +781,7 @@ try {
     const vars = async () => (await page.waitForTimeout(450), page.evaluate(() => ({ bg: getComputedStyle(document.documentElement).getPropertyValue("--bg").trim(), fill: getComputedStyle(document.documentElement).getPropertyValue("--fill").trim(), ink: getComputedStyle(document.documentElement).getPropertyValue("--ink").trim(), saved: JSON.parse(localStorage.getItem("northvale-learn-v1")).settings })));
     await menu("Me");
     await button(/^Settings/).click();
-    const look = page.getByRole("radiogroup", { name: "Look" });
+    const look = page.getByRole("radiogroup", { name: "Colors" });
     await look.waitFor();
     // Cream is where learners start (the seed saved "white"), with the red spark.
     assert.deepEqual([(await vars()).bg, (await vars()).fill], ["#F7F2E8", "#C8202A"]);
@@ -799,9 +815,9 @@ try {
     assert.deepEqual([(await vars()).bg, (await vars()).fill], ["#1B3560", "#F7F2E8"]);
     await menu("Me");
     await button(/^Settings/).click();
-    assert.equal(await page.getByRole("radiogroup", { name: "Look" }).getByRole("radio", { name: /^Navy & cream/ }).getAttribute("aria-checked"), "true");
+    assert.equal(await page.getByRole("radiogroup", { name: "Colors" }).getByRole("radio", { name: /^Navy & cream/ }).getAttribute("aria-checked"), "true");
     // Match my device: Navy at night, Cream by day.
-    await page.getByRole("radiogroup", { name: "Look" }).getByRole("radio", { name: /^Match my device/ }).click();
+    await page.getByRole("radiogroup", { name: "Colors" }).getByRole("radio", { name: /^Match my device/ }).click();
     await page.emulateMedia({ colorScheme: "dark" });
     await page.waitForFunction(() => getComputedStyle(document.documentElement).getPropertyValue("--bg").trim() === "#1B3560");
     await page.emulateMedia({ colorScheme: "light" });
@@ -830,6 +846,21 @@ try {
     await app.close();
   }
   console.log("ok: a chosen answer is outlined in the main button's color, thick, with a check, in Navy, Cream, Navy & cream, Cream & navy and a red page");
+
+  // --- Smart: after a tricky lesson (three misses) the finish screen offers a quick review first ---
+  {
+    const lessons = Object.fromEntries(["budget-1", "budget-2"].map((id) => [id, { done: true, at: day(-3), last: day(-3), best: 0, times: 1 }]));
+    const app = await open(learner({ ageBand: "18-25" }, { lessons, counters: { lessons: 2 } }));
+    const { page, top, button } = app;
+    await button(/^Start|^Continue/).first().click();
+    await play(app); // answers the first option each time: several misses
+    await top().getByText("That one was tricky").waitFor();
+    await top().getByText("A quick review first makes the next lesson easier.").waitFor();
+    await button("Review first", top()).click();
+    await page.getByText(/^Review/).first().waitFor();
+    console.log("ok: after a tricky lesson the finish screen offers a quick review first");
+    await app.close();
+  }
 
   // --- Certificates: a finished track earns one (checked on the server); adults choose a name, under 18 never has one on the public page ---
   for (const [who, ageBand, nick] of [["adult", "18-25", "Ada"], ["teen", "13-17", "Tito"]]) {

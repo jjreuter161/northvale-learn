@@ -252,3 +252,32 @@ console.log("ok: RSS headlines parsed (CDATA, entities, dates); items without li
   assert.deepEqual(r(once), { text: once, hidden: 0 });
   console.log("ok: Explain this hides card, account and ID numbers (and long digit strings) and leaves amounts, dates and rates");
 }
+
+// Today's best next step and the finish screen's offers.
+{
+  const { bestNext, adaptOffer } = await import("../src/modules/lessons/today.js");
+  const kind = (x) => (bestNext(x) || {}).kind;
+  assert.deepEqual(bestNext({ lessonsDone: 0, hasLesson: true }), { kind: "lesson", reason: "first" }, "a brand-new learner: the first lesson");
+  assert.deepEqual(bestNext({ lessonsDone: 2, hasLesson: true, goal: "Car" }), { kind: "lesson", reason: "goal" }, "the next lesson, for the goal");
+  assert.deepEqual(bestNext({ lessonsDone: 2, hasLesson: true }), { kind: "lesson", reason: "course" });
+  assert.equal(kind({ lessonsDone: 9, hasLesson: true, due: 7 }), "review", "a lot slipping: refresh first");
+  assert.equal(kind({ lessonsDone: 9, hasLesson: true, due: 2 }), "lesson", "a little due: the lesson first");
+  assert.equal(kind({ lessonsDone: 9, hasLesson: true, due: 7, doneToday: true }), "review", "after today's lesson, a review is worth it");
+  assert.equal(kind({ lessonsDone: 1, hasLesson: true, due: 1, doneToday: true }), "lesson", "day one: just the next lesson, not a one-idea review");
+  assert.deepEqual(bestNext({ lessonsDone: 5, hasLesson: true, doneToday: true, mission: { title: "x" } }), { kind: "mission", reason: "mission" }, "done today: something real");
+  assert.deepEqual(bestNext({ lessonsDone: 8, hasLesson: true, doneToday: true, year: { running: false, finished: 0 } }), { kind: "year", reason: "year_new" });
+  assert.deepEqual(bestNext({ lessonsDone: 8, hasLesson: true, doneToday: true, year: { running: true, finished: 0, month: 4 } }), { kind: "year", reason: "year_go" });
+  assert.equal(kind({ lessonsDone: 3, hasLesson: true, doneToday: true, year: { running: false, finished: 0 } }), "lesson", "Your Money Year waits until the basics are in");
+  assert.equal(kind({ lessonsDone: 8, hasLesson: true, doneToday: true, year: { running: false, finished: 2 } }), "lesson", "someone who has played it isn't nagged");
+  assert.equal(bestNext({ lessonsDone: 60, hasLesson: false }), null, "course done and nothing else: no suggestion");
+  const base = { today: "2026-11-13", hasNext: true };
+  assert.equal(adaptOffer({ ...base, mistakes: 0, cleanRun: 3 }), "skip", "three perfect lessons: offer to skip ahead");
+  assert.equal(adaptOffer({ ...base, mistakes: 0, cleanRun: 2 }), null);
+  assert.equal(adaptOffer({ ...base, mistakes: 1, cleanRun: 3 }), null, "a miss in this one: no");
+  assert.equal(adaptOffer({ ...base, mistakes: 0, cleanRun: 5, placed: 2 }), null, "already used the check");
+  assert.equal(adaptOffer({ ...base, mistakes: 0, cleanRun: 5, offeredAt: "2026-11-05" }), null, "offered within two weeks");
+  assert.equal(adaptOffer({ ...base, mistakes: 0, cleanRun: 5, offeredAt: "2026-10-20" }), "skip", "…again after two weeks");
+  assert.equal(adaptOffer({ ...base, mistakes: 3, due: 2 }), "review", "a tricky lesson: review first");
+  assert.equal(adaptOffer({ ...base, mistakes: 3, due: 0 }), null, "…only if there's something to review");
+  console.log("ok: Today suggests the one best next step (lesson, review, mission or Your Money Year) with a reason; the finish screen offers a skip-ahead check after three perfect lessons and a review after a tricky one");
+}

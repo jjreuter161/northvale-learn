@@ -227,6 +227,7 @@ export default function Settings({ t, locale, go }) {
   const session = useSession();
   const [time, setTime] = useState("18:00");
   const [confirm, setConfirm] = useState(null);
+  const [more, setMore] = useState(false);
   const [pw, setPw] = useState({ current: "", next: "" });
   const [delPw, setDelPw] = useState("");
   const [err, setErr] = useState(null);
@@ -331,6 +332,20 @@ export default function Settings({ t, locale, go }) {
       <Card>
         <LookPicker t={t} settings={settings} setSetting={setSetting} />
         {row(t("settings.motion"), t("settings.motion.sub"), <Switch label={t("settings.motion")} checked={settings.reduceMotion} onChange={(v) => setSetting("reduceMotion", v)} />)}
+      </Card>
+
+      {/* Rarely needed: tucked away so the settings stay short. */}
+      <button onClick={() => setMore(!more)} aria-expanded={more} className="nv-press" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", marginTop: 22, minHeight: 52, padding: "10px 16px", borderRadius: 18, border: "1px solid var(--line)", background: "var(--surface)", color: "var(--ink)", fontSize: 17, fontWeight: 700, cursor: "pointer", textAlign: "left" }}>
+        <span>
+          {t("settings.more")}
+          <span style={{ display: "block", fontSize: 13, fontWeight: 500, color: "var(--mid)" }}>{t("settings.more.sub")}</span>
+        </span>
+        <Icon name={more ? "minus" : "plus"} size={20} />
+      </button>
+      {more && (
+        <>
+      <Label>{t("settings.soundfeel")}</Label>
+      <Card>
         {row(t("settings.sound"), t("settings.sound.sub"), <Switch label={t("settings.sound")} checked={!!settings.sound} onChange={(v) => setSetting("sound", v)} />)}
         {canVibrate() && row(t("settings.vibrate"), t("settings.vibrate.sub"), <Switch label={t("settings.vibrate")} checked={settings.vibrate !== false} onChange={(v) => setSetting("vibrate", v)} />)}
       </Card>
@@ -364,6 +379,8 @@ export default function Settings({ t, locale, go }) {
 
       <Label>{t("settings.about")}</Label>
       <Note icon="shield">{t("disclaimer.full")}</Note>
+        </>
+      )}
 
       <Sheet open={confirm === "reset"} onClose={() => setConfirm(null)} title={t("settings.reset")}>
         <p style={{ fontSize: 16, lineHeight: 1.5, marginTop: 0 }}>{t("settings.reset.body")}</p>

@@ -44,6 +44,8 @@ addStrings({
   "tutor.related": S("Related lesson: {unit} · {lesson}", "Lección relacionada: {unit} · {lesson}"),
   "tutor.open": S("Open", "Abrir"),
   "tutor.c.lesson": S("Explain “{title}” simply", "Explícame “{title}” de forma sencilla"),
+  "tutor.c.example2": S("Show me an example from “{title}”", "Muéstrame un ejemplo de “{title}”"),
+  "tutor.c.goal": S("How does this help me reach “{name}”?", "¿Cómo me ayuda esto a lograr “{name}”?"),
   "tutor.c.simpler": S("Explain this more simply", "Explícamelo más sencillo"),
   "tutor.c.example": S("Give me an example", "Dame un ejemplo"),
   "tutor.c.why": S("Why does this matter?", "¿Por qué importa esto?"),
@@ -118,7 +120,8 @@ function learnerSnapshot() {
   const s = getState();
   const units = UNITS.filter((u) => unitDone(s.progress, u)).map((u) => u.id);
   const pf = service("portfolio", "summary")();
-  return { level: level(s.progress.xp).level, unitsDone: units, ageBand: s.profile.ageBand, goals: service("goals", "summary")() || [], portfolio: pf };
+  const now = service("lessons", "current")();
+  return { currentLesson: now ? text(now.title, { lang: "en", region: "US" }) : null, level: level(s.progress.xp).level, unitsDone: units, ageBand: s.profile.ageBand, goals: service("goals", "summary")() || [], portfolio: pf };
 }
 
 const stripTopics = (x) => x.replace(/\n?\[Topics:[^\]]*\]?\s*$/i, "");
@@ -304,9 +307,10 @@ function Overlay({ t, locale, go }) {
   // Suggestions for where the learner is: about a lesson card, the lesson
   // they're on, then the usual starters. Offline: words it can explain.
   const now = service("lessons", "current")();
+  const goalName = service("goals", "buildingToward")();
   const suggestions = about
     ? [t("tutor.c.simpler"), t("tutor.c.example"), t("tutor.c.why")]
-    : [...(now ? [t("tutor.c.lesson", { title: text(now.title, locale) })] : []), ...["tutor.s1", "tutor.s2", locale.region === "MX" ? "tutor.s4.MX" : "tutor.s4"].map((k) => t(k))];
+    : [...(now ? [t("tutor.c.lesson", { title: text(now.title, locale) }), t("tutor.c.example2", { title: text(now.title, locale) })] : []), ...(goalName ? [t("tutor.c.goal", { name: goalName })] : []), ...["tutor.s1", "tutor.s2", locale.region === "MX" ? "tutor.s4.MX" : "tutor.s4"].map((k) => t(k))].slice(0, 5);
   const glossaryWords = suggestedWords(locale.lang, locale.region);
   const last = slice.messages[slice.messages.length - 1];
   const missed = last && last.offline && !last.text && !last.lesson;

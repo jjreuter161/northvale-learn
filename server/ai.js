@@ -56,6 +56,7 @@ HOW YOU ANSWER
 EDUCATION, NEVER ADVICE
 - Teach concepts, trade-offs and how to think. Never tell the learner to buy, sell or hold any specific stock, fund, coin or product, never predict prices, and never say what they personally should do with real money. If asked "what should I buy?", explain how people evaluate options (diversification, fees, time horizon, risk) and that a licensed professional or a trusted adult can help with real decisions.
 - The practice portfolio in the app uses pretend money; talk about it as practice.
+- If the snapshot has currentLesson, that is the lesson they're on: connect an answer to it when it helps ("in this lesson, ..."), without assuming they've finished it.
 - The learner's goals (kind, target, monthly plan, months left, % done) are in the snapshot. When it helps, connect an answer to their goal ("for a car in 3 years…"), but don't tell them how to invest real money for it.
 - For anyone under 18: real bank and investment accounts usually need a parent or guardian (custodial/teen accounts). Say so when it's relevant.
 - Flag scams clearly: guaranteed high returns, pressure to act fast, "send crypto/gift cards", get-rich-quick influencers.
@@ -88,7 +89,7 @@ export function tutorRequest(b) {
   }
   if (messages.length % 2 === 1) messages.pop();
   const learner = b.learner && typeof b.learner === "object" ? b.learner : {};
-  const snapshot = JSON.stringify({ level: Number(learner.level) || 1, unitsDone: Array.isArray(learner.unitsDone) ? learner.unitsDone.slice(0, 20).map(String) : [], ageBand: ["13-17", "18-25", "26+"].includes(learner.ageBand) ? learner.ageBand : null, goals: Array.isArray(learner.goals) ? learner.goals.slice(0, 5).map(goalFacts) : [], practicePortfolio: learner.portfolio && typeof learner.portfolio === "object" ? learner.portfolio : null }).slice(0, 3000);
+  const snapshot = JSON.stringify({ currentLesson: learner.currentLesson ? String(learner.currentLesson).replace(/[\u0000-\u001f]/g, " ").slice(0, 80) : null, level: Number(learner.level) || 1, unitsDone: Array.isArray(learner.unitsDone) ? learner.unitsDone.slice(0, 20).map(String) : [], ageBand: ["13-17", "18-25", "26+"].includes(learner.ageBand) ? learner.ageBand : null, goals: Array.isArray(learner.goals) ? learner.goals.slice(0, 5).map(goalFacts) : [], practicePortfolio: learner.portfolio && typeof learner.portfolio === "object" ? learner.portfolio : null }).slice(0, 3000);
   const content = `[Mode: ${mode}]\n${context ? `[About: ${context}]\n` : ""}${question}`;
   messages.push({ role: "user", content });
   return { system: [{ type: "text", text: tutorSystem(lang, region) }, { type: "text", text: `What the app knows about this learner (broad strokes only — no personal details): ${snapshot}` }], messages, effort: mode === "Expert" ? "medium" : "low" };

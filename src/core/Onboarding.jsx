@@ -1,8 +1,10 @@
 // FIRST RUN — three screens, then straight into a lesson: welcome, the
-// steps modules add (Goals: what you want money skills for, which picks the
-// first unit; Lessons: how to start, with an optional 2-minute check). No
-// account, no age, no name first: the first lesson is the hook, and the
-// account offer comes after it (that's where the age check lives).
+// steps modules add (Lessons: one warm-up question, answered in 3 taps from
+// opening the app; Goals: what you want money skills for, which picks the
+// first unit). No account, no age, no name first: the first lesson is the
+// hook, and the account offer comes after it (that's where the age check
+// lives). The 2-minute "skip what you know" check is offered later, after a
+// lesson (Today and the finish screen), not before anyone has started.
 import { useState } from "react";
 import { update } from "./store.js";
 import { LANGS, REGIONS } from "./i18n.js";
@@ -12,7 +14,7 @@ import { AccountForm } from "./Settings.jsx";
 import { track } from "./analytics.js";
 import { allModules } from "./registry.js";
 
-const ORDER = ["goals", "lessons"];
+const ORDER = ["lessons", "goals"]; // the warm-up question first, then what you want money skills for
 const rank = (m) => (ORDER.includes(m.id) ? ORDER.indexOf(m.id) : ORDER.length);
 
 export default function Onboarding({ t, locale, onDone }) {

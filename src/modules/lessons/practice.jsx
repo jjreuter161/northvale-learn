@@ -12,6 +12,7 @@ import { SELECTED, Chosen, Button, Card, Icon, Label, Loading, Sheet } from "../
 import * as M from "./mastery.js";
 import { UNITS, conceptsOfLesson, conceptsOfUnit, loadUnits } from "./content.js";
 import { CONCEPTS, PLACEMENT, conceptById } from "./concepts.js";
+import { WARMUP } from "./warmup.js";
 
 const S = (en, es) => ({ en, es });
 addStrings({
@@ -35,6 +36,15 @@ addStrings({
   "level.learning": S("Learning", "Aprendiendo"),
   "level.solid": S("Solid", "Sólido"),
   "level.mastered": S("Mastered", "Dominado"),
+  "skip.title": S("Skip what you know", "Salta lo que ya sabes"),
+  "skip.offer": S("You're moving fast", "Vas muy rápido"),
+  "skip.offer.sub": S("Three perfect lessons in a row. A 2-minute check can skip what you already know.", "Tres lecciones perfectas seguidas. Una prueba de 2 minutos puede saltar lo que ya sabes."),
+  "skip.offer.go": S("Take the 2-minute check", "Hacer la prueba de 2 minutos"),
+  "slow.offer": S("That one was tricky", "Esa estuvo difícil"),
+  "slow.offer.sub": S("A quick review first makes the next lesson easier.", "Un repaso rápido antes hace más fácil la siguiente lección."),
+  "slow.offer.go": S("Review first", "Repasar primero"),
+  "warm.title": S("Try one question", "Prueba una pregunta"),
+  "warm.sub": S("No account, no sign-up. Pick what you think is best.", "Sin cuenta ni registro. Elige lo que creas mejor."),
   "place.title": S("How do you want to start?", "¿Cómo quieres empezar?"),
   "place.sub": S("Lessons take about 4 minutes.", "Las lecciones duran unos 4 minutos."),
   "place.new": S("From the beginning", "Desde el principio"),
@@ -291,9 +301,49 @@ export function SkillsCard({ t, locale }) {
 // ---- Placement (an onboarding step) ---------------------------------------
 
 const PLACEMENT_UNITS = PLACEMENT.map((c) => conceptById(c).unit);
-export function Placement({ t, locale, header, startUnit, onNext }) {
+// SKIP AHEAD — offered after a few perfect lessons in a row: the same short check as at the start, to skip what's already known.
+export function SkipAhead({ t, locale, startUnit, onClose, go }) {
+  const head = (title, sub) => (
+    <>
+      <h2 className="nv-disp" style={{ fontSize: 26, margin: "0 0 6px" }}>{title}</h2>
+      {sub && <p style={{ margin: "0 0 16px", color: "var(--mid)" }}>{sub}</p>}
+    </>
+  );
+  return (
+    <Sheet open onClose={onClose} title={t("skip.title")} tall>
+      <Placement t={t} locale={locale} header={head} startUnit={startUnit} begin="test" onNext={() => (onClose(), go("lessons"))} />
+    </Sheet>
+  );
+}
+
+// The first thing a new learner does: one real question (warmup.js), then on to their goal.
+export function Warmup({ t, locale, header, onNext }) {
+  const [picked, setPicked] = useState(null);
+  const [checked, setChecked] = useState(null);
+  const check = () => {
+    const right = picked === WARMUP.answer;
+    setChecked(right ? "right" : "wrong");
+    track("warmup", { right: right ? 1 : 0 });
+  };
+  return (
+    <>
+      {header(t("warm.title"), t("warm.sub"))}
+      <QuestionView t={t} locale={locale} step={WARMUP} picked={picked} setPicked={checked ? () => {} : setPicked} checked={checked} />
+      <div style={{ marginTop: 16 }}>
+        {checked && <Feedback t={t} locale={locale} step={WARMUP} picked={picked} checked={checked} />}
+        {!checked ? (
+          <Button full disabled={picked === null} onClick={check}>{t("common.check")}</Button>
+        ) : (
+          <Button full onClick={() => onNext({})}>{t("common.continue")}</Button>
+        )}
+      </div>
+    </>
+  );
+}
+
+export function Placement({ t, locale, header, startUnit, onNext, begin = "ask" }) {
   const x = tx(locale);
-  const [phase, setPhase] = useState("ask"); // ask | test | result
+  const [phase, setPhase] = useState(begin); // ask | test | result
   const [results, setResults] = useState([]);
   const [picked, setPicked] = useState(null);
   const [checked, setChecked] = useState(null);
