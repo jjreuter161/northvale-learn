@@ -364,11 +364,11 @@ function MythCard({ t, locale }) {
     );
   if (!myth) return null;
   const right = answered && answered.picked === myth.answer;
-  const btn = { flex: 1, minHeight: 46, borderRadius: 15, border: "1.5px solid var(--line)", background: "var(--surface)", color: "var(--ink)", fontWeight: 700, fontSize: 16, cursor: "pointer", font: "inherit", "--btn-edge": "var(--line)" };
+  const btn = { flex: 1, minHeight: 46, borderRadius: 14, border: "1.5px solid var(--line)", background: "var(--surface)", color: "var(--ink)", fontWeight: 700, fontSize: 16, cursor: "pointer", font: "inherit", "--btn-edge": "var(--line)" };
   return (
     <Card style={{ marginTop: 12 }} data-myth={myth.id}>
       <div style={{ fontSize: 14, fontWeight: 650, color: "var(--mid)", marginBottom: 6 }}>{t("myth.label")}</div>
-      <div className="nv-disp" style={{ fontSize: 21, lineHeight: 1.3, color: "var(--head)" }}>“{tx(myth.claim)}”</div>
+      <div className="nv-disp" style={{ fontSize: 20, lineHeight: 1.3, color: "var(--head)" }}>“{tx(myth.claim)}”</div>
       {!answered ? (
         <>
           <div style={{ display: "flex", gap: 10, marginTop: 14 }}>
@@ -501,7 +501,7 @@ function SeaChart({ t, tx, go, progress, ci, next, all, setAll, opened, toggle, 
               <button onClick={() => currentRef.current && currentRef.current.scrollIntoView({ behavior: "smooth", block: "start" })} aria-expanded="true" aria-label={name} className="nv-press" style={{ position: "absolute", left: pct(x - 8, W), top: pct(y - 6, H), width: pct(136, W), height: pct(118, H), border: "none", background: "transparent", borderRadius: 20, cursor: "pointer", padding: 0 }} />
               <div style={{ position: "absolute", left: pct(i % 2 ? 10 : 168, W), top: pct(y + 2, H), width: pct(180, W), background: "var(--surface)", borderRadius: 18, padding: 12, boxShadow: "0 0 0 2px var(--head), var(--lift)" }}>
                 <span style={{ display: "inline-block", fontSize: 12, fontWeight: 700, borderRadius: 999, padding: "2px 9px", background: "var(--warmSoft)", color: "var(--warmInk)" }}>{t("path.now", { n: i + 1 })}</span>
-                <div className="nv-disp" style={{ fontSize: 19, lineHeight: 1.15, margin: "6px 0 2px", color: "var(--head)" }}>{tx(u.title)}</div>
+                <div className="nv-disp" style={{ fontSize: 18, lineHeight: 1.15, margin: "6px 0 2px", color: "var(--head)" }}>{tx(u.title)}</div>
                 <div style={{ fontSize: 13, color: "var(--mid)" }}>{meta}</div>
                 <div style={{ height: 6, borderRadius: 3, background: "var(--surface2)", overflow: "hidden", margin: "6px 0 10px" }}>
                   <div style={{ width: `${(d / n) * 100}%`, height: "100%", background: "var(--brand)" }} />
@@ -573,7 +573,7 @@ function Course({ t, locale, go, route }) {
           {now ? (
             <BoatNode id={l.id} playing={playing} />
           ) : (
-            <span data-node={l.id} style={{ width: 30, height: 30, borderRadius: 15, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: st === "done" ? "var(--accent)" : "var(--surface)", border: st === "done" ? "none" : "2px solid var(--line)", color: st === "done" ? "var(--onBrand)" : "var(--low)", position: "relative" }}>
+            <span data-node={l.id} style={{ width: 30, height: 30, borderRadius: 14, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: st === "done" ? "var(--accent)" : "var(--surface)", border: st === "done" ? "none" : "2px solid var(--line)", color: st === "done" ? "var(--onBrand)" : "var(--low)", position: "relative" }}>
               {st === "done" ? <Icon name="check" size={16} stroke={2.6} /> : st === "locked" ? <Icon name="lock" size={13} /> : null}
             </span>
           )}
@@ -1008,8 +1008,8 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
       <div key={step.key} className="nv-in" style={{ flex: 1, overflowY: "auto" }}>
         {step.type === "card" && (
           <div>
-            <h2 className="nv-disp" style={{ fontSize: 29, margin: "0 0 12px", lineHeight: 1.15 }}>{tx(step.title)}</h2>
-            <p style={{ fontSize: 19, lineHeight: 1.55, margin: 0 }}>{tx(step.body)}</p>
+            <h2 className="nv-disp" style={{ fontSize: 28, margin: "0 0 12px", lineHeight: 1.15 }}>{tx(step.title)}</h2>
+            <p style={{ fontSize: 18, lineHeight: 1.55, margin: 0 }}>{tx(step.body)}</p>
             {service("tutor", "canExplain")(`${tx(step.title)} ${tx(step.body)}`) && <button onClick={() => service("tutor", "explain")({ question: tx(step.title), context: tx(step.body) })} className="nv-press" style={{ marginTop: 18, border: "1px solid var(--line)", background: "var(--bg)", color: "var(--brand)", borderRadius: 999, padding: "10px 16px", fontWeight: 650, fontSize: 15, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 8, minHeight: 44 }}>
               <Icon name="chat" size={18} /> {t("lessons.explain")}
             </button>}

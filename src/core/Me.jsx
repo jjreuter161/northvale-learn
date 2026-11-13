@@ -159,7 +159,7 @@ export default function Me({ t, locale, session, go, route }) {
         ].map(([icon, value, label]) => (
           <Card key={label} pad={14}>
             {icon === "streak" ? <StreakStar count={progress.streak.count} size={20} /> : <Icon name={icon} size={18} color="var(--mid)" />}
-            <div className="nv-disp" style={{ fontSize: 27, marginTop: 6, fontVariantNumeric: "tabular-nums" }}>{value}</div>
+            <div className="nv-disp" style={{ fontSize: 26, marginTop: 6, fontVariantNumeric: "tabular-nums" }}>{value}</div>
             <div style={{ fontSize: 13, color: "var(--mid)", fontWeight: 500 }}>{label}</div>
           </Card>
         ))}

@@ -267,7 +267,7 @@ export function Segmented({ options, value, onChange, label }) {
   return (
     <div role="radiogroup" aria-label={label} style={{ display: "flex", background: "var(--surface)", borderRadius: 14, padding: 4, gap: 4 }}>
       {options.map((o) => (
-        <button key={o.value} role="radio" aria-checked={value === o.value} onClick={() => onChange(o.value)} style={{ flex: 1, minWidth: 0, overflowWrap: "anywhere", ...(value === o.value ? SELECTED : { border: "2px solid transparent" }), borderRadius: 11, padding: "7px 8px", minHeight: 40, fontSize: 14, fontWeight: value === o.value ? 750 : 650, cursor: "pointer", background: value === o.value ? "var(--bg)" : "transparent", color: value === o.value ? "var(--ink)" : "var(--mid)" }}>
+        <button key={o.value} role="radio" aria-checked={value === o.value} onClick={() => onChange(o.value)} style={{ flex: 1, minWidth: 0, overflowWrap: "anywhere", ...(value === o.value ? SELECTED : { border: "2px solid transparent" }), borderRadius: 12, padding: "7px 8px", minHeight: 40, fontSize: 14, fontWeight: value === o.value ? 750 : 650, cursor: "pointer", background: value === o.value ? "var(--bg)" : "transparent", color: value === o.value ? "var(--ink)" : "var(--mid)" }}>
           {o.label}
         </button>
       ))}
@@ -278,7 +278,7 @@ export function Segmented({ options, value, onChange, label }) {
 export function Switch({ checked, onChange, label }) {
   return (
     <button role="switch" aria-checked={!!checked} aria-label={label} onClick={() => onChange(!checked)} style={{ width: 52, height: 32, borderRadius: 16, border: "none", background: checked ? "var(--brand)" : "var(--surface2)", position: "relative", cursor: "pointer", flexShrink: 0, transition: "background .2s" }}>
-      <span style={{ position: "absolute", top: 3, left: checked ? 23 : 3, width: 26, height: 26, borderRadius: 13, background: checked ? "var(--onBrand)" : "#fff", boxShadow: "0 1px 4px rgba(0,0,0,.3)", transition: "left .2s" }} />
+      <span style={{ position: "absolute", top: 3, left: checked ? 23 : 3, width: 26, height: 26, borderRadius: 12, background: checked ? "var(--onBrand)" : "#fff", boxShadow: "0 1px 4px rgba(0,0,0,.3)", transition: "left .2s" }} />
     </button>
   );
 }
@@ -325,7 +325,7 @@ export function Sheet({ open, onClose, title, children, tall }) {
       <div style={{ position: "relative", width: "100%", maxWidth: 560, maxHeight: tall ? "92dvh" : "85dvh", overflowY: "auto", background: "var(--bg)", borderRadius: "24px 24px 0 0", padding: "10px 18px calc(22px + env(safe-area-inset-bottom))", animation: "nvSpring .26s cubic-bezier(.2,.8,.3,1) both" }}>
         <div style={{ width: 40, height: 5, borderRadius: 3, background: "var(--line)", margin: "0 auto 10px" }} />
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-          <h2 className="nv-disp" style={{ fontSize: 23, margin: 0 }}>{title}</h2>
+          <h2 className="nv-disp" style={{ fontSize: 24, margin: 0 }}>{title}</h2>
           <button onClick={onClose} aria-label="Close" style={{ border: "none", background: "var(--surface2)", borderRadius: 20, width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "var(--ink)" }}>
             <Icon name="close" size={18} />
           </button>

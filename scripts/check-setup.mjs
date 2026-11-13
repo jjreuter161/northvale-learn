@@ -18,44 +18,21 @@ let problems = 0;
 const ok = (m) => console.log(`  ✓ ${m}`);
 const bad = (m) => (problems++, console.log(`  ✗ ${m}`));
 
+const show = (r) => {
+  for (const l of r.lines) ok(l);
+  if (r.ok === false) bad(r.problem);
+  else if (r.ok === null) console.log(`  · ${r.problem}`);
+};
+const { check } = await import("./lib/key-checks.mjs");
 console.log("\nAnthropic (AI tutor)");
-if (!e.ANTHROPIC_API_KEY) bad("ANTHROPIC_API_KEY is empty — see docs/SETUP-KEYS.md §2");
-else {
-  try {
-    const { default: Anthropic } = await import("@anthropic-ai/sdk");
-    const page = await new Anthropic().models.list({ limit: 50 });
-    const ids = page.data.map((m) => m.id);
-    ok("the key works");
-    const model = e.TUTOR_MODEL || "claude-haiku-5-5";
-    ids.includes(model) ? ok(`${model} is available`) : bad(`${model} isn't in this account's model list`);
-    ok(`monthly AI budget: $${e.AI_MONTHLY_BUDGET_USD || 25} (also set a spend limit in the Anthropic console)`);
-  } catch (x) {
-    bad(x.status === 401 ? "the key wasn't accepted — copy it again from console.anthropic.com → API Keys" : x.status === 403 ? "the key works but the account can't use the API yet — add credit under Billing" : `couldn't check the key (${String(x.message).slice(0, 80)})`);
-  }
-}
+show(await check("anthropic"));
+if (e.ANTHROPIC_API_KEY) ok(`monthly AI budget: $${e.AI_MONTHLY_BUDGET_USD || 25} (also set a spend limit in the Anthropic console)`);
 
 console.log("\nTwelve Data (prices)");
-if (!e.TWELVEDATA_API_KEY) bad("TWELVEDATA_API_KEY is empty — prices will be labeled samples");
-else {
-  try {
-    const r = await fetch("https://api.twelvedata.com/quote?symbol=VOO", { headers: { Authorization: `apikey ${e.TWELVEDATA_API_KEY}` } }).then((x) => x.json());
-    r.close ? ok(`the key works (VOO last close ${r.close})`) : bad(`Twelve Data said: ${String(r.message || "no price").slice(0, 100)}`);
-  } catch (x) {
-    bad(`couldn't reach Twelve Data (${x.message})`);
-  }
-}
+show(await check("twelve"));
 
 console.log("\nGmail (password reset emails)");
-if (!e.SMTP_USER || !e.SMTP_PASS) bad("SMTP_USER / SMTP_PASS are empty — password reset will show your contact email instead");
-else {
-  try {
-    const mail = await import("../server/mail.js");
-    await mail.checkLogin();
-    ok(`signed in to ${e.SMTP_USER} (no email was sent)`);
-  } catch (x) {
-    bad(`Gmail refused the sign-in (${String(x.message).slice(0, 90)}). Use an app password, not the normal password, with 2-Step Verification on`);
-  }
-}
+show(await check("gmail"));
 e.PUBLIC_URL ? ok(`reset links will open ${e.PUBLIC_URL}`) : bad("PUBLIC_URL is empty");
 e.CONTACT_EMAIL ? ok(`contact email: ${e.CONTACT_EMAIL}`) : bad("CONTACT_EMAIL is empty");
 

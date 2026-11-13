@@ -106,7 +106,7 @@ export function BudgetTool({ params = {}, t, locale, onDone, done }) {
   return (
     <Card>
       <Slider label={t("budget.income")} value={income} min={amt([100, 1500], R)} max={amt([4000, 60000], R)} step={amt([50, 500], R)} onChange={setIncome} display={fmt(income)} />
-      <div style={{ display: "flex", height: 26, borderRadius: 13, overflow: "hidden", margin: "4px 0 12px" }} aria-hidden>
+      <div style={{ display: "flex", height: 26, borderRadius: 12, overflow: "hidden", margin: "4px 0 12px" }} aria-hidden>
         {bar.map(([k, v, c]) => (
           <div key={k} style={{ width: `${v}%`, background: c, transition: "width .3s" }} />
         ))}

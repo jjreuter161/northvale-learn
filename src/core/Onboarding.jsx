@@ -50,7 +50,7 @@ export default function Onboarding({ t, locale, onDone }) {
         </div>
         <span style={{ fontSize: 14, color: "var(--mid)", whiteSpace: "nowrap" }}>{t("onb.step", { n: step, total: steps })}</span>
       </div>
-      <h1 className="nv-disp" style={{ fontSize: 29, margin: "0 0 8px", lineHeight: 1.15 }}>{title}</h1>
+      <h1 className="nv-disp" style={{ fontSize: 28, margin: "0 0 8px", lineHeight: 1.15 }}>{title}</h1>
       {sub && <p style={{ fontSize: 16, color: "var(--mid)", margin: "0 0 22px", lineHeight: 1.45 }}>{sub}</p>}
     </>
   );
@@ -75,7 +75,7 @@ export default function Onboarding({ t, locale, onDone }) {
         <button onClick={() => setSigningIn(false)} aria-label={t("common.back")} style={{ border: "none", background: "transparent", color: "var(--ink)", width: 44, height: 44, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", marginBottom: 12 }}>
           <Icon name="back" />
         </button>
-        <h1 className="nv-disp" style={{ fontSize: 29, margin: "0 0 16px" }}>{t("account.signin")}</h1>
+        <h1 className="nv-disp" style={{ fontSize: 28, margin: "0 0 16px" }}>{t("account.signin")}</h1>
         <AccountForm t={t} mode="signin" signinOnly onDone={() => update((s) => ({ ...s, profile: { ...s.profile, onboarded: true } }))} />
       </>
     );
@@ -93,7 +93,7 @@ export default function Onboarding({ t, locale, onDone }) {
             <span style={{ fontSize: 13, fontWeight: 650, letterSpacing: 4, color: "var(--low)" }}>LEARN</span> <BetaTag label={t("common.beta")} />
           </div>
           <div style={{ fontSize: 15, color: "var(--mid)", marginTop: 2 }}>{t("brand.tagline")}</div>
-          <h1 className="nv-disp" style={{ fontSize: 33, lineHeight: 1.12, margin: "26px 0 0" }}>{t("onb.tagline")}</h1>
+          <h1 className="nv-disp" style={{ fontSize: 32, lineHeight: 1.12, margin: "26px 0 0" }}>{t("onb.tagline")}</h1>
           <p style={{ fontSize: 17, color: "var(--mid)", maxWidth: 340, lineHeight: 1.45, margin: "4px 0 0" }}>{t("onb.tagline.sub")}</p>
         </div>
         <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 10 }}>

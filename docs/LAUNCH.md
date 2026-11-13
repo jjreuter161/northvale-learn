@@ -24,113 +24,121 @@ Nothing else costs money. Nothing is charged automatically beyond Fly.io's small
 
 ## Part 1 — what you do (with a parent or guardian)
 
-### 1. A Gmail just for the app (free, 10 minutes)
+A guided checklist. Tick each box as you go. Total time: about an hour, most of it waiting for emails and sign-up pages. **Two commands do the hard parts**: `npm run setup` asks for each key and tries it for you the moment you type it, and `npm run ready` tells you when everything is done.
+
+> **Never paste a key into a chat, an email or a screenshot.** You type keys only into your own Terminal (hidden), and they're saved in `.env` on your computer.
+
+### Before you start: have these ready
+
+- [ ] A parent or guardian next to you (they hold the accounts that need a card)
+- [ ] About an hour
+- [ ] A note file open, only for the 16-letter Gmail password and the Anthropic key, until you've typed them into `npm run setup`. Delete the note after.
+
+### Step 1. A Gmail just for the app (free, about 10 minutes)
 
 It sends password-reset links, the "confirm your email" link for teachers, waitlist confirmations and the weekly recap.
 
-1. Create a new Gmail, for example `northvale.learn.app@gmail.com`.
-2. Go to **Google Account → Security → 2-Step Verification** and turn it on.
-3. Go to **Google Account → Security → App passwords**. Make one called "Northvale Learn", then copy its 16 letters into a note for step 5.
+- [ ] Open **gmail.com**, click **Create account → For my personal use**, and make one, for example `northvale.learn.app@gmail.com`.
+- [ ] Click your picture (top right) → **Manage your Google Account** → **Security** (left side).
+- [ ] Under "How you sign in to Google", click **2-Step Verification** → **Get started**, and finish turning it on.
+- [ ] Back on the **Security** page, use the search box at the top and type **App passwords**. Open it, type the name **Northvale Learn**, click **Create**.
+- [ ] Google shows 16 letters in a yellow box. **Copy them into your note.** (If you can't find "App passwords", 2-Step Verification isn't on yet.)
 
-More detail is in [SETUP-KEYS.md §4](SETUP-KEYS.md).
+More detail: [SETUP-KEYS.md §4](SETUP-KEYS.md).
 
-### 2. The Anthropic key (the AI tutor)
+### Step 2. The Anthropic key (the AI tutor)
 
-1. At **console.anthropic.com**, sign up (the adult does this), then **Billing** → buy $5–10 of credit.
-2. **Limits** → set a monthly spend limit, for example $25. This is a second cap on top of the app's own.
-3. **API Keys** → create a key named "Northvale Learn", then copy it for step 5.
+The adult does the sign-up and the card.
 
-### 3. Twelve Data (optional, free)
+- [ ] Open **console.anthropic.com** and click **Sign up** (or **Log in**).
+- [ ] Left menu → **Billing** → **Add credit** (or **Buy credits**): $5–10 is plenty to start.
+- [ ] Left menu → **Limits** (or **Billing → Limits**) → set a **monthly spend limit**, for example **$25**. This is a second safety cap on top of the app's own.
+- [ ] Left menu → **API keys** → **Create key**. Name it **Northvale Learn** and copy the key into your note (it starts with `sk-ant-`). Anthropic shows it only once.
 
-At **twelvedata.com**, sign up and copy the API key. Without it, the practice portfolio uses clearly labeled sample prices, which is fine for the beta.
+### Step 3. Twelve Data (optional, free)
 
-### 4. Fly.io (hosting)
+Without it the practice portfolio uses clearly labeled sample prices, which is fine for the beta. Skip this if you're short on time.
 
-1. Install the Fly tool and sign up. The adult adds the card in the browser:
+- [ ] Open **twelvedata.com** → **Sign up** (the free plan).
+- [ ] In the **Dashboard**, find **API key** and copy it into your note.
 
-   ```bash
-   brew install flyctl
-   ```
+### Step 4. Fly.io (hosting)
 
-   ```bash
-   fly auth signup
-   ```
+- [ ] In Terminal, in the project folder:
 
-2. **The app's name** becomes its address: `https://northvale-learn.fly.dev`. If you want another name, tell the builder now, because it has to match in a few files.
+  ```bash
+  brew install flyctl
+  ```
 
-### 4b. Your own domain (optional)
+- [ ] Then:
 
-If you'd like testers to see `northvalelearn.com` instead of `northvale-learn.fly.dev`:
-1. The adult buys `northvalelearn.com` at any registrar (Cloudflare, Porkbun, Namecheap, GoDaddy…). Keep the login handy: at deploy time you'll add two or three DNS records there, and the builder will tell you exactly which.
-2. Tell the builder you have it.
+  ```bash
+  fly auth signup
+  ```
 
-**Decide before inviting testers.** Each phone keeps a tester's progress under the address they first used. A tester without an account who moves to a new address later would start over, and everyone would have to sign in again.
+  A browser page opens. The adult creates the account and adds the card there (about $2–3 a month).
+- [ ] **The app's name** becomes its address: `https://northvale-learn.fly.dev`. If you want a different name, tell the builder now, because it has to match in a few files.
 
-**We plan to move to Vercel + Supabase after testers' first week** (the `vercel-supabase` branch, `docs/VERCEL-SUPABASE.md`), so **your own domain is recommended**. With it, the address never changes when the app moves, and nobody loses anything. Without it, testers move from the `fly.dev` address to a new one at the switch.
+**Optional: your own domain.** If you'd like testers to see `northvalelearn.com`, the adult buys it at any registrar (Cloudflare, Porkbun, Namecheap, GoDaddy). At deploy time the builder will tell you exactly which two or three records to add. **Decide before inviting testers**: each phone keeps a tester's progress under the address they first used, so a tester without an account would start over if the address changed later. A domain is recommended because we plan to move to Vercel + Supabase after the first week (`docs/VERCEL-SUPABASE.md`); with your own domain the address never changes.
 
-### 5. Fill in `.env`
+### Step 5. Fill in `.env` with the wizard
 
-From the project folder, run:
+- [ ] In Terminal, in the project folder:
 
-```bash
-npm run setup
-```
+  ```bash
+  npm run setup
+  ```
 
-It asks for each setting, one at a time. What you type for keys stays hidden. Press Enter to keep a suggestion.
+  It has six short steps. For each key it **tries it right away** (free: it lists AI models, gets one price, and signs in to Gmail without sending anything) and tells you in plain words if something's wrong, so a typo is fixed on the spot:
 
-| It asks for | What to put |
-|---|---|
-| Twelve Data API key | from step 3, or Enter to skip |
-| Anthropic API key | from step 2 (starts with `sk-ant-`) |
-| Monthly AI budget | `25` |
-| Gmail address / app password | from step 1 |
-| Contact email | the app's Gmail is fine |
-| The app's web address | Enter, to keep `https://northvale-learn.fly.dev` |
-| Invite code | a word you'll give only to testers, like `NORTHSTAR`. Only people with it can make an account. |
+  | Step | It asks for | What to type |
+  |---|---|---|
+  | 1 | Gmail address, then the app password | from step 1 (spaces don't matter). Then a contact email: Enter keeps the Gmail. |
+  | 2 | Anthropic API key, then the monthly budget | from step 2; for the budget, `25` |
+  | 3 | Twelve Data API key | from step 3, or Enter to skip |
+  | 4 | The web address | Enter, to keep `https://northvale-learn.fly.dev` |
+  | 5 | Invite code | a word only your testers will know, like `NORTHSTAR` (or Enter for none) |
+  | 6 | (nothing) | it makes the admin token for you |
 
-It makes the admin token for you, sets the AI tutor to Haiku, and saves `.env` so only your computer account can read it.
+  Your typing is hidden, and nothing is ever printed back. At the end it says **"Everything needed is there"** or lists, by name, what's still missing (run it again when you have it; what you typed is kept).
+- [ ] Delete your note with the keys.
 
-Then check every key for real. This is free: it lists AI models, gets one price, and signs in to Gmail without sending anything.
+### Step 6. Your name and contact in the legal drafts
 
-```bash
-npm run check-setup
-```
+- [ ] Open these four files and replace each **[bracketed blank]** that asks for a name or contact:
+  - `docs/legal/privacy.en.md`: your name or company, an address, and the contact email, in 3 places;
+  - `docs/legal/privacy.es.md`: the same, in Spanish;
+  - `docs/legal/terms.en.md` and `docs/legal/terms.es.md`: your name or company, and the email.
+- [ ] If you're under 18, decide with your parent or guardian whose name goes there: often the adult's. Leave the **[Lawyer: …]** notes as they are. They're fine for a beta and get answered before a public launch.
+- [ ] Save the change in git:
 
-### 6. Your name and contact in the legal drafts
+  ```bash
+  git add docs/legal
+  ```
 
-Open these four files and replace each **[bracketed blank]** that asks for a name or contact:
+  ```bash
+  git commit -m "Contact details in the legal drafts"
+  ```
 
-- `docs/legal/privacy.en.md` — your name or company, an address, and the contact email, in 3 places;
-- `docs/legal/privacy.es.md` — the same, in Spanish;
-- `docs/legal/terms.en.md` and `docs/legal/terms.es.md` — your name or company, and the email.
+### Step 7. One command: are you ready?
 
-If you're under 18, decide with your parent or guardian whose name goes there: often the adult's. Leave the **[Lawyer: …]** notes as they are. They're fine for a beta and get answered before a public launch.
+- [ ] In Terminal:
 
-Then save the change in git:
+  ```bash
+  npm run ready
+  ```
 
-```bash
-git add docs/legal
-```
+  It tries every key for real, then runs the full launch checklist (about 6 minutes, because the tests click through the app in a browser). You want the big box that says **"You're ready to deploy."** If it says **"Not yet"**, the lines marked ✗ say exactly what to fix; then run it again. (`npm run ready -- --quick` skips the tests, for a fast look at just the keys and settings.) It never shows a key.
 
-```bash
-git commit -m "Contact details in the legal drafts"
-```
+### Step 8. Tell the builder
 
-### 7. The final check
+- [ ] Send this message:
 
-```bash
-npm run preflight
-```
-
-It takes about 3 minutes, because it runs every test, including clicking through the app in a browser. You want **"Everything passes."** Anything with a ✗ tells you what to fix. It never shows your keys.
-
-### 8. Tell the builder
-
-> **Setup is done, go ahead and deploy.**
+  > **Setup is done, go ahead and deploy.**
 
 That message is also your OK for:
 - the Fly.io charges (about $2–3 a month);
-- the AI safety check (about 1¢).
+- the AI safety check (a few cents).
 
 ---
 

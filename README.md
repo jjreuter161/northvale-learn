@@ -59,7 +59,7 @@ npm run dev        # http://localhost:8950
 npm test
 ```
 
-**Going live:** follow **[docs/LAUNCH.md](docs/LAUNCH.md)**. `npm run preflight` checks everything before launch and prints a pass/fail list: the settings (never their values), Haiku and the AI cap, classroom mode off, every test (browser too), git clean with no keys or data in it, and the legal drafts' contact details. Add `-- --quick` to skip the tests.
+**Going live:** follow the guided checklist in **[docs/LAUNCH.md](docs/LAUNCH.md)**. `npm run setup` is a step-by-step wizard that tries each key as you type it (hidden, never printed); `npm run ready` tries every key for real and runs the whole checklist, then says "You're ready to deploy" or what to fix. Under the hood, `npm run preflight` checks everything before launch and prints a pass/fail list: the settings (never their values), Haiku and the AI cap, classroom mode off, every test (browser too), git clean with no keys or data in it, and the legal drafts' contact details. Add `-- --quick` to skip the tests.
 
 **Demo data and the preview:**
 

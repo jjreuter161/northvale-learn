@@ -332,7 +332,7 @@ function LookPicker({ t, settings, setSetting }) {
                 )}
               </span>
               <span style={{ display: "flex", alignItems: "center", gap: 7, marginTop: 8, fontWeight: 700, color: "var(--head)" }}>
-                <span aria-hidden="true" style={{ width: 18, height: 18, borderRadius: 9, border: "2px solid var(--brand)", display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                <span aria-hidden="true" style={{ width: 18, height: 18, borderRadius: 8, border: "2px solid var(--brand)", display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                   {on && <span style={{ width: 9, height: 9, borderRadius: 5, background: "var(--brand)" }} />}
                 </span>
                 {t(`look.${k}`)}
