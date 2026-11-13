@@ -5,10 +5,10 @@
   "type": "module",
   "description": "Northvale Learn — learn money and investing by doing. Simulated only: no real money, trades or bank connections.",
   "scripts": {
-    "build": "node scripts/lesson-index.mjs && esbuild src/main.jsx --bundle --minify --sourcemap --jsx=automatic --loader:.md=text --format=esm --splitting --outdir=web --entry-names=app --chunk-names=chunks/[name]-[hash]",
+    "build": "node scripts/lesson-index.mjs && node -e \"require('fs').rmSync('web/chunks',{recursive:true,force:true})\" && esbuild src/main.jsx --bundle --minify --sourcemap --jsx=automatic --loader:.md=text --format=esm --splitting --outdir=web --entry-names=app --chunk-names=chunks/[name]-[hash] && node scripts/precache.mjs",
     "start": "node server/index.js",
     "dev": "npm run build && node server/index.js",
-    "test": "node test/engines.test.mjs && node test/look.test.mjs && node test/content.test.mjs && node test/goals.test.mjs && node test/missions.test.mjs && node test/mastery.test.mjs && node test/mail.test.mjs && node test/retention.test.mjs && node test/classroom.test.mjs && node test/waitlist.test.mjs && node test/seed.test.mjs && node test/server.test.mjs && npm run build --silent && node test/size.test.mjs && node test/a11y.test.mjs && node test/browser.test.mjs && node test/lessons.test.mjs && node test/data.test.mjs",
+    "test": "node test/engines.test.mjs && node test/look.test.mjs && node test/content.test.mjs && node test/goals.test.mjs && node test/missions.test.mjs && node test/mastery.test.mjs && node test/mail.test.mjs && node test/retention.test.mjs && node test/classroom.test.mjs && node test/waitlist.test.mjs && node test/seed.test.mjs && node test/server.test.mjs && npm run build --silent && node test/size.test.mjs && node test/a11y.test.mjs && node test/browser.test.mjs && node test/lessons.test.mjs && node test/data.test.mjs && node test/install.test.mjs",
     "setup": "node scripts/setup.mjs",
     "check-setup": "node scripts/check-setup.mjs",
     "test:browser": "npm run build --silent && node test/browser.test.mjs",

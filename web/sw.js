@@ -4,9 +4,18 @@
 // portfolio (sample prices) and the goal simulator work offline; progress
 // syncs when the connection is back. /api always goes to the network.
 // Also shows the daily reminder (server/push.js) and opens the app on tap.
-const CACHE = "northvale-learn-v6";
+const CACHE = "northvale-learn-v7";
 const SHELL = ["/", "/app.js", "/manifest.webmanifest", "/icon.svg", "/icon-192.png", "/icon-512.png", "/icon-180.png", "/fonts/inter-latin-wght-normal.woff2", "/fonts/inter-latin-ext-wght-normal.woff2", "/fonts/eb-garamond-latin-600-normal.woff2", "/fonts/fraunces-latin-soft-normal.woff2"];
-self.addEventListener("install", (e) => e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting())));
+// The shell, plus the files the app imports to start (web/precache.json,
+// written by the build), so it opens offline from the first visit.
+self.addEventListener("install", (e) =>
+  e.waitUntil(
+    caches
+      .open(CACHE)
+      .then(async (c) => c.addAll([...new Set([...SHELL, ...(await fetch("/precache.json").then((r) => (r.ok ? r.json() : [])).then((l) => (Array.isArray(l) ? l : [])).catch(() => []))])]))
+      .then(() => self.skipWaiting())
+  )
+);
 self.addEventListener("activate", (e) => e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim())));
 self.addEventListener("fetch", (e) => {
   const url = new URL(e.request.url);
