@@ -109,7 +109,7 @@ export function InviteCard({ t, session }) {
       </div>
       {url ? (
         <>
-          <div style={{ marginTop: 12, padding: "10px 12px", borderRadius: 12, background: "var(--surface2)", fontSize: 14, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{url}</div>
+          <div style={{ marginTop: 12, padding: "10px 12px", borderRadius: 8, background: "var(--surface2)", fontSize: 14, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{url}</div>
           <div style={{ display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap" }}>
             <Button size="md" kind="secondary" onClick={() => navigator.clipboard.writeText(url).then(() => toast(t("inv.copied"), "good"), () => {})}>
               <Icon name="copy" size={18} /> {t("inv.copy")}

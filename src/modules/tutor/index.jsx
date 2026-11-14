@@ -145,7 +145,7 @@ function Sections({ value }) {
     const body = p.lines.join("\n");
     if (p.label && WARN.test(p.label))
       return (
-        <div key={i} style={{ display: "flex", gap: 10, margin: "0 0 10px", padding: "10px 12px 10px 10px", borderRadius: 14, background: "var(--badSoft)", borderLeft: "5px solid var(--bad)" }}>
+        <div key={i} style={{ display: "flex", gap: 10, margin: "0 0 10px", padding: "10px 12px 10px 10px", borderRadius: 8, background: "var(--badSoft)", borderLeft: "5px solid var(--bad)" }}>
           <span style={{ paddingTop: 1, color: "var(--bad)" }}><Icon name="flag" size={20} stroke={2.2} /></span>
           <div style={{ minWidth: 0 }}>
             <div style={{ fontWeight: 750 }}>{p.label}</div>
@@ -201,7 +201,7 @@ function ExplainPanel({ t, locale, mode, aiReady, session, go, onGlossary, relat
   const showing = out || sent !== null;
   return (
     <div>
-      <div style={{ background: "var(--surface)", borderRadius: 18, padding: 14, fontSize: 16, lineHeight: 1.5, marginBottom: 12 }}>{t("explain.hello")}</div>
+      <div style={{ background: "var(--surface)", borderRadius: 10, padding: 14, fontSize: 16, lineHeight: 1.5, marginBottom: 12 }}>{t("explain.hello")}</div>
       <Note icon="shield" style={{ marginBottom: 12 }}>{t("explain.warn")}</Note>
       {!aiReady && (
         <Note icon="info" style={{ marginBottom: 12 }}>
@@ -216,13 +216,13 @@ function ExplainPanel({ t, locale, mode, aiReady, session, go, onGlossary, relat
       )}
       {!showing && (
         <>
-          <textarea value={input} onChange={(e) => setInput(e.target.value)} placeholder={t("explain.placeholder")} aria-label={t("explain.placeholder")} rows={7} maxLength={4000} style={{ width: "100%", boxSizing: "border-box", borderRadius: 16, border: "1px solid var(--line)", background: "var(--surface)", color: "var(--ink)", padding: 12, fontSize: 16, lineHeight: 1.45, fontFamily: "inherit", resize: "vertical" }} />
+          <textarea value={input} onChange={(e) => setInput(e.target.value)} placeholder={t("explain.placeholder")} aria-label={t("explain.placeholder")} rows={7} maxLength={4000} style={{ width: "100%", boxSizing: "border-box", borderRadius: 10, border: "1px solid var(--line)", background: "var(--surface)", color: "var(--ink)", padding: 12, fontSize: 16, lineHeight: 1.45, fontFamily: "inherit", resize: "vertical" }} />
           <div aria-live="polite" style={{ fontSize: 13, color: "var(--mid)", minHeight: 20, margin: "6px 2px 10px" }}>{hiddenNow ? t("explain.hidden", { n: hiddenNow }) : ""}</div>
           <Button full onClick={run} disabled={!input.trim() || busy || !aiReady}>{t("explain.go")}</Button>
         </>
       )}
       {showing && (
-        <div style={{ background: "var(--surface)", borderRadius: "18px 18px 18px 4px", padding: "12px 14px", fontSize: 16, lineHeight: 1.5 }}>
+        <div style={{ background: "var(--surface)", borderRadius: "10px 10px 10px 3px", padding: "12px 14px", fontSize: 16, lineHeight: 1.5 }}>
           {error ? <p style={{ margin: 0 }}>{error}</p> : out ? <Sections value={stripTopics(out)} /> : <Loading label={t("tutor.thinking")} size={28} />}
           {!busy && lessonIds.map((id) => <div key={id}>{related(id)}</div>)}
           {sent !== null && (
@@ -374,7 +374,7 @@ function Overlay({ t, locale, go }) {
       )}
       <div style={{ display: "flex", flexDirection: "column", gap: 10, minHeight: 200 }}>
         {slice.messages.length === 0 && (
-          <div style={{ background: "var(--surface)", borderRadius: 18, padding: 14, fontSize: 16, lineHeight: 1.5 }}>
+          <div style={{ background: "var(--surface)", borderRadius: 10, padding: 14, fontSize: 16, lineHeight: 1.5 }}>
             {t("tutor.hello")}
           </div>
         )}
@@ -382,10 +382,10 @@ function Overlay({ t, locale, go }) {
           m.role === "user" ? (
             <div key={m.id} style={{ alignSelf: "flex-end", maxWidth: "86%" }}>
               {m.about && <div style={{ fontSize: 12, color: "var(--low)", textAlign: "right", marginBottom: 4 }}>{t("tutor.about", { what: m.about })}…</div>}
-              <div style={{ background: "var(--brand)", color: "var(--onBrand)", borderRadius: "18px 18px 4px 18px", padding: "11px 14px", fontSize: 16, lineHeight: 1.45 }}>{m.text}</div>
+              <div style={{ background: "var(--brand)", color: "var(--onBrand)", borderRadius: "10px 10px 3px 10px", padding: "11px 14px", fontSize: 16, lineHeight: 1.45 }}>{m.text}</div>
             </div>
           ) : (
-            <div key={m.id} style={{ alignSelf: "flex-start", maxWidth: "94%", background: "var(--surface)", borderRadius: "18px 18px 18px 4px", padding: "12px 14px", fontSize: 16, lineHeight: 1.5, color: "var(--ink)", fontWeight: m.error ? 650 : undefined, overflowWrap: "anywhere" }}>
+            <div key={m.id} style={{ alignSelf: "flex-start", maxWidth: "94%", background: "var(--surface)", borderRadius: "10px 10px 10px 3px", padding: "12px 14px", fontSize: 16, lineHeight: 1.5, color: "var(--ink)", fontWeight: m.error ? 650 : undefined, overflowWrap: "anywhere" }}>
               {m.offline ? (
                 <>
                   <p style={{ margin: "0 0 8px", color: "var(--mid)", fontSize: 14 }}>{m.glossary ? t("tutor.offline") : m.lesson ? t("tutor.offline.lesson") : t("tutor.offline.none")}</p>
@@ -426,7 +426,7 @@ function Overlay({ t, locale, go }) {
         }}
         style={{ display: "flex", gap: 8, marginTop: 12, position: "sticky", bottom: 0, background: "var(--bg)", paddingTop: 8 }}
       >
-        <input value={input} onChange={(e) => setInput(e.target.value)} placeholder={t("tutor.placeholder")} aria-label={t("tutor.placeholder")} enterKeyHint="send" maxLength={2000} style={{ flex: 1, minWidth: 0, border: "1px solid var(--line)", borderRadius: 999, padding: "12px 16px", fontSize: 16, background: "var(--surface)", color: "var(--ink)" }} />
+        <input value={input} onChange={(e) => setInput(e.target.value)} placeholder={t("tutor.placeholder")} aria-label={t("tutor.placeholder")} enterKeyHint="send" maxLength={2000} style={{ flex: 1, minWidth: 0, border: "1px solid var(--line)", borderRadius: 8, padding: "12px 16px", fontSize: 16, background: "var(--surface)", color: "var(--ink)" }} />
         <button type="submit" disabled={busy || !input.trim()} aria-label={t("tutor.send")} style={{ width: 48, height: 48, borderRadius: 24, border: "none", background: "var(--brand)", color: "var(--onBrand)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", opacity: busy || !input.trim() ? 0.5 : 1, flexShrink: 0 }}>
           <Icon name="send" size={20} />
         </button>

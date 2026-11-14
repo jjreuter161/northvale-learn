@@ -34,7 +34,7 @@ export function RepairOffer({ t, onRepaired }) {
   const broken = useAppState((s) => s.progress.streak.broken);
   if (!repairAvailable()) return null;
   return (
-    <div style={{ background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 14, padding: 14, margin: "0 0 14px", textAlign: "left" }}>
+    <div style={{ background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 8, padding: 14, margin: "0 0 14px", textAlign: "left" }}>
       <p style={{ fontSize: 15, lineHeight: 1.5, margin: "0 0 10px" }}>{t("repair.offer", { n: broken.count })}</p>
       <Button
         full

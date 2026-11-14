@@ -251,7 +251,7 @@ function AssetPanel({ t, locale, symbol, pf, prices, quotes, onTraded, compact, 
           <span style={{ display: "block", fontSize: 14, fontWeight: 650, color: "var(--mid)", marginBottom: 6 }}>
             {t("pf.amount")} ({pf.currency}) · {t("pf.cash")}: {fmt(pf.cash)}
           </span>
-          <input inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0" aria-label={t("pf.amount")} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 14, padding: "13px 14px", fontSize: 20, fontWeight: 650, background: "var(--surface)", color: "var(--ink)" }} />
+          <input inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0" aria-label={t("pf.amount")} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 8, padding: "13px 14px", fontSize: 20, fontWeight: 650, background: "var(--surface)", color: "var(--ink)" }} />
         </label>
         {mode === "buy" && (
           <div style={{ display: "flex", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
@@ -284,7 +284,7 @@ function AssetPanel({ t, locale, symbol, pf, prices, quotes, onTraded, compact, 
 function AssetRow({ t, locale, a, price, q, pf, onClick, right, tag, first }) {
   return (
     <button onClick={onClick} className="nv-press" style={{ display: "flex", alignItems: "center", gap: 12, width: "100%", textAlign: "left", border: "none", borderTop: first ? "none" : "1px solid var(--line)", background: "transparent", color: "var(--ink)", padding: "12px 0", cursor: "pointer", minHeight: 56 }}>
-      <span style={{ width: 42, height: 42, borderRadius: 12, background: "var(--surface2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 750, letterSpacing: -0.2, flexShrink: 0 }}>{a.symbol.slice(0, 5)}</span>
+      <span style={{ width: 42, height: 42, borderRadius: 8, background: "var(--surface2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 750, letterSpacing: -0.2, flexShrink: 0 }}>{a.symbol.slice(0, 5)}</span>
       <span style={{ flex: 1, minWidth: 0 }}>
         <span style={{ display: "block", fontWeight: 650, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{a.name}</span>
         <span style={{ display: "block", fontSize: 13, color: tag ? "var(--accent)" : "var(--mid)", fontWeight: tag ? 650 : 400, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{tag ? t("pf.for_goal", { name: tag }) : text(a.short, locale)}</span>
@@ -335,7 +335,7 @@ function Screen({ t, locale, go }) {
       <Card>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
           <span style={{ fontSize: 14, fontWeight: 650, color: "var(--mid)" }}>{t("pf.total")}</span>
-          <span style={{ fontSize: 12, fontWeight: 650, background: "var(--surface2)", color: "var(--mid)", borderRadius: 999, padding: "4px 10px", whiteSpace: "nowrap" }}>{t("pf.pretend")}</span>
+          <span style={{ fontSize: 12, fontWeight: 650, background: "var(--surface2)", color: "var(--mid)", borderRadius: 8, padding: "4px 10px", whiteSpace: "nowrap" }}>{t("pf.pretend")}</span>
         </div>
         <div style={{ fontSize: 36, fontWeight: 700, letterSpacing: -0.8, lineHeight: 1.15, fontVariantNumeric: "tabular-nums" }}>{fmt(v.total)}</div>
         <div style={{ fontWeight: 650, fontSize: 15, color: "var(--ink)", fontVariantNumeric: "tabular-nums" }}>
@@ -395,7 +395,7 @@ function Screen({ t, locale, go }) {
         return (
           <Card key={type} pad={"14px 16px 4px"} style={{ marginBottom: 12 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
-              <span style={{ width: 36, height: 36, borderRadius: 10, background: "var(--brandSoft)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <span style={{ width: 36, height: 36, borderRadius: 6, background: "var(--brandSoft)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                 <Icon name={type === "safe" ? "shield" : type === "etf" ? "layers" : "building"} size={20} />
               </span>
               <div style={{ flex: 1 }}>

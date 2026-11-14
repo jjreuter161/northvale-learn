@@ -50,7 +50,7 @@ export default function Practice(ctx) {
     const n = Math.min(3, lessonsDone(progress));
     const cash = money(fact(locale.region === "MX" ? "startCashMX" : "startCashUS"), { ...locale, currency: locale.region === "MX" ? "MXN" : "USD" }).replace(/\.00$/, "");
     return (
-      <div>
+      <div style={ctx.layout !== "phone" ? { maxWidth: 760 } : undefined}>
         <Title sub={t("practice.sub")}>{t("nav.practice")}</Title>
         <Card pad={0} style={{ overflow: "hidden" }}>
           <Scene name="harbor" w={358} h={170} />

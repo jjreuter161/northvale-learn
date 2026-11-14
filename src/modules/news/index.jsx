@@ -58,7 +58,7 @@ function Story({ item, t, onRead, read }) {
       <h3 style={{ fontSize: 18, fontWeight: 750, lineHeight: 1.3, margin: "6px 0 10px" }}>{item.headline || item.title}</h3>
       {item.headline && item.headline !== item.title && <p style={{ fontSize: 13, color: "var(--low)", margin: "-4px 0 10px", fontStyle: "italic" }}>“{item.title}”</p>}
       {item.summary && (
-        <div style={{ background: "var(--brandSoft)", borderRadius: 14, padding: "12px 14px" }}>
+        <div style={{ background: "var(--brandSoft)", borderRadius: 8, padding: "12px 14px" }}>
           <div style={{ fontSize: 13, fontWeight: 750, marginBottom: 4 }}>{t("news.means")}</div>
           <p style={{ margin: 0, fontSize: 16, lineHeight: 1.5 }}>{item.summary}</p>
         </div>

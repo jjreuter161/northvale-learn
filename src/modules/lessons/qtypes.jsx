@@ -51,7 +51,7 @@ addStrings({
 
 const at = (v, region) => (Array.isArray(v) ? v[region === "MX" ? 1 : 0] : v);
 const tx = (locale) => (x, vars) => text(x, locale, vars);
-const btn = { textAlign: "left", display: "flex", alignItems: "center", gap: 12, width: "100%", borderRadius: 14, padding: "14px 16px", fontSize: 16, fontWeight: 650, minHeight: 56, color: "var(--ink)", font: "inherit" };
+const btn = { textAlign: "left", display: "flex", alignItems: "center", gap: 12, width: "100%", borderRadius: 8, padding: "14px 16px", fontSize: 16, fontWeight: 650, minHeight: 56, color: "var(--ink)", font: "inherit" };
 const tone = (state) =>
   state === "right" ? { border: "2px solid var(--right)", background: "var(--rightSoft)" } : state === "wrong" ? { border: "2px dashed var(--warn)", background: "var(--warnSoft)" } : state === "on" ? { ...SELECTED, background: "var(--brandSoft)" } : { border: "2px solid transparent", background: "var(--surface)" };
 const Badge = ({ n, on }) => (
@@ -152,7 +152,7 @@ function EstimateView({ step, value, setValue, checked, t, locale, submit }) {
     </div>
   );
   return (
-    <div style={{ background: "var(--surface)", borderRadius: 18, padding: 18 }}>
+    <div style={{ background: "var(--surface)", borderRadius: 10, padding: 18 }}>
       {!checked ? (
         <>
           <div style={{ fontSize: 32, fontWeight: 750, letterSpacing: -0.6, textAlign: "center", fontVariantNumeric: "tabular-nums" }} aria-hidden>
@@ -235,7 +235,7 @@ const parseNum = (v) => Number(String(v).replace(/[,\s$%]/g, ""));
 function NumberView({ step, value, setValue, checked, right, t, locale, submit }) {
   const s = spec(step, locale.region);
   return (
-    <label style={{ display: "flex", alignItems: "center", gap: 8, borderRadius: 14, padding: "10px 16px", ...tone(checked ? (right ? "right" : "wrong") : value ? "on" : null) }}>
+    <label style={{ display: "flex", alignItems: "center", gap: 8, borderRadius: 8, padding: "10px 16px", ...tone(checked ? (right ? "right" : "wrong") : value ? "on" : null) }}>
       {s.unit === "money" && <span style={{ fontSize: 24, color: "var(--mid)", fontWeight: 650 }}>$</span>}
       <input data-q="number" inputMode="decimal" autoComplete="off" value={value} disabled={!!checked} onChange={(e) => setValue(e.target.value.slice(0, 14))} onKeyDown={(e) => e.key === "Enter" && submit()} aria-label={t("q.number.label")} placeholder="0" style={{ flex: 1, minWidth: 0, border: "none", background: "transparent", fontSize: 26, fontWeight: 750, color: "var(--ink)", outline: "none", fontVariantNumeric: "tabular-nums" }} />
       {s.unit === "percent" && <span style={{ fontSize: 24, color: "var(--mid)", fontWeight: 650 }}>%</span>}
@@ -256,7 +256,7 @@ function SpotView({ step, value, setValue, checked, t, locale }) {
   const lines = step.frame === "receipt";
   return (
     <div>
-      <div style={{ background: "var(--surface)", borderRadius: 18, padding: 14 }}>
+      <div style={{ background: "var(--surface)", borderRadius: 10, padding: 14 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "var(--mid)", marginBottom: 8 }}>
           <Icon name={FRAME_ICON[step.frame] || "chat"} size={15} /> {x(step.from)}
         </div>

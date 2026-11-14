@@ -56,6 +56,8 @@ addStrings({
   "badge.earned": S("Achievement: {name}", "Logro: {name}"),
 
   "brand.tagline": S("Find your open water", "Rumbo a mar abierto"),
+  "brand.line": S("Calm, practical money lessons in English and Spanish, made for life between the US and Mexico.", "Lecciones de dinero claras y prácticas, en español y en inglés, hechas para la vida entre México y Estados Unidos."),
+  "brand.promise": S("No ads. We never sell your data.", "Sin anuncios. Nunca vendemos tus datos."),
   "onb.tagline": S("Learn money by doing.", "Aprende de dinero practicando."),
   "onb.tagline.sub": S("Four-minute lessons, a goal to learn for, and practice with pretend money.", "Lecciones de cuatro minutos, una meta para aprender y dinero de práctica para probar."),
   "onb.step": S("{n} of {total}", "{n} de {total}"),

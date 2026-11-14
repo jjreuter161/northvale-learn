@@ -147,7 +147,7 @@ export default function Settings({ t, locale, go, layout }) {
                 <div style={{ display: "flex", alignItems: "flex-end", gap: 10, flexWrap: "wrap" }}>
                   <label style={{ flex: 1 }}>
                     <span style={{ display: "block", fontWeight: 650, marginBottom: 6 }}>{t("settings.reminder")}</span>
-                    <input type="time" value={time} onChange={(e) => setTime(e.target.value)} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 14, padding: "11px 12px", background: "var(--surface)", color: "var(--ink)" }} />
+                    <input type="time" value={time} onChange={(e) => setTime(e.target.value)} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 8, padding: "11px 12px", background: "var(--surface)", color: "var(--ink)" }} />
                   </label>
                   <Button size="md" onClick={() => downloadReminder(t, time)}>
                     {t("settings.reminder.add")}
@@ -189,7 +189,7 @@ export default function Settings({ t, locale, go, layout }) {
       </Sec>
 
       {/* Rarely needed: tucked away so the settings stay short. */}
-      {!desk && <button onClick={() => setMore(!more)} aria-expanded={more} className="nv-press" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", marginTop: 22, minHeight: 52, padding: "10px 16px", borderRadius: 18, border: "1px solid var(--line)", background: "var(--surface)", color: "var(--ink)", fontSize: 17, fontWeight: 700, cursor: "pointer", textAlign: "left" }}>
+      {!desk && <button onClick={() => setMore(!more)} aria-expanded={more} className="nv-press" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", marginTop: 22, minHeight: 52, padding: "10px 16px", borderRadius: 10, border: "1px solid var(--line)", background: "var(--surface)", color: "var(--ink)", fontSize: 17, fontWeight: 700, cursor: "pointer", textAlign: "left" }}>
         <span>
           {t("settings.more")}
           <span style={{ display: "block", fontSize: 13, fontWeight: 500, color: "var(--mid)" }}>{t("settings.more.sub")}</span>
@@ -353,8 +353,8 @@ function LookPicker({ t, settings, setSetting }) {
         {keys.map((k) => {
           const on = settings.look === k;
           return (
-            <button key={k} role="radio" aria-checked={on} onClick={() => (setSetting("look", k), k !== "auto" && setSetting("colors", { bg: PRESETS.find((p) => p.value === k).bg, text: PRESETS.find((p) => p.value === k).text, hi: PRESETS.find((p) => p.value === k).hi }))} className="nv-press" style={{ gridColumn: k === "auto" ? "1 / -1" : undefined, textAlign: "left", ...(on ? SELECTED : { border: "2px solid transparent", boxShadow: "var(--lift)" }), borderRadius: 20, padding: 8, background: "var(--surface)", cursor: "pointer", color: "var(--ink)" }}>
-              <span aria-hidden="true" style={{ display: "flex", height: k === "auto" ? 64 : 80, borderRadius: 14, overflow: "hidden" }}>
+            <button key={k} role="radio" aria-checked={on} onClick={() => (setSetting("look", k), k !== "auto" && setSetting("colors", { bg: PRESETS.find((p) => p.value === k).bg, text: PRESETS.find((p) => p.value === k).text, hi: PRESETS.find((p) => p.value === k).hi }))} className="nv-press" style={{ gridColumn: k === "auto" ? "1 / -1" : undefined, textAlign: "left", ...(on ? SELECTED : { border: "2px solid transparent", boxShadow: "var(--lift)" }), borderRadius: 10, padding: 8, background: "var(--surface)", cursor: "pointer", color: "var(--ink)" }}>
+              <span aria-hidden="true" style={{ display: "flex", height: k === "auto" ? 64 : 80, borderRadius: 8, overflow: "hidden" }}>
                 {k === "auto" ? (
                   <>
                     {mini(previews.white)}
@@ -375,7 +375,7 @@ function LookPicker({ t, settings, setSetting }) {
           );
         })}
       </div>
-      <button onClick={() => setOwn(!own)} aria-expanded={own} className="nv-press" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", marginTop: 12, minHeight: 48, padding: "10px 14px", borderRadius: 16, border: "1px solid var(--line)", background: "transparent", color: "var(--ink)", fontSize: 16, fontWeight: 650, cursor: "pointer", textAlign: "left" }}>
+      <button onClick={() => setOwn(!own)} aria-expanded={own} className="nv-press" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", marginTop: 12, minHeight: 48, padding: "10px 14px", borderRadius: 10, border: "1px solid var(--line)", background: "transparent", color: "var(--ink)", fontSize: 16, fontWeight: 650, cursor: "pointer", textAlign: "left" }}>
         <span>
           {t("look.own")}
           {settings.look === "custom" && <span style={{ display: "block", fontSize: 13, color: "var(--mid)", fontWeight: 500 }}>{[spec.bg, spec.text, spec.hi].map((id) => t(`look.c.${id}`)).join(" · ")}</span>}

@@ -196,7 +196,7 @@ export function RemitTool({ t, locale, onDone, done }) {
       <Slider label={t("remit.amount")} value={amount} min={50} max={1000} step={10} display={usd(amount)} onChange={(v) => (setAmount(v), touch())} />
       <div style={{ display: "flex", gap: 10, marginBottom: 12 }}>
         {svc.map((x, i) => (
-          <div key={x.n} style={{ flex: 1, border: `1px solid ${i === best ? "var(--accent)" : "var(--line)"}`, borderRadius: 12, padding: 12, background: i === best ? "var(--accentSoft)" : "var(--surface)" }}>
+          <div key={x.n} style={{ flex: 1, border: `1px solid ${i === best ? "var(--accent)" : "var(--line)"}`, borderRadius: 8, padding: 12, background: i === best ? "var(--accentSoft)" : "var(--surface)" }}>
             <div style={{ fontWeight: 650, marginBottom: 6 }}>{t("remit.service", { n: x.n })}{i === best ? ` · ${t("remit.best")}` : ""}</div>
             <div style={{ fontSize: 13, color: "var(--mid)", lineHeight: 1.4 }}>{t("remit.fee", { amount: usd(x.fee) })}</div>
             <div style={{ fontSize: 13, color: "var(--mid)", lineHeight: 1.4, minHeight: 52 }}>{t("remit.markup", { pct: pct(x.markupPct, locale), amount: usd((amount * x.markupPct) / 100) })}</div>
@@ -224,7 +224,7 @@ export function FeeTool({ t, locale, onDone, done }) {
   const yA = accountYear(A);
   const yB = accountYear(B);
   const box = (title, desc, year, best) => (
-    <div style={{ flex: 1, border: `1px solid ${best ? "var(--accent)" : "var(--line)"}`, borderRadius: 12, padding: 12, background: best ? "var(--accentSoft)" : "var(--surface)" }}>
+    <div style={{ flex: 1, border: `1px solid ${best ? "var(--accent)" : "var(--line)"}`, borderRadius: 8, padding: 12, background: best ? "var(--accentSoft)" : "var(--surface)" }}>
       <div style={{ fontWeight: 650 }}>{title}</div>
       <div style={{ fontSize: 13, color: "var(--mid)", lineHeight: 1.35, margin: "4px 0 8px", minHeight: 52 }}>{desc}</div>
       <div style={{ fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>{t("fee.year", { amount: fmt(year) })}</div>
@@ -328,7 +328,7 @@ export function ScamTool({ params = {}, t, locale, onDone, done }) {
           const verdict = checked && (l.flag ? (on ? "flag" : "missed") : on ? "fine" : null);
           const tone = verdict === "flag" ? ["var(--accent)", "var(--accentSoft)"] : verdict === "missed" || verdict === "fine" ? ["var(--warn)", "var(--warnSoft)"] : on ? ["var(--brand)", "var(--brandSoft)"] : ["var(--line)", "var(--surface)"];
           return (
-            <button key={i} disabled={checked} onClick={() => setPicked((p) => p.map((v, j) => (j === i ? !v : v)))} aria-pressed={on} className="nv-press" style={{ textAlign: "left", border: `${verdict === "flag" ? 2 : 1}px ${verdict === "missed" || verdict === "fine" ? "dashed" : "solid"} ${tone[0]}`, background: tone[1], color: "var(--ink)", borderRadius: 12, padding: "12px 14px", fontSize: 15, lineHeight: 1.4, cursor: checked ? "default" : "pointer", minHeight: 48 }}>
+            <button key={i} disabled={checked} onClick={() => setPicked((p) => p.map((v, j) => (j === i ? !v : v)))} aria-pressed={on} className="nv-press" style={{ textAlign: "left", border: `${verdict === "flag" ? 2 : 1}px ${verdict === "missed" || verdict === "fine" ? "dashed" : "solid"} ${tone[0]}`, background: tone[1], color: "var(--ink)", borderRadius: 8, padding: "12px 14px", fontSize: 15, lineHeight: 1.4, cursor: checked ? "default" : "pointer", minHeight: 48 }}>
               <span style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
                 <span style={{ flexShrink: 0, marginTop: 2, color: tone[0] }}>
                   <Icon name={on ? "flag" : "plus"} size={16} />
@@ -368,7 +368,7 @@ export function InsuranceTool({ t, locale, onDone, done }) {
   const yA = insuranceYear(A, costs);
   const yB = insuranceYear(B, costs);
   const plan = (name, p, y, best) => (
-    <div style={{ border: `1px solid ${best ? "var(--accent)" : "var(--line)"}`, background: best ? "var(--accentSoft)" : "var(--surface)", borderRadius: 12, padding: 12, marginBottom: 8 }}>
+    <div style={{ border: `1px solid ${best ? "var(--accent)" : "var(--line)"}`, background: best ? "var(--accentSoft)" : "var(--surface)", borderRadius: 8, padding: 12, marginBottom: 8 }}>
       <div style={{ fontSize: 14, color: "var(--mid)" }}>{t(name, { premium: fmt(p.premium), deductible: fmt(p.deductible) })}</div>
       <div style={{ fontWeight: 700, marginTop: 4, fontVariantNumeric: "tabular-nums" }}>{t("ins.year", { amount: fmt(y) })}</div>
     </div>

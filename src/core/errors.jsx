@@ -34,7 +34,7 @@ export class Boundary extends Component {
       <div style={{ padding: "40px 8px", textAlign: "center" }}>
         <p style={{ fontSize: 18, fontWeight: 650, margin: "0 0 8px" }}>{this.props.t("error.title")}</p>
         <p style={{ color: "var(--mid)", margin: "0 0 16px" }}>{this.props.t("error.body")}</p>
-        <button onClick={() => location.reload()} style={{ border: "none", borderRadius: 12, padding: "12px 18px", background: "var(--brand)", color: "var(--onBrand)", fontWeight: 650, fontSize: 15, cursor: "pointer" }}>
+        <button onClick={() => location.reload()} style={{ border: "none", borderRadius: 8, padding: "12px 18px", background: "var(--brand)", color: "var(--onBrand)", fontWeight: 650, fontSize: 15, cursor: "pointer" }}>
           {this.props.t("error.reload")}
         </button>
       </div>

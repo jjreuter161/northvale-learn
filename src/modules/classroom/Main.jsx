@@ -227,7 +227,7 @@ function JoinSheet({ t, go, initialCode, onClose }) {
           {!profile.ageBand && (
             <label style={{ display: "block", marginBottom: 14 }}>
               <span style={{ display: "block", fontSize: 14, fontWeight: 650, color: "var(--mid)", marginBottom: 6 }}>{t("onb.age.title")}</span>
-              <select required value={age} onChange={(e) => setAge(e.target.value)} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 10, padding: "13px 12px", background: "var(--surface)", color: "var(--ink)", fontSize: 16 }}>
+              <select required value={age} onChange={(e) => setAge(e.target.value)} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 6, padding: "13px 12px", background: "var(--surface)", color: "var(--ink)", fontSize: 16 }}>
                 <option value="" disabled>
                   {t("account.age.pick")}
                 </option>
@@ -497,7 +497,7 @@ function ClassAdmin({ t, locale, id, onBack }) {
           <div aria-label={t("cls.code")} style={{ fontSize: 40, fontWeight: 750, letterSpacing: 6, fontVariantNumeric: "tabular-nums", margin: "2px 0 10px" }}>{v.code}</div>
           <div style={{ fontSize: 13, color: "var(--mid)", fontWeight: 650 }}>{t("cls.t.link")}</div>
           <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 4 }}>
-            <div style={{ flex: 1, minWidth: 0, padding: "10px 12px", borderRadius: 12, background: "var(--surface2)", fontSize: 14, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{link}</div>
+            <div style={{ flex: 1, minWidth: 0, padding: "10px 12px", borderRadius: 8, background: "var(--surface2)", fontSize: 14, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{link}</div>
             <Button size="md" kind="secondary" aria-label={t("inv.copy")} onClick={() => navigator.clipboard.writeText(link).then(() => toast(t("cls.t.copied"), "good"), () => {})}>
               <Icon name="copy" size={18} />
             </Button>
@@ -535,7 +535,7 @@ function ClassAdmin({ t, locale, id, onBack }) {
           <form onSubmit={(e) => (e.preventDefault(), act(api("/api/teach/assign", { method: "POST", body: { id, unit, due } }), () => setUnit("")))} style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-end", marginTop: 10 }}>
             <label style={{ flex: 2, minWidth: 160 }}>
               <span style={{ display: "block", fontSize: 14, fontWeight: 650, color: "var(--mid)", marginBottom: 6 }}>{t("cls.t.unit")}</span>
-              <select required value={unit} onChange={(e) => setUnit(e.target.value)} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 10, padding: "12px", background: "var(--surface)", color: "var(--ink)", fontSize: 16 }}>
+              <select required value={unit} onChange={(e) => setUnit(e.target.value)} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 6, padding: "12px", background: "var(--surface)", color: "var(--ink)", fontSize: 16 }}>
                 <option value="" disabled>
                   {t("cls.t.unit")}
                 </option>
@@ -548,7 +548,7 @@ function ClassAdmin({ t, locale, id, onBack }) {
             </label>
             <label style={{ flex: 1, minWidth: 140 }}>
               <span style={{ display: "block", fontSize: 14, fontWeight: 650, color: "var(--mid)", marginBottom: 6 }}>{t("cls.t.due")}</span>
-              <input type="date" required min={dayKey()} value={due} onChange={(e) => setDue(e.target.value)} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 10, padding: "11px 12px", background: "var(--surface)", color: "var(--ink)", fontSize: 16 }} />
+              <input type="date" required min={dayKey()} value={due} onChange={(e) => setDue(e.target.value)} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 6, padding: "11px 12px", background: "var(--surface)", color: "var(--ink)", fontSize: 16 }} />
             </label>
             <Button size="md" type="submit">
               {t("cls.t.assign")}

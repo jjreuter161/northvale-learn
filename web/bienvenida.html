@@ -26,7 +26,6 @@
     <link rel="preload" href="/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
     <style>
       @font-face { font-family: "Inter"; font-weight: 100 900; font-display: swap; src: url(/fonts/inter-latin-wght-normal.woff2) format("woff2"); }
-      @font-face { font-family: "Fraunces"; font-weight: 100 900; font-display: swap; src: url(/fonts/fraunces-latin-soft-normal.woff2) format("woff2"); }
       @font-face { font-family: "EB Garamond"; font-weight: 600 700; font-display: swap; src: url(/fonts/eb-garamond-latin-600-normal.woff2) format("woff2"); }
       :root { --bg: #F7F2E8; --surface: #FFFDF8; --surface2: #EFE7D8; --ink: #1B3560; --head: #1B3560; --mid: #3e5376; --low: #546683; --line: #E3D9C6; --brand: #1B3560; --brandSoft: #EFE7D8; --accent: #1B3560; --accentSoft: #EFE7D8; --bad: #A21A22; --badSoft: #F6DAD5; --warnSoft: #EFE7D8; --fill: #C8202A }
       * { box-sizing: border-box }
@@ -44,12 +43,12 @@
       .mark small { font-family: Inter, sans-serif; font-size: 11px; font-weight: 650; letter-spacing: 2.5px; color: var(--low); margin-left: 6px; vertical-align: 3px }
       .grow { flex: 1 }
       .lang { font-size: 15px; font-weight: 600; text-decoration: none; padding: 10px 6px }
-      .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 22px; border-radius: 14px; border: 0; background: var(--fill); color: #F7F2E8; font: inherit; font-weight: 650; text-decoration: none; cursor: pointer }
-      .btn.small { min-height: 40px; padding: 0 16px; font-size: 15px; border-radius: 12px }
+      .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 22px; border-radius: 8px; border: 0; background: var(--fill); color: #F7F2E8; font: inherit; font-weight: 650; text-decoration: none; cursor: pointer }
+      .btn.small { min-height: 40px; padding: 0 16px; font-size: 15px; border-radius: 8px }
       .btn.secondary { background: var(--surface); color: var(--ink); border: 1px solid var(--line) }
       .btn:disabled { opacity: .45; cursor: default }
       .btn:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid #1B3560; outline-offset: 2px }
-      .pill { display: inline-block; font-size: 14px; font-weight: 650; color: var(--brand); background: var(--brandSoft); border-radius: 999px; padding: 5px 12px }
+      .pill { display: inline-block; font-size: 14px; font-weight: 650; color: var(--brand); background: var(--brandSoft); border-radius: 6px; padding: 5px 12px }
       h1, h2, h3 { color: var(--head) }
       .promise-line { margin: 18px 0 20px; padding-left: 14px; border-left: 4px solid var(--fill); font-size: 16.5px; color: var(--ink); max-width: 30em }
       .promise-line strong { color: var(--ink) }
@@ -61,42 +60,41 @@
       section { padding: 56px 0; scroll-margin-top: 60px }
       .hero { display: grid; gap: 28px; align-items: center; padding-top: 36px; padding-bottom: 48px }
       .hero .ctas { display: flex; flex-wrap: wrap; gap: 12px; align-items: center }
-      .phone { width: min(280px, 72vw); margin: 0 auto; border-radius: 30px; border: 8px solid var(--ink); background: var(--ink); overflow: hidden; box-shadow: 0 18px 40px rgba(11, 22, 38, .18) }
+      .phone { width: min(280px, 72vw); margin: 0 auto; border-radius: 22px; border: 8px solid var(--ink); background: var(--ink); overflow: hidden; box-shadow: 0 18px 40px rgba(11, 22, 38, .18) }
       .phone img { display: block; width: 100%; height: auto }
       .cards { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) }
-      .card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 20px }
+      .card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px }
       .card p { margin: 0; color: var(--mid); font-size: 16px }
-      .num { display: inline-flex; width: 30px; height: 30px; border-radius: 9px; background: var(--brandSoft); color: var(--brand); font-weight: 750; align-items: center; justify-content: center; margin-bottom: 10px; font-size: 15px }
+      .num { display: inline-flex; width: 30px; height: 30px; border-radius: 6px; background: var(--brandSoft); color: var(--brand); font-weight: 750; align-items: center; justify-content: center; margin-bottom: 10px; font-size: 15px }
       .shots { display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 4px 4px 14px; margin: 0 -4px }
       .shots figure { flex: 0 0 min(230px, 62vw); margin: 0; scroll-snap-align: start }
-      .shots .phone { width: 100%; border-width: 6px; border-radius: 24px; box-shadow: none }
+      .shots .phone { width: 100%; border-width: 6px; border-radius: 16px; box-shadow: none }
       figcaption { font-size: 15px; color: var(--mid); margin-top: 10px; text-align: center }
       .list { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px }
       .list li { display: flex; gap: 10px; align-items: flex-start }
       .list li::before { content: ""; flex: 0 0 8px; height: 8px; border-radius: 4px; background: var(--accent); margin-top: 9px }
       .band { background: var(--surface); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line) }
-      .note { background: var(--warnSoft); border-radius: 14px; padding: 14px 16px; font-size: 16px }
+      .note { background: var(--warnSoft); border-radius: 8px; padding: 14px 16px; font-size: 16px }
       form { display: grid; gap: 14px; max-width: 520px }
       label.f { display: grid; gap: 6px; font-size: 15px; font-weight: 650; color: var(--mid) }
-      input[type="email"], select { width: 100%; font: inherit; font-size: 16px; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px; min-height: 48px }
+      input[type="email"], select { width: 100%; font: inherit; font-size: 16px; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px; min-height: 48px }
       .check { display: flex; gap: 10px; align-items: flex-start; font-size: 16px; cursor: pointer }
       .check input { width: 22px; height: 22px; margin: 1px 0 0; accent-color: var(--brand); flex-shrink: 0 }
       .hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden }
-      .msg { border-radius: 12px; padding: 12px 14px; font-size: 16px; margin: 0 }
+      .msg { border-radius: 8px; padding: 12px 14px; font-size: 16px; margin: 0 }
       .msg.bad { background: var(--badSoft); color: var(--bad) }
       .msg.info { background: var(--brandSoft) }
-      .panel { background: var(--accentSoft); border-radius: 18px; padding: 22px; max-width: 520px }
+      .panel { background: var(--accentSoft); border-radius: 12px; padding: 22px; max-width: 520px }
       .panel:focus { outline: none }
       .linkish { background: none; border: 0; padding: 8px 0; font: inherit; font-size: 15px; color: var(--brand); text-decoration: underline; cursor: pointer }
       footer { padding: 36px 0 calc(40px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); font-size: 15px; color: var(--mid) }
       footer nav { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 12px }
       .btn { white-space: nowrap }
       @media (max-width: 440px) { header .btn { display: none } }
-      h1, h2 { font-family: Fraunces, Georgia, serif; font-variation-settings: "SOFT" 100, "WONK" 0; font-weight: 620 }
-      .btn { border-radius: 16px; box-shadow: 0 3px 0 #10223F; transition: transform .12s, box-shadow .12s }
-      .btn.secondary { box-shadow: 0 3px 0 var(--line) }
-      .btn:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 #10223F }
-      .card { border-radius: 22px }
+      h1, h2 { font-weight: 650; letter-spacing: -.022em }
+      .btn { border-radius: 8px; transition: filter .15s }
+      .btn:active:not(:disabled) { filter: brightness(.92) }
+      .card { border-radius: 12px }
       /* The sea: under the hero, and at the end of the brand story (two places only). */
       .sea { position: relative; height: 120px; background: linear-gradient(var(--bg), #E8EDF4); overflow: hidden }
       .sea .waves { position: absolute; inset: 0; width: 100%; height: 100% }

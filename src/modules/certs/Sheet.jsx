@@ -169,7 +169,7 @@ export default function CertSheet({ t, locale, go, onClose }) {
   };
 
   const chip = (value, label) => (
-    <button key={value} role="radio" aria-checked={choice === value} onClick={() => setChoice(value)} className="nv-press" style={{ display: "block", width: "100%", textAlign: "left", minHeight: 48, padding: "10px 14px", borderRadius: 14, ...(choice === value ? SELECTED : { border: "2px solid var(--line)" }), background: choice === value ? "var(--brandSoft)" : "var(--surface)", color: "var(--ink)", fontSize: 16, fontWeight: 650, cursor: "pointer" }}>
+    <button key={value} role="radio" aria-checked={choice === value} onClick={() => setChoice(value)} className="nv-press" style={{ display: "block", width: "100%", textAlign: "left", minHeight: 48, padding: "10px 14px", borderRadius: 8, ...(choice === value ? SELECTED : { border: "2px solid var(--line)" }), background: choice === value ? "var(--brandSoft)" : "var(--surface)", color: "var(--ink)", fontSize: 16, fontWeight: 650, cursor: "pointer" }}>
       {label}
     </button>
   );
@@ -230,7 +230,7 @@ export default function CertSheet({ t, locale, go, onClose }) {
             {chip("none", t("cert.name.none"))}
           </div>
           {isAdult && choice === "real" && (
-            <input value={realName} onChange={(e) => setRealName(e.target.value)} placeholder={t("cert.name.real.ph")} aria-label={t("cert.name.real.ph")} maxLength={60} autoComplete="name" style={{ width: "100%", boxSizing: "border-box", marginTop: 10, minHeight: 48, borderRadius: 14, border: "1px solid var(--line)", background: "var(--surface)", color: "var(--ink)", padding: "0 14px", fontSize: 16 }} />
+            <input value={realName} onChange={(e) => setRealName(e.target.value)} placeholder={t("cert.name.real.ph")} aria-label={t("cert.name.real.ph")} maxLength={60} autoComplete="name" style={{ width: "100%", boxSizing: "border-box", marginTop: 10, minHeight: 48, borderRadius: 8, border: "1px solid var(--line)", background: "var(--surface)", color: "var(--ink)", padding: "0 14px", fontSize: 16 }} />
           )}
           <Note icon="shield" style={{ marginTop: 12 }}>{t(isAdult ? "cert.name.adult" : "cert.name.teen")}</Note>
           {error && <p role="alert" style={{ color: "var(--ink)", fontWeight: 650, margin: "10px 0 0" }}>{error}</p>}
@@ -244,7 +244,7 @@ export default function CertSheet({ t, locale, go, onClose }) {
       {view.id === "cert" && !cert && <Loading label={t("cert.title")} size={30} />}
       {view.id === "cert" && cert && (
         <>
-          <div style={{ aspectRatio: "1600 / 1131", borderRadius: 12, overflow: "hidden", background: "var(--bg)", border: "1px solid var(--line)", marginBottom: 12 }}>
+          <div style={{ aspectRatio: "1600 / 1131", borderRadius: 8, overflow: "hidden", background: "var(--bg)", border: "1px solid var(--line)", marginBottom: 12 }}>
             {img ? <img src={img.url} alt={t("cert.img.alt", { title: text(tr.title, locale), date: dateText })} style={{ width: "100%", height: "100%", display: "block" }} /> : <Loading label={t("cert.title")} size={30} />}
           </div>
           <p style={{ margin: "0 0 2px", fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>{t("cert.code", { code: pretty(cert.code) })}</p>

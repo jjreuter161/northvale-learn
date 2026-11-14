@@ -10,6 +10,7 @@ import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { chromium } from "playwright-core";
+import * as P from "../src/modules/goals/plan.js";
 
 const ROOT = join(import.meta.dirname, "..");
 const port = 30000 + Math.floor(Math.random() * 20000);
@@ -27,7 +28,7 @@ const learner = (lang, region) => ({
   profile: { onboarded: true, nickname: "Dani", ageBand: "18-25", avatar: 0, ageAsked: true, remindAsked: true, seenIntros: { practice: true, portfolio: true, tools: true, news: true, goals: true } },
   settings: { lang, region, look: "white", reduceMotion: true, analytics: false },
   progress: { xp: 200, days: Object.fromEntries(days.map((x) => [x, 25])), streak: { count: 5, last: d(0), best: 5, frozen: [] }, freezes: 1, dailyGoal: 20, lessons: Object.fromEntries(done.map((id) => [id, { done: true, at: d(8), last: d(8), best: 0, times: 1 }])), lessonDays: days, badges: { first_lesson: d(8) }, counters: { lessons: done.length }, practiced: {}, startUnit: "budget", placed: [], seen: d(0) },
-  modules: { goals: { goals: [{ id: "g1", template: "car", name: lang === "es" ? "Mi primer carro" : "My first car", currency: region === "MX" ? "MXN" : "USD", target: region === "MX" ? 60000 : 4000, months: 18, start: 0, path: "save", createdAt: d(30), contributions: [{ date: d(20), amount: region === "MX" ? 8000 : 600 }] }], checkIn: d(0) }, feedback: { pending: [], survey: "skipped" } },
+  modules: { goals: { goals: [{ ...P.newGoal({ id: "g1", templateId: "car", name: lang === "es" ? "Mi primer carro" : "My first car", target: region === "MX" ? 60000 : 4000, months: 18, start: 0, path: "save", today: d(30), region }), contributions: [{ date: d(20), amount: region === "MX" ? 8000 : 600 }] }], checkIn: d(0) }, feedback: { pending: [], survey: "skipped" } },
 });
 const SIZES = [["phone", 390, 844], ["tablet", 820, 1180], ["laptop", 1366, 768], ["desktop", 1920, 1080]];
 const open = async (w, h, lang = "en", extra = {}) => {
@@ -114,7 +115,7 @@ try {
     assert.ok(card.width <= 701, `${name}: Today's column is ${Math.round(card.width)}px (at most 700)`);
     assert.ok(today.left >= 0);
     await fits(page, `${name}: Today`);
-    if (computer) assert.equal(await page.getByText(/more islands? in the mist/).count(), 0, `${name}: every island is shown`);
+    if (computer) assert.equal(await page.getByText(/^Show \d+ more units?$/).count(), 0, `${name}: every island is shown`);
 
     // --- the other tabs ---
     for (const t of ["goals", "practice", "me"]) {
@@ -222,6 +223,52 @@ try {
     await fits(page, "200%: Settings");
     await ctx.close();
     console.log("ok: a laptop zoomed to 200% (683px) switches to the tablet layout; every tab and Settings fit");
+  }
+
+  // --- resizing the window never loses your place: in setup, in Settings, in a lesson ---
+  {
+    const ctx = await browser.newContext({ viewport: { width: 1366, height: 768 }, serviceWorkers: "block", reducedMotion: "reduce" });
+    const page = await ctx.newPage();
+    page.setDefaultTimeout(8000);
+    await page.goto(BASE);
+    await page.getByRole("button", { name: /Get started/ }).click();
+    await page.getByRole("radio").first().click();
+    assert.equal(await page.locator(".nv-brand").count(), 1, "the brand is on the left of setup on a laptop");
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.waitForTimeout(300);
+    assert.equal(await page.locator(".nv-brand").count(), 0, "on a phone, setup is just the form");
+    assert.equal(await page.getByRole("radio", { checked: true }).count(), 1, "shrinking the window kept the answer picked in setup");
+    await page.getByRole("button", { name: "Check", exact: true }).click();
+    await page.setViewportSize({ width: 1366, height: 768 });
+    await page.waitForTimeout(300);
+    assert.ok(await page.getByRole("button", { name: "Continue", exact: true }).count(), "growing the window kept the checked answer");
+    await ctx.close();
+    const { ctx: c2, page: p2 } = await open(1366, 768);
+    await openSettings(p2, "en");
+    await p2.getByRole("navigation", { name: "Settings" }).getByRole("button", { name: "Colors" }).click();
+    await p2.setViewportSize({ width: 390, height: 844 });
+    await p2.waitForTimeout(300);
+    assert.ok(await p2.getByRole("heading", { name: "Settings" }).count(), "shrinking kept you in Settings");
+    assert.ok(await p2.getByRole("radiogroup", { name: "Colors" }).count(), "and the Colors section is on the page");
+    await p2.setViewportSize({ width: 1366, height: 768 });
+    await p2.waitForTimeout(300);
+    assert.ok(await p2.getByRole("radiogroup", { name: "Colors" }).count(), "growing again kept the picked section");
+    await tab(p2, "en", "learn");
+    await startLesson(p2);
+    await p2.keyboard.press("Enter");
+    await p2.setViewportSize({ width: 390, height: 844 });
+    await p2.waitForTimeout(300);
+    assert.equal(await p2.locator("[data-player]").count(), 1, "shrinking kept the lesson open");
+    await p2.setViewportSize({ width: 1366, height: 768 });
+    await p2.waitForTimeout(300);
+    assert.equal(await p2.locator("[data-player]").count(), 1, "and growing did too");
+    await c2.close();
+    // The panel beside Today fits a short window (and scrolls on its own if it must).
+    const { ctx: c3, page: p3 } = await open(1366, 560);
+    const pb = await p3.locator('aside[aria-label="At a glance"]').evaluate((el) => ({ bottom: el.getBoundingClientRect().bottom, overflowY: getComputedStyle(el).overflowY }));
+    assert.ok(pb.bottom <= 561 && pb.overflowY === "auto", `the panel fits a 560px-tall window and scrolls on its own (${JSON.stringify(pb)})`);
+    await c3.close();
+    console.log("ok: resizing the window (laptop to phone and back) keeps your place in setup, in Settings and in a lesson");
   }
 
   // --- Spanish, the longer language: a phone and a laptop ---

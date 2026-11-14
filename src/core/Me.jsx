@@ -88,6 +88,27 @@ function League({ t, session, go }) {
 // friends here (nothing anyone had disappears).
 export const leagueOpen = (progress, session) => (progress.lessonDays || []).length >= 3 || !!service("classroom", "inClass")() || !!(session.user && session.user.league && session.user.league !== "everyone");
 
+// A row of badges, earned ones first, on the Me page: what's earned and what's next.
+function BadgePreview({ t, progress, go }) {
+  const sorted = [...BADGES].sort((a, b) => !!progress.badges[b.id] - !!progress.badges[a.id]).slice(0, 8);
+  const got = BADGES.filter((b) => progress.badges[b.id]).length;
+  return (
+    <Card pad={16} onClick={() => go("me", { section: "achievements" })}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+        <span style={{ fontWeight: 700 }}>{t("me.badges.n", { n: got, total: BADGES.length })}</span>
+        <Icon name="next" size={18} color="var(--low)" />
+      </div>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+        {sorted.map((b) => (
+          <span key={b.id} title={t(`badge.${b.id}`)} style={{ display: "inline-flex" }}>
+            <Badge id={b.id} size={44} locked={!progress.badges[b.id]} />
+          </span>
+        ))}
+      </div>
+    </Card>
+  );
+}
+
 function Badges({ t, progress }) {
   return (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(96px, 1fr))", gap: 10 }}>
@@ -95,7 +116,7 @@ function Badges({ t, progress }) {
         const got = progress.badges[b.id];
         const Tile = got ? "button" : "div";
         return (
-          <Tile key={b.id} title={t(`badge.${b.id}.how`)} {...(got ? { onClick: () => openShare({ kind: "badge", name: t(`badge.${b.id}`) }), className: "nv-press" } : {})} style={{ background: "var(--surface)", border: "none", borderRadius: 24, boxShadow: "var(--lift)", padding: "14px 8px", textAlign: "center", color: "var(--ink)", font: "inherit", cursor: got ? "pointer" : "default" }}>
+          <Tile key={b.id} title={t(`badge.${b.id}.how`)} {...(got ? { onClick: () => openShare({ kind: "badge", name: t(`badge.${b.id}`) }), className: "nv-press" } : {})} style={{ background: "var(--surface)", border: "none", borderRadius: 12, boxShadow: "var(--lift)", padding: "14px 8px", textAlign: "center", color: "var(--ink)", font: "inherit", cursor: got ? "pointer" : "default" }}>
             <div style={{ display: "flex", justifyContent: "center" }}>
               <Badge id={b.id} size={64} locked={!got} />
             </div>
@@ -109,7 +130,7 @@ function Badges({ t, progress }) {
   );
 }
 
-export default function Me({ t, locale, session, go, route }) {
+export default function Me({ t, locale, session, go, route, layout }) {
   const profile = useAppState((s) => s.profile);
   const progress = useAppState((s) => s.progress);
   const section = route && route.params.section;
@@ -189,6 +210,17 @@ export default function Me({ t, locale, session, go, route }) {
           })}
         </div>
       </Card>
+      {layout !== "phone" && (
+        <>
+          <Label>{t("me.section.achievements")}</Label>
+          <BadgePreview t={t} progress={progress} go={go} />
+          {cards.map((m) => (
+            <div key={m.id} style={{ marginTop: 16 }}>
+              <m.MeCard t={t} locale={locale} go={go} />
+            </div>
+          ))}
+        </>
+      )}
       </div>
 
       <div>

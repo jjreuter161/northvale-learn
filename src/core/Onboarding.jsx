@@ -13,14 +13,23 @@ import { LATEST_NOTE } from "./whatsnew.jsx";
 import { AccountForm } from "./Account.jsx";
 import { track } from "./analytics.js";
 import { useLayout } from "./layout.js";
+import Split from "./Split.jsx";
 import { allModules } from "./registry.js";
 
 const ORDER = ["lessons", "goals"]; // the warm-up question first, then what you want money skills for
 const rank = (m) => (ORDER.includes(m.id) ? ORDER.indexOf(m.id) : ORDER.length);
 
-export default function Onboarding({ t, locale, onDone }) {
-  const [step, setStep] = useState(0);
+export default function Onboarding(props) {
   const phone = useLayout() === "phone";
+  return (
+    <Split t={props.t} phone={phone}>
+      <Steps {...props} phone={phone} />
+    </Split>
+  );
+}
+
+function Steps({ t, locale, onDone, phone }) {
+  const [step, setStep] = useState(0);
   const [reason, setReason] = useState("curious");
   const [startUnit, setStartUnit] = useState("budget");
   const [signingIn, setSigningIn] = useState(false);
@@ -37,7 +46,7 @@ export default function Onboarding({ t, locale, onDone }) {
   };
 
   const wrap = (children) => (
-    <div className="nv-in" key={step} style={{ maxWidth: 520, margin: "0 auto", minHeight: "100dvh", display: "flex", flexDirection: "column", padding: "calc(16px + env(safe-area-inset-top)) 18px calc(20px + env(safe-area-inset-bottom))" }}>
+    <div className="nv-in" key={step} style={phone ? { maxWidth: 520, margin: "0 auto", minHeight: "100dvh", display: "flex", flexDirection: "column", padding: "calc(16px + env(safe-area-inset-top)) 18px calc(20px + env(safe-area-inset-bottom))" } : { width: "100%", maxWidth: 480, display: "flex", flexDirection: "column", padding: "24px 0" }}>
       {children}
     </div>
   );
@@ -57,9 +66,9 @@ export default function Onboarding({ t, locale, onDone }) {
     </>
   );
   const option = (key, icon, label, sub, onClick) => (
-    <button key={key} onClick={onClick} className="nv-press" style={{ display: "flex", alignItems: "center", gap: 14, width: "100%", textAlign: "left", border: "1px solid var(--line)", background: "var(--surface)", color: "var(--ink)", borderRadius: 14, padding: "14px 16px", marginBottom: 10, cursor: "pointer", minHeight: 64 }}>
+    <button key={key} onClick={onClick} className="nv-press" style={{ display: "flex", alignItems: "center", gap: 14, width: "100%", textAlign: "left", border: "1px solid var(--line)", background: "var(--surface)", color: "var(--ink)", borderRadius: 8, padding: "14px 16px", marginBottom: 10, cursor: "pointer", minHeight: 64 }}>
       {icon && (
-        <span style={{ width: 38, height: 38, borderRadius: 10, background: "var(--brandSoft)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+        <span style={{ width: 38, height: 38, borderRadius: 6, background: "var(--brandSoft)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
           <Icon name={icon} size={20} />
         </span>
       )}
@@ -84,19 +93,21 @@ export default function Onboarding({ t, locale, onDone }) {
 
   if (step === 0)
     return (
-      <div className="nv-in" style={{ maxWidth: 520, margin: "0 auto", minHeight: "100dvh", display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", padding: "0 22px calc(24px + env(safe-area-inset-bottom))" }}>
+      <div className="nv-in" style={phone ? { maxWidth: 520, margin: "0 auto", minHeight: "100dvh", display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", padding: "0 22px calc(24px + env(safe-area-inset-bottom))" } : { width: "100%", maxWidth: 480, display: "flex", flexDirection: "column", gap: 28, padding: "24px 0" }}>
         {/* The logo's boat out on open water (a picture; the name follows). */}
-        {phone ? (
+        {phone && (
           <div style={{ width: "calc(100% + 44px)", margin: "0 -22px", background: "var(--artSky)", paddingTop: "env(safe-area-inset-top)" }}>
             <Scene name="welcome" w={390} h={280} style={{ height: "min(30dvh, 260px)", width: "100%" }} />
           </div>
-        ) : (
-          // Bigger screens: the whole picture, as a rounded card (not cropped to a strip).
-          <div style={{ width: 390, maxWidth: "100%", margin: "28px auto 0", borderRadius: 28, overflow: "hidden", background: "var(--artSky)" }}>
-            <Scene name="welcome" w={390} h={280} style={{ height: "auto", width: "100%" }} />
+        )}
+        {!phone && (
+          // On a computer the brand is the left half; here only what to do.
+          <div>
+            <h1 className="nv-disp" style={{ fontSize: 38, lineHeight: 1.1, margin: 0 }}>{t("onb.tagline")}</h1>
+            <p style={{ fontSize: 18, color: "var(--mid)", lineHeight: 1.5, margin: "12px 0 0" }}>{t("onb.tagline.sub")}</p>
           </div>
         )}
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: 10, paddingTop: 8 }}>
+        {phone && <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: 10, paddingTop: 8 }}>
           <Wordmark size={50} />
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <span style={{ fontSize: 13, fontWeight: 650, letterSpacing: 4, color: "var(--low)" }}>LEARN</span> <BetaTag label={t("common.beta")} />
@@ -104,7 +115,7 @@ export default function Onboarding({ t, locale, onDone }) {
           <div style={{ fontSize: 15, color: "var(--mid)", marginTop: 2 }}>{t("brand.tagline")}</div>
           <h1 className="nv-disp" style={{ fontSize: 32, lineHeight: 1.12, margin: "26px 0 0" }}>{t("onb.tagline")}</h1>
           <p style={{ fontSize: 17, color: "var(--mid)", maxWidth: 340, lineHeight: 1.45, margin: "4px 0 0" }}>{t("onb.tagline.sub")}</p>
-        </div>
+        </div>}
         <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 10 }}>
           <Button full onClick={() => setStep(1)}>
             {t("onb.start")}
@@ -112,7 +123,7 @@ export default function Onboarding({ t, locale, onDone }) {
           <Button full kind="secondary" onClick={() => setSigningIn(true)}>
             {t("onb.have_account")}
           </Button>
-          <div style={{ display: "flex", justifyContent: "center", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", justifyContent: phone ? "center" : "flex-start", gap: 6, marginTop: 8, flexWrap: "wrap", marginLeft: phone ? 0 : -8 }}>
             {Object.entries(LANGS).map(([k, name]) => (
               <button key={k} onClick={() => setSetting("lang", k)} aria-pressed={locale.lang === k} style={chip(locale.lang === k)}>
                 {locale.lang === k && <Chosen size={14} />}
@@ -156,4 +167,4 @@ export default function Onboarding({ t, locale, onDone }) {
   );
 }
 
-const chip = (on) => ({ ...(on ? SELECTED : { border: "2px solid transparent" }), display: "inline-flex", alignItems: "center", gap: 5, background: on ? "var(--brandSoft)" : "transparent", color: "var(--ink)", borderRadius: 999, padding: "8px 12px", fontWeight: 600, fontSize: 14, cursor: "pointer", minHeight: 40 });
+const chip = (on) => ({ ...(on ? SELECTED : { border: "2px solid transparent" }), display: "inline-flex", alignItems: "center", gap: 5, background: on ? "var(--brandSoft)" : "transparent", color: "var(--ink)", borderRadius: 8, padding: "8px 12px", fontWeight: 600, fontSize: 14, cursor: "pointer", minHeight: 40 });

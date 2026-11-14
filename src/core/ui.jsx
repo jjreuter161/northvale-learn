@@ -5,6 +5,7 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { lookFrom, specFor } from "./colors.js";
 import { MARK_PATHS, UNIT_ART, BADGE_ART, SCENE, wave } from "./art.js";
 import { createPortal } from "react-dom";
+import { useLayout } from "./layout.js";
 
 // THE LOOK — three colors (navy, cream, signal red; colors.js): the app's CSS
 // variables come from `lookFrom(background, text, highlight)`. Words, icons and
@@ -39,9 +40,9 @@ export const AVATARS = ["#1B3560", "#2D4D86", "#46679F", "#10223F", "#A21A22", "
 
 export const FONT = "'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif";
 export const SERIF = "'EB Garamond', Georgia, serif";
-// Headings and big numbers: Fraunces with its soft corners (self-hosted,
-// web/fonts; SIL Open Font License). Only at 20px and up.
-export const DISPLAY = "'Fraunces', Georgia, serif";
+// Headings and big numbers: Inter, set heavier and tighter (self-hosted, web/fonts; SIL Open Font License).
+// The other option: EB Garamond, the logo's face (add ?heading=serif to the address to look, or set it in code).
+export const DISPLAY = FONT;
 
 export const GLOBAL_CSS = `
 *{box-sizing:border-box}
@@ -52,34 +53,26 @@ button{font-family:inherit}
 input,select,textarea{font-family:inherit;font-size:16px}
 :focus-visible{outline:3px solid var(--focus);outline-offset:2px}
 h1,h2{color:var(--head)}
-.nv-disp{font-family:${DISPLAY};font-variation-settings:"SOFT" 100,"WONK" 0;font-weight:620;letter-spacing:-.3px}
-.nv-btn{box-shadow:0 0 0 var(--ring,0px) var(--ringc,transparent),0 3px 0 var(--btn-edge,transparent);transition:transform .12s ease-out,box-shadow .12s ease-out}
-.nv-btn:active:not(:disabled){transform:translateY(2px);box-shadow:0 0 0 var(--ring,0px) var(--ringc,transparent),0 1px 0 var(--btn-edge,transparent)}
-.nv-ripple{border-radius:50%;animation:nvRipple .8s ease-out 1}
-.nv-bob{animation:nvBob 1.6s ease-in-out infinite;transform-origin:50% 90%}
-.nv-drift{animation:nvDrift 2.4s ease-in-out 2 alternate}
-.nv-twinkle{animation:nvTwinkle .7s ease-out 1;transform-box:fill-box;transform-origin:center}
+.nv-disp{font-family:${DISPLAY};font-weight:650;letter-spacing:-.022em}
+html[data-heading="serif"] .nv-disp{font-family:${SERIF};font-weight:700;letter-spacing:-.005em;font-size-adjust:.5}
+.nv-btn{box-shadow:0 0 0 var(--ring,0px) var(--ringc,transparent);transition:filter .15s ease-out,background-color .15s ease-out}
+.nv-btn:active:not(:disabled){filter:brightness(.92)}
+
 .nv-glide{transition:transform .7s cubic-bezier(.3,.8,.3,1)}
-.nv-beam{transform-box:view-box;animation:nvSweep 3s ease-in-out infinite alternate}
-.nv-water{animation:nvWater 7s ease-in-out infinite alternate}
-@keyframes nvRipple{from{box-shadow:0 0 0 0 color-mix(in srgb,var(--right) 45%,transparent)}to{box-shadow:0 0 0 16px transparent}}
-@keyframes nvBob{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-3px) rotate(5deg)}}
-@keyframes nvDrift{from{transform:translateX(0)}to{transform:translateX(-36px)}}
-@keyframes nvTwinkle{0%,100%{transform:scale(1)}45%{transform:scale(1.6) rotate(45deg)}}
-@keyframes nvSweep{0%{transform:rotate(-24deg);opacity:.65}50%{opacity:1}100%{transform:rotate(24deg);opacity:.65}}
-@keyframes nvWater{from{transform:translateX(0)}to{transform:translateX(-14px)}}
-@keyframes nvSpring{0%{transform:translateY(100%)}75%{transform:translateY(-5px)}100%{transform:none}}
-.nv-press{transition:transform .15s cubic-bezier(.2,.7,.2,1),filter .15s;-webkit-tap-highlight-color:transparent}
-.nv-press:active{transform:scale(.98);filter:brightness(.97)}
+@keyframes nvSpring{from{transform:translateY(16px);opacity:0}to{transform:none;opacity:1}}
+.nv-press{transition:filter .15s ease-out;-webkit-tap-highlight-color:transparent}
+.nv-press:active{filter:brightness(.96)}
 .nv-in{animation:nvIn .2s ease-out both}
 .nv-pop{animation:nvIn .2s ease-out both}
 @keyframes nvIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 @keyframes nvFade{from{opacity:0}to{opacity:1}}
 @media (prefers-reduced-motion: reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 .nv-reduce *{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
-@media (prefers-reduced-motion: reduce){.nv-beam,.nv-water{animation:none!important}}
-.nv-reduce .nv-beam,.nv-reduce .nv-water{animation:none!important}
 .nv-list>*+*{border-top:1px solid var(--line)}
+.nv-scene{max-height:132px}
+.nv-split{display:grid;grid-template-columns:minmax(380px,5fr) 6fr;min-height:100dvh}
+.nv-brand{background:var(--brand);color:var(--onBrand);display:flex;flex-direction:column;justify-content:space-between;gap:40px;padding:56px;position:sticky;top:0;height:100dvh;align-self:start}
+.nv-formside{display:flex;align-items:center;justify-content:center;padding:40px 48px}
 @media (max-width:280px){.nv-word{display:none}}.nv-hdr{container-type:inline-size}@container (max-width:215px){.nv-beta{display:none}}@container (max-width:160px){.nv-hdr .nv-word{display:none}}
 .nv-sr{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .nv-app{min-height:100dvh}
@@ -87,12 +80,12 @@ h1,h2{color:var(--head)}
 .nv-side{position:sticky;top:0;height:100dvh;display:flex;flex-direction:column;gap:4px;padding:20px 14px 18px;border-right:1px solid var(--line);overflow-y:auto}
 .nv-sidebtn{display:flex;align-items:center;gap:12px;width:100%;min-height:48px;padding:0 14px;border:2px solid transparent;border-radius:14px;background:transparent;color:var(--low);font:inherit;font-size:16px;font-weight:650;cursor:pointer;text-align:left}
 .nv-learn{display:grid;grid-template-columns:minmax(0,700px);justify-content:center;gap:32px}
-@media(min-width:1180px){.nv-learn{grid-template-columns:minmax(0,700px) 300px;align-items:start}.nv-learn>aside{position:sticky;top:76px;display:flex;flex-direction:column;gap:14px}}
+@media(min-width:1180px){.nv-learn{grid-template-columns:minmax(0,700px) 300px;align-items:start}.nv-learn>aside{position:sticky;top:76px;display:flex;flex-direction:column;gap:14px;max-height:calc(100dvh - 92px);overflow-y:auto;padding:2px}}
 .nv-cols{display:block}
 @media(min-width:600px){.nv-cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;align-items:start}.nv-cols>.nv-span{grid-column:1/-1}.nv-cols>div>:first-child{margin-top:0!important}}
 @media(min-width:1024px){.nv-cols.nv-c3{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .nv-sheetwrap{align-items:flex-end}
-@media(min-width:700px){.nv-sheetwrap{align-items:center}.nv-sheet{border-radius:24px!important;padding-bottom:22px!important;max-height:min(88dvh,760px)!important;animation:nvIn .22s ease-out both!important;box-shadow:var(--lift)}.nv-grab{display:none}}
+@media(min-width:700px){.nv-sheetwrap{align-items:center}.nv-sheet{border-radius:12px!important;padding-bottom:22px!important;max-height:min(88dvh,760px)!important;animation:nvIn .18s ease-out both!important;box-shadow:var(--lift)}.nv-grab{display:none}}
 @media(min-width:1024px){.nv-ovl{padding-top:40px!important;padding-bottom:28px!important}}
 @media(hover:hover) and (pointer:fine){.nv-press:hover:not(:disabled){filter:brightness(.97)}.nv-btn.nv-press:hover:not(:disabled){filter:brightness(1.07)}.nv-list>.nv-press:hover{background:var(--bg)!important}.nv-sidebtn:not([aria-current]):hover{background:var(--surface);color:var(--ink)}.nv-hit:hover{background:color-mix(in srgb,var(--artPaper) 32%,transparent)!important;outline:2px solid var(--artSea2)}}
 `;
@@ -207,7 +200,7 @@ export function Button({ kind = "primary", size = "lg", full, disabled, onClick,
 export function Card({ children, style, onClick, pad = 18, ...rest }) {
   const Tag = onClick ? "button" : "div";
   return (
-    <Tag className={onClick ? "nv-press" : undefined} onClick={onClick} style={{ display: "block", width: "100%", textAlign: "left", background: "var(--surface)", border: "none", borderRadius: 24, boxShadow: "var(--lift)", padding: pad, color: "var(--ink)", font: "inherit", cursor: onClick ? "pointer" : undefined, ...style }} {...rest}>
+    <Tag className={onClick ? "nv-press" : undefined} onClick={onClick} style={{ display: "block", width: "100%", textAlign: "left", background: "var(--surface)", border: "none", borderRadius: 12, boxShadow: "var(--lift)", padding: pad, color: "var(--ink)", font: "inherit", cursor: onClick ? "pointer" : undefined, ...style }} {...rest}>
       {children}
     </Tag>
   );
@@ -215,7 +208,7 @@ export function Card({ children, style, onClick, pad = 18, ...rest }) {
 
 // A list in one card, rows split by hairlines (the one list style).
 export const List = ({ children, style }) => (
-  <div className="nv-list" style={{ background: "var(--surface)", borderRadius: 24, boxShadow: "var(--lift)", overflow: "hidden", ...style }}>
+  <div className="nv-list" style={{ background: "var(--surface)", borderRadius: 12, boxShadow: "var(--lift)", overflow: "hidden", ...style }}>
     {children}
   </div>
 );
@@ -227,7 +220,7 @@ export function ListRow({ icon, title, sub, onClick, right, locked, isNew, label
   return (
     <Tag onClick={locked ? undefined : onClick} className={onClick && !locked ? "nv-press" : undefined} aria-label={label} style={{ display: "flex", alignItems: "center", gap: 12, width: "100%", textAlign: "left", border: "none", background: "transparent", color: "var(--ink)", padding: "13px 16px", minHeight: 60, font: "inherit", cursor: onClick && !locked ? "pointer" : "default" }}>
       {icon && (
-        <span style={{ width: 38, height: 38, borderRadius: 12, background: "var(--bg)", color: locked ? "var(--low)" : "var(--ink)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+        <span style={{ width: 38, height: 38, borderRadius: 8, background: "var(--bg)", color: locked ? "var(--low)" : "var(--ink)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
           <Icon name={locked ? "lock" : icon} size={19} />
         </span>
       )}
@@ -269,7 +262,7 @@ export function Ring({ value, max = 1, size = 56, stroke = 7, color = "var(--acc
 
 export function Chip({ active, onClick, children, style }) {
   return (
-    <button className="nv-press" onClick={onClick} aria-pressed={!!active} style={{ ...(active ? SELECTED : { border: "2px solid transparent" }), display: "inline-flex", alignItems: "center", gap: 6, background: active ? "var(--brandSoft)" : "var(--surface)", color: "var(--ink)", borderRadius: 999, padding: "7px 14px", minHeight: 40, fontSize: 15, fontWeight: 650, cursor: "pointer", ...style }}>
+    <button className="nv-press" onClick={onClick} aria-pressed={!!active} style={{ ...(active ? SELECTED : { border: "2px solid transparent" }), display: "inline-flex", alignItems: "center", gap: 6, background: active ? "var(--brandSoft)" : "var(--surface)", color: "var(--ink)", borderRadius: 8, padding: "7px 14px", minHeight: 40, fontSize: 15, fontWeight: 650, cursor: "pointer", ...style }}>
       {active && <Chosen size={15} />}
       {children}
     </button>
@@ -278,9 +271,9 @@ export function Chip({ active, onClick, children, style }) {
 
 export function Segmented({ options, value, onChange, label }) {
   return (
-    <div role="radiogroup" aria-label={label} style={{ display: "flex", background: "var(--surface)", borderRadius: 14, padding: 4, gap: 4 }}>
+    <div role="radiogroup" aria-label={label} style={{ display: "flex", background: "var(--surface)", borderRadius: 8, padding: 4, gap: 4 }}>
       {options.map((o) => (
-        <button key={o.value} role="radio" aria-checked={value === o.value} onClick={() => onChange(o.value)} style={{ flex: 1, minWidth: 0, overflowWrap: "anywhere", ...(value === o.value ? SELECTED : { border: "2px solid transparent" }), borderRadius: 12, padding: "7px 8px", minHeight: 40, fontSize: 14, fontWeight: value === o.value ? 750 : 650, cursor: "pointer", background: value === o.value ? "var(--bg)" : "transparent", color: value === o.value ? "var(--ink)" : "var(--mid)" }}>
+        <button key={o.value} role="radio" aria-checked={value === o.value} onClick={() => onChange(o.value)} style={{ flex: 1, minWidth: 0, overflowWrap: "anywhere", ...(value === o.value ? SELECTED : { border: "2px solid transparent" }), borderRadius: 8, padding: "7px 8px", minHeight: 40, fontSize: 14, fontWeight: value === o.value ? 750 : 650, cursor: "pointer", background: value === o.value ? "var(--bg)" : "transparent", color: value === o.value ? "var(--ink)" : "var(--mid)" }}>
           {o.label}
         </button>
       ))}
@@ -291,7 +284,7 @@ export function Segmented({ options, value, onChange, label }) {
 export function Switch({ checked, onChange, label }) {
   return (
     <button role="switch" aria-checked={!!checked} aria-label={label} onClick={() => onChange(!checked)} style={{ width: 52, height: 32, borderRadius: 16, border: "none", background: checked ? "var(--brand)" : "var(--surface2)", position: "relative", cursor: "pointer", flexShrink: 0, transition: "background .2s" }}>
-      <span style={{ position: "absolute", top: 3, left: checked ? 23 : 3, width: 26, height: 26, borderRadius: 12, background: checked ? "var(--onBrand)" : "#fff", boxShadow: "0 1px 4px rgba(0,0,0,.3)", transition: "left .2s" }} />
+      <span style={{ position: "absolute", top: 3, left: checked ? 23 : 3, width: 26, height: 26, borderRadius: 8, background: checked ? "var(--onBrand)" : "#fff", boxShadow: "0 1px 4px rgba(0,0,0,.3)", transition: "left .2s" }} />
     </button>
   );
 }
@@ -300,7 +293,7 @@ export function Field({ label, hint, style, ...input }) {
   return (
     <label style={{ display: "block", marginBottom: 14 }}>
       {label && <span style={{ display: "block", fontSize: 14, fontWeight: 650, color: "var(--mid)", marginBottom: 6 }}>{label}</span>}
-      <input {...input} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 12, background: "var(--bg)", color: "var(--ink)", padding: "13px 14px", fontSize: 16, outline: "none", ...style }} />
+      <input {...input} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 8, background: "var(--bg)", color: "var(--ink)", padding: "13px 14px", fontSize: 16, outline: "none", ...style }} />
       {hint && <span style={{ display: "block", fontSize: 13, color: "var(--low)", marginTop: 5 }}>{hint}</span>}
     </label>
   );
@@ -335,7 +328,7 @@ export function Sheet({ open, onClose, title, children, tall }) {
     <Layer>
     <div role="dialog" aria-modal="true" aria-label={title} className="nv-sheetwrap" style={{ position: "fixed", inset: 0, zIndex: 60, display: "flex", justifyContent: "center", color: "var(--ink)", fontFamily: FONT }}>
       <div onClick={onClose} style={{ position: "absolute", inset: 0, background: "rgba(5,12,25,.45)", animation: "nvFade .2s both" }} />
-      <div className="nv-sheet" style={{ position: "relative", width: "100%", maxWidth: 560, maxHeight: tall ? "92dvh" : "85dvh", overflowY: "auto", background: "var(--bg)", borderRadius: "24px 24px 0 0", padding: "10px 18px calc(22px + env(safe-area-inset-bottom))", animation: "nvSpring .26s cubic-bezier(.2,.8,.3,1) both" }}>
+      <div className="nv-sheet" style={{ position: "relative", width: "100%", maxWidth: 560, maxHeight: tall ? "92dvh" : "85dvh", overflowY: "auto", background: "var(--bg)", borderRadius: "14px 14px 0 0", padding: "10px 18px calc(22px + env(safe-area-inset-bottom))", animation: "nvSpring .2s ease-out both" }}>
         <div className="nv-grab" style={{ width: 40, height: 5, borderRadius: 3, background: "var(--line)", margin: "0 auto 10px" }} />
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "0 0 12px", paddingTop: 2 }}>
           <h2 className="nv-disp" style={{ fontSize: 24, margin: 0 }}>{title}</h2>
@@ -354,7 +347,7 @@ export function Note({ tone = "info", icon, children, style }) {
   const tones = { info: ["var(--brandSoft)", "var(--ink)"], good: ["var(--goodSoft)", "var(--ink)"], bad: ["var(--badSoft)", "var(--ink)"] };
   const [bg, fg] = tones[tone];
   return (
-    <div style={{ display: "flex", gap: 10, alignItems: "flex-start", background: bg, color: fg, borderRadius: 16, padding: "12px 14px", fontSize: 14, lineHeight: 1.45, ...style }}>
+    <div style={{ display: "flex", gap: 10, alignItems: "flex-start", background: bg, color: fg, borderRadius: 10, padding: "12px 14px", fontSize: 14, lineHeight: 1.45, ...style }}>
       {icon && <span style={{ flexShrink: 0, marginTop: 1 }}><Icon name={icon} size={18} /></span>}
       <div style={{ minWidth: 0 }}>{children}</div>
     </div>
@@ -419,7 +412,7 @@ export function Wordmark({ size = 24, mark, fill, play }) {
 // "Beta", beside the wordmark while the app is in its beta. In the header it
 // steps aside when there isn't room (a long streak, Spanish, a small phone).
 export const BetaTag = ({ label, style }) => (
-  <span className="nv-word nv-beta" style={{ fontSize: 11, fontWeight: 750, letterSpacing: 0.6, textTransform: "uppercase", color: "var(--brand)", background: "var(--brandSoft)", borderRadius: 999, padding: "3px 8px", lineHeight: 1.2, ...style }}>
+  <span className="nv-word nv-beta" style={{ fontSize: 11, fontWeight: 750, letterSpacing: 0.6, textTransform: "uppercase", color: "var(--brand)", background: "var(--brandSoft)", borderRadius: 8, padding: "3px 8px", lineHeight: 1.2, ...style }}>
     {label}
   </span>
 );
@@ -463,7 +456,12 @@ export function Badge({ id, size = 64, locked }) {
   return svgArt(size, size, "0 0 96 96", `<defs><clipPath id="${cid}"><circle cx="48" cy="48" r="38"/></clipPath></defs><circle cx="48" cy="48" r="46" fill="var(--artSea)"/><circle cx="48" cy="48" r="38" fill="var(--artPaper)"/><g clip-path="url(#${cid})">${inner}</g>${rim}`, locked ? { filter: "grayscale(1)", opacity: 0.45 } : undefined);
 }
 // A wide scene (art.js SCENE), drawn at w×h and scaled to the width.
-export const Scene = ({ name, w = 358, h = 170, style }) => <svg viewBox={`0 0 ${w} ${h}`} width="100%" aria-hidden="true" preserveAspectRatio="xMidYMax slice" style={{ display: "block", ...style }} dangerouslySetInnerHTML={{ __html: SCENE[name](w, h) }} />;
+// On a tablet or computer the picture is drawn wider and shorter, so it fits the card instead of being cropped.
+export function Scene({ name, w = 358, h = 170, style }) {
+  const phone = useLayout() === "phone";
+  const sw = phone ? w : 700, sh = phone ? h : Math.min(h, 120);
+  return <svg className="nv-scene" viewBox={`0 0 ${sw} ${sh}`} width="100%" aria-hidden="true" preserveAspectRatio="xMidYMax slice" style={{ display: "block", ...style }} dangerouslySetInnerHTML={{ __html: SCENE[name](sw, sh) }} />;
+}
 // A soft wave edge between a picture and what's under it.
 export const WaveEdge = ({ color = "var(--surface)", style }) => (
   <svg viewBox="0 0 390 24" width="100%" height="20" preserveAspectRatio="none" aria-hidden="true" style={{ display: "block", ...style }}>
@@ -490,7 +488,7 @@ export function Toasts() {
   return createPortal(
     <div aria-live="polite" style={{ position: "fixed", top: "calc(10px + env(safe-area-inset-top))", left: 0, right: 0, zIndex: 80, display: "flex", flexDirection: "column", alignItems: "center", gap: 8, pointerEvents: "none" }}>
       {items.map((t) => (
-        <div key={t.id} className="nv-in" style={{ background: "var(--ink)", color: "var(--bg)", borderRadius: 999, padding: "10px 18px", fontWeight: 650, fontSize: 15, boxShadow: "var(--shadow)", maxWidth: "90vw" }}>
+        <div key={t.id} className="nv-in" style={{ background: "var(--ink)", color: "var(--bg)", borderRadius: 8, padding: "10px 18px", fontWeight: 650, fontSize: 15, boxShadow: "var(--shadow)", maxWidth: "90vw" }}>
           {t.message}
         </div>
       ))}

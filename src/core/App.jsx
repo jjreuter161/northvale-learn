@@ -26,6 +26,7 @@ import "./strings.js";
 import { track } from "./analytics.js";
 import { Boundary } from "./errors.jsx";
 import { useLayout, isDesk } from "./layout.js";
+import Split from "./Split.jsx";
 
 const CORE_SCREENS = { me: Me, settings: Settings, legal: Legal, practice: Practice };
 // The 4 tabs and the route each one opens.
@@ -78,6 +79,8 @@ export default function App() {
   }, [settings.lang, vars, spec.bg, settings.reduceMotion]);
   useEffect(() => {
     refreshSession();
+    // To look at the other heading font (EB Garamond): add ?heading=serif to the address.
+    if (new URLSearchParams(location.search).get("heading") === "serif") document.documentElement.dataset.heading = "serif";
   }, []);
   // Missed days: a freeze covers them, or the streak starts over; after 3+
   // days away, a short catch-up instead (Comeback.jsx). Said kindly.
@@ -149,7 +152,10 @@ export default function App() {
     return (
       <div style={rootStyle}>
         <style>{GLOBAL_CSS}</style>
-        <ResetPassword t={t} token={resetToken} onDone={() => (history.replaceState(null, "", location.pathname), setResetToken(null))} />
+        {(() => {
+          const form = <ResetPassword t={t} token={resetToken} onDone={() => (history.replaceState(null, "", location.pathname), setResetToken(null))} />;
+          return <Split t={t} phone={layout === "phone"}>{form}</Split>;
+        })()}
         <Toasts />
       </div>
     );
@@ -200,7 +206,7 @@ export default function App() {
         <span style={{ fontWeight: 650, fontSize: 15, fontVariantNumeric: "tabular-nums" }}>{progress.streak.count}</span>
       </button>
       {getModule("tutor") && !desk && (
-        <button onClick={() => getModule("tutor").services.open({})} aria-label={t("nav.ask")} className="nv-press" style={{ display: "inline-flex", alignItems: "center", gap: 6, border: "none", background: "var(--surface)", color: "var(--ink)", borderRadius: 999, height: 38, padding: "0 14px", fontSize: 15, fontWeight: 650, cursor: "pointer", flexShrink: 0 }}>
+        <button onClick={() => getModule("tutor").services.open({})} aria-label={t("nav.ask")} className="nv-press" style={{ display: "inline-flex", alignItems: "center", gap: 6, border: "none", background: "var(--surface)", color: "var(--ink)", borderRadius: 8, height: 38, padding: "0 14px", fontSize: 15, fontWeight: 650, cursor: "pointer", flexShrink: 0 }}>
           <Icon name="chat" size={17} /> <span className="nv-word">{t("nav.ask")}</span>
         </button>
       )}
@@ -235,7 +241,7 @@ export default function App() {
       <div style={{ display: "flex", maxWidth: 640, margin: "0 auto" }}>
         {TABS.map((x) => (
           <button key={x.id} onClick={() => openTab(x)} aria-current={tab.id === x.id ? "page" : undefined} className="nv-press" style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 3, border: "none", background: "transparent", color: tab.id === x.id ? "var(--brand)" : "var(--low)", padding: "8px 2px 6px", minHeight: 58, fontSize: 12, lineHeight: 1.15, fontWeight: 650, cursor: "pointer", textAlign: "center", hyphens: "auto", overflowWrap: "anywhere" }}>
-            <span style={{ width: "100%", maxWidth: 60, height: 32, borderRadius: 999, display: "flex", alignItems: "center", justifyContent: "center", background: tab.id === x.id ? "var(--brandSoft)" : "transparent", ...(tab.id === x.id ? SELECTED : { border: "2px solid transparent" }), transition: "background .2s" }}>
+            <span style={{ width: "100%", maxWidth: 60, height: 32, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", background: tab.id === x.id ? "var(--brandSoft)" : "transparent", ...(tab.id === x.id ? SELECTED : { border: "2px solid transparent" }), transition: "background .2s" }}>
               <Icon name={x.icon} size={23} />
             </span>
             {t(x.label)}
@@ -277,8 +283,8 @@ export default function App() {
   );
 }
 
-const iconBtn = { border: "none", background: "transparent", color: "var(--ink)", width: 44, height: 44, borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 };
-const chip = { border: "none", background: "transparent", display: "flex", alignItems: "center", gap: 4, height: 44, padding: "0 8px", borderRadius: 12, cursor: "pointer", flexShrink: 0 };
+const iconBtn = { border: "none", background: "transparent", color: "var(--ink)", width: 44, height: 44, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 };
+const chip = { border: "none", background: "transparent", display: "flex", alignItems: "center", gap: 4, height: 44, padding: "0 8px", borderRadius: 8, cursor: "pointer", flexShrink: 0 };
 
 function StreakSheet({ open, onClose, t, progress, today }) {
   const s = progress.streak;
@@ -298,13 +304,13 @@ function StreakSheet({ open, onClose, t, progress, today }) {
           const lesson = lessonDays.has(d);
           const frozen = s.frozen.includes(d);
           return (
-            <div key={d} title={d} style={{ aspectRatio: "1", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 650, background: frozen ? "var(--brandSoft)" : lesson ? "var(--flame)" : "var(--surface2)", color: lesson && !frozen ? "var(--onBrand)" : "var(--mid)", outline: d === today ? "1px solid var(--ink)" : "none" }}>
+            <div key={d} title={d} style={{ aspectRatio: "1", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 650, background: frozen ? "var(--brandSoft)" : lesson ? "var(--flame)" : "var(--surface2)", color: lesson && !frozen ? "var(--onBrand)" : "var(--mid)", outline: d === today ? "1px solid var(--ink)" : "none" }}>
               {frozen ? <Icon name="snow" size={16} color="var(--sky)" /> : Number(d.slice(8))}
             </div>
           );
         })}
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 12, background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 16, padding: 14 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 10, padding: 14 }}>
         <Icon name="snow" size={28} color="var(--sky)" />
         <div style={{ flex: 1 }}>
           <div style={{ fontWeight: 750 }}>{t("streak.freezes", { n: progress.freezes, max: MAX_FREEZES })}</div>

@@ -139,7 +139,7 @@ export function ShareHost({ t }) {
     );
   return (
     <Sheet open onClose={() => setCard(null)} title={t("share.title")}>
-      <div style={{ aspectRatio: "1", borderRadius: 16, overflow: "hidden", background: "var(--bg)", marginBottom: 12 }}>{image && <img src={image.url} alt={lines.join(" — ")} style={{ width: "100%", height: "100%", display: "block" }} />}</div>
+      <div style={{ aspectRatio: "1", borderRadius: 10, overflow: "hidden", background: "var(--bg)", marginBottom: 12 }}>{image && <img src={image.url} alt={lines.join(" — ")} style={{ width: "100%", height: "100%", display: "block" }} />}</div>
       {card.kind === "goal" && adult(ageBand) ? (
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
           <div style={{ flex: 1 }}>

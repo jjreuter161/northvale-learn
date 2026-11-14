@@ -120,7 +120,7 @@ function Overlay({ t, locale, route }) {
                 </Chip>
               ))}
             </div>
-            <textarea value={msg} onChange={(e) => setMsg(e.target.value)} maxLength={2000} rows={4} placeholder={t("fb.placeholder")} aria-label={t("fb.title")} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 12, padding: 12, fontSize: 16, background: "var(--surface)", color: "var(--ink)", resize: "vertical" }} />
+            <textarea value={msg} onChange={(e) => setMsg(e.target.value)} maxLength={2000} rows={4} placeholder={t("fb.placeholder")} aria-label={t("fb.title")} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 8, padding: 12, fontSize: 16, background: "var(--surface)", color: "var(--ink)", resize: "vertical" }} />
             <p style={{ fontSize: 13, color: "var(--low)", margin: "6px 0 12px" }}>{t("fb.private")}</p>
             <Button full disabled={!msg.trim()} onClick={sendFeedback}>
               {t("fb.send")}
@@ -132,12 +132,12 @@ function Overlay({ t, locale, route }) {
         <p style={{ fontSize: 18, fontWeight: 650, lineHeight: 1.4, margin: "0 0 14px" }}>{t("survey.q")}</p>
         <div role="radiogroup" style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 }}>
           {["very", "somewhat", "not"].map((k) => (
-            <button key={k} role="radio" aria-checked={answer === k} onClick={() => setAnswer(k)} className="nv-press" style={{ textAlign: "left", ...(answer === k ? SELECTED : { border: "1px solid var(--line)" }), background: answer === k ? "var(--brandSoft)" : "var(--surface)", color: "var(--ink)", borderRadius: 12, padding: "14px 16px", fontSize: 16, fontWeight: 600, cursor: "pointer", minHeight: 52 }}>
+            <button key={k} role="radio" aria-checked={answer === k} onClick={() => setAnswer(k)} className="nv-press" style={{ textAlign: "left", ...(answer === k ? SELECTED : { border: "1px solid var(--line)" }), background: answer === k ? "var(--brandSoft)" : "var(--surface)", color: "var(--ink)", borderRadius: 8, padding: "14px 16px", fontSize: 16, fontWeight: 600, cursor: "pointer", minHeight: 52 }}>
               {t(`survey.${k}`)}
             </button>
           ))}
         </div>
-        {answer && <textarea value={why} onChange={(e) => setWhy(e.target.value)} maxLength={1000} rows={3} placeholder={t("survey.why")} aria-label={t("survey.why")} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 12, padding: 12, fontSize: 16, background: "var(--surface)", color: "var(--ink)", marginBottom: 12 }} />}
+        {answer && <textarea value={why} onChange={(e) => setWhy(e.target.value)} maxLength={1000} rows={3} placeholder={t("survey.why")} aria-label={t("survey.why")} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 8, padding: 12, fontSize: 16, background: "var(--surface)", color: "var(--ink)", marginBottom: 12 }} />}
         <Button full disabled={!answer} onClick={() => sendSurvey(false)}>
           {t("survey.send")}
         </Button>

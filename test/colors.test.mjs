@@ -127,3 +127,10 @@ for (const f of ["modules/lessons/practice.jsx", "modules/lessons/qtypes.jsx", "
 assert.doesNotMatch(read("src/core/ui.jsx") + read("src/core/Onboarding.jsx") + read("src/modules/feedback/index.jsx"), /border: ["`][^"`]*var\(--brand\)/, "no leftover brand-colored selection borders");
 for (const f of ["core/ui.jsx", "modules/lessons/practice.jsx", "core/Onboarding.jsx"]) assert.match(read(`src/${f}`), /Chosen/, `${f} also shows a check (never color alone)`);
 console.log("ok: whatever is chosen (answers, chips, onboarding, pickers, tabs) is outlined in the main button's color with its edge on navy, keyboard focus is readable, and a check shows too");
+
+// The brand half of setup on a computer (a panel in the text color with the page color on it) is readable in every look.
+for (const { bg, text, hi } of ALL_ALLOWED) {
+  const v = lookFrom(bg, text, hi);
+  assert.ok(contrast(v["--brand"], v["--onBrand"]) >= 4.5, `the setup brand panel is readable in ${bg}/${text}/${hi}`);
+}
+console.log("ok: the setup brand panel (page color on text color) is readable in every look");

@@ -205,7 +205,7 @@ try {
     await page.getByRole("heading", { name: "Today" }).waitFor();
     await page.getByText("Building toward: Car").first().waitFor();
     await page.getByText("Lesson 2 of 3", { exact: false }).waitFor().catch(async (e) => { console.log("TODAY SHOWS:", (await page.evaluate(() => document.body.innerText)).slice(0, 700)); throw e; });
-    await page.getByText("You've learned today. One more keeps the momentum.").waitFor(); // why this is suggested, in one line
+    await page.getByText("You've done today's lesson. One more builds on it.").waitFor(); // why this is suggested, in one line
     assert.equal(await page.getByText("Myth or fact?").count(), 0, "day 1 is just the first lesson: no myth card");
     assert.equal(await page.getByRole("heading", { name: "What's new" }).count(), 0, "someone new doesn't get \"What's new\"");
     assert.equal(await page.locator("header").getByText("Beta", { exact: true }).count(), 1, "a small Beta label in the header");
@@ -490,10 +490,12 @@ try {
     assert.equal(await page.locator(".nv-glide").count(), 1, "one boat, at the current lesson");
     await clean("the course as a voyage");
     // Each animation class, measured inside the app (motion on, then Reduce motion).
+    // Only smooth, subtle transitions are left; the bobbing, twinkling, rippling, drifting and sweeping motion is gone for good.
+    const GONE = ["nv-ripple", "nv-bob", "nv-drift", "nv-twinkle", "nv-beam", "nv-water"];
     const timings = () =>
-      page.evaluate(() => {
+      page.evaluate((names) => {
         const root = document.querySelector("#root > div");
-        return ["nv-ripple", "nv-bob", "nv-drift", "nv-twinkle", "nv-glide", "nv-btn", "nv-in", "nv-beam", "nv-water"].map((c) => {
+        return names.map((c) => {
           const e = Object.assign(document.createElement("span"), { className: c });
           root.appendChild(e);
           const st = getComputedStyle(e);
@@ -501,13 +503,13 @@ try {
           e.remove();
           return [c, v];
         });
-      });
-    for (const [c, v] of await timings()) assert.ok(v >= 0.1, `${c} moves with motion on (${v}s)`);
+      }, ["nv-glide", "nv-btn", "nv-in", ...GONE]);
+    for (const [c, v] of await timings()) assert.ok(GONE.includes(c) ? v < 0.01 : v >= 0.1, GONE.includes(c) ? `${c} is gone: no bobbing, twinkling, rippling or sweeping (${v}s)` : `${c} moves with motion on (${v}s)`);
     await menu("Settings");
     await page.getByRole("switch", { name: "Reduce motion" }).click();
     await page.waitForFunction(() => !!document.querySelector(".nv-reduce"));
     for (const [c, v] of await timings()) assert.ok(v < 0.01, `${c} is still with Reduce motion (${v}s)`);
-    console.log("ok: the course as a voyage (an island opens its unit, the boat at the current lesson); every animation stops with Reduce motion");
+    console.log("ok: the course (an island opens its unit, the boat at the current lesson); only smooth, subtle transitions remain (no bobbing or twinkling), and they stop with Reduce motion");
     await app.close();
   }
 
@@ -958,8 +960,8 @@ const lessons = Object.fromEntries(track.map((id) => [id, { done: true, at: day(
   for (const [lang, region] of [["en", "US"], ["es", "MX"]]) {
     const es = lang === "es";
     const W = es
-      ? { tab: "Práctica", row: /^Tu Año de Dinero/, start: /^Tu primer trabajo de tiempo completo/, pick: "Elige una", next: "Siguiente mes", see: "Ver tu año", end: "Viaje completado", compare: "Tu año y el camino constante", again: "Jugar otra vez con otras decisiones", past: "Viajes anteriores", resume: /^Tu Año de Dinero[\s\S]*Seguir: mes 4 de 12/, lesson: /Lección:/ }
-      : { tab: "Practice", row: /^Your Money Year/, start: /^Your first full-time job/, pick: "Choose one", next: "Next month", see: "See your year", end: "Voyage complete", compare: "Your year and the steady path", again: "Play again with different choices", past: "Past voyages", resume: /^Your Money Year[\s\S]*Continue: month 4 of 12/, lesson: /Lesson:/ };
+      ? { tab: "Práctica", row: /^Tu Año de Dinero/, start: /^Tu primer trabajo de tiempo completo/, pick: "Elige una", next: "Siguiente mes", see: "Ver tu año", end: "Año completado", compare: "Tu año y el camino constante", again: "Jugar otra vez con otras decisiones", past: "Años anteriores", resume: /^Tu Año de Dinero[\s\S]*Seguir: mes 4 de 12/, lesson: /Lección:/ }
+      : { tab: "Practice", row: /^Your Money Year/, start: /^Your first full-time job/, pick: "Choose one", next: "Next month", see: "See your year", end: "Year complete", compare: "Your year and the steady path", again: "Play again with different choices", past: "Past years", resume: /^Your Money Year[\s\S]*Continue: month 4 of 12/, lesson: /Lesson:/ };
     const seed = { ...learner({ ageBand: "18-25" }, { counters: { lessons: 3 } }), settings: { lang, region, look: "white", reduceMotion: true } };
     const app = await open(seed);
     const { page, button, clean, menu } = app;
@@ -1053,7 +1055,7 @@ const lessons = Object.fromEntries(track.map((id) => [id, { done: true, at: day(
     await top().getByText(/^About: /).waitFor();
     await top().getByRole("textbox", { name: "Send feedback" }).fill("A test note about a lesson step.");
     await button("Send", top()).click();
-    await page.getByText("Got it, thank you. We read every one.").waitFor();
+    await page.getByText("Got it, thank you. We read every one.").last().waitFor(); // (the first note may still be fading)
     await app.close();
     console.log("ok: feedback from Me and from a lesson step (which says where it came from)");
   }

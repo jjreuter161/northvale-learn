@@ -82,7 +82,7 @@ function TimeTag({ t, m }) {
 function Head({ t, locale, m, sub }) {
   return (
     <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
-      <span style={{ width: 40, height: 40, borderRadius: 10, background: "var(--surface2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+      <span style={{ width: 40, height: 40, borderRadius: 6, background: "var(--surface2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
         <Icon name={m.icon} size={20} />
       </span>
       <div style={{ flex: 1, minWidth: 0 }}>
@@ -111,7 +111,7 @@ function DoneSheet({ t, locale, go, id, onClose }) {
           <label htmlFor="ms-note" style={{ display: "block", fontWeight: 650, fontSize: 15, marginBottom: 8 }}>
             {text(m.ask, locale)}
           </label>
-          <textarea id="ms-note" value={note} onChange={(e) => setNote(e.target.value)} maxLength={NOTE_MAX} rows={3} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 12, padding: 12, fontSize: 16, background: "var(--surface)", color: "var(--ink)", resize: "vertical" }} />
+          <textarea id="ms-note" value={note} onChange={(e) => setNote(e.target.value)} maxLength={NOTE_MAX} rows={3} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 8, padding: 12, fontSize: 16, background: "var(--surface)", color: "var(--ink)", resize: "vertical" }} />
           <p style={{ fontSize: 13, color: "var(--low)", lineHeight: 1.45, margin: "6px 0 14px" }}>{t("mi.note.hint")}</p>
           <Button
             full

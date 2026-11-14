@@ -32,7 +32,7 @@ function MeCard({ t, locale, go }) {
     <>
       <Card pad={16} onClick={() => setOpen(true)}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <span style={{ width: 38, height: 38, borderRadius: 12, background: "var(--bg)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <span style={{ width: 38, height: 38, borderRadius: 8, background: "var(--bg)", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <Icon name="trophy" size={19} />
           </span>
           <div style={{ flex: 1 }}>

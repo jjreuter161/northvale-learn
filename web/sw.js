@@ -5,7 +5,7 @@
 // syncs when the connection is back. /api always goes to the network.
 // Also shows the daily reminder (server/push.js) and opens the app on tap.
 const CACHE = "northvale-learn-v7";
-const SHELL = ["/", "/app.js", "/manifest.webmanifest", "/icon.svg", "/icon-192.png", "/icon-512.png", "/icon-180.png", "/fonts/inter-latin-wght-normal.woff2", "/fonts/inter-latin-ext-wght-normal.woff2", "/fonts/eb-garamond-latin-600-normal.woff2", "/fonts/fraunces-latin-soft-normal.woff2"];
+const SHELL = ["/", "/app.js", "/manifest.webmanifest", "/icon.svg", "/icon-192.png", "/icon-512.png", "/icon-180.png", "/fonts/inter-latin-wght-normal.woff2", "/fonts/inter-latin-ext-wght-normal.woff2", "/fonts/eb-garamond-latin-600-normal.woff2"];
 // The shell, plus the files the app imports to start (web/precache.json,
 // written by the build), so it opens offline from the first visit.
 self.addEventListener("install", (e) =>

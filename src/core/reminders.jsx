@@ -113,7 +113,7 @@ function TimeSelect({ t, lang, value, quiet, onChange }) {
   return (
     <label style={{ flex: 1, minWidth: 140 }}>
       <span style={{ display: "block", fontSize: 14, fontWeight: 650, color: "var(--mid)", marginBottom: 6 }}>{t("remind.time")}</span>
-      <select value={value} onChange={(e) => onChange(e.target.value)} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 14, padding: "12px", background: "var(--surface)", color: "var(--ink)", fontSize: 16 }}>
+      <select value={value} onChange={(e) => onChange(e.target.value)} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 8, padding: "12px", background: "var(--surface)", color: "var(--ink)", fontSize: 16 }}>
         {timeOptions(quiet).map((x) => (
           <option key={x} value={x}>
             {timeLabel(x, lang)}

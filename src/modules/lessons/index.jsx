@@ -10,7 +10,7 @@ import { recordLesson, recordReview, recordPractice } from "../../core/game.js";
 import { openShare } from "../../core/share.jsx";
 import { track } from "../../core/analytics.js";
 import { text, addStrings } from "../../core/i18n.js";
-import { xpOn, dayKey, addDays } from "../../core/progress.js";
+import { xpOn, dayKey, addDays, weekStart, weekXp } from "../../core/progress.js";
 import { Button, Card, Icon, Layer, List, ListRow, Loading, Mark, Progress, Ring, Scene, Sheet, StreakStar, UnitArt, WaveEdge, toast } from "../../core/ui.jsx";
 import { isDesk } from "../../core/layout.js";
 import { star, wave, boat, LANDMARK } from "../../core/art.js";
@@ -20,7 +20,7 @@ import { WhatsNewCard } from "../../core/whatsnew.jsx";
 import { practiceOpen, markIntro, useSeen } from "../../core/Practice.jsx";
 import { feel, reducedMotion } from "../../core/feel.js";
 import { UNITS, ALL_LESSONS, lessonById, lessonState, nextLesson, nextFor, unitDone, isQuestion, conceptPool, loadUnits, unitLoaded, conceptsOfLesson, conceptsOfUnit, minutes, setBothMode } from "./content.js";
-import { conceptById } from "./concepts.js";
+import { conceptById, CONCEPTS } from "./concepts.js";
 import * as M from "./mastery.js";
 import { bestNext, adaptOffer } from "./today.js";
 import { Question, QTYPES, startValue } from "./qtypes.jsx";
@@ -35,9 +35,9 @@ addStrings({
   "best.first": S("Your first lesson. It takes about {min} minutes.", "Tu primera lección. Dura unos {min} minutos."),
   "best.goal": S("Next for your goal: {name}.", "Lo que sigue para tu meta: {name}."),
   "best.course": S("The next step in your course.", "El siguiente paso de tu curso."),
-  "best.more": S("You've learned today. One more keeps the momentum.", "Ya aprendiste hoy. Otra más mantiene el ritmo."),
-  "best.review": S("You have {n} {n|idea|ideas} to refresh. A quick review makes them stick.", "Tienes {n} {n|idea|ideas} por repasar. Un repaso rápido ayuda a que se queden."),
-  "best.mission": S("You've learned today. Try something real: this week's mission.", "Ya aprendiste hoy. Prueba algo real: la misión de esta semana."),
+  "best.more": S("You've done today's lesson. One more builds on it.", "Ya hiciste la lección de hoy. Otra más refuerza lo aprendido."),
+  "best.review": S("You have {n} {n|idea|ideas} to refresh. A short review helps you keep them.", "Tienes {n} {n|idea|ideas} por repasar. Un repaso corto ayuda a retenerlas."),
+  "best.mission": S("You've done today's lesson. Next, something real: this week's mission.", "Ya hiciste la lección de hoy. Sigue algo real: la misión de esta semana."),
   "best.year_new": S("Try a year of money choices in about 10 minutes. Example numbers, no risk.", "Prueba un año de decisiones de dinero en unos 10 minutos. Números de ejemplo, sin riesgo."),
   "best.year_go": S("You're in month {m} of 12. Pick up where you left off.", "Vas en el mes {m} de 12. Sigue donde te quedaste."),
   "best.cta.review": S("Start review", "Empezar repaso"),
@@ -64,9 +64,9 @@ addStrings({
   "moment.streak.7": S("A week, every day.", "Una semana, todos los días."),
   "moment.streak.7.sub": S("Seven days in a row. This is about where habits start.", "Siete días seguidos. Más o menos aquí empiezan los hábitos."),
   "moment.streak.30": S("Thirty days in a row.", "Treinta días seguidos."),
-  "moment.streak.30.sub": S("A month of showing up, a few minutes at a time. That's a habit now.", "Un mes de constancia, unos minutos a la vez. Eso ya es un hábito."),
+  "moment.streak.30.sub": S("A month of a few minutes a day. That is a habit.", "Un mes de unos minutos al día. Eso es un hábito."),
   "moment.streak.100": S("A hundred days.", "Cien días."),
-  "moment.streak.100.sub": S("Most people never stick with anything this long. You did.", "Casi nadie mantiene algo tanto tiempo. Tú sí."),
+  "moment.streak.100.sub": S("One lesson a day, a hundred days running.", "Una lección al día, cien días seguidos."),
   "moment.unit.eyebrow": S("Unit {n} of {total} · complete", "Unidad {n} de {total} · completa"),
   "moment.unit.sub": S("You covered {lessons}.", "Viste {lessons}."),
   "moment.lessons": S("{n} {n|lesson|lessons}", "{n} {n|lección|lecciones}"),
@@ -117,6 +117,19 @@ addStrings({
   "today.streak.start": S("One lesson starts a streak. Three minutes is enough.", "Una lección empieza una racha. Tres minutos bastan."),
   "today.mission": S("This week's mission", "La misión de esta semana"),
   "panel.title": S("At a glance", "De un vistazo"),
+  "panel.goal.none": S("No goal yet. A goal gives your lessons a purpose.", "Todavía no tienes meta. Una meta le da un propósito a tus lecciones."),
+  "panel.goal.cta": S("Set a goal", "Poner una meta"),
+  "panel.mission.locked": S("Opens after your first three lessons.", "Se abre después de tus primeras tres lecciones."),
+  "panel.myth.soon": S("A daily question, starting tomorrow.", "Una pregunta al día, desde mañana."),
+  "overview.title": S("Your progress", "Tu progreso"),
+  "overview.lessons": S("Lessons done", "Lecciones hechas"),
+  "overview.unit": S("Current unit", "Unidad actual"),
+  "overview.unit.v": S("{n} of {total}", "{n} de {total}"),
+  "overview.mastery": S("Ideas solid or mastered", "Ideas firmes o dominadas"),
+  "overview.mastery.v": S("{n} of {total} learned", "{n} de {total} aprendidas"),
+  "overview.mastery.none": S("Learned ideas show up here", "Aquí verás las ideas aprendidas"),
+  "overview.upnext": S("Up next", "Lo que sigue"),
+  "overview.week": S("This week", "Esta semana"),
   "kb.hint": S("Tip: press 1–4 to choose an answer, and Enter to check or continue.", "Consejo: pulsa 1–4 para elegir una respuesta y Enter para comprobar o continuar."),
   "today.week": S("Your money week", "Tu semana de dinero"),
   "today.week.sub": S("A short look back, then the check-in", "Un repaso corto y luego la revisión"),
@@ -141,7 +154,7 @@ addStrings({
   "path.after": S("after Unit {n}", "después de la Unidad {n}"),
   "path.more": S("{n} more units", "{n} unidades más"),
   "path.open": S("Open water", "Mar abierto"),
-  "path.mist": S("{n} more {n|island|islands} in the mist", "{n} {n|isla|islas} más en la niebla"),
+  "path.mist": S("Show {n} more {n|unit|units}", "Mostrar {n} {n|unidad|unidades} más"),
   "path.lessons_of": S("{done} of {n} lessons", "{done} de {n} lecciones"),
   "path.continue": S("Continue: {title}", "Continuar: {title}"),
 
@@ -181,6 +194,75 @@ const todayLine = (locale) => {
 // week's mission, the streak), then at most one question for the learner
 // (goal plan, age, reminders). Nothing is lost when a row doesn't fit: the
 // streak is in the top bar, the check-in on Goals, the mission on Practice.
+// On a tablet or computer, under the best next step: where you are in the course, the next few lessons, this week.
+function Overview({ t, locale, go }) {
+  const progress = useAppState((s) => s.progress);
+  const concepts = useConcepts();
+  const tx = useLocaleText(locale);
+  const next = currentLesson(progress);
+  const unit = next && UNITS.find((u) => u.id === next.unit);
+  const done = ALL_LESSONS.filter((l) => lessonState(progress, l.id) === "done").length;
+  const learned = CONCEPTS.filter((c) => M.levelOf(concepts[c.id]) !== "new");
+  const firm = learned.filter((c) => ["solid", "mastered"].includes(M.levelOf(concepts[c.id])));
+  const at = next ? ALL_LESSONS.findIndex((l) => l.id === next.id) : ALL_LESSONS.length;
+  const coming = ALL_LESSONS.slice(at, at + 4);
+  const today = dayKey();
+  const week = Array.from({ length: 7 }, (_, i) => addDays(weekStart(today), i));
+  const top = Math.max(progress.dailyGoal, ...week.map((d) => xpOn(progress, d)));
+  const tile = (label, value, sub) => (
+    <div style={{ background: "var(--bg)", borderRadius: 8, padding: "12px 14px", minWidth: 0 }}>
+      <div style={{ fontSize: 13, color: "var(--mid)", fontWeight: 600 }}>{label}</div>
+      <div className="nv-disp" style={{ fontSize: 22, margin: "3px 0 0", overflowWrap: "anywhere" }}>{value}</div>
+      {sub && <div style={{ fontSize: 13, color: "var(--mid)", marginTop: 2 }}>{sub}</div>}
+    </div>
+  );
+  return (
+    <section aria-label={t("overview.title")} style={{ marginTop: 12 }}>
+      <Card pad={18}>
+        <h2 className="nv-disp" style={{ fontSize: 20, margin: "0 0 12px" }}>{t("overview.title")}</h2>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 10 }}>
+          {tile(t("overview.lessons"), `${done} / ${ALL_LESSONS.length}`)}
+          {tile(t("overview.unit"), unit ? t("overview.unit.v", { n: UNITS.indexOf(unit) + 1, total: UNITS.length }) : "✓", unit && tx(unit.title))}
+          {tile(t("overview.mastery"), learned.length ? `${firm.length}` : "—", learned.length ? t("overview.mastery.v", { n: firm.length, total: learned.length }) : t("overview.mastery.none"))}
+        </div>
+        <div className="nv-cols" style={{ marginTop: 18 }}>
+          <div>
+            <div style={{ fontSize: 14, fontWeight: 700, margin: "0 0 6px" }}>{t("overview.upnext")}</div>
+            {coming.length === 0 && <div style={{ fontSize: 14, color: "var(--mid)" }}>{t("lessons.all_done")}</div>}
+            {coming.map((l, i) => {
+              const st = lessonState(progress, l.id);
+              return (
+                <button key={l.id} onClick={() => (st === "locked" ? toast(t("lessons.locked")) : go("lessons", { lesson: l.id }))} className="nv-press" style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", textAlign: "left", border: "none", borderTop: i ? "1px solid var(--line)" : "none", background: "transparent", color: st === "locked" ? "var(--mid)" : "var(--ink)", padding: "9px 2px", font: "inherit", cursor: "pointer", minHeight: 44 }}>
+                  <Icon name={st === "locked" ? "lock" : "book"} size={16} />
+                  <span style={{ flex: 1, minWidth: 0, fontSize: 15, fontWeight: i ? 500 : 650 }}>{tx(l.title)}</span>
+                  <span style={{ fontSize: 13, color: "var(--mid)", whiteSpace: "nowrap" }}>{t("lessons.minutes", { n: Math.round(minutes(l)) })}</span>
+                </button>
+              );
+            })}
+          </div>
+          <div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", margin: "0 0 6px" }}>
+              <span style={{ fontSize: 14, fontWeight: 700 }}>{t("overview.week")}</span>
+              <span style={{ fontSize: 13, color: "var(--mid)" }}>{t("me.week_total", { xp: weekXp(progress, today) })}</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "flex-end", gap: 8, height: 84 }} role="img" aria-label={t("me.week_total", { xp: weekXp(progress, today) })}>
+              {week.map((d) => {
+                const xp = xpOn(progress, d);
+                return (
+                  <div key={d} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4, height: "100%", justifyContent: "flex-end" }}>
+                    <div title={`${xp} XP`} style={{ width: "100%", maxWidth: 26, height: `${Math.max(4, (xp / top) * 60)}px`, borderRadius: 3, background: xp ? "var(--accent)" : "var(--surface2)", opacity: d > today ? 0.4 : 1 }} />
+                    <span style={{ fontSize: 12, fontWeight: 650, color: d === today ? "var(--ink)" : "var(--low)" }}>{new Date(`${d}T12:00:00`).toLocaleDateString(t("locale.tag"), { weekday: "narrow" })}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </Card>
+    </section>
+  );
+}
+
 // One daily card: Myth or Fact. Not on the first day (that's for the first lesson), not while a question
 // for the learner is waiting, and not on a Sunday with the money week to look at.
 function canShowMyth(progress, profile, planDue, checkIn) {
@@ -219,6 +301,18 @@ function Panel({ t, locale, go, openStreak }) {
           <div style={{ fontWeight: 650, fontSize: 15 }}>{t("me.today", { xp, goal: progress.dailyGoal })}</div>
         </div>
       </Card>
+      {!goal && (
+        <Card pad={14} onClick={() => go("goals")}>
+          <div style={row}>
+            <Icon name="target" size={20} />
+            <div>
+              <div style={{ fontWeight: 700, fontSize: 16 }}>{t("goals.nav")}</div>
+              <div style={small}>{t("panel.goal.none")}</div>
+              <div style={{ fontSize: 14, fontWeight: 650, marginTop: 4 }}>{t("panel.goal.cta")}</div>
+            </div>
+          </div>
+        </Card>
+      )}
       {goal && (
         <Card pad={14} onClick={() => go("goals")}>
           <div style={{ ...row, marginBottom: 10 }}>
@@ -227,6 +321,17 @@ function Panel({ t, locale, go, openStreak }) {
           </div>
           <Progress value={goal.percent} max={100} height={8} label={`${goal.name}: ${goal.percent}%`} />
           <div style={{ ...small, marginTop: 6, fontVariantNumeric: "tabular-nums" }}>{goal.percent}%</div>
+        </Card>
+      )}
+      {!mission && !practiceOpen(progress) && (
+        <Card pad={14}>
+          <div style={row}>
+            <Icon name="flag" size={20} />
+            <div>
+              <div style={small}>{t("today.mission")}</div>
+              <div style={{ fontSize: 14 }}>{t("panel.mission.locked")}</div>
+            </div>
+          </div>
         </Card>
       )}
       {mission && (
@@ -240,7 +345,16 @@ function Panel({ t, locale, go, openStreak }) {
           </div>
         </Card>
       )}
-      {canShowMyth(progress, profile, service("goals", "planPromptDue")(), service("goals", "checkInDue")()) && <MythCard t={t} locale={locale} />}
+      {canShowMyth(progress, profile, service("goals", "planPromptDue")(), service("goals", "checkInDue")()) ? (
+        <MythCard t={t} locale={locale} />
+      ) : (
+        !(progress.lessonDays || []).some((d) => d < dayKey()) && (
+          <Card pad={14}>
+            <div style={small}>{t("myth.label")}</div>
+            <div style={{ fontSize: 14, marginTop: 2 }}>{t("panel.myth.soon")}</div>
+          </Card>
+        )
+      )}
     </>
   );
 }
@@ -301,12 +415,12 @@ function Today({ t, locale, go, openStreak, layout }) {
           </>
         ) : next ? (
           <>
-            <div style={{ position: "relative", background: "var(--artSky)", minHeight: 136 }}>
+            <div style={{ position: "relative", background: "var(--artSky)", minHeight: 108 }}>
               <svg viewBox="0 0 390 40" preserveAspectRatio="none" width="100%" height="40" aria-hidden="true" style={{ position: "absolute", left: 0, bottom: 0, display: "block" }}>
                 <path d={wave(390, 40, 3, 6, 12)} fill="var(--artSea)" />
               </svg>
               <div style={{ position: "absolute", right: 4, bottom: 10 }}>
-                <UnitArt id={unit.id} width={150} />
+                <UnitArt id={unit.id} width={112} />
               </div>
               <div style={{ position: "relative", padding: "18px 20px 34px", maxWidth: "60%" }}>
                 <div style={{ fontSize: 13, fontWeight: 600, color: "var(--low)" }}>
@@ -356,6 +470,7 @@ function Today({ t, locale, go, openStreak, layout }) {
           .filter(Boolean)
           .slice(0, 2)}
       </List>
+      {layout !== "phone" && <Overview t={t} locale={locale} go={go} />}
       <WhatsNewCard t={t} locale={locale} />
       {planDue ? (
         <PlanPrompt t={t} go={go} />
@@ -424,13 +539,13 @@ function MythCard({ t, locale }) {
   };
   if (answered && !now)
     return (
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 12, padding: "12px 16px", background: "var(--surface)", borderRadius: 24, boxShadow: "var(--lift)", fontSize: 14, color: "var(--mid)" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 12, padding: "12px 16px", background: "var(--surface)", borderRadius: 12, boxShadow: "var(--lift)", fontSize: 14, color: "var(--mid)" }}>
         <Icon name="check" size={16} /> {t("myth.done")}
       </div>
     );
   if (!myth) return null;
   const right = answered && answered.picked === myth.answer;
-  const btn = { flex: 1, minHeight: 46, borderRadius: 14, border: "1.5px solid var(--line)", background: "var(--surface)", color: "var(--ink)", fontWeight: 700, fontSize: 16, cursor: "pointer", font: "inherit", "--btn-edge": "var(--line)" };
+  const btn = { flex: 1, minHeight: 46, borderRadius: 8, border: "1.5px solid var(--line)", background: "var(--surface)", color: "var(--ink)", fontWeight: 700, fontSize: 16, cursor: "pointer", font: "inherit", "--btn-edge": "var(--line)" };
   return (
     <Card style={{ marginTop: 12 }} data-myth={myth.id}>
       <div style={{ fontSize: 14, fontWeight: 650, color: "var(--mid)", marginBottom: 6 }}>{t("myth.label")}</div>
@@ -519,7 +634,7 @@ function SeaChart({ t, tx, go, progress, ci, next, all, setAll, opened, toggle, 
   const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
   const waves = Array.from({ length: Math.round(H / 26) }, () => [rnd() * (W - 30) + 8, rnd() * (H - 150) + 14])
     .filter(([x, y]) => !list.some((_, i) => Math.abs(x - ctr(i)[0]) < 64 && Math.abs(y - ctr(i)[1] + 8) < 46))
-    .map(([x, y]) => `<path d="M${x.toFixed(0)} ${y.toFixed(0)}q5-3 10 0t10 0" stroke="var(--artSea2)" stroke-width="1.6" fill="none" stroke-linecap="round" opacity=".55"/>`)
+    .map(([x, y]) => `<path d="M${x.toFixed(0)} ${y.toFixed(0)}q5-3 10 0t10 0" stroke="var(--artSea2)" stroke-width="1.6" fill="none" stroke-linecap="round" opacity=".4"/>`)
     .join("");
   const buoys = pts.slice(0, -1).map((a, i) => {
     const b = pts[i + 1];
@@ -542,16 +657,16 @@ function SeaChart({ t, tx, go, progress, ci, next, all, setAll, opened, toggle, 
     `<defs><linearGradient id="nvmist" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--artPaper)" stop-opacity="0"/><stop offset="1" stop-color="var(--artPaper)" stop-opacity=".7"/></linearGradient></defs>`,
     `<g class="nv-water">${waves}</g>`,
     `<circle cx="${W / 2}" cy="${H - 108}" r="40" fill="var(--artSun2)"/><rect x="0" y="${H - 108}" width="${W}" height="108" fill="var(--artSea)"/><path d="M0 ${H - 108}H${W}" stroke="var(--artSea2)" stroke-width="2"/>${star(W / 2, H - 170, 10, "var(--artSun)")}<path d="M${W / 2 - 30} ${H - 92}h60M${W / 2 - 16} ${H - 82}h32" stroke="var(--artSun2)" stroke-width="4" stroke-linecap="round"/>`,
-    `<path d="${curve(pts.slice(here))}" fill="none" stroke="var(--artSea2)" stroke-width="3" stroke-linecap="round" stroke-dasharray="0.1 9"/>`,
-    `<path d="${curve(pts.slice(0, here + 1))}" fill="none" stroke="var(--artInk)" stroke-width="3" stroke-linecap="round" stroke-dasharray="0.1 9"/>`,
-    buoys, birds, isles,
+    `<path d="${curve(pts.slice(here))}" fill="none" stroke="var(--artSea2)" stroke-width="1.5" stroke-dasharray="5 6"/>`,
+    `<path d="${curve(pts.slice(0, here + 1))}" fill="none" stroke="var(--artInk)" stroke-width="1.5"/>`,
+    isles,
     mistTop < H ? `<rect x="0" y="${mistTop}" width="${W}" height="${Math.max(0, H - 150 - mistTop)}" fill="url(#nvmist)"/>` : "",
     `<g class="nv-bob">${boat(boatAt[0], boatAt[1], 0.4)}</g>`,
   ].join("");
   const pct = (v, of) => `${(v / of) * 100}%`;
   const doneOf = (u) => u.lessons.filter((l) => lessonState(progress, l.id) === "done").length;
   return (
-    <div style={{ position: "relative", width: "100%", maxWidth: { phone: 460, tablet: 540 }[layout] || 620, margin: "16px auto 0", aspectRatio: `${W} / ${H}`, borderRadius: 28, overflow: "hidden", background: "linear-gradient(180deg, var(--artSky), color-mix(in srgb, var(--artSea) 55%, var(--artSky)))", boxShadow: "var(--lift)" }}>
+    <div style={{ position: "relative", width: "100%", maxWidth: { phone: 460, tablet: 540 }[layout] || 620, margin: "16px auto 0", aspectRatio: `${W} / ${H}`, borderRadius: 14, overflow: "hidden", background: "linear-gradient(180deg, var(--artSky), color-mix(in srgb, var(--artSea) 55%, var(--artSky)))", boxShadow: "var(--lift)" }}>
       <svg viewBox={`0 0 ${W} ${H}`} width="100%" height="100%" aria-hidden="true" style={{ position: "absolute", inset: 0, display: "block" }} dangerouslySetInnerHTML={{ __html: svg }} />
       {list.map((u, i) => {
         const [x, y] = pos(i);
@@ -564,9 +679,9 @@ function SeaChart({ t, tx, go, progress, ci, next, all, setAll, opened, toggle, 
         if (now)
           return (
             <div key={u.id}>
-              <button onClick={() => currentRef.current && currentRef.current.scrollIntoView({ behavior: "smooth", block: "start" })} aria-expanded="true" aria-label={name} className="nv-press nv-hit" style={{ position: "absolute", left: pct(x - 8, W), top: pct(y - 6, H), width: pct(136, W), height: pct(118, H), border: "none", background: "transparent", borderRadius: 20, cursor: "pointer", padding: 0 }} />
-              <div style={{ position: "absolute", left: pct(i % 2 ? 10 : 168, W), top: pct(y + 2, H), width: pct(180, W), background: "var(--surface)", borderRadius: 18, padding: 12, boxShadow: "0 0 0 2px var(--head), var(--lift)" }}>
-                <span style={{ display: "inline-block", fontSize: 12, fontWeight: 700, borderRadius: 999, padding: "2px 9px", background: "var(--warmSoft)", color: "var(--warmInk)" }}>{t("path.now", { n: i + 1 })}</span>
+              <button onClick={() => currentRef.current && currentRef.current.scrollIntoView({ behavior: "smooth", block: "start" })} aria-expanded="true" aria-label={name} className="nv-press nv-hit" style={{ position: "absolute", left: pct(x - 8, W), top: pct(y - 6, H), width: pct(136, W), height: pct(118, H), border: "none", background: "transparent", borderRadius: 10, cursor: "pointer", padding: 0 }} />
+              <div style={{ position: "absolute", left: pct(i % 2 ? 10 : 168, W), top: pct(y + 2, H), width: pct(180, W), background: "var(--surface)", borderRadius: 10, padding: 12, boxShadow: "0 0 0 2px var(--head), var(--lift)" }}>
+                <span style={{ display: "inline-block", fontSize: 12, fontWeight: 700, borderRadius: 8, padding: "2px 9px", background: "var(--warmSoft)", color: "var(--warmInk)" }}>{t("path.now", { n: i + 1 })}</span>
                 <div className="nv-disp" style={{ fontSize: 18, lineHeight: 1.15, margin: "6px 0 2px", color: "var(--head)" }}>{tx(u.title)}</div>
                 <div style={{ fontSize: 13, color: "var(--mid)" }}>{meta}</div>
                 <div style={{ height: 6, borderRadius: 3, background: "var(--surface2)", overflow: "hidden", margin: "6px 0 10px" }}>
@@ -584,11 +699,11 @@ function SeaChart({ t, tx, go, progress, ci, next, all, setAll, opened, toggle, 
         // for the eye, so they're hidden from screen readers and let taps through.
         return (
           <div key={u.id}>
-            <button onClick={() => toggle(u.id)} aria-expanded={!!opened[u.id]} aria-label={name} className="nv-press nv-hit" style={{ position: "absolute", left: 0, width: "100%", top: pct(y, H), height: pct(ROW - 8, H), border: "none", background: "transparent", cursor: "pointer", padding: 0, borderRadius: 18 }} />
+            <button onClick={() => toggle(u.id)} aria-expanded={!!opened[u.id]} aria-label={name} className="nv-press nv-hit" style={{ position: "absolute", left: 0, width: "100%", top: pct(y, H), height: pct(ROW - 8, H), border: "none", background: "transparent", cursor: "pointer", padding: 0, borderRadius: 10 }} />
             <span aria-hidden="true" style={{ position: "absolute", left: pct(i % 2 ? 14 : 150, W), top: pct(y + 24, H), width: pct(176, W), pointerEvents: "none" }}>
               <span style={{ display: "block", fontSize: 12.5, fontWeight: 650, color: "var(--low)" }}>{t("lessons.unit_n", { n: i + 1 })}</span>
               <span style={{ display: "block", fontWeight: 700, color: "var(--head)", fontSize: 15, lineHeight: 1.25 }}>{tx(u.title)}</span>
-              <span style={{ display: "inline-flex", alignItems: "center", gap: 4, marginTop: 4, fontSize: 12, fontWeight: 700, borderRadius: 999, padding: "2px 9px", background: done ? "var(--rightSoft)" : "var(--surface2)", color: done ? "var(--right)" : "var(--mid)" }}>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 4, marginTop: 4, fontSize: 12, fontWeight: 700, borderRadius: 8, padding: "2px 9px", background: done ? "var(--rightSoft)" : "var(--surface2)", color: done ? "var(--right)" : "var(--mid)" }}>
                 {done && <Icon name="check" size={12} stroke={2.6} />}
                 {meta}
               </span>
@@ -598,7 +713,7 @@ function SeaChart({ t, tx, go, progress, ci, next, all, setAll, opened, toggle, 
       })}
       {list.length < UNITS.length && (
         <div style={{ position: "absolute", left: 0, right: 0, top: pct(H - 150, H), textAlign: "center" }}>
-          <button onClick={() => setAll(true)} className="nv-press" style={{ border: "none", background: "var(--surface)", borderRadius: 999, padding: "8px 16px", fontWeight: 650, fontSize: 14, color: "var(--head)", boxShadow: "var(--lift)", cursor: "pointer", font: "inherit", minHeight: 40 }}>
+          <button onClick={() => setAll(true)} className="nv-press" style={{ border: "none", background: "var(--surface)", borderRadius: 8, padding: "8px 16px", fontWeight: 650, fontSize: 14, color: "var(--head)", boxShadow: "var(--lift)", cursor: "pointer", font: "inherit", minHeight: 40 }}>
             {t("path.mist", { n: UNITS.length - list.length })}
           </button>
         </div>
@@ -639,7 +754,7 @@ function Course({ t, locale, go, route, layout }) {
           {now ? (
             <BoatNode id={l.id} playing={playing} />
           ) : (
-            <span data-node={l.id} style={{ width: 30, height: 30, borderRadius: 14, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: st === "done" ? "var(--accent)" : "var(--surface)", border: st === "done" ? "none" : "2px solid var(--line)", color: st === "done" ? "var(--onBrand)" : "var(--low)", position: "relative" }}>
+            <span data-node={l.id} style={{ width: 30, height: 30, borderRadius: 8, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: st === "done" ? "var(--accent)" : "var(--surface)", border: st === "done" ? "none" : "2px solid var(--line)", color: st === "done" ? "var(--onBrand)" : "var(--low)", position: "relative" }}>
               {st === "done" ? <Icon name="check" size={16} stroke={2.6} /> : st === "locked" ? <Icon name="lock" size={13} /> : null}
             </span>
           )}
@@ -649,13 +764,13 @@ function Course({ t, locale, go, route, layout }) {
           </span>
           {now && " "}
           {now && (
-            <span className="nv-btn" style={{ background: "var(--brand)", color: "var(--onBrand)", borderRadius: 14, padding: "8px 14px", fontSize: 14, fontWeight: 700, "--btn-edge": "var(--edge)" }} aria-hidden="true">
+            <span className="nv-btn" style={{ background: "var(--brand)", color: "var(--onBrand)", borderRadius: 8, padding: "8px 14px", fontSize: 14, fontWeight: 700, "--btn-edge": "var(--edge)" }} aria-hidden="true">
               {t("lessons.start")}
             </span>
           )}
         </button>
         {challenge && (
-          <button onClick={() => go("lessons", { challenge: l.id })} className="nv-press" style={{ border: "1px solid var(--line)", background: "var(--bg)", color: "var(--brand)", borderRadius: 999, padding: "6px 12px", marginRight: 14, fontSize: 13, fontWeight: 650, cursor: "pointer", minHeight: 36, flexShrink: 0 }}>
+          <button onClick={() => go("lessons", { challenge: l.id })} className="nv-press" style={{ border: "1px solid var(--line)", background: "var(--bg)", color: "var(--brand)", borderRadius: 8, padding: "6px 12px", marginRight: 14, fontSize: 13, fontWeight: 650, cursor: "pointer", minHeight: 36, flexShrink: 0 }}>
             {t("challenge.chip")}
           </button>
         )}
@@ -695,7 +810,7 @@ function Course({ t, locale, go, route, layout }) {
                   <div style={{ fontSize: 13, color: "var(--low)", fontWeight: 600 }}>{t("path.now", { n: ci + 1 })}</div>
                   <div className="nv-disp" style={{ fontSize: 24, lineHeight: 1.15, color: "var(--head)" }}>{tx(current.title)}</div>
                 </div>
-                <span style={{ width: 80, height: 62, borderRadius: 16, background: "var(--artSky)", overflow: "hidden", display: "flex", alignItems: "flex-end", justifyContent: "center", flexShrink: 0 }}>
+                <span style={{ width: 80, height: 62, borderRadius: 10, background: "var(--artSky)", overflow: "hidden", display: "flex", alignItems: "flex-end", justifyContent: "center", flexShrink: 0 }}>
                   <UnitArt id={current.id} width={82} />
                 </span>
               </div>
@@ -764,7 +879,7 @@ function Moment({ t, locale, result, unit, onDone }) {
           </>
         ) : (
           <>
-            <span style={{ width: 220, height: 165, borderRadius: 28, background: "var(--artSky)", overflow: "hidden", display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
+            <span style={{ width: 220, height: 165, borderRadius: 14, background: "var(--artSky)", overflow: "hidden", display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
               <UnitArt id={unit.id} width={220} />
             </span>
             <div style={{ fontSize: 14, fontWeight: 600, color: "var(--low)", marginTop: 22 }}>{t("moment.unit.eyebrow", { n: UNITS.indexOf(unit) + 1, total: UNITS.length })}</div>
@@ -795,10 +910,10 @@ function Moment({ t, locale, result, unit, onDone }) {
 // confetti). The waves drift for a few seconds, then stop.
 // The one red spark on the sea chart: a small pennant on the island you're on.
 const spark = (x, y) => `<path d="M${x} ${y + 26}V${y}" stroke="var(--artInk)" stroke-width="2.4" stroke-linecap="round"/><path d="M${x + 1.2} ${y}L${x + 17} ${y + 6}L${x + 1.2} ${y + 12}Z" fill="var(--spark)"/>`;
-const SUNRISE = `<defs><linearGradient id="nvsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--bg)"/><stop offset="1" stop-color="var(--warmSoft)"/></linearGradient></defs><rect width="390" height="250" fill="url(#nvsky)"/>${[[60, 64, 7], [326, 76, 9], [40, 142, 4], [352, 132, 5], [92, 34, 3]].map(([x, y, r]) => star(x, y, r, "var(--warm)")).join("")}<g class="nv-drift"><path d="${wave(440, 250, 7, 5, 196)}" fill="var(--artSea)"/><path d="${wave(440, 250, 6, 4, 218)}" fill="var(--artSea2)" opacity=".7"/></g>${boat(296, 156, 0.42)}<path d="${wave(390, 250, 8, 5, 240)}" fill="var(--bg)"/>`;
+const SUNRISE = `<defs><linearGradient id="nvsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--bg)"/><stop offset="1" stop-color="var(--warmSoft)"/></linearGradient></defs><rect width="390" height="250" fill="url(#nvsky)"/><g class="nv-drift"><path d="${wave(440, 250, 7, 5, 196)}" fill="var(--artSea)"/><path d="${wave(440, 250, 6, 4, 218)}" fill="var(--artSea2)" opacity=".7"/></g>${boat(296, 156, 0.42)}<path d="${wave(390, 250, 8, 5, 240)}" fill="var(--bg)"/>`;
 function Sunrise({ children }) {
   return (
-    <div style={{ position: "relative", margin: "-10px -18px 0", padding: "26px 18px 70px" }}>
+    <div style={{ position: "relative", margin: "-10px -18px 0", padding: "20px 18px 56px" }}>
       <svg viewBox="0 0 390 250" preserveAspectRatio="xMidYMax slice" aria-hidden="true" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", display: "block" }} dangerouslySetInnerHTML={{ __html: SUNRISE }} />
       <div style={{ position: "relative" }}>{children}</div>
     </div>
@@ -1093,7 +1208,7 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
             <Mark size={26} color="var(--artInk)" />
           </span>
         </div>
-        <button onClick={() => service("tutor", "open")({ context: tx(step.title || step.q || step.prompt || "") })} className="nv-press" style={{ border: "1px solid var(--line)", background: "var(--bg)", color: "var(--ink)", borderRadius: 999, height: 36, padding: "0 12px", display: "inline-flex", alignItems: "center", gap: 6, fontWeight: 650, fontSize: 14, cursor: "pointer", flexShrink: 0 }}>
+        <button onClick={() => service("tutor", "open")({ context: tx(step.title || step.q || step.prompt || "") })} className="nv-press" style={{ border: "1px solid var(--line)", background: "var(--bg)", color: "var(--ink)", borderRadius: 8, height: 36, padding: "0 12px", display: "inline-flex", alignItems: "center", gap: 6, fontWeight: 650, fontSize: 14, cursor: "pointer", flexShrink: 0 }}>
           <Icon name="chat" size={16} /> {t("nav.ask")}
         </button>
         <button onClick={() => service("feedback", "open")({ kind: "content", context: `${mode === "lesson" ? lesson.id : `${mode} ${step.c || ""}`} · step ${at + 1} · ${tx(step.title || step.q || step.prompt || "")}`.slice(0, 280) })} aria-label={t("lessons.report")} title={t("lessons.report")} style={{ border: "none", background: "transparent", color: "var(--low)", width: 44, height: 44, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
@@ -1106,7 +1221,7 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
           <div>
             <h2 className="nv-disp" style={{ fontSize: 28, margin: "0 0 12px", lineHeight: 1.15 }}>{tx(step.title)}</h2>
             <p style={{ fontSize: 18, lineHeight: 1.55, margin: 0 }}>{tx(step.body)}</p>
-            {service("tutor", "canExplain")(`${tx(step.title)} ${tx(step.body)}`) && <button onClick={() => service("tutor", "explain")({ question: tx(step.title), context: tx(step.body) })} className="nv-press" style={{ marginTop: 18, border: "1px solid var(--line)", background: "var(--bg)", color: "var(--brand)", borderRadius: 999, padding: "10px 16px", fontWeight: 650, fontSize: 15, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 8, minHeight: 44 }}>
+            {service("tutor", "canExplain")(`${tx(step.title)} ${tx(step.body)}`) && <button onClick={() => service("tutor", "explain")({ question: tx(step.title), context: tx(step.body) })} className="nv-press" style={{ marginTop: 18, border: "1px solid var(--line)", background: "var(--bg)", color: "var(--brand)", borderRadius: 8, padding: "10px 16px", fontWeight: 650, fontSize: 15, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 8, minHeight: 44 }}>
               <Icon name="chat" size={18} /> {t("lessons.explain")}
             </button>}
           </div>
@@ -1114,7 +1229,7 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
         {isQuestion(step) && <Question t={t} locale={locale} step={step} value={value} setValue={setPicked} checked={checked} right={checked === "right"} submit={check} label={mode === "challenge" ? t("challenge.chip") : mode === "review" ? t("review.title") : null} />}
         {step.type === "action" && (
           <div>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 750, color: "var(--onBrand)", background: "var(--brand)", borderRadius: 999, padding: "6px 12px", marginBottom: 12 }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 750, color: "var(--onBrand)", background: "var(--brand)", borderRadius: 8, padding: "6px 12px", marginBottom: 12 }}>
               <Icon name="target" size={15} /> {t("lessons.do_it")}
             </div>
             <h2 style={{ fontSize: 22, fontWeight: 750, margin: "0 0 16px", lineHeight: 1.3 }}>{tx(step.prompt)}</h2>

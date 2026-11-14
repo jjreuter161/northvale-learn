@@ -222,6 +222,23 @@ try {
   }
   console.log("ok: the computer layouts (a tablet, a laptop, a large desktop; English Cream and Spanish Navy): Today with its panel, Goals, Practice, Me, Settings, a dialog and a lesson");
 
+  // Setup on a computer: the brand on the left, the question on the right (welcome, sign-in, a question, the goal).
+  for (const [w, h] of [[1366, 768], [1920, 1080]]) {
+    const { ctx, page } = await open(null, "en", { viewport: { width: w, height: h } });
+    await axe(page, `setup at ${w}px, welcome`);
+    await page.getByRole("button", { name: "I already have an account" }).click();
+    await axe(page, `setup at ${w}px, sign-in`);
+    await page.getByRole("button", { name: "Back" }).first().click();
+    await page.getByRole("button", { name: /Get started/ }).click();
+    await axe(page, `setup at ${w}px, first question`);
+    await page.getByRole("radio").first().click();
+    await page.getByRole("button", { name: "Check", exact: true }).click();
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
+    await axe(page, `setup at ${w}px, goal`);
+    await ctx.close();
+  }
+  console.log("ok: setup on a computer (laptop and large desktop): welcome, sign-in, a question and the goal, with the brand on the left");
+
   // Zoomed to 200% (a 390-pixel phone at double size is 195 pixels wide):
   // nothing runs off the side.
   {

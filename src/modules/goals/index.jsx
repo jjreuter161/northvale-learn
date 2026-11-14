@@ -305,7 +305,7 @@ function useDailyBookkeeping(rows, holdings, onMilestone) {
 const TONE = { on_track: ["var(--brandSoft)", "var(--brand)"], ahead: ["var(--accentSoft)", "var(--accent)"], done: ["var(--accent)", "var(--onBrand)"], behind: ["var(--warnSoft)", "var(--warn)"], paused: ["var(--surface2)", "var(--mid)"] };
 function StatusPill({ t, status }) {
   const [bg, fg] = TONE[status];
-  return <span style={{ fontSize: 12, fontWeight: 650, background: bg, color: fg, borderRadius: 999, padding: "4px 10px", whiteSpace: "nowrap", letterSpacing: 0.1 }}>{t(`status.${status}`)}</span>;
+  return <span style={{ fontSize: 12, fontWeight: 650, background: bg, color: fg, borderRadius: 8, padding: "4px 10px", whiteSpace: "nowrap", letterSpacing: 0.1 }}>{t(`status.${status}`)}</span>;
 }
 
 const NUM = { fontVariantNumeric: "tabular-nums" };
@@ -366,7 +366,7 @@ const timeLeft = (t, g) => {
 
 function TemplateIcon({ id, size = 40 }) {
   return (
-    <span style={{ width: size, height: size, borderRadius: 10, background: "var(--brandSoft)", color: "var(--brand)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+    <span style={{ width: size, height: size, borderRadius: 6, background: "var(--brandSoft)", color: "var(--brand)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
       <Icon name={P.template(id).icon} size={size / 2} />
     </span>
   );
@@ -376,7 +376,7 @@ function TemplateGrid({ t, onPick, highlight }) {
   return (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 10 }}>
       {P.TEMPLATES.map((tp) => (
-        <button key={tp.id} onClick={() => onPick(tp.id)} className="nv-press" style={{ textAlign: "left", ...(highlight === tp.id ? SELECTED : { border: "1px solid var(--line)" }), background: "var(--surface)", color: "var(--ink)", borderRadius: 14, padding: 14, cursor: "pointer", minHeight: 112, display: "flex", flexDirection: "column", gap: 10 }}>
+        <button key={tp.id} onClick={() => onPick(tp.id)} className="nv-press" style={{ textAlign: "left", ...(highlight === tp.id ? SELECTED : { border: "1px solid var(--line)" }), background: "var(--surface)", color: "var(--ink)", borderRadius: 8, padding: 14, cursor: "pointer", minHeight: 112, display: "flex", flexDirection: "column", gap: 10 }}>
           <TemplateIcon id={tp.id} size={36} />
           <span>
             <span style={{ display: "block", fontWeight: 650, fontSize: 15 }}>{t(`tpl.${tp.id}`)}</span>
@@ -485,7 +485,7 @@ function RecordSheet({ t, locale, open, onClose, goals, goalId }) {
       {goals.length > 1 && (
         <div style={{ marginBottom: 12 }}>
           <div style={{ fontSize: 14, fontWeight: 650, color: "var(--mid)", marginBottom: 6 }}>{t("goal.record.which")}</div>
-          <select value={which || ""} onChange={(e) => setWhich(e.target.value)} aria-label={t("goal.record.which")} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 10, background: "var(--surface)", color: "var(--ink)", padding: "12px 14px", fontSize: 16, minHeight: 48 }}>
+          <select value={which || ""} onChange={(e) => setWhich(e.target.value)} aria-label={t("goal.record.which")} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 6, background: "var(--surface)", color: "var(--ink)", padding: "12px 14px", fontSize: 16, minHeight: 48 }}>
             {goals.map((g) => (
               <option key={g.id} value={g.id}>
                 {nameOf(g, t)}
@@ -626,7 +626,7 @@ function Home({ t, locale, go, data, setOpen, sheets, layout }) {
       <Title sub={t("goals.sub")}>{t("goals.nav")}</Title>
       {!leadRow ? (
         <div style={layout !== "phone" ? { maxWidth: 760 } : undefined}>
-          <div style={{ borderRadius: 24, overflow: "hidden", boxShadow: "var(--lift)", marginBottom: 14 }}>
+          <div style={{ borderRadius: 12, overflow: "hidden", boxShadow: "var(--lift)", marginBottom: 14 }}>
             <Scene name="harbor" w={358} h={140} />
           </div>
           <Label style={{ marginTop: 4 }}>{t("home.empty.title")}</Label>
@@ -634,7 +634,7 @@ function Home({ t, locale, go, data, setOpen, sheets, layout }) {
           <TemplateGrid t={t} onPick={(id) => sheets.newGoal(id)} highlight={goalFor} />
         </div>
       ) : (
-        <div className="nv-cols" style={others.length || layout === "phone" ? undefined : { maxWidth: 760, gridTemplateColumns: "minmax(0,1fr)" }}>
+        <div className="nv-cols">
           <div>
           <GoalCard t={t} locale={locale} row={leadRow} fx={data.holdings.fx} big onClick={() => setOpen(leadRow.g.id)} />
           {checkIn && (
@@ -653,9 +653,16 @@ function Home({ t, locale, go, data, setOpen, sheets, layout }) {
               <GoalCard key={r.g.id} t={t} locale={locale} row={r} fx={data.holdings.fx} onClick={() => setOpen(r.g.id)} />
             ))}
           </div>
-          <Button full kind="ghost" style={{ marginTop: 10 }} onClick={() => sheets.newGoal()}>
-            <Icon name="plus" size={18} /> {t("home.new_goal")}
-          </Button>
+          {layout === "phone" ? (
+            <Button full kind="ghost" style={{ marginTop: 10 }} onClick={() => sheets.newGoal()}>
+              <Icon name="plus" size={18} /> {t("home.new_goal")}
+            </Button>
+          ) : (
+            <>
+              <Label>{t("home.new_goal")}</Label>
+              <TemplateGrid t={t} onPick={(id) => sheets.newGoal(id)} highlight={null} />
+            </>
+          )}
           </div>
         </div>
       )}
@@ -1081,7 +1088,7 @@ function WeekStory({ t, locale, go, onClose }) {
   const done = () => save((s) => ({ ...s, checkIn: sunday }));
   const line = (icon, title, sub) => (
     <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px" }}>
-      <span style={{ width: 36, height: 36, borderRadius: 10, background: "var(--bg)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+      <span style={{ width: 36, height: 36, borderRadius: 6, background: "var(--bg)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
         <Icon name={icon} size={19} />
       </span>
       <span style={{ flex: 1, minWidth: 0 }}>
@@ -1195,7 +1202,7 @@ function RealCostCard({ t, locale, go }) {
       <div style={{ fontSize: 18, fontWeight: 700, lineHeight: 1.35, color: "var(--head)" }}>{t("rc.pick")}</div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8, margin: "12px 0" }} role="radiogroup" aria-label={t("rc.pick")}>
         {[...EVERYDAY.map((x) => [x[0], `${t(`rc.${x[0]}`)} · ${m(x[1][R])}`]), ["own", t("rc.own")]].map(([id, label]) => (
-          <button key={id} role="radio" aria-checked={pick === id} onClick={() => setPick(id)} className="nv-press" style={{ ...(pick === id ? SELECTED : { border: "2px solid transparent" }), borderRadius: 999, padding: "6px 14px", fontWeight: 650, fontSize: 15, cursor: "pointer", background: pick === id ? "var(--brand)" : "var(--bg)", color: pick === id ? "var(--onBrand)" : "var(--ink)", font: "inherit" }}>
+          <button key={id} role="radio" aria-checked={pick === id} onClick={() => setPick(id)} className="nv-press" style={{ ...(pick === id ? SELECTED : { border: "2px solid transparent" }), borderRadius: 8, padding: "6px 14px", fontWeight: 650, fontSize: 15, cursor: "pointer", background: pick === id ? "var(--brand)" : "var(--bg)", color: pick === id ? "var(--onBrand)" : "var(--ink)", font: "inherit" }}>
             {label}
           </button>
         ))}
@@ -1203,7 +1210,7 @@ function RealCostCard({ t, locale, go }) {
       {pick === "own" && (
         <label style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10, fontSize: 14, color: "var(--mid)" }}>
           {t("rc.own.label")}
-          <input inputMode="decimal" value={own} onChange={(e) => setOwn(e.target.value.slice(0, 8))} aria-label={t("rc.own.label")} style={{ width: 90, border: "1px solid var(--line)", borderRadius: 10, padding: "8px 10px", background: "var(--bg)", color: "var(--ink)", fontSize: 16 }} />
+          <input inputMode="decimal" value={own} onChange={(e) => setOwn(e.target.value.slice(0, 8))} aria-label={t("rc.own.label")} style={{ width: 90, border: "1px solid var(--line)", borderRadius: 6, padding: "8px 10px", background: "var(--bg)", color: "var(--ink)", fontSize: 16 }} />
         </label>
       )}
       <p style={{ fontSize: 16, lineHeight: 1.55, margin: 0 }} aria-live="polite">
