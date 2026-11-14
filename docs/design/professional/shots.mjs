@@ -2,7 +2,6 @@
 // screens) and one three weeks in. Used for the before-and-after of the professional pass.
 //   npm run build && node docs/design/professional/shots.mjs after            (this checkout)
 //   APP_ROOT=/path/to/older/checkout node docs/design/professional/shots.mjs before
-//   node docs/design/professional/shots.mjs serif      (the other heading font, EB Garamond)
 // Writes docs/design/professional/{before|after}/{1366|1920}-{new|weeks}-{screen}.jpg
 import { spawn } from "node:child_process";
 import { mkdirSync, mkdtempSync } from "node:fs";
@@ -12,9 +11,9 @@ import { chromium } from "playwright-core";
 
 const HERE = import.meta.dirname;
 const APP = process.env.APP_ROOT || join(HERE, "../../..");
-const which = ["before", "serif"].includes(process.argv[2]) ? process.argv[2] : "after"; // "serif": the other heading font (EB Garamond), laptop size only
-const SIZES = which === "after" ? [[1366, 768], [1920, 1080]] : [[1366, 768]];
-const OUT = join(HERE, which === "serif" ? "option-serif" : which);
+const which = process.argv[2] === "before" ? "before" : "after";
+const SIZES = which === "before" ? [[1366, 768]] : [[1366, 768], [1920, 1080]];
+const OUT = join(HERE, which);
 mkdirSync(OUT, { recursive: true });
 const port = 20000 + Math.floor(Math.random() * 20000);
 const env = { ...process.env, NORTHVALE_DOTENV: "0", PORT: String(port), NORTHVALE_DATA: mkdtempSync(join(tmpdir(), "nvl-pro-")), ANTHROPIC_API_KEY: "", TWELVEDATA_API_KEY: "" };
@@ -54,7 +53,7 @@ for (const [w, h] of SIZES) {
     if (who === "weeks") await ctx.addInitScript((s) => localStorage.setItem("northvale-learn-v1", s), JSON.stringify(weeks));
     const page = await ctx.newPage();
     page.setDefaultTimeout(10000);
-    await page.goto(which === "serif" ? `${BASE}?heading=serif` : BASE);
+    await page.goto(BASE);
     await page.evaluate(() => document.fonts.ready);
     await page.waitForTimeout(600);
     const shot = async (name) => {
@@ -93,4 +92,4 @@ for (const [w, h] of SIZES) {
 }
 await browser.close();
 server.kill();
-console.log(`wrote ${which} screenshots to docs/design/professional/${which === "serif" ? "option-serif" : which}`);
+console.log(`wrote ${which} screenshots to docs/design/professional/${which}`);

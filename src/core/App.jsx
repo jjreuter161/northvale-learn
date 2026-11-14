@@ -79,8 +79,6 @@ export default function App() {
   }, [settings.lang, vars, spec.bg, settings.reduceMotion]);
   useEffect(() => {
     refreshSession();
-    // To look at the other heading font (EB Garamond): add ?heading=serif to the address.
-    if (new URLSearchParams(location.search).get("heading") === "serif") document.documentElement.dataset.heading = "serif";
   }, []);
   // Missed days: a freeze covers them, or the streak starts over; after 3+
   // days away, a short catch-up instead (Comeback.jsx). Said kindly.

@@ -41,7 +41,6 @@ export const AVATARS = ["#1B3560", "#2D4D86", "#46679F", "#10223F", "#A21A22", "
 export const FONT = "'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif";
 export const SERIF = "'EB Garamond', Georgia, serif";
 // Headings and big numbers: Inter, set heavier and tighter (self-hosted, web/fonts; SIL Open Font License).
-// The other option: EB Garamond, the logo's face (add ?heading=serif to the address to look, or set it in code).
 export const DISPLAY = FONT;
 
 export const GLOBAL_CSS = `
@@ -54,7 +53,6 @@ input,select,textarea{font-family:inherit;font-size:16px}
 :focus-visible{outline:3px solid var(--focus);outline-offset:2px}
 h1,h2{color:var(--head)}
 .nv-disp{font-family:${DISPLAY};font-weight:650;letter-spacing:-.022em}
-html[data-heading="serif"] .nv-disp{font-family:${SERIF};font-weight:700;letter-spacing:-.005em;font-size-adjust:.5}
 .nv-btn{box-shadow:0 0 0 var(--ring,0px) var(--ringc,transparent);transition:filter .15s ease-out,background-color .15s ease-out}
 .nv-btn:active:not(:disabled){filter:brightness(.92)}
 
