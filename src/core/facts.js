@@ -37,6 +37,8 @@ export const FACTS = {
   // Credit
   ficoRange: { value: { en: "300 to 850", es: "300 a 850" }, kind: "text", check: "myfico.com — the FICO Score range (VantageScore uses the same range)", review: "rarely" },
   ficoFactors: { value: { en: "payment history (~35%), amounts owed (~30%), length of history (~15%), new credit (~10%) and credit mix (~10%)", es: "historial de pagos (~35%), montos que debes (~30%), antigüedad (~15%), crédito nuevo (~10%) y mezcla de créditos (~10%)" }, kind: "text", check: "myfico.com — \"What's in my FICO Scores\" (the published weights)", review: "rarely" },
+  usFreeReportFrequency: { value: { en: "once a week", es: "una vez por semana" }, kind: "text", check: "annualcreditreport.com and consumerfinance.gov — free reports from each of the three bureaus (weekly since 2023)", review: "yearly (the bureaus' voluntary program could change)" },
+  buroScoreRange: { value: { en: "400 to 850", es: "400 a 850" }, kind: "text", check: "burodecredito.com.mx — the Score de Buró range", review: "rarely" },
   buroFreeReportMonths: { value: 12, kind: "number", check: "Ley para Regular las Sociedades de Información Crediticia, art. 40, and burodecredito.com.mx — one free Reporte de Crédito Especial every this many months", review: "rarely (set by law)" },
   // Paychecks and taxes — US
   socialSecurityRate: { value: 6.2, kind: "pct", check: "ssa.gov — employee share of Social Security tax (up to the yearly wage base)", review: "yearly" },

@@ -382,6 +382,24 @@ export const MISSIONS = [
     ask: T("Who did you tell, and what did they say?", "¿A quién se lo dijiste y qué dijo?"),
   }),
 
+  m("foreignfee", {
+    unit: "payments",
+    icon: "card",
+    time: 15,
+    title: T("Find the foreign-transaction fee on one card", "Encuentra la comisión por operaciones en el extranjero de una tarjeta"),
+    how: T("Pick a card you or your family use and find its fee table (the bank's site or app, or the paper that came with it). Find the line for purchases in another country and the line for ATM withdrawals. Just reading.", "Elige una tarjeta que tú o tu familia usen y busca su tabla de comisiones (el sitio o la app del banco, o el papel que venía con ella). Busca la línea de compras en otro país y la de retiros en cajeros. Solo leer."),
+    ask: T("What does it charge on a {$100|1500} purchase abroad?", "¿Cuánto cobra por una compra de {$100|1500} en el extranjero?"),
+  }),
+
+  m("freereport", {
+    unit: "score",
+    icon: "chart",
+    time: 15,
+    title: T("Find the official place to get your free credit report", "Encuentra el lugar oficial para pedir tu reporte de crédito gratuito"),
+    how: T("Look up the official site for your free report (in the US, annualcreditreport.com; in Mexico, each bureau's own site) and read what it asks for. Don't enter anything unless you're an adult doing it yourself. Just reading.", "Busca el sitio oficial para tu reporte gratuito (en EE. UU., annualcreditreport.com; en México, el sitio de cada buró) y lee qué te pide. No escribas nada, a menos que seas adulto y lo hagas tú mismo. Solo leer."),
+    ask: T("What would you need to bring or know to request it?", "¿Qué necesitarías saber o tener a la mano para pedirlo?"),
+  }),
+
   // Reading the news
   m("headline", {
     unit: "news",

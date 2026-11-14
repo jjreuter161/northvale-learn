@@ -180,6 +180,8 @@ addStrings({
   "why.twobanks": S("Banks on each side ask for different papers and charge different fees. Knowing both ahead of time saves trips and money.", "Los bancos de cada lado piden papeles distintos y cobran comisiones distintas. Saberlo antes te ahorra viajes y dinero."),
   "why.crosswork": S("Pay, benefits and rights change at the border. Knowing how each side works helps you compare jobs and protect your future.", "El sueldo, las prestaciones y los derechos cambian en la frontera. Saber cómo funciona cada lado te ayuda a comparar empleos y proteger tu futuro."),
   "why.borderscams": S("Scammers target people with family and money on both sides. A pause and a call to a number you already have stops most of them.", "Los estafadores buscan a quienes tienen familia y dinero en los dos lados. Una pausa y una llamada a un número que ya tienes detienen a casi todos."),
+  "why.payments": S("Most spending is by card or phone now. Knowing the difference between debit, credit and apps keeps fees and fraud away.", "Casi todo el gasto es con tarjeta o celular. Conocer la diferencia entre débito, crédito y apps te aleja de comisiones y fraudes."),
+  "why.score": S("Lenders read your credit report before they decide. Knowing what's on it, and fixing mistakes, makes borrowing cheaper.", "Los prestamistas leen tu reporte de crédito antes de decidir. Saber qué contiene, y corregir errores, hace más barato pedir prestado."),
   "why.news": S("The news moves rates and prices that touch your money.", "Las noticias mueven tasas y precios que afectan tu dinero."),
 });
 

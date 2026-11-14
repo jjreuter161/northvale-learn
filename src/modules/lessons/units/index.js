@@ -42,4 +42,6 @@ export const LOADERS = {
   twobanks: () => import("./twobanks.js"),
   crosswork: () => import("./crosswork.js"),
   borderscams: () => import("./borderscams.js"),
+  payments: () => import("./payments.js"),
+  score: () => import("./score.js"),
 };
