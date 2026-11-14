@@ -21,6 +21,6 @@ What a tester on a computer said: it feels childish, setup is still phone-sized 
 
 ## Decisions for you
 
-1. **The heading font.** Option A (Inter, the default now) reads as modern finance (Linear, Stripe, Monzo). Option B (EB Garamond) reads as an editorial or private-bank feel and echoes the logo. To switch for good, change `DISPLAY` and the heading CSS in `src/core/ui.jsx` (it's marked) and the two landing pages.
+1. **The heading font: decided, Inter** (reads as modern finance: Linear, Stripe, Monzo). Option B (EB Garamond, editorial and echoing the logo) stays one switch away for comparing (`?heading=serif` on the address); to adopt it for good, change `DISPLAY` and the heading CSS in `src/core/ui.jsx` (it's marked) and the two landing pages.
 2. **The logo's wordmark** is still EB Garamond (it's the brand). If you want it in Inter too, say so.
 3. **How far to go on the sea chart.** It's cleaner now, but the island drawings are still illustrations. A truly "refined map" look (a grid, a compass, flat shapes) means redrawing all 18 landmarks, which is a bigger job.
