@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Learn with 50 units: a mockup</title>
+<style>
+  @font-face { font-family: "Inter"; font-weight: 100 900; src: url(../../../web/fonts/inter-latin-wght-normal.woff2) format("woff2"); }
+  @font-face { font-family: "EB Garamond"; font-weight: 600 700; src: url(../../../web/fonts/eb-garamond-latin-600-normal.woff2) format("woff2"); }
+  :root { --bg: #F7F2E8; --surface: #FFFDF8; --surface2: #EFE7D8; --ink: #1B3560; --mid: #3e5376; --low: #546683; --line: #E3D9C6; --red: #C8202A; --sky: #E8EDF5; --sea: #D3DDEA; --sea2: #A9BBD5; --sand: #E4D8C0 }
+  * { box-sizing: border-box }
+  body { margin: 0; padding: 28px; background: #E9E1D1; color: var(--ink); font: 15px/1.4 Inter, system-ui, sans-serif }
+  h1.page { font-size: 20px; margin: 0 0 4px } p.note { margin: 0 0 22px; color: var(--mid); max-width: 880px }
+  .frames { display: flex; gap: 36px; align-items: flex-start; flex-wrap: wrap }
+  .phone { width: 390px; height: 880px; background: var(--bg); border: 1px solid #cdbf9f; border-radius: 28px; overflow: hidden; position: relative }
+  .computer { width: 1180px; height: 720px; background: var(--bg); border: 1px solid #cdbf9f; border-radius: 12px; overflow: hidden; display: grid; grid-template-columns: 200px 250px 1fr 270px }
+  .label { font-size: 13px; color: var(--mid); margin: 8px 2px 0 }
+  .word { font: 650 22px "EB Garamond", serif; letter-spacing: -.3px }
+  .chips { display: flex; gap: 8px; overflow: hidden; padding: 4px 16px 6px }
+  .chip { flex: none; display: inline-flex; align-items: center; gap: 7px; background: var(--surface); border: 2px solid transparent; border-radius: 8px; padding: 7px 11px; font-weight: 650; font-size: 13.5px; box-shadow: 0 1px 2px rgba(27,53,96,.12) }
+  .chip.on { border-color: var(--red); background: #EFE7D8 }
+  .tag { font-size: 11px; font-weight: 700; background: var(--ink); color: var(--bg); border-radius: 4px; padding: 1px 6px }
+  .ring { width: 22px; height: 22px; border-radius: 50%; background: conic-gradient(var(--ink) calc(var(--p) * 1%), var(--surface2) 0); position: relative; flex: none }
+  .ring::after { content: ""; position: absolute; inset: 4px; background: var(--surface); border-radius: 50% }
+  .card { background: var(--surface); border-radius: 12px; box-shadow: 0 1px 3px rgba(27,53,96,.14); padding: 14px }
+  .levels { display: flex; gap: 4px; margin-top: 8px } .levels span { flex: 1; height: 6px; border-radius: 3px; background: var(--surface2) } .levels .f { background: var(--ink) }
+  .lv { display: flex; justify-content: space-between; font-size: 12px; color: var(--mid); margin-top: 4px }
+  .sea { position: relative; border-radius: 12px; overflow: hidden; background: linear-gradient(var(--sky), #DCE5F0) }
+  .band { position: absolute; left: 0; right: 0; font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--low); padding-left: 12px; border-top: 1px dashed var(--sea2) }
+  .isle { position: absolute; width: 110px; text-align: center; font-size: 12.5px; font-weight: 650; line-height: 1.2 }
+  .isle.far { opacity: .45 } .isle svg { display: block; margin: 0 auto 2px }
+  .now { position: absolute; background: var(--surface); border-radius: 10px; padding: 10px; width: 150px; box-shadow: 0 0 0 2px var(--ink), 0 2px 6px rgba(27,53,96,.2) }
+  .btn { display: block; background: var(--red); color: #F7F2E8; font-weight: 700; text-align: center; border-radius: 8px; padding: 8px; margin-top: 8px; font-size: 14px }
+  .rail { padding: 18px 12px; border-right: 1px solid var(--line); overflow: hidden }
+  .rail .t { display: flex; align-items: center; gap: 9px; padding: 8px 8px; border-radius: 8px; border: 2px solid transparent; font-size: 13.5px; font-weight: 600 }
+  .rail .t.on { border-color: var(--red); background: #EFE7D8 } .rail .t small { margin-left: auto; color: var(--mid); font-weight: 600 }
+  .side { padding: 18px 12px; border-right: 1px solid var(--line) } .side .n { display: flex; gap: 10px; align-items: center; padding: 10px 12px; font-weight: 650; border-radius: 8px; border: 2px solid transparent; margin-bottom: 4px; color: var(--low) } .side .n.on { border-color: var(--red); background: #EFE7D8; color: var(--ink) }
+  .panel { padding: 18px 14px; display: flex; flex-direction: column; gap: 12px; border-left: 1px solid var(--line) }
+  h2 { margin: 0; font-size: 26px; letter-spacing: -.02em; font-weight: 650 }
+  .small { font-size: 13px; color: var(--mid) }
+</style>
+</head>
+<body>
+<h1 class="page">Learn with 50 units: tracks, levels and the sea chart</h1>
+<p class="note">A mockup, not the built app. Twelve tracks are small archipelagos; three levels are bands of water (Start, Build, Go further). On a phone: a row of track chips above the current track's chart. On a computer: a track rail beside a bigger chart, and today's panel on the right.</p>
+
+<div class="frames">
+  <div>
+    <div class="phone">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px 4px"><span class="word">Northvale</span><span class="small">✦ 9</span></div>
+      <div style="padding:6px 16px 4px"><h2>Your course</h2><div class="small">11 of 225 lessons · 3 of 50 units</div></div>
+      <div class="chips">
+        <span class="chip"><span class="ring" style="--p:6"></span>Whole map</span>
+        <span class="chip on"><span class="ring" style="--p:17"></span>Life Across Borders <span class="tag">For you</span></span>
+        <span class="chip"><span class="ring" style="--p:66"></span>Foundations</span>
+        <span class="chip"><span class="ring" style="--p:33"></span>Saving &amp; Banking</span>
+        <span class="chip"><span class="ring" style="--p:0"></span>Everyday Money</span>
+      </div>
+      <div style="padding:6px 16px">
+        <div class="card" style="padding:12px 14px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline"><b style="font-size:16px">Life Across Borders</b><span class="small">1 of 6 units</span></div>
+          <div class="levels"><span class="f"></span><span></span><span></span></div>
+          <div class="lv"><span>Start</span><span>Build</span><span>Go further</span></div>
+        </div>
+      </div>
+      <div style="padding:6px 16px 0">
+        <div class="sea" style="height:545px">
+          <div class="band" style="top:6px">Start · Harbor</div>
+          <div class="isle" style="left:24px;top:30px"><svg width="64" height="46" viewBox="0 0 64 46"><ellipse cx="32" cy="38" rx="30" ry="7" fill="var(--sand)"/><path d="M14 36V22l18-10 18 10v14z" fill="var(--ink)"/><rect x="28" y="26" width="8" height="10" fill="var(--bg)"/></svg>Money across borders<br><span style="font-weight:500;color:var(--mid)">done</span></div>
+          <div class="isle" style="left:230px;top:62px"><svg width="64" height="46" viewBox="0 0 64 46"><ellipse cx="32" cy="38" rx="30" ry="7" fill="var(--sand)"/><path d="M6 34h52l-6 6H12z" fill="var(--ink)"/><path d="M20 34V16l10 18zM34 34V10l12 24z" fill="var(--ink)"/><path d="M33 4v8l8-3z" fill="var(--red)"/></svg>Sending and receiving money</div>
+          <div class="now" style="left:20px;top:112px"><span class="tag" style="background:#EFE7D8;color:var(--ink)">Unit 2 · Now</span><div style="font-weight:700;margin:5px 0 1px">Sending and receiving money</div><div class="small">1 of 5 lessons</div><span class="btn">Continue</span></div>
+          <div class="band" style="top:268px">Build · Coast</div>
+          <div class="isle far" style="left:20px;top:292px"><svg width="64" height="46" viewBox="0 0 64 46"><ellipse cx="32" cy="38" rx="30" ry="7" fill="var(--sand)"/><path d="M4 36V24h8v12M52 36V24h8v12M4 24h56" fill="none" stroke="var(--ink)" stroke-width="4"/></svg>Banking in two countries</div>
+          <div class="isle far" style="left:140px;top:326px"><svg width="64" height="46" viewBox="0 0 64 46"><ellipse cx="32" cy="38" rx="30" ry="7" fill="var(--sand)"/><path d="M8 36h48l-8-10H16z" fill="var(--ink)"/></svg>Working across the border</div>
+          <div class="isle far" style="left:250px;top:292px"><svg width="64" height="46" viewBox="0 0 64 46"><ellipse cx="32" cy="38" rx="30" ry="7" fill="var(--sand)"/><path d="M6 30q10-8 20 0t20 0t12 0v8H6z" fill="var(--sea2)"/></svg>Border scams</div>
+          <div class="band" style="top:424px">Go further · Open water</div>
+          <div class="isle far" style="left:140px;top:448px"><svg width="64" height="46" viewBox="0 0 64 46"><ellipse cx="32" cy="38" rx="30" ry="7" fill="var(--sand)"/><path d="M18 36V18l6-4 6 4v18M36 36V18l6-4 6 4v18" fill="var(--ink)"/></svg>Taxes in two countries</div>
+        </div>
+      </div>
+      <div style="position:absolute;left:0;right:0;bottom:0;height:62px;background:var(--bg);border-top:1px solid var(--line);display:flex;justify-content:space-around;align-items:center;font-size:12px;font-weight:650;color:var(--low)"><span style="border:2px solid var(--red);border-radius:8px;padding:5px 12px;color:var(--ink)">Learn</span><span>Goals</span><span>Practice</span><span>Me</span></div>
+    </div>
+    <div class="label">Phone (390px): chips above the current track's chart</div>
+  </div>
+
+  <div>
+    <div class="computer">
+      <div class="side">
+        <div class="word" style="padding:2px 10px 18px">Northvale</div>
+        <div class="n on">Learn</div><div class="n">Goals</div><div class="n">Practice</div><div class="n">Me</div>
+      </div>
+      <div class="rail">
+        <div style="font-size:13px;font-weight:700;color:var(--mid);margin:2px 8px 8px">Tracks · 3 of 50 units</div>
+        <div class="t"><span class="ring" style="--p:6"></span>Whole map</div>
+        <div class="t on"><span class="ring" style="--p:17"></span>Life Across Borders <small>1/6</small></div>
+        <div class="t"><span class="ring" style="--p:66"></span>Foundations <small>2/3</small></div>
+        <div class="t"><span class="ring" style="--p:33"></span>Saving &amp; Banking <small>1/3</small></div>
+        <div class="t"><span class="ring" style="--p:0"></span>Everyday Money <small>0/2</small></div>
+        <div class="t"><span class="ring" style="--p:20"></span>Work &amp; Income <small>1/5</small></div>
+        <div class="t"><span class="ring" style="--p:25"></span>Credit &amp; Debt <small>1/4</small></div>
+        <div class="t"><span class="ring" style="--p:10"></span>Investing <small>1/10</small></div>
+        <div class="t"><span class="ring" style="--p:33"></span>Taxes <small>1/3</small></div>
+        <div class="t"><span class="ring" style="--p:0"></span>Big Life Decisions <small>0/4</small></div>
+        <div class="t"><span class="ring" style="--p:40"></span>Protecting Yourself <small>2/5</small></div>
+        <div class="t"><span class="ring" style="--p:0"></span>Building a Business <small>0/3</small></div>
+        <div class="t"><span class="ring" style="--p:0"></span>How the Economy Works <small>0/2</small></div>
+      </div>
+      <div style="padding:20px 22px;overflow:hidden">
+        <h2>Life Across Borders</h2>
+        <div class="small" style="margin:2px 0 10px">Money between the US and Mexico · 1 of 6 units</div>
+        <div class="sea" style="height:610px">
+          <div class="band" style="top:8px">Start · Harbor</div>
+          <div class="isle" style="left:30px;top:36px"><svg width="64" height="46" viewBox="0 0 64 46"><ellipse cx="32" cy="38" rx="30" ry="7" fill="var(--sand)"/><path d="M14 36V22l18-10 18 10v14z" fill="var(--ink)"/><rect x="28" y="26" width="8" height="10" fill="var(--bg)"/></svg>Money across borders<br><span style="font-weight:500;color:var(--mid)">done</span></div>
+          <div class="isle" style="left:290px;top:62px"><svg width="64" height="46" viewBox="0 0 64 46"><ellipse cx="32" cy="38" rx="30" ry="7" fill="var(--sand)"/><path d="M6 34h52l-6 6H12z" fill="var(--ink)"/><path d="M20 34V16l10 18zM34 34V10l12 24z" fill="var(--ink)"/><path d="M33 4v8l8-3z" fill="var(--red)"/></svg>Sending and receiving money</div>
+          <div class="now" style="left:130px;top:130px"><span class="tag" style="background:#EFE7D8;color:var(--ink)">Unit 2 · Now</span><div style="font-weight:700;margin:5px 0 1px">Sending and receiving money</div><div class="small">1 of 5 lessons</div><span class="btn">Continue</span></div>
+          <div class="band" style="top:300px">Build · Coast</div>
+          <div class="isle far" style="left:20px;top:330px"><svg width="64" height="46" viewBox="0 0 64 46"><ellipse cx="32" cy="38" rx="30" ry="7" fill="var(--sand)"/><path d="M4 36V24h8v12M52 36V24h8v12M4 24h56" fill="none" stroke="var(--ink)" stroke-width="4"/></svg>Banking in two countries</div>
+          <div class="isle far" style="left:150px;top:380px"><svg width="64" height="46" viewBox="0 0 64 46"><ellipse cx="32" cy="38" rx="30" ry="7" fill="var(--sand)"/><path d="M8 36h48l-8-10H16z" fill="var(--ink)"/></svg>Working across the border</div>
+          <div class="isle far" style="left:290px;top:330px"><svg width="64" height="46" viewBox="0 0 64 46"><ellipse cx="32" cy="38" rx="30" ry="7" fill="var(--sand)"/><path d="M6 30q10-8 20 0t20 0t12 0v8H6z" fill="var(--sea2)"/></svg>Border scams</div>
+          <div class="band" style="top:482px">Go further · Open water</div>
+          <div class="isle far" style="left:150px;top:508px"><svg width="64" height="46" viewBox="0 0 64 46"><ellipse cx="32" cy="38" rx="30" ry="7" fill="var(--sand)"/><path d="M18 36V18l6-4 6 4v18M36 36V18l6-4 6 4v18" fill="var(--ink)"/></svg>Taxes in two countries</div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="card" style="padding:12px"><b>Today</b><div class="small" style="margin-top:3px">Next: Fee plus exchange rate, the full cost · 4 min</div><span class="btn">Continue</span></div>
+        <div class="card" style="padding:12px"><div class="small">Your whole course</div><b style="font-size:20px">3 of 50 units</b><div class="levels"><span class="f"></span><span class="f"></span><span class="f"></span><span></span><span></span><span></span><span></span><span></span></div></div>
+        <div class="card" style="padding:12px"><div class="small">For your goal: emergency fund</div><b>Foundations, Saving and Banking</b><div class="small" style="margin-top:3px">2 units to go</div></div>
+        <div class="card" style="padding:12px"><div class="small">Finished tracks</div><div class="small" style="margin-top:3px">None yet. A finished track folds into one flag on the whole map.</div></div>
+      </div>
+    </div>
+    <div class="label">Computer (1366px and up): a track rail, a bigger chart with labeled levels, and the day's panel</div>
+  </div>
+</div>
+</body>
+</html>
