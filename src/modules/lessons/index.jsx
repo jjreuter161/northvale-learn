@@ -176,6 +176,10 @@ addStrings({
   "why.retire": S("Starting early makes retirement much easier to afford.", "Empezar temprano hace mucho más fácil pagar el retiro."),
   "why.earning": S("Earning more is the other half of having more.", "Ganar más es la otra mitad de tener más."),
   "why.borders": S("If your life touches two countries, the details of sending, saving and borrowing across the border save you real money.", "Si tu vida toca dos países, los detalles de enviar, ahorrar y pedir prestado entre fronteras te ahorran dinero de verdad."),
+  "why.remit": S("Sending money costs more than the fee you see. Comparing what arrives can save you real money over a year.", "Enviar dinero cuesta más que la comisión que ves. Comparar lo que llega puede ahorrarte dinero de verdad en un año."),
+  "why.twobanks": S("Banks on each side ask for different papers and charge different fees. Knowing both ahead of time saves trips and money.", "Los bancos de cada lado piden papeles distintos y cobran comisiones distintas. Saberlo antes te ahorra viajes y dinero."),
+  "why.crosswork": S("Pay, benefits and rights change at the border. Knowing how each side works helps you compare jobs and protect your future.", "El sueldo, las prestaciones y los derechos cambian en la frontera. Saber cómo funciona cada lado te ayuda a comparar empleos y proteger tu futuro."),
+  "why.borderscams": S("Scammers target people with family and money on both sides. A pause and a call to a number you already have stops most of them.", "Los estafadores buscan a quienes tienen familia y dinero en los dos lados. Una pausa y una llamada a un número que ya tienes detienen a casi todos."),
   "why.news": S("The news moves rates and prices that touch your money.", "Las noticias mueven tasas y precios que afectan tu dinero."),
 });
 

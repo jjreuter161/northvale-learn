@@ -10,11 +10,13 @@ import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { UNITS } from "../src/modules/lessons/units/all.js";
 import { minutesOf, isQuestion } from "../src/modules/lessons/units/time.js";
+import { REVIEWED } from "../src/modules/lessons/units/reviews.js";
 
 const FILE = join(import.meta.dirname, "../src/modules/lessons/units/index.gen.js");
 const index = UNITS.map((u) => ({
   id: u.id,
   icon: u.icon,
+  reviewed: REVIEWED[u.id] || null,
   title: u.title,
   concepts: u.concepts.map((c) => ({ id: c.id, name: c.name })),
   lessons: u.lessons.map((l) => ({

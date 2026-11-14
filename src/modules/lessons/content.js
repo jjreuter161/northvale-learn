@@ -61,16 +61,18 @@ const reached = (progress, ui) => UNITS.slice(ui).some((u) => started(progress, 
 // end of the course, and for someone with ties to both countries it opens
 // after Banking and comes up in "what's next" there. The app sets this when
 // the setting changes (App.jsx); the server and the tests leave it off.
-const BORDERS = "borders";
+// The units written for life between two countries, in the order they open for someone who picked "Both".
+const BORDER_UNITS = ["borders", "remit", "twobanks", "crosswork", "borderscams", "taxestwo"];
+const borderUnits = () => BORDER_UNITS.filter((id) => unitIndex(id) >= 0);
 let BOTH = false;
 export const setBothMode = (v) => {
   BOTH = !!v;
 };
 const courseOrder = () => {
   if (!BOTH) return UNITS;
-  const rest = UNITS.filter((u) => u.id !== BORDERS);
+  const rest = UNITS.filter((u) => !BORDER_UNITS.includes(u.id));
   const at = rest.findIndex((u) => u.id === "banking") + 1;
-  return [...rest.slice(0, at), ...UNITS.filter((u) => u.id === BORDERS), ...rest.slice(at)];
+  return [...rest.slice(0, at), ...borderUnits().map((id) => UNITS[unitIndex(id)]), ...rest.slice(at)];
 };
 export function lessonState(progress, id) {
   if (isDone(progress, id)) return "done";
@@ -78,9 +80,13 @@ export function lessonState(progress, id) {
   if (!l) return "locked";
   const ui = unitIndex(l.unit);
   const start = Math.max(0, unitIndex(progress.startUnit || UNITS[0].id));
-  if (BOTH && l.unit === BORDERS) {
+  if (BOTH && BORDER_UNITS.includes(l.unit)) {
+    // The first opens after Banking; each next one when the one before it is finished (or tested out of, or already reached).
+    const B = borderUnits();
+    const k = B.indexOf(l.unit);
     const anchor = unitIndex("banking");
-    const open = start > anchor || unitDone(progress, UNITS[anchor]) || placed(progress, "banking") || reached(progress, ui);
+    const prev = k === 0 ? UNITS[anchor] : UNITS[unitIndex(B[k - 1])];
+    const open = (k === 0 && start > anchor) || unitDone(progress, prev) || placed(progress, prev.id) || reached(progress, ui);
     return open && (l.index === 0 || isDone(progress, UNITS[ui].lessons[l.index - 1].id)) ? "open" : "locked";
   }
   const prev = UNITS[ui - 1];

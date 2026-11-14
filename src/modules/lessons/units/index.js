@@ -6,7 +6,19 @@
 import { INDEX } from "./index.gen.js";
 export { PLACEMENT } from "./placement.js";
 
-export const UNITS = INDEX.map((u) => ({ ...u, concepts: u.concepts.map((c) => ({ ...c, unit: u.id })), lessons: u.lessons.map((l, index) => ({ ...l, unit: u.id, index })) }));
+// Units nobody has signed off yet (reviews.js) stay hidden, unless this tab asked to preview them (?preview=units) or, in
+// Node (tests, scripts), NORTHVALE_PREVIEW_UNITS=1.
+function previewing() {
+  try {
+    if (typeof location !== "undefined") {
+      if (new URLSearchParams(location.search).get("preview") === "units") sessionStorage.setItem("nv-preview-units", "1");
+      return sessionStorage.getItem("nv-preview-units") === "1";
+    }
+  } catch {}
+  return typeof process !== "undefined" && !!process.env && process.env.NORTHVALE_PREVIEW_UNITS === "1";
+}
+const PREVIEW = previewing();
+export const UNITS = INDEX.filter((u) => u.reviewed || PREVIEW).map((u) => ({ ...u, concepts: u.concepts.map((c) => ({ ...c, unit: u.id })), lessons: u.lessons.map((l, index) => ({ ...l, unit: u.id, index })) }));
 export const LOADERS = {
   budget: () => import("./budget.js"),
   save: () => import("./save.js"),
@@ -26,4 +38,8 @@ export const LOADERS = {
   earning: () => import("./earning.js"),
   news: () => import("./news.js"),
   borders: () => import("./borders.js"),
+  remit: () => import("./remit.js"),
+  twobanks: () => import("./twobanks.js"),
+  crosswork: () => import("./crosswork.js"),
+  borderscams: () => import("./borderscams.js"),
 };

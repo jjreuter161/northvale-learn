@@ -24,7 +24,11 @@ import retire from "./retire.js";
 import earning from "./earning.js";
 import news from "./news.js";
 import borders from "./borders.js";
+import remit from "./remit.js";
+import twobanks from "./twobanks.js";
+import crosswork from "./crosswork.js";
+import borderscams from "./borderscams.js";
 
-export const UNITS = [budget, save, banking, paycheck, credit, scams, compound, taxes, insurance, psychology, stocks, etf, risk, crypto, retire, earning, news, borders];
+export const UNITS = [budget, save, banking, paycheck, credit, scams, compound, taxes, insurance, psychology, stocks, etf, risk, crypto, retire, earning, news, borders, remit, twobanks, crosswork, borderscams];
 
 export { PLACEMENT } from "./placement.js";

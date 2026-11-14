@@ -346,6 +346,42 @@ export const MISSIONS = [
     ask: T("Which one costs less, and by how much?", "¿Cuál cuesta menos y por cuánto?"),
   }),
 
+  m("remitid", {
+    unit: "remit",
+    icon: "send",
+    time: 15,
+    title: T("Find out how your family can receive money", "Averigua cómo puede recibir dinero tu familia"),
+    how: T("Ask someone who receives money from far away which ways they can use (cash pickup, a bank account, an app), what ID each one needs, and what each costs them. Write the answers in one place.", "Pregunta a alguien que recibe dinero de lejos qué formas puede usar (efectivo en ventanilla, cuenta de banco, una app), qué identificación pide cada una y cuánto le cuesta. Anota las respuestas en un solo lugar."),
+    ask: T("What surprised you?", "¿Qué te sorprendió?"),
+  }),
+
+  m("bankasks", {
+    unit: "twobanks",
+    icon: "building",
+    time: 15,
+    title: T("Read what a bank needs to open an account", "Lee qué pide un banco para abrir una cuenta"),
+    how: T("Pick one bank and find the page that lists what it needs to open an account: the ID it accepts, proof of address and tax number. Just reading, don't apply. Write the list on one line.", "Elige un banco y busca la página que explica qué pide para abrir una cuenta: la identificación que acepta, el comprobante de domicilio y el número fiscal. Solo leer, no solicites nada. Anota la lista en una línea."),
+    ask: T("Was anything on the list a surprise?", "¿Hubo algo en la lista que te sorprendió?"),
+  }),
+
+  m("workfolder", {
+    unit: "crosswork",
+    icon: "users",
+    time: 15,
+    title: T("List the papers you'd keep if you worked in both countries", "Haz la lista de papeles que guardarías si trabajaras en ambos países"),
+    how: T("Write the list of what you'd keep in one folder for each job: pay stubs or recibos de nómina, the contract, tax forms, benefit statements. Add where you'd keep a backup. Nothing to share or send, this is just your plan.", "Haz la lista de lo que guardarías en una carpeta por cada empleo: recibos de pago o de nómina, el contrato, formularios de impuestos, estados de prestaciones. Agrega dónde guardarías una copia. No hay nada que compartir o enviar, es solo tu plan."),
+    ask: T("What would be hardest to get back if you lost it?", "¿Qué sería lo más difícil de recuperar si lo perdieras?"),
+  }),
+
+  m("codeword", {
+    unit: "borderscams",
+    icon: "shield",
+    time: 10,
+    title: T("Agree on a family code word", "Acuerden una palabra clave en la familia"),
+    how: T("Pick a word or phrase only your family would know, and tell it to the people who might get an \"emergency\" call. Decide together: if someone asks for money urgently, they must say it, or you hang up and call back.", "Elijan una palabra o frase que solo tu familia conozca y díganla a quienes podrían recibir una llamada de \"emergencia\". Decidan juntos: si alguien pide dinero con urgencia, debe decirla, o cuelgas y vuelves a llamar."),
+    ask: T("Who did you tell, and what did they say?", "¿A quién se lo dijiste y qué dijo?"),
+  }),
+
   // Reading the news
   m("headline", {
     unit: "news",
