@@ -4,7 +4,7 @@ Every fact, number and rule the app states, with where to check it. Tick each on
 
 **Status:** the advisor checked the content facts on 2026-10-25 and 2026-10-26 (see `docs/CONTENT-REVIEW.md`). What's new since then is marked **new**. Nothing here is legal advice.
 
-## 1. Numbers that change (src/core/facts.js): 61
+## 1. Numbers that change (src/core/facts.js): 86
 
 Each one appears in the lessons, the glossary or the tools as `{@name}`; `docs/FACTS.md` says where.
 
@@ -65,14 +65,39 @@ Each one appears in the lessons, the glossary or the tools as `{@name}`; `docs/F
 | ☐ | `remitFeeExampleB` **new** | $0 | an example of a service advertising no fee; teaching number | yearly |
 | ☐ | `remitMarkupExampleB` **new** | 5% | an example bigger markup hidden in the exchange rate; teaching number | yearly |
 | ☐ | `remitCancelMinutes` **new** | 30 | consumerfinance.gov — the Remittance Rule: a sender can usually cancel within 30 minutes of paying, if the money hasn't been picked up or deposited | rarely (set by law) |
+| ☐ | `remitRecordUSD` | $3,000 | 31 CFR 1010.410(e) — nonbank financial institutions (money transmitters) must collect and keep the sender's details for transmittals of this amount or more. Text read on law.cornell.edu 2026-11-17; confirm on ecfr.gov or fincen.gov | rarely (set by law) |
 | ☐ | `fbarThreshold` **new** | $10,000 | fincen.gov — people in the US must report foreign accounts if together they top this at any time in the year (FBAR) | rarely (set by law) |
 | ☐ | `f1WorkHours` **new** | 20 | studyinthestates.dhs.gov — an F-1 student can usually work on campus up to this many hours a week while classes are in session | rarely (set by law) |
+| ☐ | `usOvertimeHours` | 40 | dol.gov, Fact Sheet #23 — covered, non-exempt US workers get at least time and one-half for hours over 40 in a workweek (federal rule; some states add their own) | rarely (set by law) |
+| ☐ | `usSsCredits` | 40 | ssa.gov, Benefits Planner — 40 Social Security credits (about 10 years of work, at most 4 a year) to qualify for retirement benefits | rarely (set by law) |
+| ☐ | `usLargeEmployer` | 50 | irs.gov, Employer shared responsibility — employers with 50 or more full-time employees, counting full-time equivalents, must offer affordable coverage or may owe a payment | rarely (set by law) |
+| ☐ | `mxWeekHours` | 48 | Mexico's 2026 workweek reform (Constitution art. 123 reform in force 4 March 2026; LFT reform in force 1 May 2026, as reported by the Cámara de Diputados): maximum weekly hours step down 48 (2026), 46 (2027), 44 (2028), 42 (2029), 40 (2030). Read the DOF decree. THIS NUMBER CHANGES EACH JANUARY | yearly (steps down each January) |
+| ☐ | `mxWeekHoursFinal` | 40 | the same reform: 40 hours a week from 2030. Read the DOF decree | yearly |
+| ☐ | `usMxSsaAgreementStatus` | has not taken effect / no ha entrado en vigor | ssa.gov list of international agreements — the US–Mexico Social Security agreement was signed 29 June 2004; secondary sources (KPMG, tax guides) say it never entered into force. SSA's pages would not load for me, so confirm there. If it is now in force, REWRITE lesson 4 of 'Working across the border' | yearly |
+| ☐ | `usReportSite` | ReportFraud.ftc.gov / ReportFraud.ftc.gov | reportfraud.ftc.gov — the FTC's place to report fraud and scams (consumer.ftc.gov, 'What to do if you were scammed') | yearly |
+| ☐ | `mxReportLine` | 088 / 088 | gob.mx/gncertmx — the Guardia Nacional's 088 Atención Ciudadana gives guidance on filing a cybercrime report. Confirm the number and what it covers (fraud by phone and in person is not clearly stated) | yearly |
+| ☐ | `usCardLiability` | $50 | consumerfinance.gov, Regulation Z 1026.12 and Regulation E 1005.6 — most you can owe for unauthorized use of a credit card ($50), and of a debit card if you report within two business days | rarely (set by law) |
+| ☐ | `usDisputeDays` | 60 | consumerfinance.gov — send a written billing error notice within 60 calendar days after the charge appeared on your credit card statement (Regulation Z 1026.13) | rarely (set by law) |
+| ☐ | `usDebitReportDays` | 2 | consumerfinance.gov, Regulation E 1005.6 — report a lost or stolen debit card within two business days to cap your loss at $50 (it rises to $500 after that) | rarely (set by law) |
+| ☐ | `mxDisputeDays` | 90 | CONDUSEF (article of 6 Feb 2018, citing Banxico's rules) — 90 natural days from the statement cut date, or from the charge, to object to a charge you don't recognize. The article is old: confirm the current Banxico rule and how the days are counted | yearly |
+| ☐ | `usNegativeYears` | 7 | consumerfinance.gov and consumer.ftc.gov (Fair Credit Reporting Act) — most accurate negative items can be reported for 7 years | rarely (set by law) |
+| ☐ | `usBankruptcyYears` | 10 | consumerfinance.gov and consumer.ftc.gov — a bankruptcy can be reported for up to 10 years. A CFPB table lists Chapter 13 at 7; confirm | rarely (set by law) |
+| ☐ | `usCreditDisputeDays` | 30 | consumer.ftc.gov, Disputing errors on your credit reports — the credit bureau has 30 days to investigate a dispute | rarely (set by law) |
+| ☐ | `usFreeReportFrequency` | once a week / una vez por semana | consumer.ftc.gov (Oct 2023) — the three nationwide bureaus made free weekly reports at AnnualCreditReport.com permanent. Federal law's right is one free report per bureau every 12 months, so confirm the weekly program still runs | yearly |
+| ☐ | `mxBuroMaxYears` | 6 | Ley para Regular las Sociedades de Información Crediticia, art. 23, via CONDUSEF — negative records stay from 1 year (debts up to 25 UDIs) up to 6 years (over 1,000 UDIs, under 400,000 UDIs, not in court or fraud). Confirm the tiers | yearly |
+| ☐ | `mxVacationDaysYear1` | 12 | Ley Federal del Trabajo art. 76 (reform of 27 Dec 2022), via PROFEDET — at least 12 vacation days after the first year of work | yearly |
+| ☐ | `mxVacationDaysYear5` | 20 | LFT art. 76, via PROFEDET — +2 days a year up to 20 in the fifth year (then +2 every five years) | yearly |
+| ☐ | `mxPrimaVacacionalPct` | 25% | LFT art. 80, via PROFEDET — prima vacacional of at least 25% of the pay for the vacation days | rarely (set by law) |
+| ☐ | `mxProbationDays` | 30 | LFT art. 39-A (consolidated text, last reform 21 Feb 2025) — a probation of up to 30 days; it must be in writing (art. 39-C) | yearly |
+| ☐ | `mxProbationDaysSenior` | 180 | LFT art. 39-A — up to 180 days only for management roles or specialized technical or professional work | yearly |
+| ☐ | `foreignGiftReportUSD` | $100,000 | irs.gov, Gifts from foreign person / Instructions for Form 3520 — a US person who receives more than this in a year from a nonresident alien or foreign estate reports it on Form 3520 (an information return; foreign gifts aren't subject to income tax). Gifts from related people are added together. Separate, lower line for foreign corporations and partnerships | yearly (inflation-adjusted lines exist for other cases) |
+| ☐ | `cashDeclareUSD` | $10,000 | cbp.gov / FinCEN Form 105 (US: report more than $10,000 in currency or monetary instruments carried in or out) and anam.gob.mx (Mexico: declare more than the equivalent of US$10,000 on entry or exit; fine of 20% to 40% of the excess) | rarely (set by law) |
 | ☐ | `sampleUsdMxn` | 18.5 | banxico.org.mx FIX rate — keep near reality even as a sample | monthly |
 | ☐ | `startCashUS` | $10,000 | product choice | — |
 | ☐ | `startCashMX` | $200,000 MXN | product choice | — |
 | ☐ | `pprDeductionCap` | $213,973 MXN | pprDeductionUmas × umaAnnual (computed) | with umaAnnual |
 
-## 2. Worked examples: 10
+## 2. Worked examples: 13
 
 Calculations in lessons done with a fact's current value. The content check re-does each one from facts.js, so if a fact changes, `npm test` names the lesson to rewrite. Nothing to check by hand unless a fact changes.
 
@@ -85,6 +110,9 @@ Calculations in lessons done with a fact's current value. The content check re-d
 - Taxes 1, step 4: a $20 shirt plus sales tax is $21.50
 - Taxes 1, step 4 (Mexico): the IVA in a $232 price tag is $32
 - The idea "What taxes are for": a tax included in the price is about $13.79 of $100 (Mexico: $160 of $1,160), at 16%
+- Working across the border 4, step 5: the Social Security credits needed, at four a year, take 10 years
+- Judging a job offer 3, step 4 (Mexico): the minimum aguinaldo is the legal days of salary times a 600-peso daily pay
+- Debt & credit 4 (draft), step 4: $1,000 at the card rate is about $200 (Mexico: $10,000 at the CAT, about $4,000)
 - Mission "Find the sales tax on a receipt": IVA is about 14% of a price that includes it
 
 ## 3. Statements in lessons that the advisor confirmed (recheck yearly)

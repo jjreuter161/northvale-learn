@@ -11,7 +11,9 @@ import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { chromium } from "playwright-core";
-import { UNITS } from "../src/modules/lessons/units/all.js";
+import { UNITS as ALL_UNITS } from "../src/modules/lessons/units/all.js";
+// Draft units aren't in the app yet, so the app tests skip them.
+const UNITS = ALL_UNITS.filter((u) => !u.draft);
 
 const ROOT = join(import.meta.dirname, "..");
 const port = 30000 + Math.floor(Math.random() * 20000);

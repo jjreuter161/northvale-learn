@@ -8,7 +8,9 @@ import { chromium } from "playwright-core";
 import { COPY, PROMISE } from "../docs/marketing/content.mjs";
 import { aboutHtml, fingerprint, flyerHtml, readBack } from "../docs/marketing/build.mjs";
 import { qrMatrix, qrSvg } from "../docs/marketing/lib/qr.mjs";
-import { UNITS } from "../src/modules/lessons/units/all.js";
+import { UNITS as ALL_UNITS } from "../src/modules/lessons/units/all.js";
+// Marketing counts only what learners can open: draft units aren't in the app yet.
+const UNITS = ALL_UNITS.filter((u) => !u.draft);
 
 const ROOT = join(import.meta.dirname, "..");
 const MK = join(ROOT, "docs", "marketing");

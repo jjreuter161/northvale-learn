@@ -309,6 +309,28 @@ const SETS = {
       L(T("Never sell, no matter what.", "Nunca vendas, pase lo que pase."), true, T("Being told never to sell, whatever happens, is pressure, not analysis.", "Que te digan que nunca vendas, pase lo que pase, es presión, no análisis.")),
     ],
   },
+  family: {
+    ask: T("A text from a new number. Tap the red flags.", "Un mensaje de un número nuevo. Toca las señales de alerta."),
+    from: T("From: unknown number", "De: número desconocido"),
+    lines: [
+      L(T("Hi, it's me. I lost my phone, this is my new number.", "Hola, soy yo. Perdí mi celular, este es mi número nuevo."), true, T("A new number proves nothing. It's how the script starts. Check on the number you already have.", "Un número nuevo no prueba nada. Así empieza el guion. Revisa en el número que ya tienes.")),
+      L(T("I'm in trouble. Please don't tell anyone.", "Estoy en problemas. Por favor no le digas a nadie."), true, T("Secrecy stops you from checking with family. Scammers ask for it on purpose.", "El secreto te impide confirmar con la familia. Los estafadores lo piden a propósito.")),
+      L(T("I need {$400|7000} today, it can't wait.", "Necesito {$400|7000} hoy, no puede esperar."), true, T("A rush is there so you act before you think.", "La prisa es para que actúes antes de pensar.")),
+      L(T("Pay with gift cards or a transfer to my friend's account.", "Paga con tarjetas de regalo o una transferencia a la cuenta de mi amigo."), true, T("Gift cards, transfers to a third person and crypto are hard to trace and to get back.", "Las tarjetas de regalo, las transferencias a un tercero y las criptomonedas son difíciles de rastrear y de recuperar.")),
+      L(T("Thank you, I'll pay you back.", "Gracias, te lo pago."), false, T("Polite words prove nothing either way. Scammers use them too.", "Las palabras amables no prueban nada. Los estafadores también las usan.")),
+    ],
+  },
+  official: {
+    ask: T("A call from someone who says he is an officer. Tap the red flags.", "Una llamada de alguien que dice ser un oficial. Toca las señales de alerta."),
+    from: T("From: \"Border Customs Office\" (unknown number)", "De: \"Oficina de Aduanas\" (número desconocido)"),
+    lines: [
+      L(T("A package from your family is held at the border.", "Un paquete de tu familia está retenido en la frontera."), true, T("You weren't expecting it, and a real agency would send an official notice.", "No lo esperabas, y una agencia real enviaría un aviso oficial.")),
+      L(T("To release it, pay a {$150|2700} fee today.", "Para liberarlo, paga una cuota de {$150|2700} hoy."), true, T("Real fees are paid through the agency's official channel, not to a caller.", "Las cuotas reales se pagan por el canal oficial de la agencia, no a quien llama.")),
+      L(T("Pay with gift cards or cryptocurrency.", "Paga con tarjetas de regalo o criptomonedas."), true, T("No government agency demands payment by gift card, wire, crypto or payment app.", "Ninguna agencia de gobierno exige pagos con tarjetas de regalo, transferencias, criptomonedas o apps de pago.")),
+      L(T("If you hang up, you could be arrested.", "Si cuelgas, podrías ser arrestado."), true, T("Real agencies don't threaten arrest over the phone to get a payment.", "Las agencias reales no amenazan con arresto por teléfono para cobrar.")),
+      L(T("You can look up our office number and call us back.", "Puedes buscar el número de nuestra oficina y llamarnos."), false, T("A good sign. Real officials are fine with you checking. Look the number up yourself.", "Buena señal. A los oficiales reales no les molesta que verifiques. Busca el número tú mismo.")),
+    ],
+  },
 };
 export function ScamTool({ params = {}, t, locale, onDone, done }) {
   const set = SETS[params.set] || SETS.phishing;

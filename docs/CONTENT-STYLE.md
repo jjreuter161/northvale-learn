@@ -66,6 +66,29 @@ People aged 15–25, many of them earning for the first time, in the US and Mexi
 - **Every lesson has an "In real life" line** (`life`): one concrete thing to do this week, shown when the lesson is finished.
 - **Every concept has** another way to explain it (`explain`), an easier true/false (`easy`) and a harder multiple-choice (`challenge`).
 
+## Lesson design: teach people to think, not to memorize
+
+These rules apply to **every** lesson, in every track. The goal is a learner who can make a decision, not one who can repeat a definition. A worked example is in `docs/samples/BUSINESS-SAMPLE-LESSON.md`.
+
+1. **Concept before terminology.** Show what happens first, then name it.
+   - Not: "Profit is revenue minus costs."
+   - Instead: tell a month of a taquería's money in and money out, let the learner say what's left, and only then: "That's called profit."
+2. **Open with a question that makes the learner think.** The first card ends with a question about the story, and the first question makes the learner commit to an answer before the explanation. Never open with a definition.
+3. **Real examples, two kinds.**
+   - **Local and relatable:** a taquería, a border shop, a phone-repair stand, a small online store. Made-up names are fine; label them as examples.
+   - **Well-known companies:** short, factual, in our own words. No logos or their images. One sentence is enough. Every fact comes from the company's own filings or an official source and is listed in `docs/CONTENT-REVIEW.md` under "Please verify". If a fact can't be checked, use a local example instead.
+4. **Every lesson has an application.** At least one of: a real-life choice (`scenario`, or a `choice` with trade-offs), or a calculation (`number`, `estimate`). Definitions alone don't count, and neither does a recall question.
+5. **Include failure.** Many lessons include a short case of something that went wrong, asked as "Why did this fail?" or "What would you have done?", with a sympathetic tone: failures here are about numbers and decisions, never about the person. Business lessons carry the failure as a `value` story: "created value, but didn't capture it."
+6. **Test understanding, never "define X."** A question gives a situation and asks what it means or what to do.
+   - Not: "What is gross margin?"
+   - Instead: "A shop sold {$100000|600000} last year and spent {$115000|690000}. Is it successful? Why?"
+   Answers are plausible mistakes, and `miss` explains the specific misunderstanding each one shows.
+7. **Still the same limits.** At most 4.5 minutes per lesson in both languages (the validator checks it; a lesson with a calculation and a failure case usually has 3 questions, not 5), at least 3 question kinds, both languages, US and Mexico numbers, our own words, and a sources list for the unit.
+
+**Business lessons also carry a `value` tag:** `create` (solving a real problem), `deliver` (getting it to people) or `capture` (keeping something after costs). The tag shows as a small chip on the lesson, and the lesson or its closing line says which part it's about. This ties 15 business units into one idea.
+
+**Mix the difficulty.** Inside a unit, lessons go from showing, to doing a calculation, to making a choice with trade-offs. Across a track, levels go Start, Build, Go further, with each level assuming only the one before.
+
 ## Numbers
 
 - **Amounts:** write amounts as `{$US|MX}`. They should be round, realistic local numbers, not conversions ({$400|6000}, not {$400|7400}).
@@ -124,3 +147,4 @@ A mission is a small real-life task that goes with a unit. The catalog is `src/m
 3. Check every number in both countries.
 4. Look for advice words: "should", "best", "always", "guaranteed", "will".
 5. Try the lesson in the app at phone size.
+6. **Design check:** the first card tells before it names; it opens with a story and a question, not a definition; there's an application; there's no "define X" question; any real company fact is in `docs/CONTENT-REVIEW.md`.

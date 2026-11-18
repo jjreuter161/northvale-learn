@@ -12,7 +12,7 @@
 // Run: node scripts/validate-content.mjs (npm test runs it too).
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import { UNITS, PLACEMENT } from "../src/modules/lessons/units/all.js";
+import { UNITS as LIVE_AND_DRAFT_UNITS, PLACEMENT, ADDITIONS } from "../src/modules/lessons/units/all.js";
 import { FACTS } from "../src/core/facts.js";
 import { pick, fill } from "../src/core/i18n.js";
 import { minutesOf as minutes, isQuestion, QUESTION_TYPES } from "../src/modules/lessons/units/time.js";
@@ -20,6 +20,11 @@ import { fv } from "../src/modules/lessons/units/helpers.js";
 import { MISSIONS } from "../src/modules/missions/catalog.js";
 import { MYTHS } from "../src/modules/lessons/myths.js";
 
+// Draft lessons added to live units (units/additions.js) are checked as part of their unit.
+const UNITS = LIVE_AND_DRAFT_UNITS.map((u) => {
+  const extra = ADDITIONS.filter((a) => a.unit === u.id);
+  return extra.length ? { ...u, concepts: [...(u.concepts || []), ...extra.flatMap((a) => a.concepts || [])], lessons: [...u.lessons, ...extra.flatMap((a) => a.lessons)] } : u;
+});
 const root = join(import.meta.dirname, "..");
 const MINUTES = { min: 2.5, max: 4.5 };
 
@@ -39,6 +44,9 @@ export const WORKED = [
   ["Taxes 1, step 4: a $20 shirt plus sales tax is $21.50", () => near(20 * (1 + F("salesTaxExample") / 100), step("taxes-1", 4).spec.answer[0], 0.001)],
   ["Taxes 1, step 4 (Mexico): the IVA in a $232 price tag is $32", () => near(232 - 232 / (1 + F("ivaRate") / 100), step("taxes-1", 4).spec.answer[1], 0.001)],
   ["The idea \"What taxes are for\": a tax included in the price is about $13.79 of $100 (Mexico: $160 of $1,160), at 16%", () => F("ivaRate") === 16],
+  ["Working across the border 4, step 5: the Social Security credits needed, at four a year, take 10 years", () => F("usSsCredits") / 4 === step("borderwork-4", 5).spec.answer],
+  ["Judging a job offer 3, step 4 (Mexico): the minimum aguinaldo is the legal days of salary times a 600-peso daily pay", () => F("aguinaldoDays") * 600 === step("joboffer-3", 4).spec.answer[1]],
+  ["Debt & credit 4 (draft), step 4: $1,000 at the card rate is about $200 (Mexico: $10,000 at the CAT, about $4,000)", () => near(1000 * F("cardAprTypical") / 100, step("credit-4", 4).spec.answer[0]) && near(10000 * F("catTypical") / 100, step("credit-4", 4).spec.answer[1])],
   ["Mission \"Find the sales tax on a receipt\": IVA is about 14% of a price that includes it", () => Math.round((F("ivaRate") / (100 + F("ivaRate"))) * 100) === 14],
 ];
 
@@ -224,7 +232,30 @@ export function validateContent() {
   }
   // Today and the lesson's end say why each unit matters, in one line.
   const lessonsSrc = readFileSync(join(root, "src/modules/lessons/index.jsx"), "utf8");
-  for (const u of UNITS) if (!lessonsSrc.includes(`"why.${u.id}":`)) fail(`unit ${u.id}`, `no "why.${u.id}" line in lessons/index.jsx`);
+  const loadersSrc = readFileSync(join(root, "src/modules/lessons/units/index.js"), "utf8");
+  for (const u of UNITS) {
+    const at = `unit ${u.id}`;
+    if (u.draft) {
+      // A draft never reaches learners: no "why" line or loader yet, and no sign-off.
+      if (u.reviewed) fail(at, "is marked both draft and reviewed");
+      if (loadersSrc.includes(`${u.id}: () =>`)) fail(at, "is a draft but index.js loads it");
+    } else {
+      if (!lessonsSrc.includes(`"why.${u.id}":`)) fail(at, `no "why.${u.id}" line in lessons/index.jsx`);
+      if (!loadersSrc.includes(`${u.id}: () =>`)) fail(at, "isn't in index.js's LOADERS");
+    }
+    // New-format units (draft or reviewed) name at least two official sources, with a URL and the date last checked.
+    if (u.draft || u.reviewed) {
+      const ok = (u.sources || []).filter((s) => /^https:\/\//.test(s.url || "") && /^\d{4}-\d{2}-\d{2}$/.test(s.checked || "") && s.name);
+      if (ok.length < 2) fail(at, "needs at least two official sources ({ name, url, checked: YYYY-MM-DD })");
+    }
+    if (u.reviewed && !/^\d{4}-\d{2}-\d{2} · \S+/.test(u.reviewed)) fail(at, 'reviewed should look like "2027-01-15 · initials"');
+  }
+  for (const a of ADDITIONS) {
+    const at = `additions to ${a.unit}`;
+    if (!UNITS.some((u) => u.id === a.unit)) fail(at, "no such unit");
+    const ok = (a.sources || []).filter((s) => /^https:\/\//.test(s.url || "") && /^\d{4}-\d{2}-\d{2}$/.test(s.checked || "") && s.name);
+    if (ok.length < 2) fail(at, "needs at least two official sources ({ name, url, checked: YYYY-MM-DD })");
+  }
   // Every piece of app text a screen asks for — t("key") — exists.
   const appSrc = sourceFiles(join(root, "src")).map((f) => readFileSync(f, "utf8")).join("\n");
   const keys = [...appSrc.matchAll(/^\s*"([\w.]+)":\s*(?:S\(|\{)/gm)].map((x) => x[1]);

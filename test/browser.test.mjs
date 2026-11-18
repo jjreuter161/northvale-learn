@@ -18,7 +18,9 @@ import { join } from "node:path";
 import assert from "node:assert/strict";
 import { chromium } from "playwright-core";
 import { ALL_LESSONS, UNITS } from "../src/modules/lessons/content.js";
-import { UNITS as FULL_UNITS } from "../src/modules/lessons/units/all.js";
+import { UNITS as ALL_FULL_UNITS } from "../src/modules/lessons/units/all.js";
+// Draft units aren't in the app yet, so the app tests skip them.
+const FULL_UNITS = ALL_FULL_UNITS.filter((u) => !u.draft);
 import { MISSIONS } from "../src/modules/missions/catalog.js";
 import { newGoal } from "../src/modules/goals/plan.js";
 import { weekStart, dayKey } from "../src/core/progress.js";

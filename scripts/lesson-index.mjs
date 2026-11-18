@@ -12,7 +12,8 @@ import { UNITS } from "../src/modules/lessons/units/all.js";
 import { minutesOf, isQuestion } from "../src/modules/lessons/units/time.js";
 
 const FILE = join(import.meta.dirname, "../src/modules/lessons/units/index.gen.js");
-const index = UNITS.map((u) => ({
+// Draft units (not yet signed off by a reviewer) stay out of the app's index.
+const index = UNITS.filter((u) => !u.draft).map((u) => ({
   id: u.id,
   icon: u.icon,
   title: u.title,

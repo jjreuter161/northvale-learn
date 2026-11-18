@@ -64,5 +64,6 @@ Some lessons show a calculation done with a fact's current value (a card's inter
 | `remitFeeExampleA` / `remitMarkupExampleA` | $5 / 3% | the remittance tool, "Service A" | illustrative; never a real company |
 | `remitFeeExampleB` / `remitMarkupExampleB` | $0 / 5% | the remittance tool, "Service B" | illustrative; shows "no fee" isn't always cheaper |
 | `remitCancelMinutes` | 30 | lesson "What sending money really costs" | the Remittance Rule's cancellation window |
+| `remitRecordUSD` | $3,000 | draft unit "Sending and receiving money", lesson 5 | FinCEN funds-transfer recordkeeping threshold; for the reviewer to confirm |
 | `fbarThreshold` | $10,000 | lesson "Accounts and cards in two countries" | FinCEN's FBAR threshold |
 | `f1WorkHours` | 20 | lesson "Credit and work when you move" | F-1 on-campus work limit during classes |

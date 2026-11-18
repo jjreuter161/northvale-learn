@@ -1,15 +1,16 @@
-# Content roadmap: from 18 units and 63 lessons to 50 units and 225 lessons
+# Content roadmap: from 18 units and 63 lessons to 62 units and 281 lessons
 
-**Status: a plan for your approval. Nothing here is built yet.** When you approve (or change) the order, Wave 1 starts.
+**Status: a plan for your approval. Nothing here is built yet.** When you approve (or change) the order, Wave 1 starts. *Updated for the new business direction (teach people to think, not to memorize): business is now 15 units in two tracks, with a sample lesson and a simulator plan (see "Business: teaching it the right way").*
 
 ## In one page
 
 - **Today:** 18 units, 63 lessons (nine units have 3 lessons, nine have 4).
-- **Goal:** 50 units, 225 lessons: the 18 we have (nine of them grow from 3 to 5 lessons, +18 lessons) and **32 new units** (16 with 5 lessons, 16 with 4: 144 lessons). 63 + 18 + 144 = **225**.
-- **Twelve tracks, three levels.** Tracks group units by what a person is trying to do; levels (**Start, Build, Go further**) say how far in they are. A learner sees the track their goal and country point to first.
+- **Goal:** 62 units, 281 lessons: the 18 we have (nine of them grow from 3 to 5 lessons, +18 lessons) and **44 new units** (29 money units with 131 lessons, and **15 business units with 69 lessons**). 63 + 18 + 131 + 69 = **281**.
+- **Thirteen tracks, three levels.** Tracks group units by what a person is trying to do; levels (**Start, Build, Go further**) say how far in they are. A learner sees the track their goal and country point to first.
 - **The biggest strength comes first.** Wave 1 is the border: sending money, banking in two countries, working across the border, taxes in two countries, border scams, plus digital payments, credit scores and judging a job offer.
-- **Four waves of eight new units**, each with a human finance review before it goes live. About 36 new lessons per wave, plus a few added to existing units.
-- **Same standards as today:** every lesson 3–4.5 minutes, at least 3 kinds of question, an "In real life" line, a real-life mission per unit, every changeable number in `facts.js` and `docs/VERIFY-BEFORE-LAUNCH.md`, both languages, US and Mexico versions where the system differs, never advice.
+- **Business is taught as thinking, not vocabulary.** Ten fundamentals (entrepreneurship, economics, finance, marketing, sales, management, accounting, operations, strategy, business law and ethics) in four stages (Foundations, Building, Operating, Growing), tied together by one idea: create value, deliver it, capture some of it. Two new waves (5 and 6) carry it.
+- **Six waves**, each with a human review before it goes live: four of about 8 money units, then two business waves (7 and 8 units).
+- **Same standards as today:** every lesson 3–4.5 minutes, at least 3 kinds of question, an "In real life" line, a real-life mission per unit, every changeable number in `facts.js` and `docs/VERIFY-BEFORE-LAUNCH.md`, both languages, US and Mexico versions where the system differs, never advice. New lesson design rules for every lesson are in `docs/CONTENT-STYLE.md`.
 
 ## Tracks and levels
 
@@ -27,10 +28,11 @@ Levels: **Start** (anyone can begin), **Build** (needs the basics), **Go further
 | **Life Across Borders** / La vida entre fronteras | 6 | Money across borders, Sending and receiving money (new) | Banking in two countries (new), Working across the border (new), Border scams (new) | Taxes in two countries (new) |
 | **Big Life Decisions** / Grandes decisiones | 4 | | Paying for school (new), Buying a car (new), Renting a place (new) | Buying a home (new) |
 | **Protecting Yourself** / Protégete | 5 | Insurance basics, Scams and fraud, Identity and data (new) | Your rights as a customer (new) | If something goes wrong (new) |
-| **Building a Business** / Tu propio negocio | 3 | | Starting a small business (new) | Business money (new), Taxes for small business (new) |
+| **How Business Works** / Cómo funcionan los negocios | 7 | How a business works (new), Prices, costs and competition (new), Revenue, costs and profit (new) | Starting a small business (new), Customers and marketing (new), Selling (new), Making it legal and doing it right (new) | |
+| **Running a Business** / Dirigir un negocio | 8 | | Operations (new), Bookkeeping and accounting (new) | Cash flow and business money (new), Taxes for small business (new), Managing people (new), Strategy (new), Growing without breaking (new), Funding growth (new) |
 | **How the Economy Works** / Cómo funciona la economía | 2 | | Reading financial news | Inflation, rates and the economy (new) |
 
-"Earning more" (side hustles, freelancing, pricing) stays in Work and Income and leads into "Starting a small business."
+"Earning more" (side hustles, freelancing, pricing) stays in Work and Income and leads into "Starting a small business" (unit 49). Business is two tracks, explained under "Business: teaching it the right way."
 
 ## The full outline
 
@@ -201,7 +203,7 @@ For each unit: **After this unit you can…**; the lessons (English titles here;
 
 **34. Working across the border** / Trabajar a los dos lados de la frontera *(new, Build; 5; Border)*
 - After this unit you can: say what pay, benefits and rights come with work on each side, and how pensions are counted when you've worked in both.
-- Lessons: Who can work where, and with what papers · Pay, overtime and deductions on each side · Health coverage and benefits (IMSS and US plans) · Social Security and IMSS: the US–Mexico agreement · Keeping records for later
+- Lessons: Who can work where, and with what papers · Pay, overtime and deductions on each side · Health coverage and benefits (IMSS and US plans) · Two pension systems: Social Security credits and IMSS weeks (the 2004 US–Mexico agreement has not taken effect, so each system counts its own work) · Keeping records for later
 - Mission: List the papers you'd keep in one folder if you worked in both countries.
 - Landmark: a commuter ferry with a rail.
 
@@ -269,64 +271,195 @@ For each unit: **After this unit you can…**; the lessons (English titles here;
 - Mission: Write who you'd call and where your papers are.
 - Landmark: a covered lifeboat station.
 
-### Building a Business
+### Business: teaching it the right way (two tracks, 15 units)
 
-**46. Starting a small business** / Cómo empezar un negocio pequeño *(new, Build; 5; Both)*
-- After this unit you can: test an idea cheaply, price it, and find your first customers.
-- Lessons: A small test before a big bet · Who will pay, and how much · Costs, price and profit · Getting your first customers · When to make it official
+Most business courses make people memorize terms. Ours teaches people to **think like a businessperson**: make decisions, solve problems, and see why a business succeeds or fails. The plan replaces the three business units in the earlier draft (Starting a small business, Business money, Taxes for small business) with 15 units; those three live on inside it as units 49, 55 and 56.
+
+**The big idea that connects everything:** a business **creates value** (solves a real problem), **delivers value** (gets it to people), and **captures some of it** (keeps something after costs). Every business lesson has a small `value` tag (create, deliver or capture), shown as a chip on the lesson, and its "In real life" line or last question links back to the idea. Failure cases are sorted the same way: "this business created value but didn't capture it."
+
+**Ten fundamentals, four stages.** Each fundamental has at least one unit; the big ones return in a later stage at a harder level.
+
+| Stage (question it answers) | Level | Units | Fundamentals it covers |
+|---|---|---|---|
+| **Foundations**: how does business work? | Start | 46 How a business works · 47 Prices, costs and competition · 48 Revenue, costs and profit | Entrepreneurship, economics, finance |
+| **Building**: how do you build one? | Build | 49 Starting a small business · 50 Customers and marketing · 51 Selling · 52 Making it legal and doing it right | Entrepreneurship, marketing, sales, business law and ethics |
+| **Operating**: how do you run it? | Build, then Go further | 53 Operations · 54 Bookkeeping and accounting · 55 Cash flow and business money · 56 Taxes for small business · 57 Managing people | Operations, accounting, finance, law, management |
+| **Growing**: how do you scale it? | Go further | 58 Strategy: where to compete · 59 Growing without breaking · 60 Funding growth | Strategy, finance, economics |
+
+| Fundamental | Where it lives |
+|---|---|
+| Entrepreneurship | 46, 49 |
+| Economics | 47, 58 |
+| Finance | 48, 55, 60 |
+| Marketing | 50 |
+| Sales | 51 |
+| Management | 57 |
+| Accounting | 54 |
+| Operations | 53 |
+| Strategy | 58, 59 |
+| Business law and ethics | 52, 56, and an ethics case in every stage |
+
+**Tracks.** The stages become two tracks, so the Learn chart stays small: **How Business Works** (Foundations and Building: 7 units, Start and Build) and **Running a Business** (Operating and Growing: 8 units, Build and Go further). Anyone can open How Business Works without finishing any money unit. Running a Business opens after Building is mostly done.
+
+**Every business lesson follows the design rules** in `docs/CONTENT-STYLE.md` ("Teaching business and everything else"): concept before term, opens with a question, a local example (a taquería, a border shop, a phone-repair stand, a small online store) and sometimes a well-known company, an application (a choice or a calculation), failure cases, scenario questions instead of "define X," at most 4.5 minutes. A full sample is in `docs/samples/BUSINESS-SAMPLE-LESSON.md`.
+
+**Mexico and the US.** Business law and tax differ, so units 52, 54, 56 and 57 are **Both** with complete Mexico versions (persona física, RESICO, SAS, IMSS, facturas). Units 52, 56 and 57 need a licensed professional's review before shipping (see Quality plan).
+
+**Business missions** (real-life tasks; same rules as other missions, just reading, nothing handed over; an adult-only or parent-guided version where an account or paperwork is involved):
+- **Find out how a local business makes money** (unit 46): pick a place you visit, list what it sells, who pays, and its biggest costs. Reflection: "What surprised you?"
+- **Find the price of the same product in three places** (unit 47): note the three prices and one reason they might differ.
+- **Work out the cost of one thing a business sells** (unit 48): a taco, a haircut, a phone case; list the costs inside one and guess the profit.
+- **Price a product you could sell** (unit 49): costs, a price, what's left. (Carries over from the earlier draft.)
+- **Ask three people what they'd want from a business like yours** (unit 50).
+- **Watch a sale** (unit 51): at a shop, write what the seller asked before naming a price.
+- **Find which permit a local food stand needs** (unit 52): official site only, just reading.
+- **Map the steps of one purchase** (unit 53): from walking in to walking out.
+- **List the records a small business keeps** (unit 54).
+- **Draw a one-month cash-flow table** (unit 55). (Carries over.)
+- **List the records one small business should keep for taxes** (unit 56). (Carries over.)
+- **Write a one-page "how we do it" for one task** (unit 57).
+- **Compare two competitors**: choose two nearby businesses that sell the same thing and write one thing each does that the other doesn't (unit 58).
+- **Work out whether one sale makes money** (unit 59): price minus the cost of that sale.
+- **Read how a public company says it uses its money** (unit 60): its own investor page, just reading.
+
+**The practice side:** Your First Business, a one-year simulator in Practice (plan and mockups in `docs/YOUR-FIRST-BUSINESS.md` and `docs/design/your-first-business/`).
+
+### The business units
+
+**46. How a business works** / Cómo funciona un negocio *(new, Start; 4; Both)*
+- After this unit you can: describe any business as create, deliver and capture value, and say where a business you know is strongest or weakest.
+- Lessons: What problem does it solve? (create) · Getting it to people (deliver) · Why customers pay (capture) · The loop, and why some businesses stop (failure cases)
+- Mission: Find out how a local business makes money.
+- Landmark: a small harbor shop with a lantern.
+
+**47. Prices, costs and competition** / Precios, costos y competencia *(new, Start; 5; Both)*
+- After this unit you can: explain what sets a price, why the same thing costs different amounts in different places, and what happens when a competitor shows up.
+- Lessons: Scarcity and trade-offs (what you give up) · Supply and demand at a market stall · What sets a price · Competition and substitutes · When costs rise (links to unit 62)
+- Mission: Find the price of the same product in three places.
+- Landmark: a market stall with a balance scale.
+
+**48. Revenue, costs and profit** / Ingresos, costos y ganancia *(new, Start; 5; Both)*
+- After this unit you can: tell a successful business from a busy one, find what one sale leaves behind, and say how many sales cover the fixed costs.
+- Lessons: Money in, money out *(the sample lesson)* · Fixed and variable costs · What's left of each sale (margin) · How many sales to break even · Profit is not cash
+- Mission: Work out the cost of one thing a business sells.
+- Landmark: a ledger scale on a dock.
+
+**49. Starting a small business** / Cómo empezar un negocio pequeño *(new, Build; 5; Both; was unit 46)*
+- After this unit you can: test an idea cheaply, price it, find your first customers, and name the usual reasons new businesses fail.
+- Lessons: A small test before a big bet · Who will pay, and how much · Costs, price and profit · Getting your first customers · Why new businesses fail (cases)
 - Mission: Price one product you could sell, with its costs.
 - Landmark: a market stall on a dock.
 
-**47. Business money** / El dinero del negocio *(new, Go further; 4; Both)*
-- After this unit you can: keep business and personal money apart, keep simple books, and plan for slow months.
-- Lessons: Separate accounts · Simple bookkeeping · Cash flow and slow months · Borrowing or funding for a small business
+**50. Customers and marketing** / Clientes y mercadotecnia *(new, Build; 5; Both)*
+- After this unit you can: describe who a business is for, say what it offers in one clear sentence, and tell which way of reaching people is worth its cost.
+- Lessons: Who is the customer? · The problem worth solving (asking, not guessing) · Saying it clearly · Ways to reach people, and what a customer costs · Reviews, reputation and word of mouth
+- Mission: Ask three people what they'd want from a business like yours.
+- Landmark: a signal lamp tower.
+
+**51. Selling** / Ventas *(new, Build; 4; Both)*
+- After this unit you can: find out what a customer needs before naming a price, answer "that's too expensive," and win a second sale.
+- Lessons: Listening before pitching · Answering "too expensive" · Discounts and deals, and what they cost · Repeat customers and referrals
+- Mission: Watch a sale and write what the seller asked.
+- Landmark: a counter with a small bell.
+
+**52. Making it legal and doing it right** / Hacerlo legal y hacerlo bien *(new, Build; 5; Both)*
+- After this unit you can: tell the usual kinds of business apart, know which licenses and permits to look up, read a contract's key parts, and weigh honesty against a quick win.
+- Lessons: Kinds of business (US sole proprietor and LLC; persona física, RESICO, SAS) · Licenses and permits · Contracts in plain words · Protecting your name and ideas (trademark, copyright) · Doing right when it costs you (honest ads, fair prices, ethics cases)
+- Mission: Find which permit a local food stand needs.
+- Landmark: a customs-house archway with a scale of justice.
+- *Needs a licensed professional's review before it ships.*
+
+**53. Operations: getting the work done** / Operaciones *(new, Build; 5; Both)*
+- After this unit you can: map how an order becomes a delivered product, spot where it slows or breaks, and plan for busy and slow days.
+- Lessons: From order to delivery · Inventory: too much, too little · Suppliers and what happens when one fails · Quality and mistakes · Busy days and slow days
+- Mission: Map the steps of one purchase.
+- Landmark: a boatyard with a conveyor.
+
+**54. Bookkeeping and accounting** / Contabilidad básica *(new, Build; 5; Both)*
+- After this unit you can: keep business and personal money apart, record sales and costs, and read a simple income statement and balance sheet.
+- Lessons: Separate accounts · Recording sales and costs · The income statement in one picture · The balance sheet: what you own and owe · Reading your numbers each month
+- Mission: List the records a small business keeps.
+- Landmark: a brass ledger tower.
+
+**55. Cash flow and business money** / Flujo de efectivo y dinero del negocio *(new, Go further; 4; Both; was "Business money," unit 47)*
+- After this unit you can: say why a profitable business can run out of cash, plan for slow months, and compare ways to borrow.
+- Lessons: Profit and cash: the timing gap · Slow months and a cash cushion · Getting paid late · Borrowing for a small business
 - Mission: Draw a one-month cash-flow table.
 - Landmark: a ledger with a brass register.
 
-**48. Taxes for small business** / Impuestos para negocios pequeños *(new, Go further; 4; Both)*
+**56. Taxes for small business** / Impuestos para negocios pequeños *(new, Go further; 4; Both; was unit 48)*
 - After this unit you can: say how a small business is taxed in each country and what records to keep.
 - Lessons: Registering (US sole proprietors; RFC in Mexico) · What's taxed and when · Simple regimes for small taxpayers (RESICO) · Records and invoices (facturas)
-- Mission: List the records one small business should keep.
+- Mission: List the records one small business should keep for taxes.
 - Landmark: a gatehouse with a stamp.
 - *Needs a licensed tax professional's review before it ships.*
 
-### How the Economy Works
+**57. Managing people** / Dirigir personas *(new, Go further; 5; Both)*
+- After this unit you can: say what a first hire really costs, give clear instructions and feedback, and know where fair-treatment rules come from.
+- Lessons: Your first helper or hire · What an employee really costs · Clear instructions and honest feedback · When things go wrong (mistakes, conflict, goodbyes) · Fair treatment and the law (wages and hours; IMSS and US basics)
+- Mission: Write a one-page "how we do it" for one task.
+- Landmark: a crew hall with a long table.
+- *Needs a licensed professional's review (labor law) before it ships.*
 
-**49. Reading financial news** / Leer noticias financieras *(existing; 3 → 5; Both)*
+**58. Strategy: where to compete** / Estrategia: dónde competir *(new, Go further; 5; Both)*
+- After this unit you can: explain what makes a business hard to copy, why saying no is part of strategy, and where a good business took a wrong turn.
+- Lessons: What makes a business hard to copy · Niches and saying no · Reading competitors and their moves · Well-known companies' choices (cases) · Strategy failures: a good business, a wrong turn
+- Mission: Compare two competitors.
+- Landmark: a chart room with a compass rose.
+
+**59. Growing without breaking** / Crecer sin romperse *(new, Go further; 4; Both)*
+- After this unit you can: check that each sale makes money before growing, put systems in place first, and spot the signs of growing too fast.
+- Lessons: Does each sale make money? (unit economics) · Systems before scale · Growing too fast (cases) · Partners, franchises and going online
+- Mission: Work out whether one sale makes money.
+- Landmark: a bridge under construction.
+
+**60. Funding growth** / Financiar el crecimiento *(new, Go further; 4; Both)*
+- After this unit you can: compare reinvesting, borrowing and taking investors, and say what giving up a share costs.
+- Lessons: Reinvesting what you earn · Loans for growth, and when they hurt · Investors and giving up a share · Knowing when not to grow
+- Mission: Read how a public company says it uses its money (just reading).
+- Landmark: a lighthouse with a second lamp.
+
+### How the Economy Works (continued)
+
+**61. Reading financial news** / Leer noticias financieras *(existing; 3 → 5; Both; was unit 49)*
 - Added lessons: Reading an earnings headline · Spotting ads and bias
 
-**50. Inflation, rates and the economy** / Inflación, tasas y economía *(new, Go further; 4; Both)*
+**62. Inflation, rates and the economy** / Inflación, tasas y economía *(new, Go further; 4; Both; was unit 50)*
 - After this unit you can: explain inflation, central banks and why rates move, and how that touches your savings, loans and pay.
 - Lessons: What inflation is and who measures it · What central banks do (the Fed, Banxico) · Rates, loans and savings · Slowdowns and recoveries
 - Mission: Find the latest published inflation number and what it was a year ago.
 - Landmark: a weather station with a barometer.
 
-## Build order: four waves of eight new units
+## Build order: six waves
 
-The order puts what helps young people between the US and Mexico first, then what protects them, then life's big decisions, then investing and business. Each wave also adds lessons to a few existing units.
+The order puts what helps young people between the US and Mexico first, then what protects them, then life's big decisions, then investing; the two business waves follow. Each wave also adds lessons to a few existing units.
 
-| Wave | New units (8) | Why now | Also adds to existing units |
+| Wave | New units | Why now | Also adds to existing units |
 |---|---|---|---|
 | **1. The border and everyday money** | 32 Sending and receiving money · 33 Banking in two countries · 34 Working across the border · 35 Border scams · 7 Cards and digital payments · 15 Credit scores and reports · 10 Judging a job offer · 36 Taxes in two countries *(held for a professional's review; ships last in the wave)* | Our biggest strength, and the questions people ask first | Budgeting +2, Saving +2, Debt & credit +2 |
 | **2. Protect yourself and get out of trouble** | 43 Identity and data · 44 Your rights · 45 If something goes wrong · 17 Risky loans · 16 Paying off debt · 12 Gig and freelance income · 13 When income stops · 6 Where savings can grow | Fewer costly mistakes | Compound +2, Stocks +2 |
 | **3. Life's big decisions and taxes** | 37 Paying for school · 38 Buying a car · 39 Renting a place · 40 Buying a home · 29 Sales tax, IVA and other taxes · 30 Tax credits and deductions · 8 Money with family and friends · 1 How money works | The decisions that come at 18–25 | ETFs +2, Risk +2 |
-| **4. Investing, business and the economy** | 22 Bonds · 23 Investing accounts · 25 Costs and taxes of investing · 26 Building a portfolio · 46 Starting a small business · 47 Business money · 48 Taxes for small business · 50 Inflation, rates and the economy | Builds on everything before it | Retirement +2, News +2 |
+| **4. Investing and the economy** | 22 Bonds · 23 Investing accounts · 25 Costs and taxes of investing · 26 Building a portfolio · 62 Inflation, rates and the economy | Builds on everything before it | Retirement +2, News +2 |
+| **5. Business: foundations and building** | 46 How a business works · 47 Prices, costs and competition · 48 Revenue, costs and profit · 49 Starting a small business · 50 Customers and marketing · 51 Selling · 52 Making it legal and doing it right *(held for a professional's review)* | Teaches the thinking first; ships with the first version of Your First Business | None |
+| **6. Business: operating and growing** | 53 Operations · 54 Bookkeeping and accounting · 55 Cash flow and business money · 56 Taxes for small business *(held for review)* · 57 Managing people *(held for review)* · 58 Strategy · 59 Growing without breaking · 60 Funding growth | Needs the Foundations stage; fills in the simulator's later events | None |
 
-Notes: (a) Wave 1 starts with the five border units, so a new learner from Ciudad Juárez or El Paso finds their own life in the app. (b) Units marked for professional review stay hidden until signed off, even after the rest of their wave ships. (c) Each wave is about 36 new lessons plus about 8 added to existing units.
+Waves 1–4 are 29 units (131 lessons plus 18 added to existing units). Wave 5 is 7 units and 33 lessons; wave 6 is 8 units and 36 lessons.
 
-## The sea chart and the Learn tab with 50 units
+Notes: (a) Wave 1 starts with the five border units, so a new learner from Ciudad Juárez or El Paso finds their own life in the app. (b) Units marked for professional review stay hidden until signed off, even after the rest of their wave ships. (c) If you'd rather lead with business, waves 5 and 6 can move to the front; nothing in them needs a money unit first. Inside the business waves, unit 55 reads better after 54. **That order is your call.**
 
-**The problem:** one long chart of 50 islands is too much on a phone, and "show 4 more units" doesn't help people find their way.
+## The sea chart and the Learn tab with 62 units
+
+**The problem:** one long chart of 62 islands is too much on a phone, and "show 4 more units" doesn't help people find their way.
 
 **The idea: archipelagos.** Each track is a small archipelago (a region of the chart); each level is a band of water: **Start** (the harbor), **Build** (the coast), **Go further** (open water). Islands are the units.
 
-- **On a phone:** Learn opens on your **current track** (a chart of 3 to 10 islands, the way it is today). A row of **track chips** sits above it (each with a small progress ring and "3 of 6"), scrolling sideways. Tap a chip to move to that archipelago; the one your goal and country point to has a small "For you" tag. A "Whole map" chip shows all twelve regions as one overview with progress.
-- **On a computer:** a **track rail** on the left of Learn (the twelve tracks with rings and counts), the **region's chart** in the middle (bigger, with the level bands labeled), and the panel on the right (today's step, "11 of 50 units").
+- **On a phone:** Learn opens on your **current track** (a chart of 3 to 10 islands, the way it is today). A row of **track chips** sits above it (each with a small progress ring and "3 of 6"), scrolling sideways. Tap a chip to move to that archipelago; the one your goal and country point to has a small "For you" tag. A "Whole map" chip shows all thirteen regions as one overview with progress.
+- **On a computer:** a **track rail** on the left of Learn (the thirteen tracks with rings and counts), the **region's chart** in the middle (bigger, with the level bands labeled), and the panel on the right (today's step, "11 of 62 units").
 - **Finished tracks fold up** into a single flag on the whole map; unfinished ones stay open.
 - **Order stays gentle:** units inside a track unlock in order within a level; a new level opens when the one before it is mostly done (or after a short "skip ahead" check, as today).
 - **Where it goes by default:** the track of your goal if you have one, else Foundations for new learners, else the track you were last in.
 
-A mockup (phone and computer): `docs/design/content-roadmap/mockup-phone.png` and `mockup-computer.png` (source `mockup.html`).
+The mockup below still shows the earlier 50-unit, 12-track version; the two business tracks add two chips. A mockup (phone and computer): `docs/design/content-roadmap/mockup-phone.png` and `mockup-computer.png` (source `mockup.html`).
 
 ## Quality plan
 
@@ -353,6 +486,7 @@ Today it checks translations, concept tags, explanations, facts, actions and len
 - **United States:** consumerfinance.gov (CFPB), irs.gov, ssa.gov, fdic.gov, investor.gov and sec.gov, finra.org, consumer.ftc.gov, federalreserve.gov, studentaid.gov, hud.gov, annualcreditreport.com, healthcare.gov, usa.gov, mymoney.gov, cbp.gov (carrying cash), uscis.gov.
 - **Mexico:** banxico.org.mx, cnbv.gob.mx, condusef.gob.mx, sat.gob.mx, imss.gob.mx, infonavit.org.mx, consar.gob.mx, profeco.gob.mx, ipab.org.mx, gob.mx, buro.gob.mx and burodecredito.com.mx, inegi.org.mx, shcp.gob.mx, cetesdirecto.com.
 - **Across the border:** the SSA page on the US–Mexico totalization agreement, Profeco's money-transfer comparison, the Mexican consulates and the Institute of Mexicans Abroad (IME) for ID and consular services, and each agency's own cash-reporting pages.
+- **Business additions:** sba.gov (US Small Business Administration), uspto.gov and copyright.gov (names and ideas), ftc.gov business guidance (honest advertising), dol.gov (wages and hours), irs.gov small-business pages; for Mexico, gob.mx/se and tuempresa.gob.mx (registering), sat.gob.mx (RESICO, facturas), imss.gob.mx (employers), impi.gob.mx (names and ideas), stps.gob.mx (labor). Well-known company cases come from the company's own filings (sec.gov/edgar) or an official regulator, never from a news summary alone, and are listed in `docs/CONTENT-REVIEW.md` for checking.
 - Anything from one study or report is named as such in the lesson ("according to…"). No blogs, no company marketing pages, no social media as a source.
 
 ### What a human reviewer with a finance background checks before each wave goes live
@@ -360,14 +494,17 @@ Today it checks translations, concept tags, explanations, facts, actions and len
 2. **Nothing reads as personal advice** or a recommendation of a product, firm or coin; examples are labeled as examples.
 3. **Risk is described honestly**, with no promises ("historically", "can", "not guaranteed").
 4. **Both countries are right** for how the system works in each, including the border cases.
-5. **Legal and tax content** (taxes in two countries, small-business taxes, buying across the border, work papers) is read by a licensed professional; a lesson that depends on immigration status says where to get help rather than guessing.
+5. **Legal and tax content** (taxes in two countries, small-business taxes, business structures and permits, labor law in the managing-people unit, buying across the border, work papers) is read by a licensed professional; a lesson that depends on immigration status says where to get help rather than guessing.
 6. **Teens:** nothing asks a teen to open an account, apply, buy or share numbers.
 7. **Sign-off record:** `docs/reviews/wave-N.md` with the reviewer's name, the date, each unit approved, and anything changed. Nothing in the wave goes live without it.
 
 ## Risks and decisions for you
 
 - **A human reviewer.** Sign-off needs a person with a finance background (and a tax professional for three units). That's the main thing that decides how fast waves can ship. Who will it be?
-- **The every-lesson test gets long.** 225 lessons in two languages is about four times today's playthrough. I'd run it in parallel, and for each wave run every new lesson in full while sampling the older ones. (Today's: 63 lessons.)
-- **Size and offline.** Units already load on demand (each under 14 KB), so 50 units stay inside the first-download budget; offline, only opened units are kept. The unit list grows the course index slightly; I'd check the budget each wave.
+- **The every-lesson test gets long.** 281 lessons in two languages is about four and a half times today's playthrough. I'd run it in parallel, and for each wave run every new lesson in full while sampling the older ones. (Today's: 63 lessons.)
+- **Size and offline.** Units already load on demand (each under 14 KB), so 62 units stay inside the first-download budget; offline, only opened units are kept. The unit list grows the course index slightly; I'd check the budget each wave.
 - **Order.** I'd like your view on Wave 1 (the border first), on whether "Taxes in two countries" should wait for its professional review, and whether any track should be split or merged.
+- **Business cases need care.** Lessons that name a real company are short, factual, in our own words, with no logos or images, and each fact is checked against the company's filings. If a case can't be verified, it becomes a made-up local example.
+- **Your First Business is a real build.** A new module like Your Money Year, with the same engine-and-events design. Its first version needs only units 46–49 and 55; later events link to the later lessons as waves 5 and 6 ship (plan: `docs/YOUR-FIRST-BUSINESS.md`).
+- **Business is two tracks.** If you'd rather have one track of 15 units (a longer, busier chart), say so; the unit list doesn't change.
 - **Spanish titles for lessons** are written with each wave, not now.

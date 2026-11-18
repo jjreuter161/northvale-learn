@@ -24,7 +24,19 @@ import retire from "./retire.js";
 import earning from "./earning.js";
 import news from "./news.js";
 import borders from "./borders.js";
+// DRAFT units (draft: true) are checked by the validator and the tests but
+// stay out of the app until a reviewer signs them off (see docs/CONTENT-ROADMAP.md).
+import sending from "./sending.js";
+import twobanks from "./twobanks.js";
+import borderwork from "./borderwork.js";
+import borderscams from "./borderscams.js";
+import cardpay from "./cardpay.js";
+import creditscores from "./creditscores.js";
+import joboffer from "./joboffer.js";
+import bordertaxes from "./bordertaxes.js";
 
-export const UNITS = [budget, save, banking, paycheck, credit, scams, compound, taxes, insurance, psychology, stocks, etf, risk, crypto, retire, earning, news, borders];
+export const UNITS = [budget, save, banking, paycheck, credit, scams, compound, taxes, insurance, psychology, stocks, etf, risk, crypto, retire, earning, news, borders, sending, twobanks, borderwork, borderscams, cardpay, creditscores, joboffer, bordertaxes];
 
 export { PLACEMENT } from "./placement.js";
+// Draft lessons for units that are already live (see additions.js). Not in the app.
+export { ADDITIONS } from "./additions.js";
