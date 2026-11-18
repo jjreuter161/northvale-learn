@@ -83,6 +83,7 @@ These rules apply to **every** lesson, in every track. The goal is a learner who
    - Not: "What is gross margin?"
    - Instead: "A shop sold {$100000|600000} last year and spent {$115000|690000}. Is it successful? Why?"
    Answers are plausible mistakes, and `miss` explains the specific misunderstanding each one shows.
+   **In business lessons, prefer a real-life choice (`scenario`) to true/false.** True/false is the closest thing to memorizing, so keep it for a concept's easy question and use a situation with trade-offs everywhere else.
 7. **Still the same limits.** At most 4.5 minutes per lesson in both languages (the validator checks it; a lesson with a calculation and a failure case usually has 3 questions, not 5), at least 3 question kinds, both languages, US and Mexico numbers, our own words, and a sources list for the unit.
 
 **Business lessons also carry a `value` tag:** `create` (solving a real problem), `deliver` (getting it to people) or `capture` (keeping something after costs). The tag shows as a small chip on the lesson, and the lesson or its closing line says which part it's about. This ties 15 business units into one idea.

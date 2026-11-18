@@ -112,7 +112,7 @@ Added detail: the seguro facultativo is for students at public high schools and 
 ## Business sample lesson (draft, not shipped)
 
 **Please verify** before "Money in, money out" (`docs/samples/`) goes into the app:
-- **Amazon.** The lesson says it "spent years reporting losses while it reinvested to grow." My understanding is that its first full-year profit came after several years of net losses (early 2000s), but I haven't checked the filings. Confirm against its annual reports (Form 10-K, sec.gov/edgar), or swap in a local example.
+- **Amazon (checked 2026-11-18).** Amazon's own Form 10-K for 2002 shows a net loss in every year from 1998 to 2002 ($124.5 million, $720.0 million, $1,411.3 million, $567.3 million, $149.1 million), and its press release of 27 January 2004 reports net income of $35 million for 2003 against a net loss of $149 million in 2002. The lesson now says only that: "Amazon lost money every year from 1998 to 2002, then made $35 million in 2003." I dropped "reinvested to grow", because the filings I read don't say that for those years (the 2003 release mentions lower prices and investing in new businesses). The 10-K pages after the first 100,000 characters weren't read, so earlier years (1995 to 1997) are not claimed.
 - Rosa, Luis and their numbers are made up and labeled as examples.
 
 ## Wave 1, unit 32: Sending and receiving money (draft, not in the app)

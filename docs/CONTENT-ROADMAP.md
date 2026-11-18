@@ -1,6 +1,6 @@
 # Content roadmap: from 18 units and 63 lessons to 62 units and 281 lessons
 
-**Status: a plan for your approval. Nothing here is built yet.** When you approve (or change) the order, Wave 1 starts. *Updated for the new business direction (teach people to think, not to memorize): business is now 15 units in two tracks, with a sample lesson and a simulator plan (see "Business: teaching it the right way").*
+**Status: approved. Wave 1 (the money units) is drafted and waiting for reviewers; nothing is live (see `docs/reviews/wave-1.md`).** Decisions made on 2026-11-18: business stays after the money waves, and any track, including both business tracks, can be opened at any time from the track picker; business stays as two tracks; business lessons prefer a real-life choice to true/false. *Updated for the new business direction (teach people to think, not to memorize): business is now 15 units in two tracks, with a sample lesson and a simulator plan (see "Business: teaching it the right way").*
 
 ## In one page
 
@@ -445,7 +445,7 @@ The order puts what helps young people between the US and Mexico first, then wha
 
 Waves 1–4 are 29 units (131 lessons plus 18 added to existing units). Wave 5 is 7 units and 33 lessons; wave 6 is 8 units and 36 lessons.
 
-Notes: (a) Wave 1 starts with the five border units, so a new learner from Ciudad Juárez or El Paso finds their own life in the app. (b) Units marked for professional review stay hidden until signed off, even after the rest of their wave ships. (c) If you'd rather lead with business, waves 5 and 6 can move to the front; nothing in them needs a money unit first. Inside the business waves, unit 55 reads better after 54. **That order is your call.**
+Notes: (a) Wave 1 starts with the five border units, so a new learner from Ciudad Juárez or El Paso finds their own life in the app. (b) Units marked for professional review stay hidden until signed off, even after the rest of their wave ships. (c) If you'd rather lead with business, waves 5 and 6 can move to the front; nothing in them needs a money unit first. Inside the business waves, unit 55 reads better after 54. **Decided: business stays after the money waves (5 and 6), and learners can pick the business tracks at any time from the track picker, so nobody has to wait.**
 
 ## The sea chart and the Learn tab with 62 units
 
@@ -456,10 +456,11 @@ Notes: (a) Wave 1 starts with the five border units, so a new learner from Ciuda
 - **On a phone:** Learn opens on your **current track** (a chart of 3 to 10 islands, the way it is today). A row of **track chips** sits above it (each with a small progress ring and "3 of 6"), scrolling sideways. Tap a chip to move to that archipelago; the one your goal and country point to has a small "For you" tag. A "Whole map" chip shows all thirteen regions as one overview with progress.
 - **On a computer:** a **track rail** on the left of Learn (the thirteen tracks with rings and counts), the **region's chart** in the middle (bigger, with the level bands labeled), and the panel on the right (today's step, "11 of 62 units").
 - **Finished tracks fold up** into a single flag on the whole map; unfinished ones stay open.
+- **Any track can be opened at any time.** The track picker (chips on a phone, the rail on a computer) lists all thirteen tracks, including How Business Works and Running a Business, and none is locked. What stays gentle is the order inside a track:
 - **Order stays gentle:** units inside a track unlock in order within a level; a new level opens when the one before it is mostly done (or after a short "skip ahead" check, as today).
 - **Where it goes by default:** the track of your goal if you have one, else Foundations for new learners, else the track you were last in.
 
-The mockup below still shows the earlier 50-unit, 12-track version; the two business tracks add two chips. A mockup (phone and computer): `docs/design/content-roadmap/mockup-phone.png` and `mockup-computer.png` (source `mockup.html`).
+The mockup shows the 62-unit plan with all thirteen tracks (updated 2026-11-18). A mockup (phone and computer): `docs/design/content-roadmap/mockup-phone.png` and `mockup-computer.png` (source `mockup.html`).
 
 ## Quality plan
 
@@ -506,5 +507,5 @@ Today it checks translations, concept tags, explanations, facts, actions and len
 - **Order.** I'd like your view on Wave 1 (the border first), on whether "Taxes in two countries" should wait for its professional review, and whether any track should be split or merged.
 - **Business cases need care.** Lessons that name a real company are short, factual, in our own words, with no logos or images, and each fact is checked against the company's filings. If a case can't be verified, it becomes a made-up local example.
 - **Your First Business is a real build.** A new module like Your Money Year, with the same engine-and-events design. Its first version needs only units 46–49 and 55; later events link to the later lessons as waves 5 and 6 ship (plan: `docs/YOUR-FIRST-BUSINESS.md`).
-- **Business is two tracks.** If you'd rather have one track of 15 units (a longer, busier chart), say so; the unit list doesn't change.
+- **Business is two tracks.** Decided on 2026-11-18: two tracks, How Business Works and Running a Business.
 - **Spanish titles for lessons** are written with each wave, not now.

@@ -5,7 +5,7 @@
 //   node docs/samples/render-sample.mjs
 // New in this draft (needs building if approved): the `value` tag on a lesson
 // ("create" | "deliver" | "capture") and the action kind "business.month".
-import { T, card, choice, tf, act, concept, number } from "../../src/modules/lessons/units/helpers.js";
+import { T, card, choice, tf, act, concept, number, scenario, fit } from "../../src/modules/lessons/units/helpers.js";
 
 export const concepts = [
   concept(
@@ -98,7 +98,7 @@ export const lesson = {
         T("Yes. A line out the door means it works", "Sí. Una fila hasta la calle significa que funciona")
       ],
       0,
-      T("{$10000|60000} came in and {$11500|69000} went out. That leaves a hole of {$1500|9000}.", "Entraron {$10000|60000} y salieron {$11500|69000}. Eso deja un hoyo de {$1500|9000}."),
+      T("{$10000|60000} came in, {$11500|69000} went out: a hole of {$1500|9000}.", "Entraron {$10000|60000}, salieron {$11500|69000}: un hoyo de {$1500|9000}."),
       [
         null,
         T("That's only money in. Add up money out too.", "Eso es solo lo que entra. Suma también lo que sale."),
@@ -108,8 +108,8 @@ export const lesson = {
     card(
       T("Now it has names", "Ahora tiene nombre"),
       T(
-        "Money customers pay is revenue. Money spent to run the business is costs. Revenue minus costs is profit; below zero, a loss. Rosa created value and delivered it, since people line up, but she kept none. Some losses are chosen: Amazon spent years reporting losses while it reinvested to grow. Rosa's was a surprise.",
-        "El dinero que pagan los clientes son los ingresos. El dinero que se gasta para operar son los costos. Ingresos menos costos es la ganancia; menos de cero, una pérdida. Rosa creó valor y lo entregó, pues la gente hace fila, pero no se quedó con nada. Algunas pérdidas son elegidas: Amazon pasó años con pérdidas mientras reinvertía para crecer. La de Rosa fue una sorpresa."
+        "Money paid by customers is revenue; money spent to operate is costs. Revenue minus costs is profit; below zero, a loss. Rosa created and delivered value but kept none. Some losses come with growth: Amazon lost money every year from 1998 to 2002, then made $35 million in 2003. Rosa's was a surprise.",
+        "Lo que pagan los clientes son los ingresos; lo que se gasta para operar, los costos. Ingresos menos costos es la ganancia; menos de cero, una pérdida. Rosa creó y entregó valor, pero no se quedó con nada. Algunas pérdidas llegan con el crecimiento: Amazon perdió dinero cada año de 1998 a 2002 y en 2003 ganó 35 millones de dólares. La de Rosa fue una sorpresa."
       )
     ),
     number(
@@ -121,18 +121,22 @@ export const lesson = {
         T("{$12000|72000} − {$11500|69000} = {$500|3000}.", "{$12000|72000} − {$11500|69000} = {$500|3000}.")
       ]
     ),
-    tf(
+    scenario(
       "unit_cost",
-      T("Luis's juice stand sold out daily, then closed. Each juice sold for {$4|60} and cost {$5|75} to make. Selling more would have saved it. True or false?", "El puesto de jugos de Luis se agotaba a diario y luego cerró. Cada jugo se vendía en {$4|60} y costaba {$5|75}. Vender más lo habría salvado. ¿Verdadero o falso?"),
-      false,
-      T("Each juice lost {$1|15}, so more juice meant a bigger loss. Checking what one juice costs, then fixing the price or the cost, comes first.", "Cada jugo perdía {$1|15}, así que más jugo era más pérdida. Primero hay que revisar cuánto cuesta un jugo y arreglar el precio o el costo.")
+      T("Luis's juice stand sells out daily. A juice sells for {$4|60} and costs {$5|75}. A friend says sell more. What do you do first?", "El puesto de jugos de Luis se agota a diario. Un jugo se vende en {$4|60} y cuesta {$5|75}. Un amigo dice que vendas más. ¿Qué haces primero?"),
+      [
+        fit(T("Work out what one juice costs, then fix the price or cost", "Calculas cuánto cuesta un jugo y arreglas precio o costo"), "good", T("Each juice loses {$1|15}. A sale must leave something.", "Cada jugo pierde {$1|15}. Una venta debe dejar algo.")),
+        fit(T("Raise the price a little", "Subes un poco el precio"), "ok", T("A start, but you need the cost too.", "Es un inicio, pero necesitas el costo.")),
+        fit(T("Sell more, since people want it", "Vendes más, pues lo quieren"), "poor", T("More sales means a bigger loss.", "Más ventas es más pérdida."))
+      ],
+      T("Check what a sale leaves first.", "Revisa qué deja una venta primero.")
     ),
-    act("business.month", T("Run one month of Rosa's taquería. Set the price and see profit.", "Corre un mes de la taquería de Rosa. Fija el precio y mira la ganancia."), { business: "taqueria", income: [10000, 60000] })
+    act("business.month", T("Run Rosa's taquería for one month.", "Corre un mes la taquería de Rosa."), { business: "taqueria", income: [10000, 60000] })
   ]
 };
 
 export const sources = [
-  "Amazon.com, Inc. annual reports (Form 10-K), filed with the SEC (sec.gov/edgar): net loss years and the return to profit. VERIFY the exact wording before shipping.",
+  "Amazon.com, Inc., Form 10-K for 2002 (sec.gov, Archives/edgar/data/1018724/000095014903000355): net loss of $124.5 million (1998), $720.0 million (1999), $1,411.3 million (2000), $567.3 million (2001) and $149.1 million (2002). Amazon.com press release of 27 Jan 2004 (press.aboutamazon.com): net income of $35 million in 2003 against a net loss of $149 million in 2002. Both read on 2026-11-18.",
   "SBA, 'Calculate your startup costs' and 'Manage your finances' (sba.gov): revenue, costs and profit in plain words.",
   "SAT, 'Régimen Simplificado de Confianza' pages (sat.gob.mx): used later in the unit, not in this lesson.",
   "Rosa and Luis are made-up examples. All numbers are examples."

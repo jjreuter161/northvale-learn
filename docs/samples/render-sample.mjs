@@ -87,10 +87,10 @@ ${concepts.map((c) => `- **${txt(c.name, "en")}** / ${txt(c.name, "es")}`).join(
 |---|---|
 | Concept before terminology | Card 1 tells Rosa's month with no business words; "revenue," "costs," "profit" appear only on card 2, after the learner has already worked out she lost money |
 | Open with a question | Card 1 ends with "did Rosa have money left?" and the first question makes the learner commit to an answer |
-| Local example + well-known company | Rosa's taquería and Luis's juice stand (local, made up); Amazon's early losses on card 2 (one short sentence, our words, no logo) |
-| Application | A work-it-out price change, then the hands-on month in the simulator (a real-life-choice question didn't fit the 4.5-minute limit; later lessons in the unit use one) |
-| Failure case | Luis's juice stand: "would selling more have saved it?" (the answer explains what to check first) |
-| Tests understanding | No "define profit." Every question is a situation |
+| Local example + well-known company | Rosa's taquería and Luis's juice stand (local, made up); Amazon's losses from 1998 to 2002 and its 2003 profit on card 2 (one sentence, our words, no logo, checked against its filings) |
+| Application | A work-it-out price change, a real-life choice about Luis's stand, then the hands-on month in the simulator |
+| Failure case | Luis's juice stand: a real-life choice about what to do first when each juice loses money (selling more is the poor answer) |
+| Tests understanding | No "define profit," and no true/false in the lesson itself: every question is a situation (the easy true/false lives in the idea cards) |
 | Big idea | Card 2 says it directly: Rosa created and delivered value but didn't capture any |
 
 ## Sources for this lesson (our own words, official sources first)
