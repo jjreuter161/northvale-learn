@@ -320,7 +320,8 @@ export function Layer({ children, onBack }) {
 }
 
 // A bottom sheet. Escape or the backdrop closes it.
-export function Sheet({ open, onClose, title, children, tall }) {
+// `fill`: the sheet takes its full height; the title bar and close button stay put, and the body is a column that decides for itself what scrolls (the tutor's messages).
+export function Sheet({ open, onClose, title, children, tall, fill }) {
   useEffect(() => {
     if (!open) return;
     const k = (e) => e.key === "Escape" && onClose();
@@ -332,15 +333,15 @@ export function Sheet({ open, onClose, title, children, tall }) {
     <Layer onBack={onClose}>
     <div role="dialog" aria-modal="true" aria-label={title} className="nv-sheetwrap" style={{ position: "fixed", inset: 0, zIndex: 60, display: "flex", justifyContent: "center", color: "var(--ink)", fontFamily: FONT }}>
       <div onClick={onClose} style={{ position: "absolute", inset: 0, background: "rgba(5,12,25,.45)", animation: "nvFade .2s both" }} />
-      <div className="nv-sheet" style={{ position: "relative", width: "100%", maxWidth: 560, maxHeight: tall ? "92dvh" : "85dvh", overflowY: "auto", background: "var(--bg)", borderRadius: "14px 14px 0 0", padding: "10px 18px calc(22px + env(safe-area-inset-bottom))", animation: "nvSpring .2s ease-out both" }}>
+      <div className="nv-sheet" style={{ position: "relative", width: "100%", maxWidth: 560, maxHeight: tall ? "92dvh" : "85dvh", ...(fill ? { height: "92dvh", display: "flex", flexDirection: "column", overflow: "hidden" } : { overflowY: "auto" }), background: "var(--bg)", borderRadius: "14px 14px 0 0", padding: "10px 18px calc(22px + env(safe-area-inset-bottom))", animation: "nvSpring .2s ease-out both" }}>
         <div className="nv-grab" style={{ width: 40, height: 5, borderRadius: 3, background: "var(--line)", margin: "0 auto 10px" }} />
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "0 0 12px", paddingTop: 2 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "0 0 12px", paddingTop: 2, flexShrink: 0 }}>
           <h2 className="nv-disp" style={{ fontSize: 24, margin: 0 }}>{title}</h2>
           <button onClick={onClose} aria-label="Close" style={{ border: "none", background: "var(--surface2)", borderRadius: 20, width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "var(--ink)" }}>
             <Icon name="close" size={18} />
           </button>
         </div>
-        {children}
+        {fill ? <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>{children}</div> : children}
       </div>
     </div>
     </Layer>

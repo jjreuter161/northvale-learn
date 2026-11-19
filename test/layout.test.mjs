@@ -130,10 +130,11 @@ try {
     if (computer) {
       const side = page.getByRole("navigation", { name: "Settings" });
       assert.equal(await side.getByRole("button").count(), 9, `${name}: nine sections on the left`);
-      assert.ok(await page.getByText("Create a free account").count(), `${name}: Account is the first section`);
+      assert.equal(await page.getByRole("radiogroup", { name: "Language" }).count(), 1, `${name}: Language and country is the first section`);
+      assert.equal(await page.getByText("Create a free account").count(), 0, `${name}: the account form is not the first thing`);
       await side.getByRole("button", { name: "Colors" }).click();
       await page.getByRole("radiogroup", { name: "Colors" }).waitFor();
-      assert.equal(await page.getByText("Create a free account").count(), 0, `${name}: only the picked section shows`);
+      assert.equal(await page.getByRole("radiogroup", { name: "Language" }).count(), 0, `${name}: only the picked section shows`);
       const s = await rectOf(page, `nav[aria-label="Settings"]`);
       const o = await rectOf(page, `main [role="radiogroup"]`);
       assert.ok(o.left > s.right, `${name}: the options are to the right of the sections`);
@@ -142,6 +143,8 @@ try {
     } else {
       assert.equal(await page.getByRole("navigation", { name: "Settings" }).count(), 0, `${name}: no section list`);
       assert.ok(await page.getByRole("heading", { name: "Account" }).count(), `${name}: Settings is one page`);
+      const order = await page.locator("main h2").evaluateAll((hs) => hs.map((h) => h.innerText.trim()));
+      assert.ok(order.indexOf("Language and country") < order.indexOf("Account"), `${name}: language and country come before the account (${order.join(" > ")})`);
     }
     await fits(page, `${name}: Settings`);
 

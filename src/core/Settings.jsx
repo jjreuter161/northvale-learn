@@ -1,6 +1,6 @@
 // SETTINGS — account, daily goal and reminder, language and country, look,
 // privacy, and the "educational only" fine print in full.
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAppState, update, resetState } from "./store.js";
 import { LANGS, REGIONS } from "./i18n.js";
 import { DAILY_GOALS } from "./progress.js";
@@ -18,7 +18,7 @@ import { AccountForm } from "./Account.jsx";
 
 // A section of the page: with its title on a phone or tablet; on a computer only the one picked on the left (no title: the left names it).
 function Sec({ k, desk, sel, t, children }) {
-  return !desk || sel === k ? <>{!desk && <Label>{t(`settings.${k}`)}</Label>}{children}</> : null;
+  return !desk || sel === k ? <div id={`set-${k}`}>{!desk && <Label>{t(`settings.${k}`)}</Label>}{children}</div> : null;
 }
 
 const setSetting = (k, v) => update((s) => ({ ...s, settings: { ...s.settings, [k]: v } }));
@@ -53,7 +53,7 @@ async function deleteEverything(signedIn, password) {
   location.reload();
 }
 
-export default function Settings({ t, locale, go, layout }) {
+export default function Settings({ t, locale, go, layout, route }) {
   const settings = useAppState((s) => s.settings);
   const profile = useAppState((s) => s.profile);
   const progress = useAppState((s) => s.progress);
@@ -62,7 +62,8 @@ export default function Settings({ t, locale, go, layout }) {
   const [confirm, setConfirm] = useState(null);
   const [more, setMore] = useState(false);
   const desk = isDesk(layout);
-  const [sel, setSel] = useState("account"); // on a computer: one section at a time, picked on the left
+  const want = route && route.params && route.params.section; // a button that means the account opens it
+  const [sel, setSel] = useState(want || "language"); // on a computer: one section at a time, picked on the left
   const [pw, setPw] = useState({ current: "", next: "" });
   const [delPw, setDelPw] = useState("");
   const [err, setErr] = useState(null);
@@ -77,7 +78,11 @@ export default function Settings({ t, locale, go, layout }) {
     </div>
   );
 
-  const SECTIONS = ["account", "profile", "learning", "language", "look", "soundfeel", "privacy", "legal", "about"];
+  useEffect(() => {
+    if (want && !desk) document.getElementById(`set-${want}`)?.scrollIntoView({ block: "start" });
+  }, []);
+
+  const SECTIONS = ["language", "profile", "learning", "look", "account", "soundfeel", "privacy", "legal", "about"];
   const sp = { desk, sel, t };
 
   return (
@@ -95,31 +100,25 @@ export default function Settings({ t, locale, go, layout }) {
         )}
         <div>
 
-      <Sec k="account" {...sp}>
+
+      <Sec k="language" {...sp}>
       <Card>
-        {session.user ? (
+        <div style={{ fontWeight: 650, marginBottom: 10 }}>{t("settings.language.row")}</div>
+        <Segmented label={t("settings.language.row")} value={settings.lang} onChange={(v) => setSetting("lang", v)} options={Object.entries(LANGS).map(([value, label]) => ({ value, label }))} />
+        <div style={{ fontWeight: 650, margin: "18px 0 10px" }}>{t("settings.country")}</div>
+        <Segmented
+          label={t("settings.country")}
+          value={settings.both ? "BOTH" : settings.region}
+          onChange={(v) => (v === "BOTH" ? setSetting("both", true) : (setSetting("region", v), setSetting("both", false)))}
+          options={[...Object.entries(REGIONS).map(([value, r]) => ({ value, label: `${r.flag} ${r.name[locale.lang]}` })), { value: "BOTH", label: `🇺🇸🇲🇽 ${t("settings.country.both")}` }]}
+        />
+        {settings.both && (
           <>
-            <div style={{ fontWeight: 750, fontSize: 17 }}>{session.user.email}</div>
-            <div style={{ fontSize: 14, color: "var(--mid)", margin: "4px 0 14px" }}>{t("account.synced")}</div>
-            {session.recap && row(t("recap.title"), t("recap.sub"), <Switch label={t("recap.title")} checked={!!session.user.recap} onChange={(v) => setRecap(v).then(() => toast(t(v ? "recap.on" : "recap.off"), "good"), (e) => toast(e.message))} />)}
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              <Button kind="secondary" size="md" onClick={() => signOut().then(() => toast(t("account.signed_out")))}>
-                {t("account.signout")}
-              </Button>
-              <Button kind="secondary" size="md" onClick={() => (setErr(null), setConfirm("password"))}>
-                {t("account.change_pw")}
-              </Button>
-              <Button kind="ghost" size="md" onClick={() => (setErr(null), setConfirm("delete"))}>
-                {t("account.delete")}
-              </Button>
-            </div>
-          </>
-        ) : (
-          <>
-            <p style={{ fontSize: 15, lineHeight: 1.5, margin: "0 0 14px", color: "var(--mid)" }}>{t("account.why")}</p>
-            <AccountForm t={t} />
+            <div style={{ fontWeight: 650, margin: "18px 0 10px" }}>{t("settings.country.main")}</div>
+            <Segmented label={t("settings.country.main")} value={settings.region} onChange={(v) => setSetting("region", v)} options={Object.entries(REGIONS).map(([value, r]) => ({ value, label: `${r.flag} ${r.currency}` }))} />
           </>
         )}
+        <p style={{ fontSize: 13, color: "var(--low)", margin: "10px 0 0", lineHeight: 1.4 }}>{t("settings.country.how")}</p>
       </Card>
       </Sec>
 
@@ -161,30 +160,39 @@ export default function Settings({ t, locale, go, layout }) {
       </Card>
       </Sec>
 
-      <Sec k="language" {...sp}>
-      <Card>
-        <Segmented label={t("settings.language")} value={settings.lang} onChange={(v) => setSetting("lang", v)} options={Object.entries(LANGS).map(([value, label]) => ({ value, label }))} />
-        <div style={{ height: 12 }} />
-        <Segmented
-          label={t("settings.country")}
-          value={settings.both ? "BOTH" : settings.region}
-          onChange={(v) => (v === "BOTH" ? setSetting("both", true) : (setSetting("region", v), setSetting("both", false)))}
-          options={[...Object.entries(REGIONS).map(([value, r]) => ({ value, label: `${r.flag} ${r.name[locale.lang]}` })), { value: "BOTH", label: `🇺🇸🇲🇽 ${t("settings.country.both")}` }]}
-        />
-        {settings.both && (
-          <>
-            <div style={{ height: 12 }} />
-            <Segmented label={t("settings.country.main")} value={settings.region} onChange={(v) => setSetting("region", v)} options={Object.entries(REGIONS).map(([value, r]) => ({ value, label: `${r.flag} ${r.currency}` }))} />
-          </>
-        )}
-        <p style={{ fontSize: 13, color: "var(--low)", margin: "10px 0 0", lineHeight: 1.4 }}>{t("settings.country.how")}</p>
-      </Card>
-      </Sec>
 
       <Sec k="look" {...sp}>
       <Card>
         <LookPicker t={t} settings={settings} setSetting={setSetting} />
         {row(t("settings.motion"), t("settings.motion.sub"), <Switch label={t("settings.motion")} checked={settings.reduceMotion} onChange={(v) => setSetting("reduceMotion", v)} />)}
+      </Card>
+      </Sec>
+
+      <Sec k="account" {...sp}>
+      <Card>
+        {session.user ? (
+          <>
+            <div style={{ fontWeight: 750, fontSize: 17 }}>{session.user.email}</div>
+            <div style={{ fontSize: 14, color: "var(--mid)", margin: "4px 0 14px" }}>{t("account.synced")}</div>
+            {session.recap && row(t("recap.title"), t("recap.sub"), <Switch label={t("recap.title")} checked={!!session.user.recap} onChange={(v) => setRecap(v).then(() => toast(t(v ? "recap.on" : "recap.off"), "good"), (e) => toast(e.message))} />)}
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <Button kind="secondary" size="md" onClick={() => signOut().then(() => toast(t("account.signed_out")))}>
+                {t("account.signout")}
+              </Button>
+              <Button kind="secondary" size="md" onClick={() => (setErr(null), setConfirm("password"))}>
+                {t("account.change_pw")}
+              </Button>
+              <Button kind="ghost" size="md" onClick={() => (setErr(null), setConfirm("delete"))}>
+                {t("account.delete")}
+              </Button>
+            </div>
+          </>
+        ) : (
+          <>
+            <p style={{ fontSize: 15, lineHeight: 1.5, margin: "0 0 14px", color: "var(--mid)" }}>{t("account.why")}</p>
+            <AccountForm t={t} />
+          </>
+        )}
       </Card>
       </Sec>
 

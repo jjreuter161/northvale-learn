@@ -386,7 +386,7 @@ function Teaching({ t, locale, go, session }) {
     return (
       <Card>
         <p style={{ margin: "0 0 12px", color: "var(--mid)", lineHeight: 1.45 }}>{t("cls.t.account")}</p>
-        <Button size="md" kind="secondary" onClick={() => go("settings")}>
+        <Button size="md" kind="secondary" onClick={() => go("settings", { section: "account" })}>
           {t("account.signin")}
         </Button>
         <div style={{ marginTop: 8 }}>{guide}</div>

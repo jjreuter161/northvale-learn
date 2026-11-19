@@ -14,6 +14,7 @@ import { xpOn, dayKey, addDays, weekStart, weekXp } from "../../core/progress.js
 import { Button, Card, Icon, Layer, List, ListRow, Loading, Mark, Progress, Ring, Scene, Sheet, StreakStar, UnitArt, WaveEdge, toast } from "../../core/ui.jsx";
 import { isDesk } from "../../core/layout.js";
 import { holdBack } from "../../core/back.js";
+import { useAsk } from "../../core/asks.js";
 import { star, wave, boat, LANDMARK } from "../../core/art.js";
 import { AgeCard } from "../../core/Account.jsx";
 import { ReminderCard } from "../../core/reminders.jsx";
@@ -1173,15 +1174,7 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
             </div>
           )}
         </div>
-        {!ctx.session.user && ctx.session.online && (progress.counters.lessons || 0) === 1 && (
-          <Card style={{ margin: "0 0 14px" }}>
-            <div style={{ fontWeight: 650 }}>{t("lessons.save.title")}</div>
-            <p style={{ fontSize: 14, color: "var(--mid)", margin: "4px 0 12px", lineHeight: 1.45 }}>{t("lessons.save.body")}</p>
-            <Button full size="md" kind="secondary" onClick={() => go("settings")}>
-              {t("lessons.save.yes")}
-            </Button>
-          </Card>
-        )}
+        {!ctx.session.user && ctx.session.online && (progress.counters.lessons || 0) >= 2 && <SaveOffer t={t} go={go} />}
         {(mistakes === 0 || result.unitJustDone) && (
           <div style={{ display: "flex", justifyContent: "center", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
             {mistakes === 0 && (
@@ -1318,6 +1311,23 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
         </div>
       </Sheet>
     </Overlay>
+  );
+}
+
+// The account offer on a finish screen: not on the very first one, shown once, and only if nothing else has asked in this visit (asks.js).
+function SaveOffer({ t, go }) {
+  const seen = useSeen("save");
+  const turn = useAsk(!seen);
+  useEffect(() => () => turn && markIntro("save"), [turn]);
+  if (seen || !turn) return null;
+  return (
+    <Card style={{ margin: "0 0 14px" }}>
+      <div style={{ fontWeight: 650 }}>{t("lessons.save.title")}</div>
+      <p style={{ fontSize: 14, color: "var(--mid)", margin: "4px 0 12px", lineHeight: 1.45 }}>{t("lessons.save.body")}</p>
+      <Button full size="md" kind="secondary" onClick={() => go("settings", { section: "account" })}>
+        {t("lessons.save.yes")}
+      </Button>
+    </Card>
   );
 }
 

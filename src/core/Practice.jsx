@@ -5,6 +5,7 @@
 // done it shows a clear preview of what opens. Inside, the portfolio,
 // news and tools still open with the lessons that teach them.
 import { useState } from "react";
+import { claimAsk } from "./asks.js";
 import { getState, update, useAppState } from "./store.js";
 import { addStrings, money } from "./i18n.js";
 import { fact } from "./facts.js";
@@ -42,7 +43,8 @@ export default function Practice(ctx) {
   const { t, locale } = ctx;
   const progress = useAppState((s) => s.progress);
   const introSeen = useSeen("practice");
-  const [intro, setIntro] = useState(() => practiceOpen(progress) && !introSeen);
+  // An ask like the others: if something else has asked in this visit, it waits for the next time Practice opens (asks.js).
+  const [intro, setIntro] = useState(() => practiceOpen(progress) && !introSeen && claimAsk());
   const parts = allModules()
     .filter((m) => m.practice)
     .sort((a, b) => a.practice.order - b.practice.order);

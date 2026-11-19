@@ -183,7 +183,7 @@ export default function CertSheet({ t, locale, go, onClose }) {
             <Note icon="info" style={{ marginBottom: 12 }}>
               <strong style={{ display: "block" }}>{session.online ? t("cert.account") : t("cert.offline")}</strong>
               {session.online && (
-                <Button size="sm" kind="secondary" style={{ marginTop: 10 }} onClick={() => (onClose(), go("settings"))}>
+                <Button size="sm" kind="secondary" style={{ marginTop: 10 }} onClick={() => (onClose(), go("settings", { section: "account" }))}>
                   {t("cert.signin")}
                 </Button>
               )}

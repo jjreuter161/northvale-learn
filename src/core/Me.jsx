@@ -51,7 +51,7 @@ function League({ t, session, go }) {
             <div style={{ fontSize: 14, color: "var(--mid)", lineHeight: 1.4 }}>{t("league.join.sub")}</div>
           </div>
         </div>
-        <Button kind="secondary" size="md" full style={{ marginTop: 12 }} onClick={() => go("settings")}>
+        <Button kind="secondary" size="md" full style={{ marginTop: 12 }} onClick={() => go("settings", { section: "account" })}>
           {t("account.create")}
         </Button>
       </Card>

@@ -250,10 +250,11 @@ try {
       }
       await button("Done", top()).click();
     }
-    // After the third lesson: the one-question survey, once back from the lesson.
-    await page.getByRole("dialog", { name: "Quick question" }).waitFor({ timeout: 10000 });
-    await page.keyboard.press("Escape");
-    await page.waitForFunction(() => (JSON.parse(localStorage.getItem("northvale-learn-v1")).modules.feedback || {}).survey === "skipped");
+    // After the third lesson: no survey yet (it waits for the fifth lesson). It is marked skipped here so the rest of this run isn't interrupted by it.
+    await page.waitForTimeout(3500);
+    assert.equal(await page.getByRole("dialog", { name: "Quick question" }).count(), 0, "no survey after three lessons");
+    await page.evaluate(() => { const k = "northvale-learn-v1"; const x = JSON.parse(localStorage.getItem(k)); x.modules.feedback = { ...(x.modules.feedback || {}), survey: "skipped" }; localStorage.setItem(k, JSON.stringify(x)); });
+    await page.reload();
     await button("Practice", page.getByRole("navigation")).click();
     await page.getByRole("dialog", { name: "New: Practice" }).waitFor();
     await clean("practice intro");
@@ -622,9 +623,9 @@ try {
     console.log("ok: the brand: “Our promise” (English, and Spanish by link), the tagline on the welcome screen in Spanish");
   }
 
-  // --- the lesson-3 survey can't be lost: missed (app closed first), it shows on the next open; answered, never again ---
+  // --- the lesson-5 survey can't be lost: missed (app closed first), it shows on the next open; answered, never again ---
   {
-    const app = await open(learner({ ageBand: "18-25" }, { counters: { lessons: 3 } }, { feedback: { pending: [], survey: null } }));
+    const app = await open(learner({ ageBand: "18-25" }, { counters: { lessons: 5 } }, { feedback: { pending: [], survey: null } }));
     const { page, top, button, clean } = app;
     await page.getByRole("dialog", { name: "Quick question" }).waitFor({ timeout: 10000 });
     await clean("the survey");
@@ -636,8 +637,27 @@ try {
     await page.reload();
     await page.waitForTimeout(3500);
     assert.equal(await page.getByRole("dialog", { name: "Quick question" }).count(), 0, "answered surveys don't come back");
-    console.log("ok: the lesson-3 survey shows even if its moment was missed (on the next open), sends the answer, and never comes back");
+    console.log("ok: the lesson-5 survey shows even if its moment was missed (on the next open), sends the answer, and never comes back");
     await app.close();
+  }
+
+  // --- at most one ask per visit: the survey waits for the fifth lesson, and when two asks are due the first one takes the turn; the other comes on the next visit ---
+  {
+    const app = await open(learner({ ageBand: "18-25" }, { counters: { lessons: 3 } }, { feedback: { pending: [], survey: null } }));
+    const { page, top, button } = app;
+    await page.waitForTimeout(3500);
+    assert.equal(await page.getByRole("dialog", { name: "Quick question" }).count(), 0, "three lessons: no survey yet");
+    await app.close();
+    const two = await open(learner({ ageBand: "18-25" }, { counters: { lessons: 5 } }, { feedback: { pending: [], survey: null } }));
+    await two.button("Practice", two.page.getByRole("navigation")).click(); // the "New: Practice" sheet is due too: opened first, it takes the turn
+    await two.page.getByRole("dialog", { name: "New: Practice" }).waitFor();
+    await two.page.keyboard.press("Escape");
+    await two.page.waitForTimeout(3500);
+    assert.equal(await two.page.getByRole("dialog", { name: "Quick question" }).count(), 0, "one ask per visit: no survey after the Practice sheet");
+    await two.page.reload();
+    await two.page.getByRole("dialog", { name: "Quick question" }).waitFor({ timeout: 10000 });
+    console.log("ok: at most one ask per visit (the survey waits for lesson 5; of two due asks the first takes the turn, the other comes next visit)");
+    await two.close();
   }
 
   // --- the tab bar and the header never cover what's scrolled into view ---

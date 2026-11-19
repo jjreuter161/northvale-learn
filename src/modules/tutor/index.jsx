@@ -43,7 +43,8 @@ addStrings({
   "tutor.offline.banner": S("The tutor is in offline mode, so it can only explain basic terms.", "El tutor está en modo sin conexión, así que solo puede explicar términos básicos."),
   "tutor.offline.account": S("A free account turns on the full tutor, which answers any money question.", "Una cuenta gratis activa el tutor completo, que responde cualquier pregunta de dinero."),
   "tutor.offline": S("From the glossary:", "Del glosario:"),
-  "tutor.offline.lesson": S("Offline, I can only explain basic terms, but this lesson covers your question:", "Sin conexión solo puedo explicar términos básicos, pero esta lección cubre tu pregunta:"),
+  "tutor.offline.lesson": S("I can only explain money words here. This lesson covers your question:", "Aquí solo puedo explicar palabras de dinero. Esta lección cubre tu pregunta:"),
+  "tutor.hello.words": S("Type a money word and I'll explain it, or tap one below. For a longer question I'll point you to the lesson that covers it.", "Escribe una palabra de dinero y te la explico, o toca una de abajo. Para una pregunta más larga te llevo a la lección que la cubre."),
   "tutor.offline.none": S("I couldn't match that to a money term. Try a single word, like one of these:", "No encontré un término de dinero para eso. Prueba con una palabra, como alguna de estas:"),
   "tutor.related": S("Related lesson: {unit} · {lesson}", "Lección relacionada: {unit} · {lesson}"),
   "tutor.open": S("Open", "Abrir"),
@@ -209,7 +210,7 @@ function ExplainPanel({ t, locale, mode, aiReady, session, go, onGlossary, relat
           <div style={{ display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap" }}>
             <Button size="sm" kind="secondary" onClick={onGlossary}>{t("explain.glossary")}</Button>
             {!session.user && session.online && (
-              <Button size="sm" kind="secondary" onClick={() => go("settings")}>{t("tutor.signin")}</Button>
+              <Button size="sm" kind="secondary" onClick={() => go("settings", { section: "account" })}>{t("tutor.signin")}</Button>
             )}
           </div>
         </Note>
@@ -252,7 +253,7 @@ function Overlay({ t, locale, go }) {
   const [busy, setBusy] = useState(false);
   const slice = useSlice("tutor", DEFAULTS);
   const session = useSession();
-  const endRef = useRef(null);
+  const listRef = useRef(null);
   const aiReady = session.online && session.ai && session.user;
   const save = (fn) => setSlice("tutor", fn, DEFAULTS);
 
@@ -263,9 +264,12 @@ function Overlay({ t, locale, go }) {
     if (question && !context) setTimeout(() => ask(question), 50);
     else if (question) setInput(question);
   };
+  // The newest answer stays in view: the message list scrolls, nothing else.
+  const lastText = (slice.messages[slice.messages.length - 1] || {}).text;
   useEffect(() => {
-    if (open && endRef.current) endRef.current.scrollIntoView({ block: "end" });
-  }, [slice.messages.length, open, busy]);
+    const list = listRef.current;
+    if (open && list) list.scrollTop = list.scrollHeight;
+  }, [slice.messages.length, lastText, open, busy, view]);
 
   const ask = async (q) => {
     const question = String(q ?? input).trim();
@@ -318,11 +322,12 @@ function Overlay({ t, locale, go }) {
     : [...(now ? [t("tutor.c.lesson", { title: text(now.title, locale) }), t("tutor.c.example2", { title: text(now.title, locale) })] : []), ...(goalName ? [t("tutor.c.goal", { name: goalName })] : []), ...["tutor.s1", "tutor.s2", locale.region === "MX" ? "tutor.s4.MX" : "tutor.s4"].map((k) => t(k))].slice(0, 5);
   const [loadedGlossary, setLoadedGlossary] = useState(GL);
   useEffect(() => {
-    if (open && !GL) glossary().then(setLoadedGlossary);
+    // (Even if something else already loaded it: this component may have mounted before, with nothing to show.)
+    if (open) glossary().then(setLoadedGlossary);
   }, [open]);
   const glossaryWords = loadedGlossary ? loadedGlossary.suggestedWords(locale.lang, locale.region) : [];
   const last = slice.messages[slice.messages.length - 1];
-  const missed = last && last.offline && !last.text && !last.lesson;
+  const missed = last && last.offline && !last.text; // offline and no word matched: offer words to tap (a lesson link alone is not an answer)
   const related = (id) => {
     const l = ALL_LESSONS.find((x) => x.id === id);
     if (!l) return null;
@@ -340,7 +345,8 @@ function Overlay({ t, locale, go }) {
   };
 
   return (
-    <Sheet open={open} onClose={() => setOpen(false)} title={t("tutor.title")} tall>
+    <Sheet open={open} onClose={() => setOpen(false)} title={t("tutor.title")} tall fill>
+      <div style={{ flexShrink: 0 }}>
       <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 12 }}>
         <div style={{ flex: 1 }}>
           <Segmented label={t("tutor.mode")} value={slice.mode} onChange={(mode) => save((s) => ({ ...s, mode }))} options={[{ value: "simple", label: t("tutor.simple") }, { value: "expert", label: t("tutor.expert") }]} />
@@ -355,6 +361,8 @@ function Overlay({ t, locale, go }) {
       <div style={{ marginBottom: 12 }}>
         <Segmented label={t("explain.view")} value={view} onChange={setView} options={[{ value: "chat", label: t("explain.chat") }, { value: "explain", label: t("explain.tab") }]} />
       </div>
+      </div>
+      <div ref={listRef} style={{ flex: 1, minHeight: 0, overflowY: "auto" }}>
       {view === "explain" ? (
         <ExplainPanel t={t} locale={locale} mode={slice.mode} aiReady={aiReady} session={session} go={(r) => (setOpen(false), go(r))} onGlossary={() => setView("chat")} related={related} />
       ) : (
@@ -362,20 +370,20 @@ function Overlay({ t, locale, go }) {
       {!aiReady && (
         <Note icon="info" style={{ marginBottom: 12 }}>
           <strong style={{ display: "block" }}>{t("tutor.offline.banner")}</strong>
-          {!session.user && session.online && (
+          {!session.user && session.online && session.ai && (
             <>
               <span style={{ display: "block", fontSize: 14, color: "var(--mid)", marginTop: 4 }}>{t("tutor.offline.account")}</span>
-              <Button size="sm" kind="secondary" style={{ marginTop: 10 }} onClick={() => (setOpen(false), go("settings"))}>
+              <Button size="sm" kind="secondary" style={{ marginTop: 10 }} onClick={() => (setOpen(false), go("settings", { section: "account" }))}>
                 {t("tutor.signin")}
               </Button>
             </>
           )}
         </Note>
       )}
-      <div style={{ display: "flex", flexDirection: "column", gap: 10, minHeight: 200 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {slice.messages.length === 0 && (
           <div style={{ background: "var(--surface)", borderRadius: 10, padding: 14, fontSize: 16, lineHeight: 1.5 }}>
-            {t("tutor.hello")}
+            {t(aiReady ? "tutor.hello" : "tutor.hello.words")}
           </div>
         )}
         {slice.messages.map((m) =>
@@ -400,7 +408,6 @@ function Overlay({ t, locale, go }) {
             </div>
           )
         )}
-        <div ref={endRef} />
       </div>
 
       {(slice.messages.length === 0 || missed) && (
@@ -419,12 +426,17 @@ function Overlay({ t, locale, go }) {
           <div style={{ fontSize: 13, color: "var(--mid)", marginTop: 4, maxHeight: 60, overflow: "hidden" }}>{about.context}</div>
         </Note>
       )}
+        </>
+      )}
+      </div>
+      {view !== "explain" && (
+        <div style={{ flexShrink: 0 }}>
       <form
         onSubmit={(e) => {
           e.preventDefault();
           ask();
         }}
-        style={{ display: "flex", gap: 8, marginTop: 12, position: "sticky", bottom: 0, background: "var(--bg)", paddingTop: 8 }}
+        style={{ display: "flex", gap: 8, marginTop: 8 }}
       >
         <input value={input} onChange={(e) => setInput(e.target.value)} placeholder={t("tutor.placeholder")} aria-label={t("tutor.placeholder")} enterKeyHint="send" maxLength={2000} style={{ flex: 1, minWidth: 0, border: "1px solid var(--line)", borderRadius: 8, padding: "12px 16px", fontSize: 16, background: "var(--surface)", color: "var(--ink)" }} />
         <button type="submit" disabled={busy || !input.trim()} aria-label={t("tutor.send")} style={{ width: 48, height: 48, borderRadius: 24, border: "none", background: "var(--brand)", color: "var(--onBrand)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", opacity: busy || !input.trim() ? 0.5 : 1, flexShrink: 0 }}>
@@ -432,7 +444,7 @@ function Overlay({ t, locale, go }) {
         </button>
       </form>
       <p style={{ fontSize: 12, color: "var(--low)", textAlign: "center", margin: "8px 0 0" }}>{t("tutor.disclaimer")}</p>
-        </>
+        </div>
       )}
     </Sheet>
   );

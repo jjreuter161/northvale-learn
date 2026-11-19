@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased — fewer interruptions, a plainer Ask, a steadier Ask sheet and Settings that start with language (usability audit, items 6 to 9)
+
+- **At most one ask per visit.** The survey, the age question, the account offer, the "New: Practice" sheet and the reminder offer take turns (`src/core/asks.js`): the first one due in a visit is shown, the rest wait for the next visit. The survey now waits for the fifth lesson, and the account offer is not on the first finish screen (it shows from the second lesson, once). An age card nobody answers keeps its turn each visit; "Not now" ends it.
+- **Ask without the AI key** says what it can do (explain money words, point to the lesson that covers a question) and shows words to tap. The example words never appeared before (the glossary could load before the sheet mounted); they do now. The "a free account turns on the full tutor" line shows only where the host has the tutor. Nothing about how the key is read or sent changed.
+- **The Ask sheet** keeps its title bar, close button and switches in place; only the messages scroll, and the newest answer stays in view (`Sheet` has a `fill` option).
+- **Settings** opens on "Language and country" (the account form is further down, after Colors), each row is labelled (Language, Country, Main currency), the note is shorter, and the buttons that mean "make or use an account" open the Account section.
+- Tests: the browser test now expects the survey at five lessons and has a one-ask-per-visit check; the layout test checks the new Settings order.
+
 ## Unreleased — the first lesson, easier to use (usability audit, items 1 to 5)
 
 From `docs/USABILITY-AUDIT.md` (the owner's checkout, untracked): the five things a new person hits in the first lesson.
