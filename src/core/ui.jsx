@@ -69,6 +69,7 @@ h1,h2{color:var(--head)}
 .nv-reduce *{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 .nv-list>*+*{border-top:1px solid var(--line)}
 .nv-scene{max-height:132px}
+@media(min-width:700px){.nv-sunrise{-webkit-mask-image:linear-gradient(to right,transparent,#000 14%,#000 86%,transparent);mask-image:linear-gradient(to right,transparent,#000 14%,#000 86%,transparent)}}
 .nv-split{display:grid;grid-template-columns:minmax(380px,5fr) 6fr;min-height:100dvh}
 .nv-brand{background:var(--brand);color:var(--onBrand);display:flex;flex-direction:column;justify-content:space-between;gap:40px;padding:56px;position:sticky;top:0;height:100dvh;align-self:start}
 .nv-formside{display:flex;align-items:center;justify-content:center;padding:40px 48px}
@@ -188,7 +189,7 @@ export function Button({ kind = "primary", size = "lg", full, disabled, onClick,
       className="nv-press nv-btn"
       onClick={disabled ? undefined : onClick}
       disabled={disabled}
-      style={{ border: "none", borderRadius: size === "lg" ? 18 : 15, padding: pad, minHeight: size === "sm" ? 36 : size === "lg" ? 52 : 44, fontSize: size === "lg" ? 17 : 15, fontWeight: 700, letterSpacing: -0.1, cursor: disabled ? "default" : "pointer", width: full ? "100%" : undefined, maxWidth: "100%", textAlign: "center", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, opacity: disabled ? 0.45 : 1, ...BUTTON[kind], ...(disabled && (kind === "primary" || kind === "bad" || kind === "good") ? QUIET : {}), ...style }}
+      style={{ border: "none", borderRadius: size === "lg" ? 18 : 15, padding: pad, minHeight: size === "sm" ? 44 : size === "lg" ? 52 : 44, fontSize: size === "lg" ? 17 : 15, fontWeight: 700, letterSpacing: -0.1, cursor: disabled ? "default" : "pointer", width: full ? "100%" : undefined, maxWidth: "100%", textAlign: "center", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, opacity: disabled ? 0.45 : 1, ...BUTTON[kind], ...(disabled && (kind === "primary" || kind === "bad" || kind === "good") ? QUIET : {}), ...style }}
       {...rest}
     >
       {children}
@@ -261,7 +262,7 @@ export function Ring({ value, max = 1, size = 56, stroke = 7, color = "var(--acc
 
 export function Chip({ active, onClick, children, style }) {
   return (
-    <button className="nv-press" onClick={onClick} aria-pressed={!!active} style={{ ...(active ? SELECTED : { border: "2px solid transparent" }), display: "inline-flex", alignItems: "center", gap: 6, background: active ? "var(--brandSoft)" : "var(--surface)", color: "var(--ink)", borderRadius: 8, padding: "7px 14px", minHeight: 40, fontSize: 15, fontWeight: 650, cursor: "pointer", ...style }}>
+    <button className="nv-press" onClick={onClick} aria-pressed={!!active} style={{ ...(active ? SELECTED : { border: "2px solid transparent" }), display: "inline-flex", alignItems: "center", gap: 6, background: active ? "var(--brandSoft)" : "var(--surface)", color: "var(--ink)", borderRadius: 8, padding: "7px 14px", minHeight: 44, fontSize: 15, fontWeight: 650, cursor: "pointer", ...style }}>
       {active && <Chosen size={15} />}
       {children}
     </button>

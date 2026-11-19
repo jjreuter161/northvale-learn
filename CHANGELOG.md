@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased — usability audit, items 10 to 32
+
+- **Lessons:** every step says which lesson and which step ("3 of 12"; an extra card and a retry don't count), idea cards are labelled, and on a computer Continue sits under the text. A goal step that finds a goal already made is done at once; the goal wording no longer says "first".
+- **Today and Practice:** a computer shows the next few islands and "Show more units" (the page was 6,100 px tall); tapping a locked unit says when it opens; "goal met" replaces "55 / 20 XP"; "Streak freezes"; one always-true note on Practice and a locked News row that says how many lessons are done; gaps between cards; the Skills sheet only labels what has been started.
+- **Words:** no flag emoji (the welcome screen and Settings group Language and Country and use words); a goal made in a lesson keeps its name in both languages; "Falta 1 año"; "Streak: 1 day"; no stray capitals in the Money Year, which now names the month after a choice and explains Peace of mind and Credit health.
+- **Look:** the budget planner's bar has three tones and a key; every control is at least 43 px tall on a phone; the finish picture no longer has a boat on its caption and spans the window on a computer.
+- **Build:** Settings, About shows the version (commit and day, from `scripts/build-info.mjs`, written before each build); `.claude/launch.json` uses the server's real port (8950).
+- Tests: `test/usability.test.mjs` (one check per fix, phone and laptop where it matters); the browser and layout tests were updated where behaviour changed on purpose.
+
 ## Unreleased — fewer interruptions, a plainer Ask, a steadier Ask sheet and Settings that start with language (usability audit, items 6 to 9)
 
 - **At most one ask per visit.** The survey, the age question, the account offer, the "New: Practice" sheet and the reminder offer take turns (`src/core/asks.js`): the first one due in a visit is shown, the rest wait for the next visit. The survey now waits for the fifth lesson, and the account offer is not on the first finish screen (it shows from the second lesson, once). An age card nobody answers keeps its turn each visit; "Not now" ends it.

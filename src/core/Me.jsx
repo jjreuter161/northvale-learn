@@ -72,7 +72,7 @@ function League({ t, session, go }) {
           <span style={{ flex: 1, fontWeight: r.you ? 650 : 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.you ? t("league.you", { name: r.nickname || t("league.anon") }) : r.nickname || t("league.anon")}</span>
           <span style={{ fontWeight: 600, color: "var(--mid)", fontVariantNumeric: "tabular-nums" }}>{r.xp} XP</span>
           {r.link && (
-            <button onClick={() => unfriend(r)} aria-label={t("league.remove", { name: r.nickname || t("league.anon") })} style={{ border: "none", background: "transparent", color: "var(--low)", width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+            <button onClick={() => unfriend(r)} aria-label={t("league.remove", { name: r.nickname || t("league.anon") })} style={{ border: "none", background: "transparent", color: "var(--low)", width: 44, height: 44, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
               <Icon name="close" size={16} />
             </button>
           )}
@@ -194,7 +194,7 @@ export default function Me({ t, locale, session, go, route, layout }) {
             <span style={{ fontSize: 13, fontWeight: 650, fontVariantNumeric: "tabular-nums" }}>{Math.min(100, Math.round((xpOn(progress, today) / progress.dailyGoal) * 100))}%</span>
           </Ring>
           <div>
-            <div style={{ fontWeight: 650 }}>{t("me.today", { xp: xpOn(progress, today), goal: progress.dailyGoal })}</div>
+            <div style={{ fontWeight: 650 }}>{xpOn(progress, today) >= progress.dailyGoal ? t("me.today_met", { xp: xpOn(progress, today) }) : t("me.today", { xp: xpOn(progress, today), goal: progress.dailyGoal })}</div>
             <div style={{ fontSize: 14, color: "var(--mid)" }}>{t("me.week_total", { xp: weekXp(progress, today) })}</div>
           </div>
         </div>

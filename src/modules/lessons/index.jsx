@@ -12,7 +12,7 @@ import { track } from "../../core/analytics.js";
 import { text, addStrings } from "../../core/i18n.js";
 import { xpOn, dayKey, addDays, weekStart, weekXp } from "../../core/progress.js";
 import { Button, Card, Icon, Layer, List, ListRow, Loading, Mark, Progress, Ring, Scene, Sheet, StreakStar, UnitArt, WaveEdge, toast } from "../../core/ui.jsx";
-import { isDesk } from "../../core/layout.js";
+import { isDesk, useLayout } from "../../core/layout.js";
 import { holdBack } from "../../core/back.js";
 import { useAsk } from "../../core/asks.js";
 import { star, wave, boat, LANDMARK } from "../../core/art.js";
@@ -52,6 +52,9 @@ addStrings({
   "lessons.done_review": S("Completed · review", "Completada · repasar"),
   "lessons.review": S("Review", "Repasar"),
   "lessons.locked_short": S("Locked", "Bloqueada"),
+  "lessons.step_n": S("{i} of {n}", "{i} de {n}"),
+  "lessons.idea": S("Idea", "Idea"),
+  "lessons.unit_locked": S("This unit opens after Unit {n}.", "Esta unidad se abre después de la Unidad {n}."),
   "lessons.minutes": S("{n} min", "{n} min"),
   "lessons.locked": S("One at a time: finish the lesson before this one first.", "Una a la vez: primero termina la lección anterior."),
   "lessons.unit_n": S("Unit {n}", "Unidad {n}"),
@@ -60,6 +63,7 @@ addStrings({
   "lessons.streak_start": S("Do one lesson to start a streak.", "Haz una lección para empezar una racha."),
   // The finish screen and its moments
   "finish.today": S("{xp} of {goal} XP today · {n}-day streak", "{xp} de {goal} XP hoy · racha de {n} {n|día|días}"),
+  "finish.today_met": S("{xp} XP today, goal met · {n}-day streak", "{xp} XP hoy, meta cumplida · racha de {n} {n|día|días}"),
   "finish.life": S("In real life", "En la vida real"),
   "finish.solid": S("Now solid: {name}", "Ya lo tienes firme: {name}"),
   "finish.mastered": S("Mastered: {name}", "Dominado: {name}"),
@@ -299,7 +303,7 @@ function Panel({ t, locale, go, openStreak }) {
           <Ring value={xp} max={progress.dailyGoal} size={52} stroke={5} label={t("goal.aria", { xp, goal: progress.dailyGoal })}>
             <span style={{ fontSize: 12, fontWeight: 650, fontVariantNumeric: "tabular-nums" }}>{Math.min(100, Math.round((xp / progress.dailyGoal) * 100))}%</span>
           </Ring>
-          <div style={{ fontWeight: 650, fontSize: 15 }}>{t("me.today", { xp, goal: progress.dailyGoal })}</div>
+          <div style={{ fontWeight: 650, fontSize: 15 }}>{xp >= progress.dailyGoal ? t("me.today_met", { xp }) : t("me.today", { xp, goal: progress.dailyGoal })}</div>
         </div>
       </Card>
       {!goal && (
@@ -714,7 +718,7 @@ function SeaChart({ t, tx, go, progress, ci, next, all, setAll, opened, toggle, 
       })}
       {list.length < UNITS.length && (
         <div style={{ position: "absolute", left: 0, right: 0, top: pct(H - 150, H), textAlign: "center" }}>
-          <button onClick={() => setAll(true)} className="nv-press" style={{ border: "none", background: "var(--surface)", borderRadius: 8, padding: "8px 16px", fontWeight: 650, fontSize: 14, color: "var(--head)", boxShadow: "var(--lift)", cursor: "pointer", font: "inherit", minHeight: 40 }}>
+          <button onClick={() => setAll(true)} className="nv-press" style={{ border: "none", background: "var(--surface)", borderRadius: 8, padding: "8px 16px", fontWeight: 650, fontSize: 14, color: "var(--head)", boxShadow: "var(--lift)", cursor: "pointer", font: "inherit", minHeight: 44 }}>
             {t("path.mist", { n: UNITS.length - list.length })}
           </button>
         </div>
@@ -730,8 +734,13 @@ function Course({ t, locale, go, route, layout }) {
   const progress = useAppState((s) => s.progress);
   const tx = useLocaleText(locale);
   const [opened, setOpened] = useState({});
-  const [all, setAll] = useState(isDesk(layout)); // a computer has the room for every island
-  const toggle = (id) => setOpened((o) => ({ ...o, [id]: !o[id] }));
+  const [all, setAll] = useState(false); // the next few islands, then "Show more" (on every screen size)
+  // A unit that is still locked says when it opens instead of doing nothing.
+  const toggle = (id) => {
+    const i = UNITS.findIndex((u) => u.id === id);
+    if (lessonState(progress, UNITS[i].lessons[0].id) === "locked" && !opened[id]) return toast(t("lessons.unit_locked", { n: Math.max(1, i) }));
+    setOpened((o) => ({ ...o, [id]: !o[id] }));
+  };
   const next = currentLesson(progress);
   const p = (route && route.params) || {};
   const playing = !!(p.lesson || p.review || p.challenge || p.startUnit);
@@ -771,7 +780,7 @@ function Course({ t, locale, go, route, layout }) {
           )}
         </button>
         {challenge && (
-          <button onClick={() => go("lessons", { challenge: l.id })} className="nv-press" style={{ border: "1px solid var(--line)", background: "var(--bg)", color: "var(--brand)", borderRadius: 8, padding: "6px 12px", marginRight: 14, fontSize: 13, fontWeight: 650, cursor: "pointer", minHeight: 36, flexShrink: 0 }}>
+          <button onClick={() => go("lessons", { challenge: l.id })} className="nv-press" style={{ border: "1px solid var(--line)", background: "var(--bg)", color: "var(--brand)", borderRadius: 8, padding: "6px 12px", marginRight: 14, fontSize: 13, fontWeight: 650, cursor: "pointer", minHeight: 44, flexShrink: 0 }}>
             {t("challenge.chip")}
           </button>
         )}
@@ -796,7 +805,7 @@ function Course({ t, locale, go, route, layout }) {
                 <div style={{ fontSize: 13, color: "var(--low)", fontWeight: 600 }}>{t("lessons.unit_n", { n: UNITS.indexOf(u) + 1 })}</div>
                 <div style={{ fontSize: 18, fontWeight: 750 }}>{tx(u.title)}</div>
               </div>
-              <button onClick={() => toggle(u.id)} aria-label={`${t("common.close")}: ${tx(u.title)}`} style={{ border: "none", background: "var(--surface2)", color: "var(--ink)", borderRadius: 18, width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+              <button onClick={() => toggle(u.id)} aria-label={`${t("common.close")}: ${tx(u.title)}`} style={{ border: "none", background: "var(--surface2)", color: "var(--ink)", borderRadius: 22, width: 44, height: 44, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
                 <Icon name="close" size={16} />
               </button>
             </div>
@@ -911,11 +920,13 @@ function Moment({ t, locale, result, unit, onDone }) {
 // confetti). The waves drift for a few seconds, then stop.
 // The one red spark on the sea chart: a small pennant on the island you're on.
 const spark = (x, y) => `<path d="M${x} ${y + 26}V${y}" stroke="var(--artInk)" stroke-width="2.4" stroke-linecap="round"/><path d="M${x + 1.2} ${y}L${x + 17} ${y + 6}L${x + 1.2} ${y + 12}Z" fill="var(--spark)"/>`;
-const SUNRISE = `<defs><linearGradient id="nvsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--bg)"/><stop offset="1" stop-color="var(--warmSoft)"/></linearGradient></defs><rect width="390" height="250" fill="url(#nvsky)"/><g class="nv-drift"><path d="${wave(440, 250, 7, 5, 196)}" fill="var(--artSea)"/><path d="${wave(440, 250, 6, 4, 218)}" fill="var(--artSea2)" opacity=".7"/></g>${boat(296, 156, 0.42)}<path d="${wave(390, 250, 8, 5, 240)}" fill="var(--bg)"/>`;
+// The finish picture, drawn at the width it is shown (390 on a phone, 640 in the centered column), so the boat stays where it was put.
+const sunrise = (w) => `<defs><linearGradient id="nvsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--bg)"/><stop offset="1" stop-color="var(--warmSoft)"/></linearGradient></defs><rect width="${w}" height="250" fill="url(#nvsky)"/><g class="nv-drift"><path d="${wave(w + 50, 250, 7, 5, 196)}" fill="var(--artSea)"/><path d="${wave(w + 50, 250, 6, 4, 218)}" fill="var(--artSea2)" opacity=".7"/></g>${boat(w - 90, 92, 0.42)}<path d="${wave(w, 250, 8, 5, 240)}" fill="var(--bg)"/>`;
 function Sunrise({ children }) {
+  const w = useLayout() === "phone" ? 390 : 640;
   return (
     <div style={{ position: "relative", margin: "-10px -18px 0", padding: "20px 18px 56px" }}>
-      <svg viewBox="0 0 390 250" preserveAspectRatio="xMidYMax slice" aria-hidden="true" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", display: "block" }} dangerouslySetInnerHTML={{ __html: SUNRISE }} />
+      <svg className="nv-sunrise" viewBox={`0 0 ${w} 250`} preserveAspectRatio="xMidYMax slice" aria-hidden="true" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", display: "block" }} dangerouslySetInnerHTML={{ __html: sunrise(w) }} />
       <div style={{ position: "relative" }}>{children}</div>
     </div>
   );
@@ -936,17 +947,18 @@ function FinishRing({ t, before, after, goal, gained, streak }) {
     const id = setTimeout(() => setShown(after), 30);
     return () => (cancelAnimationFrame(raf), clearTimeout(id));
   }, []);
+  const line = after > goal ? t("finish.today_met", { xp: after, n: streak }) : t("finish.today", { xp: after, goal, n: streak });
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
       <div style={{ borderRadius: "50%", background: "var(--surface)" }}>
-      <Ring value={Math.min(shown, goal)} max={goal} size={150} stroke={8} label={t("finish.today", { xp: after, goal, n: streak })}>
+      <Ring value={Math.min(shown, goal)} max={goal} size={150} stroke={8} label={line}>
         <div style={{ textAlign: "center", lineHeight: 1 }}>
           <div className="nv-disp" style={{ fontSize: 44, letterSpacing: -1, fontVariantNumeric: "tabular-nums", color: "var(--head)" }}>+{n}</div>
           <div style={{ fontSize: 13, color: "var(--mid)", marginTop: 4 }}>XP</div>
         </div>
       </Ring>
       </div>
-      <p style={{ fontSize: 14, color: "var(--mid)", margin: "10px 0 0" }}>{t("finish.today", { xp: after, goal, n: streak })}</p>
+      <p style={{ fontSize: 14, color: "var(--mid)", margin: "10px 0 0" }}>{line}</p>
     </div>
   );
 }
@@ -1218,7 +1230,7 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
             <Mark size={26} color="var(--artInk)" />
           </span>
         </div>
-        <button onClick={() => service("tutor", "open")({ context: tx(step.title || step.q || step.prompt || "") })} className="nv-press" style={{ border: "1px solid var(--line)", background: "var(--bg)", color: "var(--ink)", borderRadius: 8, height: 36, padding: "0 12px", display: "inline-flex", alignItems: "center", gap: 6, fontWeight: 650, fontSize: 14, cursor: "pointer", flexShrink: 0 }}>
+        <button onClick={() => service("tutor", "open")({ context: tx(step.title || step.q || step.prompt || "") })} className="nv-press" style={{ border: "1px solid var(--line)", background: "var(--bg)", color: "var(--ink)", borderRadius: 8, height: 44, padding: "0 14px", display: "inline-flex", alignItems: "center", gap: 6, fontWeight: 650, fontSize: 14, cursor: "pointer", flexShrink: 0 }}>
           <Icon name="chat" size={16} /> {t("nav.ask")}
         </button>
         <button onClick={() => service("feedback", "open")({ kind: "content", context: `${mode === "lesson" ? lesson.id : `${mode} ${step.c || ""}`} · step ${at + 1} · ${tx(step.title || step.q || step.prompt || "")}`.slice(0, 280) })} aria-label={t("lessons.report")} title={t("lessons.report")} style={{ border: "none", background: "transparent", color: "var(--low)", width: 44, height: 44, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
@@ -1226,9 +1238,15 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
         </button>
       </div>
 
-      <div key={step.key} className="nv-in" style={{ flex: 1, overflowY: "auto" }}>
+      {/* Where you are: the lesson, and "3 of 12" (the extra card and the retry after a miss don't count). */}
+      <div style={{ fontSize: 13, fontWeight: 600, color: "var(--mid)", margin: "-8px 0 12px" }}>
+        {mode === "lesson" ? tx(lesson.title) : run.title}
+        {!step.extra && !step.retry && ` · ${t("lessons.step_n", { i: queue.slice(0, at + 1).filter((q) => !q.extra && !q.retry).length, n: run.steps.length })}`}
+      </div>
+      <div key={step.key} className="nv-in" style={{ flex: isDesk(ctx.layout) ? "0 0 auto" : 1, overflowY: "auto" }}>
         {step.type === "card" && (
           <div>
+            <div style={{ fontSize: 13, fontWeight: 650, color: "var(--mid)", marginBottom: 6 }}>{t("lessons.idea")}</div>
             <h2 className="nv-disp" style={{ fontSize: 28, margin: "0 0 12px", lineHeight: 1.15 }}>{tx(step.title)}</h2>
             <p style={{ fontSize: 18, lineHeight: 1.55, margin: 0 }}>{tx(step.body)}</p>
             {service("tutor", "canExplain")(`${tx(step.title)} ${tx(step.body)}`) && <button onClick={() => service("tutor", "explain")({ question: tx(step.title), context: tx(step.body) })} className="nv-press" style={{ marginTop: 18, border: "1px solid var(--line)", background: "var(--bg)", color: "var(--brand)", borderRadius: 8, padding: "10px 16px", fontWeight: 650, fontSize: 15, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 8, minHeight: 44 }}>
@@ -1342,7 +1360,7 @@ function Overlay({ label, children }) {
   }, []);
   return (
     <Layer>
-      <div role="dialog" aria-modal="true" aria-label={label} data-player="" style={{ position: "fixed", inset: 0, zIndex: 40, background: "var(--bg)", color: "var(--ink)", overflowY: "auto" }}>
+      <div role="dialog" aria-modal="true" aria-label={label} data-player="" style={{ position: "fixed", inset: 0, zIndex: 40, background: "var(--bg)", color: "var(--ink)", overflowY: "auto", overflowX: "hidden" }}>
         <div className="nv-ovl" style={{ maxWidth: 640, minHeight: "100%", margin: "0 auto", display: "flex", flexDirection: "column", padding: "calc(10px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom))" }}>{children}</div>
       </div>
     </Layer>

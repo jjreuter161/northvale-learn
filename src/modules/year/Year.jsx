@@ -25,6 +25,7 @@ addStrings({
   "yr.voyage": S("Month {n} of 12", "Mes {n} de 12"),
   "yr.month": S("{name}", "{name}"),
   "yr.peace": S("Peace of mind", "Tranquilidad"),
+  "yr.meters.note": S("Peace of mind is how steady your money feels. Credit health is how a lender would see you. Both are out of 100.", "Tranquilidad es qué tan estable se siente tu dinero. Salud crediticia es cómo te vería quien presta. Ambas van de 0 a 100."),
   "yr.savings": S("Savings", "Ahorros"),
   "yr.cash": S("Cash", "Efectivo"),
   "yr.invested": S("Invested", "Invertido"),
@@ -172,6 +173,7 @@ export default function Year({ t, locale, go }) {
         <Meter label={t("yr.peace")} value={r.peace} tone="var(--good)" />
         <Meter label={t("yr.credit")} value={r.credit} />
       </div>
+      <p style={{ margin: "8px 0 0", fontSize: 12, color: "var(--low)", lineHeight: 1.4 }}>{t("yr.meters.note")}</p>
       <div style={{ display: "flex", flexWrap: "wrap", gap: "10px 16px", marginTop: 12 }}>
         <Meter label={t("yr.cash")} value={r.cash} pct={false} fmt={fmt} />
         <Meter label={t("yr.savings")} value={r.savings} pct={false} fmt={fmt} />
@@ -279,7 +281,8 @@ export default function Year({ t, locale, go }) {
         <Title sub={t("yr.disclaimer")}>{t("yr.title")}</Title>
         <Card pad={16}>
           <Voyage month={run.month} t={t} />
-          <p style={{ margin: "10px 0 0", fontSize: 17, lineHeight: 1.5 }}>{text(report.choiceResult, locale, report.vars)}</p>
+          <div style={{ fontSize: 13, color: "var(--mid)", marginTop: 6 }}>{t("yr.voyage", { n: report.from + 1 })} · {monthName(report.from)}</div>
+          <p style={{ margin: "6px 0 0", fontSize: 17, lineHeight: 1.5 }}>{text(report.choiceResult, locale, report.vars)}</p>
           <div style={{ marginTop: 14, fontSize: 13, fontWeight: 700, color: "var(--mid)" }}>{t("yr.changed")}</div>
           {rows.length === 0 ? (
             <p style={{ margin: "6px 0 0", fontSize: 14, color: "var(--mid)" }}>{t("yr.nothing")}</p>
@@ -308,7 +311,7 @@ export default function Year({ t, locale, go }) {
       <Title sub={t("yr.disclaimer")}>{t("yr.title")}</Title>
       <Card pad={16}>
         <Voyage month={run.month} t={t} />
-        <div style={{ fontSize: 13, color: "var(--mid)", marginTop: 6, textTransform: "capitalize" }}>{t("yr.voyage", { n: run.month + 1 })} · {monthName(run.month)}</div>
+        <div style={{ fontSize: 13, color: "var(--mid)", marginTop: 6 }}>{t("yr.voyage", { n: run.month + 1 })} · {monthName(run.month)}</div>
         <h2 className="nv-disp" style={{ fontSize: 26, lineHeight: 1.15, margin: "6px 0 8px", color: "var(--head)" }}>{text(ev.title, locale, vars)}</h2>
         <p style={{ margin: 0, fontSize: 17, lineHeight: 1.5 }}>{text(ev.body, locale, vars)}</p>
       </Card>

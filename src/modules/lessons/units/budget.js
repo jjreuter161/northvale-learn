@@ -89,7 +89,7 @@ export default {
           ],
           T("Needs get paid first; wants fit in the space that's left.", "Las necesidades se pagan primero; los gustos caben en lo que sobra.")
         ),
-        act("goals.create", T("Make your first goal: something you want, how much it costs, and when.", "Crea tu primera meta: algo que quieras, cuánto cuesta y para cuándo."), {name: {en: "New headphones",es: "Audífonos nuevos"},target: [300,5000],months: 6,own: true}),
+        act("goals.create", T("Make a goal: something you want, how much it costs, and when.", "Crea una meta: algo que quieras, cuánto cuesta y para cuándo."), {name: {en: "New headphones",es: "Audífonos nuevos"},target: [300,5000],months: 6,own: true}),
       ],
     },
     {

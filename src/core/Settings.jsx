@@ -15,6 +15,7 @@ import { forgetInvite } from "./invites.jsx";
 import { service } from "./registry.js";
 import { canVibrate } from "./feel.js";
 import { AccountForm } from "./Account.jsx";
+import { BUILD } from "./build.gen.js";
 
 // A section of the page: with its title on a phone or tablet; on a computer only the one picked on the left (no title: the left names it).
 function Sec({ k, desk, sel, t, children }) {
@@ -110,12 +111,12 @@ export default function Settings({ t, locale, go, layout, route }) {
           label={t("settings.country")}
           value={settings.both ? "BOTH" : settings.region}
           onChange={(v) => (v === "BOTH" ? setSetting("both", true) : (setSetting("region", v), setSetting("both", false)))}
-          options={[...Object.entries(REGIONS).map(([value, r]) => ({ value, label: `${r.flag} ${r.name[locale.lang]}` })), { value: "BOTH", label: `🇺🇸🇲🇽 ${t("settings.country.both")}` }]}
+          options={[...Object.entries(REGIONS).map(([value, r]) => ({ value, label: r.name[locale.lang] })), { value: "BOTH", label: t("settings.country.both") }]}
         />
         {settings.both && (
           <>
             <div style={{ fontWeight: 650, margin: "18px 0 10px" }}>{t("settings.country.main")}</div>
-            <Segmented label={t("settings.country.main")} value={settings.region} onChange={(v) => setSetting("region", v)} options={Object.entries(REGIONS).map(([value, r]) => ({ value, label: `${r.flag} ${r.currency}` }))} />
+            <Segmented label={t("settings.country.main")} value={settings.region} onChange={(v) => setSetting("region", v)} options={Object.entries(REGIONS).map(([value, r]) => ({ value, label: `${r.currency} · ${r.name[locale.lang]}` }))} />
           </>
         )}
         <p style={{ fontSize: 13, color: "var(--low)", margin: "10px 0 0", lineHeight: 1.4 }}>{t("settings.country.how")}</p>
@@ -244,6 +245,7 @@ export default function Settings({ t, locale, go, layout, route }) {
 
       <Sec k="about" {...sp}>
       <Note icon="shield">{t("disclaimer.full")}</Note>
+      <p data-build="" style={{ fontSize: 13, color: "var(--low)", margin: "12px 2px 0" }}>{t("about.build", { commit: BUILD.commit, day: BUILD.day })}</p>
       </Sec>
         </>
       )}

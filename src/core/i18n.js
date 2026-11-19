@@ -89,10 +89,12 @@ export function addStrings(table) {
   Object.assign(STRINGS, table);
 }
 export function makeT(locale) {
-  return (key, vars) => {
+  const t = (key, vars) => {
     const s = STRINGS[key];
     if (!s) return key;
     return fill(pick(s, locale.lang, locale.region), locale, vars);
   };
+  t.locale = locale; // (so a name stored as { en, es } can be shown in the current language)
+  return t;
 }
 export const allStrings = () => STRINGS;

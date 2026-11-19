@@ -179,7 +179,7 @@ export function ReminderSettings({ t, calendar }) {
       {error && <Note tone="bad" style={{ marginTop: 10 }}>{error}</Note>}
       {!r && calendar && (
         <details style={{ marginTop: 12 }}>
-          <summary style={{ cursor: "pointer", fontSize: 14, fontWeight: 650, color: "var(--mid)", minHeight: 32 }}>{t("remind.calendar")}</summary>
+          <summary style={{ cursor: "pointer", fontSize: 14, fontWeight: 650, color: "var(--mid)", minHeight: 44 }}>{t("remind.calendar")}</summary>
           <div style={{ marginTop: 10 }}>{calendar}</div>
         </details>
       )}

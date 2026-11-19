@@ -222,7 +222,7 @@ export default function App() {
         <span style={{ fontWeight: 650, fontSize: 15, fontVariantNumeric: "tabular-nums" }}>{progress.streak.count}</span>
       </button>
       {getModule("tutor") && !desk && (
-        <button onClick={() => getModule("tutor").services.open({})} aria-label={t("nav.ask")} className="nv-press" style={{ display: "inline-flex", alignItems: "center", gap: 6, border: "none", background: "var(--surface)", color: "var(--ink)", borderRadius: 8, height: 38, padding: "0 14px", fontSize: 15, fontWeight: 650, cursor: "pointer", flexShrink: 0 }}>
+        <button onClick={() => getModule("tutor").services.open({})} aria-label={t("nav.ask")} className="nv-press" style={{ display: "inline-flex", alignItems: "center", gap: 6, border: "none", background: "var(--surface)", color: "var(--ink)", borderRadius: 8, height: 44, padding: "0 14px", fontSize: 15, fontWeight: 650, cursor: "pointer", flexShrink: 0 }}>
           <Icon name="chat" size={17} /> <span className="nv-word">{t("nav.ask")}</span>
         </button>
       )}

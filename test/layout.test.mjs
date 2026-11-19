@@ -100,7 +100,7 @@ try {
       await panel.waitFor();
       const text = await panel.innerText();
       assert.match(text, /5-day streak/);
-      assert.match(text, /Today: \d+ \/ 20 XP/);
+      assert.match(text, /Today: \d+ (\/ 20 XP|XP · goal met)/);
       assert.match(text, /My first car/);
       const p = await rectOf(page, `aside[aria-label="At a glance"]`);
       assert.ok(p.left > w * 0.55 && p.width >= 280 && p.width <= 320, `${name}: the panel sits on the right (${JSON.stringify(p)})`);
@@ -115,7 +115,7 @@ try {
     assert.ok(card.width <= 701, `${name}: Today's column is ${Math.round(card.width)}px (at most 700)`);
     assert.ok(today.left >= 0);
     await fits(page, `${name}: Today`);
-    if (computer) assert.equal(await page.getByText(/^Show \d+ more units?$/).count(), 0, `${name}: every island is shown`);
+    if (computer) assert.equal(await page.getByText(/^Show \d+ more units?$/).count(), 1, `${name}: the next few islands, then "Show more" (not all eighteen)`);
 
     // --- the other tabs ---
     for (const t of ["goals", "practice", "me"]) {

@@ -39,7 +39,7 @@ addStrings({
     "Northvale Learn es una app educativa. El dinero de tu portafolio de práctica no es real: no se hace ninguna compra de verdad y no hay ningún banco ni casa de bolsa conectado. Las lecciones, el simulador de metas y el tutor con IA explican cómo funciona el dinero en general; no conocen toda tu situación y no son asesoría financiera, fiscal ni legal. Los precios pueden ser con retraso o de ejemplo. Antes de tomar decisiones con dinero real, platícalo con un adulto de confianza o con un profesional certificado."
   ),
 
-  "streak.aria": S("Streak: {n} days", "Racha: {n} días"),
+  "streak.aria": S("Streak: {n} {n|day|days}", "Racha: {n} {n|día|días}"),
   "goal.aria": S("Today: {xp} of {goal} XP", "Hoy: {xp} de {goal} XP"),
   "streak.title": S("Your streak", "Tu racha"),
   "streak.days": S("{n}-day streak", "Racha de {n} {n|día|días}"),
@@ -189,6 +189,7 @@ addStrings({
   "settings.reset.body": S("This erases your lessons, XP, streak, badges, practice portfolio and goals on this device, and starts over.", "Esto borra tus lecciones, XP, racha, insignias, portafolio de práctica y metas en este dispositivo, y empieza de cero."),
   "settings.reset.yes": S("Erase and start over", "Borrar y empezar de nuevo"),
   "settings.about": S("About", "Acerca de"),
+  "about.build": S("Version {commit}, built {day}", "Versión {commit}, compilada {day}"),
   "settings.analytics": S("Share anonymous usage stats", "Compartir estadísticas anónimas"),
   "settings.analytics.sub": S("Helps us see what's working (lessons finished, where people get stuck). Never your name or email, never sold.", "Nos ayuda a ver qué funciona (lecciones terminadas, dónde se atoran). Nunca tu nombre ni tu correo, y nunca se vende."),
   "settings.delete_data": S("Delete my data", "Borrar mis datos"),
@@ -204,9 +205,10 @@ addStrings({
   "me.level": S("Level {n}", "Nivel {n}"),
   "me.streak": S("Day streak", "Días de racha"),
   "me.total_xp": S("Total XP", "XP total"),
-  "me.freezes": S("Freezes", "Protectores"),
+  "me.freezes": S("Streak freezes", "Protectores de racha"),
   "me.this_week": S("This week", "Esta semana"),
   "me.today": S("Today: {xp} / {goal} XP", "Hoy: {xp} / {goal} XP"),
+  "me.today_met": S("Today: {xp} XP · goal met", "Hoy: {xp} XP · meta cumplida"),
   "me.week_total": S("{xp} XP this week", "{xp} XP esta semana"),
   "me.badges": S("Achievements", "Logros"),
   "me.badges.n": S("{n} of {total} earned", "{n} de {total} obtenidos"),

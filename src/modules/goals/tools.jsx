@@ -98,17 +98,26 @@ export function BudgetTool({ params = {}, t, locale, onDone, done }) {
   const [wants, setWants] = useState(Math.min(b.wants, 100 - b.needs));
   const save = 100 - needs - wants;
   const fmt = (n) => money(n, locale);
+  // Three tones of the text color (the calm looks use one color for everything else), with a gap and a key, so the split can be seen.
   const bar = [
-    ["needs", needs, "var(--sky)"],
-    ["wants", wants, "var(--flame)"],
-    ["save", save, "var(--good)"],
+    ["needs", needs, "var(--level3)"],
+    ["wants", wants, "var(--level2)"],
+    ["save", save, "var(--level1)"],
   ];
   return (
     <Card>
       <Slider label={t("budget.income")} value={income} min={amt([100, 1500], R)} max={amt([4000, 60000], R)} step={amt([50, 500], R)} onChange={setIncome} display={fmt(income)} />
-      <div style={{ display: "flex", height: 26, borderRadius: 8, overflow: "hidden", margin: "4px 0 12px" }} aria-hidden>
+      <div style={{ display: "flex", height: 26, borderRadius: 8, overflow: "hidden", margin: "4px 0 6px", gap: 2 }} aria-hidden>
         {bar.map(([k, v, c]) => (
-          <div key={k} style={{ width: `${v}%`, background: c, transition: "width .3s" }} />
+          <div key={k} data-seg={k} style={{ width: `${v}%`, background: c, transition: "width .3s" }} />
+        ))}
+      </div>
+      <div style={{ display: "flex", gap: 14, margin: "0 0 12px", fontSize: 13, color: "var(--mid)" }} aria-hidden>
+        {bar.map(([k, , c]) => (
+          <span key={k} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+            <span style={{ width: 10, height: 10, borderRadius: 3, background: c, display: "inline-block" }} />
+            {t(`budget.${k}`)}
+          </span>
         ))}
       </div>
       <Slider label={t("budget.needs")} value={needs} min={0} max={100 - wants} onChange={setNeeds} display={`${needs}% · ${fmt((income * needs) / 100)}`} />

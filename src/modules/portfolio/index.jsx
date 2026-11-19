@@ -256,7 +256,7 @@ function AssetPanel({ t, locale, symbol, pf, prices, quotes, onTraded, compact, 
         {mode === "buy" && (
           <div style={{ display: "flex", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
             {[0.05, 0.1, 0.25, 0.5].map((f) => (
-              <Chip key={f} onClick={() => setAmount(String(Math.floor(pf.cash * f)))} style={{ padding: "6px 12px", minHeight: 36, fontSize: 14 }}>
+              <Chip key={f} onClick={() => setAmount(String(Math.floor(pf.cash * f)))} style={{ padding: "6px 12px", minHeight: 44, fontSize: 14 }}>
                 {Math.round(f * 100)}%
               </Chip>
             ))}
@@ -491,7 +491,7 @@ function BuyAction({ params, t, locale, onDone, done }) {
         </Card>
       ) : (
         <Card>
-          <button onClick={() => setSym(null)} style={{ border: "none", background: "none", color: "var(--sky)", fontWeight: 650, padding: 0, marginBottom: 8, cursor: "pointer", minHeight: 32 }}>
+          <button onClick={() => setSym(null)} style={{ border: "none", background: "none", color: "var(--sky)", fontWeight: 650, padding: 0, marginBottom: 8, cursor: "pointer", minHeight: 44 }}>
             ← {t("pf.act.pick")}
           </button>
           <AssetPanel
@@ -559,7 +559,7 @@ function ChartAction({ params, t, locale, onDone }) {
   const list = assetsFor(locale.region).filter((a) => a.type !== "safe");
   return sym ? (
     <Card>
-      <button onClick={() => setSym(null)} style={{ border: "none", background: "none", color: "var(--sky)", fontWeight: 650, padding: 0, marginBottom: 8, cursor: "pointer", minHeight: 32 }}>
+      <button onClick={() => setSym(null)} style={{ border: "none", background: "none", color: "var(--sky)", fontWeight: 650, padding: 0, marginBottom: 8, cursor: "pointer", minHeight: 44 }}>
         ← {t("pf.act.chart_pick")}
       </button>
       <AssetPanel t={t} locale={locale} symbol={sym} pf={pf} prices={prices} quotes={quotes} compact explainDone={onDone} />
@@ -591,7 +591,7 @@ function DiversifyAction({ params, t, locale, onDone, done }) {
       <p style={{ fontWeight: 750, fontSize: 18, margin: "0 0 10px" }}>{t("pf.act.holdings", { n: Math.min(n, need), need })}</p>
       {sym ? (
         <Card>
-          <button onClick={() => setSym(null)} style={{ border: "none", background: "none", color: "var(--sky)", fontWeight: 650, padding: 0, marginBottom: 8, cursor: "pointer", minHeight: 32 }}>
+          <button onClick={() => setSym(null)} style={{ border: "none", background: "none", color: "var(--sky)", fontWeight: 650, padding: 0, marginBottom: 8, cursor: "pointer", minHeight: 44 }}>
             ← {t("pf.act.pick")}
           </button>
           <AssetPanel t={t} locale={locale} symbol={sym} pf={pf} prices={prices} quotes={quotes} compact allowBuy onTraded={() => setSym(null)} />

@@ -131,9 +131,10 @@ async function play({ page, top, button }, { untilAction = false, untilMoment = 
     if (untilMoment && (await d.locator("[data-moment]").count())) return;
     const names = await d.getByRole("button").evaluateAll((bs) => bs.map((b) => b.getAttribute("aria-label") || b.innerText.trim()));
     if (process.env.DEBUG) console.log(i, JSON.stringify(names));
-    if (names.includes("Skip for now") || names.includes("Saltar por ahora")) {
+    if (names.includes("Done — continue") || names.includes("Listo, continuar")) await button(/^(Done — continue|Listo, continuar)$/, d).click(); // a tool step that is already done (a goal was already made)
+    else if (names.includes("Skip for now") || names.includes("Saltar por ahora")) {
       if (untilAction) return;
-      await button(/^(Skip for now|Saltar por ahora)$/, d).click();
+      await button(/^(Skip for now|Saltar por ahora)$/, d).click().catch(() => {}); // (a step that completes itself can take it away as we click)
     } else if (names.includes("Check") || names.includes("Comprobar")) {
       await answerAny(d);
       await button(/^(Check|Comprobar)$/, d).click();

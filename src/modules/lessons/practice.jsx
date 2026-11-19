@@ -220,7 +220,7 @@ export function SessionDone({ t, locale, mode, result, answers, onDone }) {
               <div key={c} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 0", borderTop: i ? "1px solid var(--line)" : "none" }}>
                 <span style={{ flex: 1, fontSize: 15 }}>{x(conceptById(c).name)}</span>
                 <Meter level={level} />
-                <span style={{ fontSize: 13, color: "var(--mid)", width: 84, textAlign: "right" }}>{t(`level.${level}`)}</span>
+                <span style={{ fontSize: 13, color: "var(--mid)", width: 84, textAlign: "right" }}>{level === "new" ? "" : t(`level.${level}`)}</span>
               </div>
             );
           })}
@@ -287,7 +287,7 @@ export function SkillsCard({ t, locale }) {
                 <div key={c} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 0", borderTop: i ? "1px solid var(--line)" : "none" }}>
                   <span style={{ flex: 1, fontSize: 15 }}>{x(conceptById(c).name)}</span>
                   <Meter level={levelOf(c)} />
-                  <span style={{ fontSize: 13, color: "var(--mid)", width: 84, textAlign: "right" }}>{t(`level.${levelOf(c)}`)}</span>
+                  <span style={{ fontSize: 13, color: "var(--mid)", width: 84, textAlign: "right" }}>{levelOf(c) === "new" ? "" : t(`level.${levelOf(c)}`)}</span>
                 </div>
               ))}
             </Card>
