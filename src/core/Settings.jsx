@@ -88,7 +88,7 @@ export default function Settings({ t, locale, go, layout, route }) {
 
   return (
     <div>
-      <Title>{t("nav.settings")}</Title>
+      <Title sub={t("settings.sub")}>{t("nav.settings")}</Title>
       <div style={desk ? { display: "grid", gridTemplateColumns: "230px minmax(0, 680px)", gap: 36, alignItems: "start" } : undefined}>
         {desk && (
           <nav aria-label={t("nav.settings")} style={{ position: "sticky", top: 76, display: "flex", flexDirection: "column", gap: 4 }}>

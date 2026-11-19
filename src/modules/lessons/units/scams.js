@@ -69,7 +69,7 @@ export default {
       title: T("Phishing", "Phishing"),
       life: T("If a message asks you to log in, open the company's app yourself instead of tapping the link.", "Si un mensaje te pide entrar a tu cuenta, abre tú la app de la empresa en lugar de tocar el enlace."),
       steps: [
-        card(T("It looks official", "Parece oficial"), T("Phishing messages copy logos, names and the tone of real companies. They arrive by text, email, social media or phone calls, and they all want the same thing: to get you to tap, log in or share something.", "Los mensajes de phishing copian logos, nombres y el tono de empresas reales. Llegan por mensaje, correo, redes sociales o llamada, y todos quieren lo mismo: que toques, entres o compartas algo.")),
+        card(T("It looks official", "Parece oficial"), T("Phishing messages copy the logos, names and tone of real companies, by text, email or call. They all want the same thing: a tap, a login or something you share.", "Los mensajes de phishing copian logos, nombres y el tono de empresas reales, por mensaje, correo o llamada. Todos quieren lo mismo: que toques, entres o compartas algo.")),
         card(T("Slow down, go direct", "Ve despacio y ve directo"), T("Urgency is the trick. Don't use links or numbers from the message. Open the company's app, or type its address yourself, and check there.", "La urgencia es el truco. No uses enlaces ni números del mensaje. Abre la app de la empresa o escribe tú la dirección, y revisa ahí.")),
         choice(
           "phishing",
@@ -79,7 +79,16 @@ export default {
           T("Real companies don't ask for passwords or codes by message. That request alone tells you.", "Las empresas reales no piden contraseñas ni códigos por mensaje. Esa petición ya te lo dice todo."),
           [null, T("Logos are easy to copy. They prove nothing.", "Los logos son fáciles de copiar. No prueban nada."), T("Timing doesn't matter — what it asks for does.", "La hora no importa; lo que pide, sí.")]
         ),
-        tf("phishing", T("If a message looks official, it's safe to use its link.", "Si un mensaje se ve oficial, es seguro usar su enlace."), false, T("Looking official is exactly what phishing does. Go to the app or website yourself.", "Verse oficial es justo lo que hace el phishing. Entra tú a la app o al sitio.")),
+        scenario(
+          "phishing",
+          T("A text from \"your bank\" says your account is locked and gives a link. What do you do?", "Un mensaje de \"tu banco\" dice que tu cuenta está bloqueada y trae un enlace. ¿Qué haces?"),
+          [
+            fit(T("Open the bank's app yourself and look there", "Abrir tú la app del banco y revisar ahí"), "good", T("No link, no fake page. If the account is really locked, the app says so.", "Sin enlace no hay página falsa. Si la cuenta sí está bloqueada, la app lo dice.")),
+            fit(T("Call the number printed on your bank card", "Llamar al número que viene en tu tarjeta del banco"), "ok", T("Also safe: a number you already trust.", "También es seguro: un número en el que ya confías.")),
+            fit(T("Tap the link, it looks official", "Tocar el enlace, se ve oficial"), "poor", T("Looking official is what phishing does.", "Verse oficial es lo que hace el phishing.")),
+          ],
+          T("Never use the link or number in the message.", "Nunca uses el enlace ni el número del mensaje.")
+        ),
         spot(
           "phishing",
           T("This text just arrived. Tap the 2 biggest red flags.", "Te acaba de llegar este mensaje. Toca las 2 señales de alerta más grandes."),

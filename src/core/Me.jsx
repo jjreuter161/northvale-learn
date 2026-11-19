@@ -151,7 +151,7 @@ export default function Me({ t, locale, session, go, route, layout }) {
   if (section)
     return (
       <div>
-        <Title>{t(`me.section.${section}`)}</Title>
+        <Title sub={t(`me.section.${section}.sub`)}>{t(`me.section.${section}`)}</Title>
         {section === "achievements" && <Badges t={t} progress={progress} />}
         {section === "skills" && cards.map((m) => <m.MeCard key={m.id} t={t} locale={locale} go={go} />)}
         {section === "invite" && <InviteCard t={t} session={session} />}

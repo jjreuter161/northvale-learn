@@ -56,9 +56,16 @@ export default {
       life: T("Look up how many companies one index fund holds.", "Busca cuántas empresas tiene un fondo indexado."),
       steps: [
         card(T("Buy many at once", "Compra muchas a la vez"), T("An ETF (exchange-traded fund) is a basket of many investments you can buy as one. One share of an S&P 500 fund gives you a small piece of 500 big US companies.", "Un ETF (fondo cotizado) es una canasta con muchas inversiones que compras como una sola. Una parte de un fondo del S&P 500 te da un pedacito de 500 grandes empresas de Estados Unidos.", { en: "An ETF (exchange-traded fund) is a basket of many investments you can buy as one. NAFTRAC, for example, holds the biggest companies on the Mexican Stock Exchange, and from Mexico you can also buy US funds through the SIC (Sistema Internacional de Cotizaciones).", es: "Un ETF (fondo cotizado) es una canasta con muchas inversiones que compras como una sola. El NAFTRAC, por ejemplo, tiene a las empresas más grandes de la Bolsa Mexicana, y desde México también puedes comprar fondos de Estados Unidos a través del SIC (Sistema Internacional de Cotizaciones)." })),
-        card(T("Why it helps", "Por qué ayuda"), T("If one company in the basket has a terrible year, it's just a small part of what you own. The others can make up for it.", "Si a una empresa de la canasta le va muy mal, es solo una parte pequeña de lo que tienes. Las demás pueden compensarlo.")),
+        card(T("Why it helps", "Por qué ayuda"), T("If one company in the basket has a terrible year, it's a small part of what you own.", "Si a una empresa de la canasta le va muy mal, es una parte pequeña de lo que tienes.")),
         number("index_funds", T("A fund holds 500 companies in equal parts. One of them falls 50%. About how much does the whole fund fall?", "Un fondo tiene 500 empresas en partes iguales. Una de ellas baja 50%. ¿Cuánto baja todo el fondo, más o menos?"), { unit: "percent", answer: 0.1, tol: 0.05 }, [T("Each company is 1/500 of the fund, or 0.2%.", "Cada empresa es 1/500 del fondo, o 0.2%."), T("Half of 0.2% is 0.1%. One bad company barely moves a basket of 500.", "La mitad de 0.2% es 0.1%. Una empresa mala casi no mueve una canasta de 500.")]),
-        tf("index_funds", T("ETFs trade on the stock market, like stocks.", "Los ETFs se compran y venden en la bolsa, como las acciones."), true, T("That's the \"exchange-traded\" part — you can buy and sell them any trading day.", "Esa es la parte de \"cotizado\": los puedes comprar y vender cualquier día hábil de la bolsa.")),
+        choice(
+          "index_funds",
+          T("Mia puts {$100|1800} in one company, Leo the same in an index fund. That company collapses. Who is hurt more?", "Mia pone {$100|1800} en una empresa; Leo, lo mismo en un fondo indexado. Esa empresa se hunde. ¿A quién le afecta más?"),
+          [T("Mia: it was all in one company", "A Mia: todo estaba en una empresa"), T("Leo: a fund falls with every company", "A Leo: un fondo cae con cada empresa"), T("Both, equally", "A los dos por igual")],
+          0,
+          T("Leo owns a little of hundreds of companies, so one bad year barely shows.", "Leo tiene un poquito de cientos de empresas: un mal año casi no se nota."),
+          [null, T("A fund holds many companies; one bad one is small.", "Un fondo tiene muchas empresas; una mala pesa poco."), T("The amounts match, the risk doesn't.", "Los montos son iguales, el riesgo no.")]
+        ),
         scenario(
           "index_funds",
           T("You want to start investing {$50|750} a month for the long run. Which fits a beginner best?", "Quieres empezar a invertir {$50|750} al mes a largo plazo. ¿Qué le conviene más a alguien que empieza?"),
