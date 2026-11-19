@@ -35,7 +35,7 @@ The audit text below is the original, written before any fix. This table says wh
 | 27 | Skills sheet "New" wall | Fixed |
 | 28 | No build indicator | Fixed: Settings, About shows the version and day |
 | 29 | Preview port | Fixed |
-| 30 | macOS blocks the preview from ~/Downloads | The owner decided to move the project out of ~/Downloads (done as a separate step) |
+| 30 | macOS blocks the preview from ~/Downloads | Fixed by moving the project (and its worktrees) to `~/Projects/northvale-learn`, which macOS does not protect; `.claude/launch.json` runs `npm run dev` there |
 | 31 | "1 days" | Fixed |
 | 32 | Flag emoji | Fixed (with 15) |
 
