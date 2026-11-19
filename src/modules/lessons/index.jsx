@@ -124,6 +124,8 @@ addStrings({
   "panel.title": S("At a glance", "De un vistazo"),
   "panel.goal.none": S("No goal yet. A goal gives your lessons a purpose.", "Todavía no tienes meta. Una meta le da un propósito a tus lecciones."),
   "panel.goal.cta": S("Set a goal", "Poner una meta"),
+  "panel.goal.picked": S("You picked {name}. Give it an amount and a date.", "Elegiste {name}. Ponle un monto y una fecha."),
+  "panel.goal.plan": S("Make a plan", "Hacer un plan"),
   "panel.mission.locked": S("Opens after your first three lessons.", "Se abre después de tus primeras tres lecciones."),
   "panel.myth.soon": S("A daily question, starting tomorrow.", "Una pregunta al día, desde mañana."),
   "overview.title": S("Your progress", "Tu progreso"),
@@ -284,6 +286,7 @@ function Panel({ t, locale, go, openStreak }) {
   useAppState((s) => s.modules.missions);
   const xp = xpOn(progress, dayKey());
   const goal = service("goals", "leadProgress")();
+  const picked = service("goals", "startPlan")(); // the goal picked at the start, before it has an amount
   const mission = practiceOpen(progress) && (service("missions", "status")(locale) || {}).mission;
   const row = { display: "flex", alignItems: "center", gap: 12 };
   const small = { fontSize: 14, color: "var(--mid)" };
@@ -312,8 +315,8 @@ function Panel({ t, locale, go, openStreak }) {
             <Icon name="target" size={20} />
             <div>
               <div style={{ fontWeight: 700, fontSize: 16 }}>{t("goals.nav")}</div>
-              <div style={small}>{t("panel.goal.none")}</div>
-              <div style={{ fontSize: 14, fontWeight: 650, marginTop: 4 }}>{t("panel.goal.cta")}</div>
+              <div style={small}>{picked ? t("panel.goal.picked", { name: picked.name }) : t("panel.goal.none")}</div>
+              <div style={{ fontSize: 14, fontWeight: 650, marginTop: 4 }}>{picked ? t("panel.goal.plan") : t("panel.goal.cta")}</div>
             </div>
           </div>
         </Card>

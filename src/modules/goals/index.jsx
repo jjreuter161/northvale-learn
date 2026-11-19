@@ -111,6 +111,8 @@ addStrings({
   "home.other_goals": S("Other goals", "Otras metas"),
   "home.new_goal": S("New goal", "Nueva meta"),
   "home.empty.title": S("No goal yet", "Todavía no tienes meta"),
+  "home.empty.picked": S("Your goal: {name}", "Tu meta: {name}"),
+  "home.empty.picked.sub": S("You picked this at the start. Tap it below to set how much and by when.", "Lo elegiste al empezar. Tócalo abajo para poner cuánto y para cuándo."),
   "home.empty.sub": S("Most people start with an emergency fund. It's the one that saves you from everything else.", "Casi todos empiezan con un fondo de emergencia: es el que te salva de todo lo demás."),
   "home.next_lesson": S("Next lesson", "Siguiente lección"),
   "home.start": S("Start", "Empezar"),
@@ -191,7 +193,7 @@ addStrings({
   "edit.result.week": S("About {amount} a week, until {date}.", "Unos {amount} a la semana, hasta el {date}."),
   "edit.save": S("Save goal", "Guardar meta"),
   "edit.create": S("Create goal", "Crear meta"),
-  "edit.saved": S("Goal saved. Future you says thanks.", "Meta guardada. Tu yo del futuro te lo agradece."),
+  "edit.saved": S("Goal saved.", "Meta guardada."),
   "edit.replan": S("Saving re-plans from today, keeping what you've set aside.", "Al guardar se vuelve a planear desde hoy, conservando lo que ya apartaste."),
 
   // Milestones
@@ -615,6 +617,7 @@ function CheckIn({ t, locale, rows, onRecord, onDone }) {
 function Home({ t, locale, go, data, setOpen, sheets, layout }) {
   const { slice, rows } = data;
   const goalFor = useAppState((s) => s.profile.goalFor);
+  const pickedGoal = goalFor && goalFor !== "basics" && P.TEMPLATES.some((x) => x.id === goalFor) ? goalFor : null; // (not "just understanding money")
   const lead = P.primaryGoal(rows.map((r) => r.g));
   const leadRow = lead && rows.find((r) => r.g.id === lead.id);
   const others = rows.filter((r) => r !== leadRow);
@@ -629,8 +632,8 @@ function Home({ t, locale, go, data, setOpen, sheets, layout }) {
           <div style={{ borderRadius: 12, overflow: "hidden", boxShadow: "var(--lift)", marginBottom: 14 }}>
             <Scene name="harbor" w={358} h={140} />
           </div>
-          <Label style={{ marginTop: 4 }}>{t("home.empty.title")}</Label>
-          <p style={{ fontSize: 15, color: "var(--mid)", lineHeight: 1.45, margin: "-4px 0 14px" }}>{t("home.empty.sub")}</p>
+          <Label style={{ marginTop: 4 }}>{pickedGoal ? t("home.empty.picked", { name: t(`tpl.${pickedGoal}`) }) : t("home.empty.title")}</Label>
+          <p style={{ fontSize: 15, color: "var(--mid)", lineHeight: 1.45, margin: "-4px 0 14px" }}>{pickedGoal ? t("home.empty.picked.sub") : t("home.empty.sub")}</p>
           <TemplateGrid t={t} onPick={(id) => sheets.newGoal(id)} highlight={goalFor} />
         </div>
       ) : (
