@@ -6,6 +6,7 @@ import { lookFrom, specFor } from "./colors.js";
 import { MARK_PATHS, UNIT_ART, BADGE_ART, SCENE, wave } from "./art.js";
 import { createPortal } from "react-dom";
 import { useLayout } from "./layout.js";
+import { holdBack } from "./back.js";
 
 // THE LOOK — three colors (navy, cream, signal red; colors.js): the app's CSS
 // variables come from `lookFrom(background, text, highlight)`. Words, icons and
@@ -164,7 +165,7 @@ export function Icon({ name, size = 22, color = "currentColor", stroke = 2, fill
 
 // WHAT'S CHOSEN — outlined in the main button's color (3px, with the button's edge on navy), and never by color alone:
 // whatever wears SELECTED also shows a check or a filled dot.
-export const SELECTED = { border: "2px solid var(--select)", boxShadow: "inset 0 0 0 1px var(--select), 0 0 0 var(--ringW) var(--ringC)" };
+export const SELECTED = { border: "2px solid var(--select)", boxShadow: "inset 0 0 0 1px var(--select)" };
 export const Chosen = ({ size = 18 }) => <Icon name="check" size={size} stroke={3} color="var(--ink)" />;
 
 // Buttons have a pressable edge underneath; tapping pushes them in.
@@ -302,12 +303,17 @@ export function Field({ label, hint, style, ...input }) {
 // is open, the app behind it is inert: screen readers and the keyboard
 // stay in the layer.
 let layers = 0;
-export function Layer({ children }) {
+// `onBack`: what the Back button does while this layer is open (see back.js).
+export function Layer({ children, onBack }) {
+  const back = useRef(onBack);
+  back.current = onBack;
   useEffect(() => {
     const root = document.getElementById("root");
     if (root) root.inert = ++layers > 0;
+    const release = back.current ? holdBack(() => back.current && back.current()) : null;
     return () => {
       if (root) root.inert = --layers > 0;
+      if (release) release();
     };
   }, []);
   return createPortal(children, document.body);
@@ -323,7 +329,7 @@ export function Sheet({ open, onClose, title, children, tall }) {
   }, [open, onClose]);
   if (!open) return null;
   return (
-    <Layer>
+    <Layer onBack={onClose}>
     <div role="dialog" aria-modal="true" aria-label={title} className="nv-sheetwrap" style={{ position: "fixed", inset: 0, zIndex: 60, display: "flex", justifyContent: "center", color: "var(--ink)", fontFamily: FONT }}>
       <div onClick={onClose} style={{ position: "absolute", inset: 0, background: "rgba(5,12,25,.45)", animation: "nvFade .2s both" }} />
       <div className="nv-sheet" style={{ position: "relative", width: "100%", maxWidth: 560, maxHeight: tall ? "92dvh" : "85dvh", overflowY: "auto", background: "var(--bg)", borderRadius: "14px 14px 0 0", padding: "10px 18px calc(22px + env(safe-area-inset-bottom))", animation: "nvSpring .2s ease-out both" }}>
@@ -482,9 +488,9 @@ export function Toasts() {
     toastListeners.add(l);
     return () => toastListeners.delete(l);
   }, []);
-  // Outside the app's root, so they're still heard while a lesson or sheet is open.
+  // Outside the app's root, so they're still heard while a lesson or sheet is open; they sit under the top bar (a lesson's close, progress and Ask), not on it.
   return createPortal(
-    <div aria-live="polite" style={{ position: "fixed", top: "calc(10px + env(safe-area-inset-top))", left: 0, right: 0, zIndex: 80, display: "flex", flexDirection: "column", alignItems: "center", gap: 8, pointerEvents: "none" }}>
+    <div aria-live="polite" style={{ position: "fixed", top: "calc(70px + env(safe-area-inset-top))", left: 0, right: 0, zIndex: 80, display: "flex", flexDirection: "column", alignItems: "center", gap: 8, pointerEvents: "none" }}>
       {items.map((t) => (
         <div key={t.id} className="nv-in" style={{ background: "var(--ink)", color: "var(--bg)", borderRadius: 8, padding: "10px 18px", fontWeight: 650, fontSize: 15, boxShadow: "var(--shadow)", maxWidth: "90vw" }}>
           {t.message}

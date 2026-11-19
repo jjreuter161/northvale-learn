@@ -67,7 +67,7 @@ export default {
         ),
         number("pay_yourself_first", T("You save {$10|150} every week. How much is that after a year?", "Ahorras {$10|150} cada semana. ¿Cuánto es después de un año?"), { unit: "money", answer: [520, 7800] }, [T("{$10|150} × 52 weeks.", "{$10|150} × 52 semanas."), T("{$520|7800}. Small and steady adds up, and it builds the habit.", "{$520|7800}. Poco y constante se acumula, y crea el hábito.")]),
         order("pay_yourself_first", T("Payday. Put “pay yourself first” in order.", "Día de pago. Ordena “págate primero a ti”."), [T("Your pay lands in your account", "Tu sueldo llega a tu cuenta"), T("An automatic transfer moves your savings out", "Una transferencia automática aparta tu ahorro"), T("You pay for your needs", "Pagas tus necesidades"), T("You spend what's left on wants", "Gastas lo que queda en gustos")], T("Saving comes right after payday, before anything else gets a chance at it. Then needs, then wants.", "El ahorro va justo después del pago, antes de que otra cosa lo alcance. Luego las necesidades y luego los gustos.")),
-        act("goals.create", T("Set a goal and pick how much you'll put aside each month.", "Pon una meta y elige cuánto vas a apartar cada mes."), {name: {en: "Savings goal",es: "Meta de ahorro"},target: [1000,15000],months: 12}),
+        act("goals.create", T("Set a goal and pick how much you'll put aside each month.", "Pon una meta y elige cuánto vas a apartar cada mes."), {name: {en: "Savings goal",es: "Meta de ahorro"},target: [1000,15000],months: 12,own: true}),
       ],
     },
     {

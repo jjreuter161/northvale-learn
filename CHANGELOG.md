@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased — the first lesson, easier to use (usability audit, items 1 to 5)
+
+From `docs/USABILITY-AUDIT.md` (the owner's checkout, untracked): the five things a new person hits in the first lesson.
+
+- **The way forward stays on screen.** On the lesson-complete screen "Next" and "Done" are pinned to the bottom (as the buttons in a step already were), so a long finish screen with the account card no longer hides them.
+- **The goal you picked stays your goal.** A lesson's "your first goal" step now starts from the goal chosen at the start (its own amount, and a name that follows the language) instead of making a generic "Savings goal" that re-sorted the course. The two steps that do this are marked `own: true` in `save.js` and `budget.js`. Someone who chose "Just understanding money" gets what they got before.
+- **A clearer hands-on step.** While a tool waits there is one button, "Skip for now" (no greyed "Try it above to continue"); when it's done there is one, "Done — continue". After making a goal the card shows the goal, without "You already have a goal" and a button that can't be pressed. Toasts sit under a lesson's top bar instead of on its close, progress and Ask buttons.
+- **Chosen is not red.** Whatever is chosen (a language chip, an answer, a tab, a switch) is outlined in the text color; red stays for the main button. `--select` is the text color in every look (the colors test says so), and the extra outer ring on navy is gone.
+- **Back stays in the app.** On a phone and in a browser, Back closes what is open on top (a lesson asks "Leave now?", a sheet closes, a screen below a tab goes up one level, the finish screen closes) instead of leaving the app. New `src/core/back.js`: each open layer takes one history step and gives it back when it closes. Not done: an address for each screen, and the setup screens (they have their own back arrow).
+
 ## Unreleased — three browsers, and a plan for 50 units
 
 - **Safari and Firefox** are now tested: `test/browsers.test.mjs` runs the main flows (setup for someone new, then Today, every tab, Settings, the streak dialog, Ask, and a lesson) in Chrome, Firefox and Safari's engine (WebKit), each on a laptop and on a phone (WebKit as an iPhone 13), and fails on console errors, anything cut off, or raw text. Nothing needed fixing: all three pass. (Firefox and WebKit are installed for testing only: `node node_modules/playwright-core/cli.js install firefox webkit`.) The every-screen helpers moved to `test/lib/screens.mjs`.

@@ -114,19 +114,19 @@ assert.deepEqual(using(/var\(--fill\)/), ["core/ui.jsx"], "--fill is only the ma
 assert.deepEqual(using(/#C8202A|#FF8E8B|#A21A22/i), ["core/colors.js", "core/ui.jsx"], "no stray reds");
 console.log("ok: right and wrong differ by icon, edge and words (not color); red appears only as the main button, the confirm, and the sea chart's pennant");
 
-// Chosen things are outlined in the main button's color (with its edge on navy), in every look.
+// Chosen things are outlined in the text color (never the red, which reads as a mistake), in every look.
 for (const { bg, text, hi } of ALL_ALLOWED) {
   const L = lookFrom(bg, text, hi);
-  assert.equal(L["--select"], L["--fill"], `${bg}/${text}/${hi}: the selection outline is the main button's color`);
+  assert.equal(L["--select"], L["--ink"], `${bg}/${text}/${hi}: the selection outline is the text color`);
+  assert.ok(C(L["--select"], L["--bg"]) >= 3, `${bg}/${text}/${hi}: the selection outline is visible (${C(L["--select"], L["--bg"]).toFixed(2)}:1)`);
   assert.ok(C(L["--focus"], L["--bg"]) >= 3, `${bg}/${text}/${hi}: keyboard focus is visible (${C(L["--focus"], L["--bg"]).toFixed(2)}:1)`);
-  if (C(L["--select"], L["--bg"]) < 3) assert.ok(L["--ringW"] === "2px" && C(L["--ringC"], L["--bg"]) >= 3, `${bg}/${text}/${hi}: a faint outline gets the button's edge`);
 }
 const ui = read("src/core/ui.jsx");
 assert.match(ui, /export const SELECTED = \{ border: "2px solid var\(--select\)", boxShadow: "inset 0 0 0 1px var\(--select\)/, "3px in all: a 2px border and a 1px inner line");
 for (const f of ["modules/lessons/practice.jsx", "modules/lessons/qtypes.jsx", "core/Onboarding.jsx", "core/Settings.jsx", "core/ui.jsx", "modules/goals/index.jsx", "modules/feedback/index.jsx", "modules/certs/Sheet.jsx", "core/App.jsx"]) assert.match(read(`src/${f}`), /SELECTED|var\(--select\)/, `${f} outlines what's chosen`);
 assert.doesNotMatch(read("src/core/ui.jsx") + read("src/core/Onboarding.jsx") + read("src/modules/feedback/index.jsx"), /border: ["`][^"`]*var\(--brand\)/, "no leftover brand-colored selection borders");
 for (const f of ["core/ui.jsx", "modules/lessons/practice.jsx", "core/Onboarding.jsx"]) assert.match(read(`src/${f}`), /Chosen/, `${f} also shows a check (never color alone)`);
-console.log("ok: whatever is chosen (answers, chips, onboarding, pickers, tabs) is outlined in the main button's color with its edge on navy, keyboard focus is readable, and a check shows too");
+console.log("ok: whatever is chosen (answers, chips, onboarding, pickers, tabs) is outlined in the text color (not the red), keyboard focus is readable, and a check shows too");
 
 // The brand half of setup on a computer (a panel in the text color with the page color on it) is readable in every look.
 for (const { bg, text, hi } of ALL_ALLOWED) {

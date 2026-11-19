@@ -2,7 +2,7 @@
 // screen for the current route, and a bottom tab bar with 4 tabs: Learn
 // (opens on Today), Goals, Practice, Me. Every screen belongs to one tab
 // (a module says which in nav.tab); screens below a tab get a back button.
-import { Suspense, lazy, useEffect, useMemo, useState } from "react";
+import { Suspense, lazy, useEffect, useMemo, useRef, useState } from "react";
 import { useAppState, update, on } from "./store.js";
 import { makeT } from "./i18n.js";
 import { allModules, getModule } from "./registry.js";
@@ -26,6 +26,7 @@ import "./strings.js";
 import { track } from "./analytics.js";
 import { Boundary } from "./errors.jsx";
 import { useLayout, isDesk } from "./layout.js";
+import { holdBack } from "./back.js";
 import Split from "./Split.jsx";
 
 const CORE_SCREENS = { me: Me, settings: Settings, legal: Legal, practice: Practice };
@@ -128,6 +129,22 @@ export default function App() {
     setRoute({ id, params });
     window.scrollTo(0, 0);
   };
+  // Back (the phone's, the browser's) from a screen below a tab does what the header's back button does, instead of leaving the app (back.js).
+  const upTo = useRef(null);
+  const onRoot = TABS.some((x) => x.route === route.id) && !(route.id === "me" && route.params.section);
+  useEffect(() => {
+    if (onRoot) return;
+    let release;
+    const hold = () => {
+      release = holdBack(() => {
+        const to = upTo.current;
+        go(to);
+        if (!TABS.some((x) => x.route === to)) hold();
+      });
+    };
+    hold();
+    return () => release();
+  }, [onRoot]);
 
   const rootStyle = { ...vars, background: "var(--bg)", color: "var(--ink)", minHeight: "100dvh", fontFamily: "'Inter', system-ui, sans-serif" };
 
@@ -178,6 +195,7 @@ export default function App() {
   // wordmark; deeper in, a back button named for where it goes.
   const from = route.params.from;
   const back = from ? (getModule(from) && getModule(from).nav ? getModule(from).nav.label : CORE_TITLE[from]) : tab.label;
+  upTo.current = from || tab.route;
   const today = dayKey();
   const ctx = { t, locale, go, route, session, layout, wide: layout !== "phone", openStreak: () => setStreakOpen(true) };
   const openTab = (x) => (setVisit((v) => v + 1), go(x.route));

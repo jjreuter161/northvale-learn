@@ -1006,8 +1006,8 @@ function CreateGoal({ params = {}, t, locale, onDone, done }) {
     const fmt = fmtFor(locale, lead);
     return (
       <Card>
-        <p style={{ margin: "0 0 12px", color: "var(--mid)", lineHeight: 1.45 }}>{t("create.have")}</p>
-        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
+        {!done && <p style={{ margin: "0 0 12px", color: "var(--mid)", lineHeight: 1.45 }}>{t("create.have")}</p>}
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: done ? 0 : 12 }}>
           <TemplateIcon id={lead.template} size={36} />
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontWeight: 650 }}>{nameOf(lead, t)}</div>
@@ -1016,19 +1016,25 @@ function CreateGoal({ params = {}, t, locale, onDone, done }) {
             </div>
           </div>
         </div>
-        <Button full disabled={done} onClick={() => (recordPractice("goal"), onDone && onDone())}>
-          {t("create.looks_right")}
-        </Button>
-        <Button full kind="ghost" style={{ marginTop: 6 }} onClick={() => setAnother(true)}>
-          {t("create.another")}
-        </Button>
+        {!done && (
+          <>
+            <Button full onClick={() => (recordPractice("goal"), onDone && onDone())}>
+              {t("create.looks_right")}
+            </Button>
+            <Button full kind="ghost" style={{ marginTop: 6 }} onClick={() => setAnother(true)}>
+              {t("create.another")}
+            </Button>
+          </>
+        )}
       </Card>
     );
   }
-  const preset = { name: params.name ? text(params.name, locale) : "", target: params.target, months: params.months };
+  // A "your first goal" step (params.own) starts from the goal picked at the start, with that goal's own amount and a name that follows the language; any other step keeps its own example.
+  const mine = params.own && !params.template ? goalForNow() : null;
+  const preset = mine ? {} : { name: params.name ? text(params.name, locale) : "", target: params.target, months: params.months };
   return (
     <Card>
-      <GoalForm t={t} locale={locale} templateId={params.template} preset={preset} simple onSave={(f) => (createGoal(f, R), toast(t("edit.saved"), "good"), onDone && onDone())} />
+      <GoalForm t={t} locale={locale} templateId={mine || params.template} preset={preset} simple onSave={(f) => (createGoal(mine ? { ...f, name: "" } : f, R), toast(t("edit.saved"), "good"), onDone && onDone())} />
     </Card>
   );
 }

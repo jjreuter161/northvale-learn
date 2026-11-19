@@ -68,8 +68,8 @@ export function lookFrom(bg, text, hi) {
     "--fill": H, "--onFill": labelOn(H), "--ringW": bg === "navy" && hi === "red" ? "2px" : "0px", "--ringC": T,
     "--link": T, "--red": COLORS.red.hex, "--onRed": COLORS.cream.hex, "--ringBad": bg === "cream" ? "0px" : "2px",
     "--spark": mark,
-    // Whatever is chosen (an answer, a chip, a tab, a setting) is outlined in the main button's color, with the same cream edge on navy; keyboard focus uses the readable red (or the text color).
-    "--select": H,
+    // Whatever is chosen (an answer, a chip, a tab, a setting) is outlined in the text color, so a pick never looks like a mistake; red stays for the main button. Keyboard focus uses the readable red (or the text color).
+    "--select": T,
     // Calm by default: progress, selected states and "good" are the text color, never the red.
     "--accent": T, "--accentSoft": S.surface2, "--good": T, "--goodSoft": S.surface2,
     // Feedback without color: a check for right, a gentle hint icon for "not quite", both neutral.

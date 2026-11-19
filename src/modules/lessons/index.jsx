@@ -13,6 +13,7 @@ import { text, addStrings } from "../../core/i18n.js";
 import { xpOn, dayKey, addDays, weekStart, weekXp } from "../../core/progress.js";
 import { Button, Card, Icon, Layer, List, ListRow, Loading, Mark, Progress, Ring, Scene, Sheet, StreakStar, UnitArt, WaveEdge, toast } from "../../core/ui.jsx";
 import { isDesk } from "../../core/layout.js";
+import { holdBack } from "../../core/back.js";
 import { star, wave, boat, LANDMARK } from "../../core/art.js";
 import { AgeCard } from "../../core/Account.jsx";
 import { ReminderCard } from "../../core/reminders.jsx";
@@ -84,7 +85,6 @@ addStrings({
   "lessons.wrong.again": S("You'll see this one again at the end.", "Esta la vas a ver otra vez al final."),
   "lessons.do_it": S("Practice", "Práctica"),
   "lessons.done_it": S("Done", "Hecho"),
-  "lessons.action_wait": S("Try it above to continue", "Pruébalo arriba para continuar"),
   "lessons.action_done": S("Done — continue", "Listo, continuar"),
   "lessons.explain": S("Ask about this", "Preguntar sobre esto"),
   "lessons.complete": S("Lesson complete", "Lección completa"),
@@ -993,6 +993,22 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
   const [quit, setQuit] = useState(false);
   const [momentDone, setMomentDone] = useState(false);
   const feedbackRef = useRef(null);
+  // Back (the phone's, the browser's) does what the X does: mid-lesson it asks "Leave now?" (and stays in the lesson), on the finish screen it closes. It never leaves the app.
+  const back = useRef(null);
+  back.current = { finished: !!result, finish: () => go("lessons"), ask: () => setQuit(true) };
+  useEffect(() => {
+    let release;
+    const hold = () => {
+      release = holdBack(() => {
+        const b = back.current;
+        if (b.finished) return b.finish();
+        b.ask();
+        hold();
+      });
+    };
+    hold();
+    return () => release();
+  }, []);
   // On a computer: 1–4 pick an answer, Enter checks and continues. A small hint, shown until the first lesson is over.
   const keysSeen = useSeen("keys");
   const hint = isDesk(ctx.layout) && !keysSeen;
@@ -1166,7 +1182,22 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
             </Button>
           </Card>
         )}
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {(mistakes === 0 || result.unitJustDone) && (
+          <div style={{ display: "flex", justifyContent: "center", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
+            {mistakes === 0 && (
+              <Button kind="ghost" size="md" onClick={() => go("lessons", { challenge: lesson.id })}>
+                {t("challenge.offer")}
+              </Button>
+            )}
+            {result.unitJustDone && (
+              <Button kind="ghost" size="md" onClick={() => openShare({ kind: "unit", title: tx(unit.title) })}>
+                <Icon name="share" size={18} /> {t("share.button")}
+              </Button>
+            )}
+          </div>
+        )}
+        {/* The way forward stays on screen, however long the cards above it are (same as the buttons in a step). */}
+        <div data-go="" style={{ position: "sticky", bottom: 0, background: "var(--bg)", padding: "8px 0 4px", boxShadow: "0 -10px 12px -6px var(--bg)", display: "flex", flexDirection: "column", gap: 10 }}>
           {nl && nl.id !== lesson.id && (
             <Button full onClick={() => go("lessons", { lesson: nl.id })}>
               {t("lessons.next_named", { title: tx(nl.title) })}
@@ -1175,20 +1206,6 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
           <Button full kind={nl && nl.id !== lesson.id ? "secondary" : "primary"} onClick={() => go("lessons")}>
             {t("common.done")}
           </Button>
-          {(mistakes === 0 || result.unitJustDone) && (
-            <div style={{ display: "flex", justifyContent: "center", gap: 8, flexWrap: "wrap" }}>
-              {mistakes === 0 && (
-                <Button kind="ghost" size="md" onClick={() => go("lessons", { challenge: lesson.id })}>
-                  {t("challenge.offer")}
-                </Button>
-              )}
-              {result.unitJustDone && (
-                <Button kind="ghost" size="md" onClick={() => openShare({ kind: "unit", title: tx(unit.title) })}>
-                  <Icon name="share" size={18} /> {t("share.button")}
-                </Button>
-              )}
-            </div>
-          )}
         </div>
       </Overlay>
     );
@@ -1272,11 +1289,14 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
           ))}
         {step.type === "action" && (
           <>
-            <Button full disabled={!actionDone && !!Widget} onClick={advance}>
-              {actionDone ? t("lessons.action_done") : Widget ? t("lessons.action_wait") : t("common.continue")}
-            </Button>
+            {/* One live button at a time: while the tool is waiting there's only "Skip for now"; once it's done, "Done — continue". */}
+            {(actionDone || !Widget) && (
+              <Button full onClick={advance}>
+                {actionDone ? t("lessons.action_done") : t("common.continue")}
+              </Button>
+            )}
             {Widget && !actionDone && (
-              <Button full kind="ghost" onClick={advance} style={{ marginTop: 4 }}>
+              <Button full kind="ghost" onClick={advance}>
                 {t("lessons.skip_action")}
               </Button>
             )}
