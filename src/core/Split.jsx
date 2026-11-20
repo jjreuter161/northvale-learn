@@ -9,15 +9,15 @@ export default function Split({ t, phone, children }) {
     <div className={phone ? undefined : "nv-split"}>
       {!phone && (
         <aside className="nv-brand" style={{ "--head": "var(--onBrand)", "--low": "var(--onBrand)" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <Wordmark size={32} mark />
             <BetaTag label={t("common.beta")} />
           </div>
           <div>
-            <p className="nv-disp" style={{ fontSize: 46, lineHeight: 1.06, margin: 0, color: "var(--onBrand)" }}>{t("brand.tagline")}</p>
-            <p style={{ fontSize: 18, lineHeight: 1.5, margin: "18px 0 0", maxWidth: 420, color: "var(--onBrand)", opacity: 0.88 }}>{t("brand.line")}</p>
+            <p className="nv-disp" style={{ fontSize: "var(--t-fig)", lineHeight: 1.2, margin: 0, color: "var(--onBrand)" }}>{t("brand.tagline")}</p>
+            <p style={{ fontSize: "var(--t-lead)", lineHeight: 1.5, margin: "16px 0 0", maxWidth: 420, color: "var(--onBrand)", opacity: 0.88 }}>{t("brand.line")}</p>
           </div>
-          <p style={{ fontSize: 14, margin: 0, color: "var(--onBrand)", opacity: 0.85 }}>{t("brand.promise")}</p>
+          <p style={{ fontSize: "var(--t-sm)", margin: 0, color: "var(--onBrand)", opacity: 0.85 }}>{t("brand.promise")}</p>
         </aside>
       )}
       <div className={phone ? undefined : "nv-formside"}>{children}</div>

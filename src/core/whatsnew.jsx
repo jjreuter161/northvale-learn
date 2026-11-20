@@ -39,10 +39,10 @@ export function WhatsNewCard({ t, locale }) {
   const note = NOTES[0];
   return (
     <Card style={{ marginTop: 12 }}>
-      <h2 className="nv-disp" style={{ fontSize: 20, margin: "0 0 8px", display: "flex", alignItems: "center", gap: 8, color: "var(--head)" }}>
+      <h2 className="nv-disp" style={{ fontSize: "var(--t-title)", margin: "0 0 8px", display: "flex", alignItems: "center", gap: 8, color: "var(--head)" }}>
         <Icon name="star" size={18} /> {t("new.title")}
       </h2>
-      <ul style={{ margin: "0 0 14px", paddingLeft: 20, fontSize: 15, lineHeight: 1.5 }}>
+      <ul style={{ margin: "0 0 16px", paddingLeft: 24, fontSize: "var(--t-body)", lineHeight: 1.5 }}>
         {note.lines.map((l, i) => (
           <li key={i}>{l[locale.lang] || l.en}</li>
         ))}

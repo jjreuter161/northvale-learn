@@ -3,7 +3,7 @@
 // sessions to the core (XP, streak, badges); the "do it" step at the end
 // of each lesson is a widget from whichever module owns it (portfolio,
 // goals, news), found through the registry.
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { registerModule, actionWidget, service } from "../../core/registry.js";
 import { useAppState, useSlice, getState, setSlice, saveNow } from "../../core/store.js";
 import { recordLesson, recordReview, recordPractice } from "../../core/game.js";
@@ -11,7 +11,7 @@ import { openShare } from "../../core/share.jsx";
 import { track } from "../../core/analytics.js";
 import { text, addStrings } from "../../core/i18n.js";
 import { xpOn, dayKey, addDays, weekStart, weekXp } from "../../core/progress.js";
-import { Button, Card, Icon, Layer, List, ListRow, Loading, Mark, Progress, Ring, Scene, Sheet, StreakStar, UnitArt, WaveEdge, toast } from "../../core/ui.jsx";
+import { Button, Card, Icon, Layer, List, ListRow, Loading, Mark, Progress, Ring, Scene, Sheet, StreakStar, Tag, UnitArt, WaveEdge, toast } from "../../core/ui.jsx";
 import { isDesk, useLayout } from "../../core/layout.js";
 import { holdBack } from "../../core/back.js";
 import { useAsk } from "../../core/asks.js";
@@ -54,6 +54,7 @@ addStrings({
   "lessons.locked_short": S("Locked", "Bloqueada"),
   "lessons.step_n": S("{i} of {n}", "{i} de {n}"),
   "lessons.idea": S("Idea", "Idea"),
+  "lessons.example": S("An example", "Un ejemplo"),
   "lessons.unit_locked": S("This unit opens after Unit {n}.", "Esta unidad se abre después de la Unidad {n}."),
   "lessons.minutes": S("{n} min", "{n} min"),
   "lessons.locked": S("One at a time: finish the lesson before this one first.", "Una a la vez: primero termina la lección anterior."),
@@ -92,6 +93,7 @@ addStrings({
   "lessons.done_it": S("Done", "Hecho"),
   "lessons.action_done": S("Done — continue", "Listo, continuar"),
   "lessons.explain": S("Ask about this", "Preguntar sobre esto"),
+  "lessons.in_this": S("In this lesson", "En esta lección"),
   "lessons.complete": S("Lesson complete", "Lección completa"),
   "lessons.xp": S("+{n} XP", "+{n} XP"),
   "lessons.perfect": S("No mistakes", "Sin errores"),
@@ -153,6 +155,7 @@ addStrings({
 
   // The course path
   "path.title": S("Your course", "Tu curso"),
+  "path.unit_of": S("Unit {n} of {total}", "Unidad {n} de {total}"),
   "path.count": S("{done} of {total} lessons · {units} of {unitsTotal} units", "{done} de {total} lecciones · {units} de {unitsTotal} unidades"),
   "path.now": S("Unit {n} · Now", "Unidad {n} · Ahora"),
   "path.of": S("{done} of {n}", "{done} de {n}"),
@@ -217,48 +220,48 @@ function Overview({ t, locale, go }) {
   const week = Array.from({ length: 7 }, (_, i) => addDays(weekStart(today), i));
   const top = Math.max(progress.dailyGoal, ...week.map((d) => xpOn(progress, d)));
   const tile = (label, value, sub) => (
-    <div style={{ background: "var(--bg)", borderRadius: 8, padding: "12px 14px", minWidth: 0 }}>
-      <div style={{ fontSize: 13, color: "var(--mid)", fontWeight: 600 }}>{label}</div>
-      <div className="nv-disp" style={{ fontSize: 22, margin: "3px 0 0", overflowWrap: "anywhere" }}>{value}</div>
-      {sub && <div style={{ fontSize: 13, color: "var(--mid)", marginTop: 2 }}>{sub}</div>}
+    <div style={{ background: "var(--bg)", borderRadius: 12, padding: "12px 16px", minWidth: 0 }}>
+      <div style={{ fontSize: "var(--t-sm)", color: "var(--mid)", fontWeight: 600 }}>{label}</div>
+      <div className="nv-disp" style={{ fontSize: "var(--t-title)", margin: "4px 0 0", overflowWrap: "anywhere" }}>{value}</div>
+      {sub && <div style={{ fontSize: "var(--t-sm)", color: "var(--mid)", marginTop: 4 }}>{sub}</div>}
     </div>
   );
   return (
     <section aria-label={t("overview.title")} style={{ marginTop: 12 }}>
-      <Card pad={18}>
-        <h2 className="nv-disp" style={{ fontSize: 20, margin: "0 0 12px" }}>{t("overview.title")}</h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 10 }}>
+      <Card pad={16}>
+        <h2 className="nv-disp" style={{ fontSize: "var(--t-title)", margin: "0 0 12px" }}>{t("overview.title")}</h2>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 12 }}>
           {tile(t("overview.lessons"), `${done} / ${ALL_LESSONS.length}`)}
           {tile(t("overview.unit"), unit ? t("overview.unit.v", { n: UNITS.indexOf(unit) + 1, total: UNITS.length }) : "✓", unit && tx(unit.title))}
           {tile(t("overview.mastery"), learned.length ? `${firm.length}` : "—", learned.length ? t("overview.mastery.v", { n: firm.length, total: learned.length }) : t("overview.mastery.none"))}
         </div>
-        <div className="nv-cols" style={{ marginTop: 18 }}>
+        <div className="nv-cols" style={{ marginTop: 16 }}>
           <div>
-            <div style={{ fontSize: 14, fontWeight: 700, margin: "0 0 6px" }}>{t("overview.upnext")}</div>
-            {coming.length === 0 && <div style={{ fontSize: 14, color: "var(--mid)" }}>{t("lessons.all_done")}</div>}
+            <div style={{ fontSize: "var(--t-sm)", fontWeight: 700, margin: "0 0 8px" }}>{t("overview.upnext")}</div>
+            {coming.length === 0 && <div style={{ fontSize: "var(--t-sm)", color: "var(--mid)" }}>{t("lessons.all_done")}</div>}
             {coming.map((l, i) => {
               const st = lessonState(progress, l.id);
               return (
-                <button key={l.id} onClick={() => (st === "locked" ? toast(t("lessons.locked")) : go("lessons", { lesson: l.id }))} className="nv-press" style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", textAlign: "left", border: "none", borderTop: i ? "1px solid var(--line)" : "none", background: "transparent", color: st === "locked" ? "var(--mid)" : "var(--ink)", padding: "9px 2px", font: "inherit", cursor: "pointer", minHeight: 44 }}>
+                <button key={l.id} onClick={() => (st === "locked" ? toast(t("lessons.locked")) : go("lessons", { lesson: l.id }))} className="nv-press" style={{ display: "flex", alignItems: "center", gap: 12, width: "100%", textAlign: "left", border: "none", borderTop: i ? "1px solid var(--line)" : "none", background: "transparent", color: st === "locked" ? "var(--mid)" : "var(--ink)", padding: "8px 4px", font: "inherit", cursor: "pointer", minHeight: 44 }}>
                   <Icon name={st === "locked" ? "lock" : "book"} size={16} />
-                  <span style={{ flex: 1, minWidth: 0, fontSize: 15, fontWeight: i ? 500 : 650 }}>{tx(l.title)}</span>
-                  <span style={{ fontSize: 13, color: "var(--mid)", whiteSpace: "nowrap" }}>{t("lessons.minutes", { n: Math.round(minutes(l)) })}</span>
+                  <span style={{ flex: 1, minWidth: 0, fontSize: "var(--t-body)", fontWeight: i ? 450 : 600 }}>{tx(l.title)}</span>
+                  <span style={{ fontSize: "var(--t-sm)", color: "var(--mid)", whiteSpace: "nowrap" }}>{t("lessons.minutes", { n: Math.round(minutes(l)) })}</span>
                 </button>
               );
             })}
           </div>
           <div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", margin: "0 0 6px" }}>
-              <span style={{ fontSize: 14, fontWeight: 700 }}>{t("overview.week")}</span>
-              <span style={{ fontSize: 13, color: "var(--mid)" }}>{t("me.week_total", { xp: weekXp(progress, today) })}</span>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", margin: "0 0 8px" }}>
+              <span style={{ fontSize: "var(--t-sm)", fontWeight: 700 }}>{t("overview.week")}</span>
+              <span style={{ fontSize: "var(--t-sm)", color: "var(--mid)" }}>{t("me.week_total", { xp: weekXp(progress, today) })}</span>
             </div>
             <div style={{ display: "flex", alignItems: "flex-end", gap: 8, height: 84 }} role="img" aria-label={t("me.week_total", { xp: weekXp(progress, today) })}>
               {week.map((d) => {
                 const xp = xpOn(progress, d);
                 return (
                   <div key={d} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4, height: "100%", justifyContent: "flex-end" }}>
-                    <div title={`${xp} XP`} style={{ width: "100%", maxWidth: 26, height: `${Math.max(4, (xp / top) * 60)}px`, borderRadius: 3, background: xp ? "var(--accent)" : "var(--surface2)", opacity: d > today ? 0.4 : 1 }} />
-                    <span style={{ fontSize: 12, fontWeight: 650, color: d === today ? "var(--ink)" : "var(--low)" }}>{new Date(`${d}T12:00:00`).toLocaleDateString(t("locale.tag"), { weekday: "narrow" })}</span>
+                    <div title={`${xp} XP`} style={{ width: "100%", maxWidth: 26, height: `${Math.max(4, (xp / top) * 60)}px`, borderRadius: 12, background: xp ? "var(--accent)" : "var(--surface2)", opacity: d > today ? 0.4 : 1 }} />
+                    <span style={{ fontSize: "var(--t-cap)", fontWeight: 600, color: d === today ? "var(--ink)" : "var(--low)" }}>{new Date(`${d}T12:00:00`).toLocaleDateString(t("locale.tag"), { weekday: "narrow" })}</span>
                   </div>
                 );
               })}
@@ -289,66 +292,66 @@ function Panel({ t, locale, go, openStreak }) {
   const picked = service("goals", "startPlan")(); // the goal picked at the start, before it has an amount
   const mission = practiceOpen(progress) && (service("missions", "status")(locale) || {}).mission;
   const row = { display: "flex", alignItems: "center", gap: 12 };
-  const small = { fontSize: 14, color: "var(--mid)" };
+  const small = { fontSize: "var(--t-sm)", color: "var(--mid)" };
   return (
     <>
-      <Card pad={14} onClick={openStreak}>
+      <Card pad={16} onClick={openStreak}>
         <div style={row}>
           <StreakStar count={progress.streak.count} size={34} color={progress.streak.last === dayKey() ? "var(--flame)" : "var(--low)"} />
           <div>
-            <div style={{ fontWeight: 700, fontSize: 16 }}>{t("streak.days", { n: progress.streak.count })}</div>
+            <div style={{ fontWeight: 700, fontSize: "var(--t-body)" }}>{t("streak.days", { n: progress.streak.count })}</div>
             <div style={small}>{t("streak.best", { n: progress.streak.best })}</div>
           </div>
         </div>
       </Card>
-      <Card pad={14}>
+      <Card pad={16}>
         <div style={row}>
           <Ring value={xp} max={progress.dailyGoal} size={52} stroke={5} label={t("goal.aria", { xp, goal: progress.dailyGoal })}>
-            <span style={{ fontSize: 12, fontWeight: 650, fontVariantNumeric: "tabular-nums" }}>{Math.min(100, Math.round((xp / progress.dailyGoal) * 100))}%</span>
+            <span style={{ fontSize: "var(--t-cap)", fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>{Math.min(100, Math.round((xp / progress.dailyGoal) * 100))}%</span>
           </Ring>
-          <div style={{ fontWeight: 650, fontSize: 15 }}>{xp >= progress.dailyGoal ? t("me.today_met", { xp }) : t("me.today", { xp, goal: progress.dailyGoal })}</div>
+          <div style={{ fontWeight: 600, fontSize: "var(--t-body)" }}>{xp >= progress.dailyGoal ? t("me.today_met", { xp }) : t("me.today", { xp, goal: progress.dailyGoal })}</div>
         </div>
       </Card>
       {!goal && (
-        <Card pad={14} onClick={() => go("goals")}>
+        <Card pad={16} onClick={() => go("goals")}>
           <div style={row}>
             <Icon name="target" size={20} />
             <div>
-              <div style={{ fontWeight: 700, fontSize: 16 }}>{t("goals.nav")}</div>
+              <div style={{ fontWeight: 700, fontSize: "var(--t-body)" }}>{t("goals.nav")}</div>
               <div style={small}>{picked ? t("panel.goal.picked", { name: picked.name }) : t("panel.goal.none")}</div>
-              <div style={{ fontSize: 14, fontWeight: 650, marginTop: 4 }}>{picked ? t("panel.goal.plan") : t("panel.goal.cta")}</div>
+              <div style={{ fontSize: "var(--t-sm)", fontWeight: 600, marginTop: 4 }}>{picked ? t("panel.goal.plan") : t("panel.goal.cta")}</div>
             </div>
           </div>
         </Card>
       )}
       {goal && (
-        <Card pad={14} onClick={() => go("goals")}>
-          <div style={{ ...row, marginBottom: 10 }}>
+        <Card pad={16} onClick={() => go("goals")}>
+          <div style={{ ...row, marginBottom: 12 }}>
             <Icon name="target" size={20} />
-            <div style={{ fontWeight: 700, fontSize: 16, minWidth: 0, overflowWrap: "anywhere" }}>{goal.name}</div>
+            <div style={{ fontWeight: 700, fontSize: "var(--t-body)", minWidth: 0, overflowWrap: "anywhere" }}>{goal.name}</div>
           </div>
           <Progress value={goal.percent} max={100} height={8} label={`${goal.name}: ${goal.percent}%`} />
-          <div style={{ ...small, marginTop: 6, fontVariantNumeric: "tabular-nums" }}>{goal.percent}%</div>
+          <div style={{ ...small, marginTop: 8, fontVariantNumeric: "tabular-nums" }}>{goal.percent}%</div>
         </Card>
       )}
       {!mission && !practiceOpen(progress) && (
-        <Card pad={14}>
+        <Card pad={16}>
           <div style={row}>
             <Icon name="flag" size={20} />
             <div>
               <div style={small}>{t("today.mission")}</div>
-              <div style={{ fontSize: 14 }}>{t("panel.mission.locked")}</div>
+              <div style={{ fontSize: "var(--t-sm)" }}>{t("panel.mission.locked")}</div>
             </div>
           </div>
         </Card>
       )}
       {mission && (
-        <Card pad={14} onClick={() => go("practice")}>
+        <Card pad={16} onClick={() => go("practice")}>
           <div style={row}>
             <Icon name="flag" size={20} />
             <div>
               <div style={small}>{t("today.mission")}</div>
-              <div style={{ fontWeight: 650, fontSize: 15 }}>{mission.title}</div>
+              <div style={{ fontWeight: 600, fontSize: "var(--t-body)" }}>{mission.title}</div>
             </div>
           </div>
         </Card>
@@ -357,9 +360,9 @@ function Panel({ t, locale, go, openStreak }) {
         <MythCard t={t} locale={locale} />
       ) : (
         !(progress.lessonDays || []).some((d) => d < dayKey()) && (
-          <Card pad={14}>
+          <Card pad={16}>
             <div style={small}>{t("myth.label")}</div>
-            <div style={{ fontSize: 14, marginTop: 2 }}>{t("panel.myth.soon")}</div>
+            <div style={{ fontSize: "var(--t-sm)", marginTop: 4 }}>{t("panel.myth.soon")}</div>
           </Card>
         )
       )}
@@ -401,71 +404,55 @@ function Today({ t, locale, go, openStreak, layout }) {
   const day = dayKey();
   const showMyth = canShowMyth(progress, profile, planDue, checkIn);
   const mythWaiting = showMyth && !(myth && myth.day === day);
+  const toLine = toward && (
+    <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 16, fontSize: "var(--t-sm)", color: "var(--mid)" }}>
+      <Icon name="target" size={16} /> {t("today.toward", { name: toward })}
+    </div>
+  );
+  const ci = next ? UNITS.findIndex((u) => u.id === next.unit) : UNITS.length;
   return (
     <div>
-      <div style={{ fontSize: 14, color: "var(--mid)", fontWeight: 600, margin: "4px 2px 0" }}>{todayLine(locale)}</div>
-      <h1 className="nv-disp" style={{ fontSize: 36, lineHeight: 1.08, margin: "2px 0 14px" }}>{t("today.title")}</h1>
-      <Card pad={0} style={{ overflow: "hidden" }}>
+      <div style={{ fontSize: "var(--t-sm)", color: "var(--mid)", fontWeight: 600, margin: "4px 4px 0" }}>{todayLine(locale)}</div>
+      <h1 className="nv-disp" style={{ fontSize: "var(--t-head)", margin: "0 0 16px" }}>{t("today.title")}</h1>
+      {/* One card, one red button: the best next step. */}
+      <Card hero pad={0} style={{ overflow: "hidden" }}>
         {heroIsAction ? (
-          <>
-            <Scene name="harbor" w={358} h={110} />
-            <div style={{ padding: "14px 20px 20px" }}>
-              <div style={{ fontSize: 13, fontWeight: 650, color: "var(--low)" }}>{t("best.eyebrow")}</div>
-              <div className="nv-disp" style={{ fontSize: 28, lineHeight: 1.12, margin: "5px 0 6px", color: "var(--head)" }}>{heroTitle}</div>
-              <p style={{ fontSize: 15, lineHeight: 1.5, margin: "0 0 16px" }}>{t(`best.${best.reason}`, { n: Math.min(due, M.REVIEW_SIZE), m: year ? year.month : 1 })}</p>
-              <Button full onClick={heroGo}>{heroCta}</Button>
-              {toward && (
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 14, fontSize: 14, color: "var(--mid)" }}>
-                  <Icon name="target" size={16} /> {t("today.toward", { name: toward })}
-                </div>
-              )}
-            </div>
-          </>
+          <div className="nv-hero" style={{ padding: "16px 24px 24px" }}>
+            <div className="nv-cap">{t("best.eyebrow")}</div>
+            <h2 className="nv-disp" style={{ fontSize: "var(--t-head)", margin: "8px 0" }}>{heroTitle}</h2>
+            <p style={{ fontSize: "var(--t-lead)", color: "var(--mid)", margin: "0 0 16px" }}>{t(`best.${best.reason}`, { n: Math.min(due, M.REVIEW_SIZE), m: year ? year.month : 1 })}</p>
+            <Button full onClick={heroGo}>{heroCta}</Button>
+            {toLine}
+          </div>
         ) : next ? (
-          <>
-            <div style={{ position: "relative", background: "var(--artSky)", minHeight: 108 }}>
-              <svg viewBox="0 0 390 40" preserveAspectRatio="none" width="100%" height="40" aria-hidden="true" style={{ position: "absolute", left: 0, bottom: 0, display: "block" }}>
-                <path d={wave(390, 40, 3, 6, 12)} fill="var(--artSea)" />
-              </svg>
-              <div style={{ position: "absolute", right: 4, bottom: 10 }}>
-                <UnitArt id={unit.id} width={112} />
-              </div>
-              <div style={{ position: "relative", padding: "18px 20px 34px", maxWidth: "60%" }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: "var(--low)" }}>
-                  {t("lessons.unit_n", { n: UNITS.indexOf(unit) + 1 })} · {tx(unit.title)}
-                </div>
-                <div className="nv-disp" style={{ fontSize: 28, lineHeight: 1.12, margin: "5px 0 4px", color: "var(--head)" }}>{tx(next.title)}</div>
-                <div style={{ fontSize: 14, color: "var(--mid)" }}>{t("today.lesson_n", { i: next.index + 1, n: unit.lessons.length, min: Math.round(minutes(next)) })}</div>
-              </div>
-              <WaveEdge style={{ position: "absolute", left: 0, right: 0, bottom: -1 }} />
+          <div className="nv-hero" style={{ padding: "16px 24px 24px" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+              <span className="nv-cap">{t("best.eyebrow")}</span>
+              <Tag>
+                <Icon name={unit.icon} size={16} /> {tx(unit.title)}
+              </Tag>
             </div>
-            <div style={{ padding: "2px 20px 20px" }}>
-              <p style={{ fontSize: 15, lineHeight: 1.5, margin: "6px 0 16px" }}>{best && best.kind === "lesson" ? t(`best.${best.reason}`, { name: toward, min: Math.round(minutes(next)) }) : t(`why.${unit.id}`)}</p>
-              <Button full onClick={() => go("lessons", { lesson: next.id })}>
-                {progress.counters.lessons ? t("common.continue") : t("lessons.start")}
-              </Button>
-              {toward && (
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 14, fontSize: 14, color: "var(--mid)" }}>
-                  <Icon name="target" size={16} /> {t("today.toward", { name: toward })}
-                </div>
-              )}
-            </div>
-          </>
+            <h2 className="nv-disp" style={{ fontSize: "var(--t-head)", margin: "8px 0" }}>{tx(next.title)}</h2>
+            <p style={{ fontSize: "var(--t-lead)", color: "var(--mid)", margin: "0 0 8px" }}>{best && best.kind === "lesson" ? t(`best.${best.reason}`, { name: toward, min: Math.round(minutes(next)) }) : t(`why.${unit.id}`)}</p>
+            <div style={{ fontSize: "var(--t-sm)", color: "var(--mid)", margin: "0 0 16px" }}>{t("today.lesson_n", { i: next.index + 1, n: unit.lessons.length, min: Math.round(minutes(next)) })}</div>
+            <Button full onClick={() => go("lessons", { lesson: next.id })}>
+              {progress.counters.lessons ? t("common.continue") : t("lessons.start")}
+              <Icon name="next" size={20} stroke={2.6} />
+            </Button>
+            {toLine}
+          </div>
         ) : (
           <>
             <Scene name="open" w={358} h={200} />
-            <div style={{ padding: "16px 20px 20px" }}>
-              <div className="nv-disp" style={{ fontSize: 26, lineHeight: 1.2, color: "var(--head)" }}>{t("lessons.course_done")}</div>
-              <p style={{ fontSize: 15, lineHeight: 1.5, color: "var(--mid)", margin: "8px 0 0" }}>{t("lessons.all_done")}</p>
-              {toward && (
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 14, fontSize: 14, color: "var(--mid)" }}>
-                  <Icon name="target" size={16} /> {t("today.toward", { name: toward })}
-                </div>
-              )}
+            <div className="nv-hero" style={{ padding: "16px 24px 24px" }}>
+              <h2 className="nv-disp" style={{ fontSize: "var(--t-head)", margin: 0 }}>{t("lessons.course_done")}</h2>
+              <p style={{ fontSize: "var(--t-lead)", color: "var(--mid)", margin: "8px 0 0" }}>{t("lessons.all_done")}</p>
+              {toLine}
             </div>
           </>
         )}
       </Card>
+      <PathStrip t={t} tx={tx} progress={progress} ci={ci} />
       <List style={{ marginTop: 12 }}>
         {[
           heroIsAction && <ListRow key="lesson" icon="book" title={t("best.next_lesson")} sub={tx(next.title)} onClick={() => go("lessons", { lesson: next.id })} />,
@@ -495,6 +482,40 @@ function Today({ t, locale, go, openStreak, layout }) {
   );
 }
 
+// Where you are in the course: five units, the finished ones filled, this one lit, the rest ahead. Tapping it goes to the course below.
+function PathStrip({ t, tx, progress, ci }) {
+  const from = Math.max(0, Math.min(ci - 1, UNITS.length - 5));
+  const unit = UNITS[Math.min(ci, UNITS.length - 1)];
+  const open = () => {
+    const el = document.getElementById("nv-course");
+    if (el) el.scrollIntoView({ behavior: reducedMotion() ? "auto" : "smooth", block: "start" });
+  };
+  return (
+    <Card onClick={open} style={{ marginTop: 12 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12 }}>
+        <span className="nv-cap">{t("path.title")}</span>
+        <span style={{ fontSize: "var(--t-sm)", color: "var(--mid)", textAlign: "right" }}>{t("path.unit_of", { n: Math.min(ci, UNITS.length - 1) + 1, total: UNITS.length })} · {tx(unit.title)}</span>
+      </div>
+      <div aria-hidden="true" style={{ display: "flex", alignItems: "center", marginTop: 16, overflow: "hidden", padding: 8 }}>
+        {UNITS.slice(from, from + 5).map((u, k) => {
+          const i = from + k;
+          const done = unitDone(progress, u);
+          const now = i === ci;
+          const size = now ? 52 : 40;
+          return (
+            <Fragment key={u.id}>
+              {k > 0 && <span style={{ flex: 1, minWidth: 4, borderTop: "2px dashed var(--line)" }} />}
+              <span style={{ width: size, height: size, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", background: done ? "var(--ink)" : "var(--surface)", color: done ? "var(--bg)" : now ? "var(--ink)" : "var(--low)", border: `2px solid ${done || now ? "var(--ink)" : "var(--line)"}`, boxShadow: now ? "0 0 0 6px var(--surface2)" : undefined }}>
+                <Icon name={done ? "check" : u.icon} size={now ? 24 : 18} stroke={done ? 3 : 2} />
+              </span>
+            </Fragment>
+          );
+        })}
+      </div>
+    </Card>
+  );
+}
+
 // ADAPTING TO THE LEARNER — on the finish screen: after three perfect lessons in a
 // row, offer to skip what's known (once in a while); after a tricky one, offer a
 // quick review first. Worked out here from this lesson and the last few.
@@ -516,7 +537,7 @@ function AdaptCard({ t, locale, go, mistakes, nextUnit }) {
   return (
     <Card>
       <div style={{ fontWeight: 700 }}>{t(skip ? "skip.offer" : "slow.offer")}</div>
-      <p style={{ fontSize: 14, color: "var(--mid)", margin: "4px 0 12px", lineHeight: 1.45 }}>{t(skip ? "skip.offer.sub" : "slow.offer.sub")}</p>
+      <p style={{ fontSize: "var(--t-sm)", color: "var(--mid)", margin: "4px 0 12px", lineHeight: 1.5 }}>{t(skip ? "skip.offer.sub" : "slow.offer.sub")}</p>
       <Button full size="md" kind="secondary" onClick={() => (skip ? setOpen(true) : go("lessons", { review: true }))}>
         {t(skip ? "skip.offer.go" : "slow.offer.go")}
       </Button>
@@ -547,36 +568,35 @@ function MythCard({ t, locale }) {
   };
   if (answered && !now)
     return (
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 12, padding: "12px 16px", background: "var(--surface)", borderRadius: 12, boxShadow: "var(--lift)", fontSize: 14, color: "var(--mid)" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 12, padding: "12px 16px", background: "var(--surface)", borderRadius: 12, boxShadow: "var(--lift)", fontSize: "var(--t-sm)", color: "var(--mid)" }}>
         <Icon name="check" size={16} /> {t("myth.done")}
       </div>
     );
   if (!myth) return null;
   const right = answered && answered.picked === myth.answer;
-  const btn = { flex: 1, minHeight: 46, borderRadius: 8, border: "1.5px solid var(--line)", background: "var(--surface)", color: "var(--ink)", fontWeight: 700, fontSize: 16, cursor: "pointer", font: "inherit", "--btn-edge": "var(--line)" };
   return (
     <Card style={{ marginTop: 12 }} data-myth={myth.id}>
-      <div style={{ fontSize: 14, fontWeight: 650, color: "var(--mid)", marginBottom: 6 }}>{t("myth.label")}</div>
-      <div className="nv-disp" style={{ fontSize: 20, lineHeight: 1.3, color: "var(--head)" }}>“{tx(myth.claim)}”</div>
+      <div style={{ fontSize: "var(--t-sm)", fontWeight: 600, color: "var(--mid)", marginBottom: 8 }}>{t("myth.label")}</div>
+      <div className="nv-disp" style={{ fontSize: "var(--t-title)", lineHeight: 1.2, color: "var(--head)" }}>“{tx(myth.claim)}”</div>
       {!answered ? (
         <>
-          <div style={{ display: "flex", gap: 10, marginTop: 14 }}>
-            <button className="nv-press nv-btn" style={btn} onClick={() => pick("myth")}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 16 }}>
+            <Button kind="secondary" size="md" style={{ flex: "1 1 120px" }} onClick={() => pick("myth")}>
               {t("myth.myth")}
-            </button>
-            <button className="nv-press nv-btn" style={btn} onClick={() => pick("fact")}>
+            </Button>
+            <Button kind="secondary" size="md" style={{ flex: "1 1 120px" }} onClick={() => pick("fact")}>
               {t("myth.fact")}
-            </button>
+            </Button>
           </div>
-          <div style={{ fontSize: 13, color: "var(--low)", marginTop: 10 }}>{t("myth.meta")}</div>
+          <div style={{ fontSize: "var(--t-sm)", color: "var(--low)", marginTop: 12 }}>{t("myth.meta")}</div>
         </>
       ) : (
         <div role="status">
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 12, fontWeight: 750, color: right ? "var(--right)" : "var(--warn)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 12, fontWeight: 700, color: right ? "var(--right)" : "var(--warn)" }}>
             <Icon name={right ? "check" : "info"} size={18} stroke={2.6} /> {t(right ? "myth.right" : "myth.wrong", { it: t(`myth.is.${myth.answer}`) })}
           </div>
-          <p style={{ fontSize: 15, lineHeight: 1.5, margin: "4px 0 0" }}>{tx(myth.why)}</p>
-          <div style={{ fontSize: 13, color: "var(--low)", marginTop: 8 }}>{t("myth.after")}</div>
+          <p style={{ fontSize: "var(--t-body)", lineHeight: 1.5, margin: "4px 0 0" }}>{tx(myth.why)}</p>
+          <div style={{ fontSize: "var(--t-sm)", color: "var(--low)", marginTop: 8 }}>{t("myth.after")}</div>
         </div>
       )}
     </Card>
@@ -609,7 +629,7 @@ function BoatNode({ id, playing }) {
     el.style.transform = "";
   }, [id, playing]);
   return (
-    <span ref={ref} className="nv-glide" style={{ width: 44, height: 44, borderRadius: 22, margin: "0 -7px", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "var(--artSky)", boxShadow: "0 0 0 3px var(--brand)", position: "relative", zIndex: 1 }}>
+    <span ref={ref} className="nv-glide" style={{ width: 44, height: 44, borderRadius: 18, margin: "0 -8px", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "var(--artSky)", boxShadow: "0 0 0 3px var(--brand)", position: "relative", zIndex: 1 }}>
       <Mark size={28} color="var(--artInk)" />
     </span>
   );
@@ -674,7 +694,7 @@ function SeaChart({ t, tx, go, progress, ci, next, all, setAll, opened, toggle, 
   const pct = (v, of) => `${(v / of) * 100}%`;
   const doneOf = (u) => u.lessons.filter((l) => lessonState(progress, l.id) === "done").length;
   return (
-    <div style={{ position: "relative", width: "100%", maxWidth: { phone: 460, tablet: 540 }[layout] || 620, margin: "16px auto 0", aspectRatio: `${W} / ${H}`, borderRadius: 14, overflow: "hidden", background: "linear-gradient(180deg, var(--artSky), color-mix(in srgb, var(--artSea) 55%, var(--artSky)))", boxShadow: "var(--lift)" }}>
+    <div style={{ position: "relative", width: "100%", maxWidth: { phone: 460, tablet: 540 }[layout] || 620, margin: "16px auto 0", aspectRatio: `${W} / ${H}`, borderRadius: 12, overflow: "hidden", background: "linear-gradient(180deg, var(--artSky), color-mix(in srgb, var(--artSea) 55%, var(--artSky)))", boxShadow: "var(--lift)" }}>
       <svg viewBox={`0 0 ${W} ${H}`} width="100%" height="100%" aria-hidden="true" style={{ position: "absolute", inset: 0, display: "block" }} dangerouslySetInnerHTML={{ __html: svg }} />
       {list.map((u, i) => {
         const [x, y] = pos(i);
@@ -687,16 +707,16 @@ function SeaChart({ t, tx, go, progress, ci, next, all, setAll, opened, toggle, 
         if (now)
           return (
             <div key={u.id}>
-              <button onClick={() => currentRef.current && currentRef.current.scrollIntoView({ behavior: "smooth", block: "start" })} aria-expanded="true" aria-label={name} className="nv-press nv-hit" style={{ position: "absolute", left: pct(x - 8, W), top: pct(y - 6, H), width: pct(136, W), height: pct(118, H), border: "none", background: "transparent", borderRadius: 10, cursor: "pointer", padding: 0 }} />
-              <div style={{ position: "absolute", left: pct(i % 2 ? 10 : 168, W), top: pct(y + 2, H), width: pct(180, W), background: "var(--surface)", borderRadius: 10, padding: 12, boxShadow: "0 0 0 2px var(--head), var(--lift)" }}>
-                <span style={{ display: "inline-block", fontSize: 12, fontWeight: 700, borderRadius: 8, padding: "2px 9px", background: "var(--warmSoft)", color: "var(--warmInk)" }}>{t("path.now", { n: i + 1 })}</span>
-                <div className="nv-disp" style={{ fontSize: 18, lineHeight: 1.15, margin: "6px 0 2px", color: "var(--head)" }}>{tx(u.title)}</div>
-                <div style={{ fontSize: 13, color: "var(--mid)" }}>{meta}</div>
-                <div style={{ height: 6, borderRadius: 3, background: "var(--surface2)", overflow: "hidden", margin: "6px 0 10px" }}>
+              <button onClick={() => currentRef.current && currentRef.current.scrollIntoView({ behavior: "smooth", block: "start" })} aria-expanded="true" aria-label={name} className="nv-press nv-hit" style={{ position: "absolute", left: pct(x - 8, W), top: pct(y - 6, H), width: pct(136, W), height: pct(118, H), border: "none", background: "transparent", borderRadius: 12, cursor: "pointer", padding: 0 }} />
+              <div style={{ position: "absolute", left: pct(i % 2 ? 10 : 168, W), top: pct(y + 2, H), width: pct(180, W), background: "var(--surface)", borderRadius: 12, padding: 12, boxShadow: "0 0 0 2px var(--head), var(--lift)" }}>
+                <span style={{ display: "inline-block", fontSize: "var(--t-cap)", fontWeight: 700, borderRadius: 12, padding: "4px 8px", background: "var(--warmSoft)", color: "var(--warmInk)" }}>{t("path.now", { n: i + 1 })}</span>
+                <div className="nv-disp" style={{ fontSize: "var(--t-lead)", lineHeight: 1.2, margin: "8px 0 4px", color: "var(--head)" }}>{tx(u.title)}</div>
+                <div style={{ fontSize: "var(--t-sm)", color: "var(--mid)" }}>{meta}</div>
+                <div style={{ height: 6, borderRadius: 12, background: "var(--surface2)", overflow: "hidden", margin: "8px 0 12px" }}>
                   <div style={{ width: `${(d / n) * 100}%`, height: "100%", background: "var(--brand)" }} />
                 </div>
                 {next && (
-                  <Button full size="sm" onClick={() => go("lessons", { lesson: next.id })} aria-label={t("path.continue", { title: tx(next.title) })}>
+                  <Button full size="sm" kind="secondary" onClick={() => go("lessons", { lesson: next.id })} aria-label={t("path.continue", { title: tx(next.title) })}>
                     {t("common.continue")}
                   </Button>
                 )}
@@ -707,11 +727,11 @@ function SeaChart({ t, tx, go, progress, ci, next, all, setAll, opened, toggle, 
         // for the eye, so they're hidden from screen readers and let taps through.
         return (
           <div key={u.id}>
-            <button onClick={() => toggle(u.id)} aria-expanded={!!opened[u.id]} aria-label={name} className="nv-press nv-hit" style={{ position: "absolute", left: 0, width: "100%", top: pct(y, H), height: pct(ROW - 8, H), border: "none", background: "transparent", cursor: "pointer", padding: 0, borderRadius: 10 }} />
+            <button onClick={() => toggle(u.id)} aria-expanded={!!opened[u.id]} aria-label={name} className="nv-press nv-hit" style={{ position: "absolute", left: 0, width: "100%", top: pct(y, H), height: pct(ROW - 8, H), border: "none", background: "transparent", cursor: "pointer", padding: 0, borderRadius: 12 }} />
             <span aria-hidden="true" style={{ position: "absolute", left: pct(i % 2 ? 14 : 150, W), top: pct(y + 24, H), width: pct(176, W), pointerEvents: "none" }}>
-              <span style={{ display: "block", fontSize: 12.5, fontWeight: 650, color: "var(--low)" }}>{t("lessons.unit_n", { n: i + 1 })}</span>
-              <span style={{ display: "block", fontWeight: 700, color: "var(--head)", fontSize: 15, lineHeight: 1.25 }}>{tx(u.title)}</span>
-              <span style={{ display: "inline-flex", alignItems: "center", gap: 4, marginTop: 4, fontSize: 12, fontWeight: 700, borderRadius: 8, padding: "2px 9px", background: done ? "var(--rightSoft)" : "var(--surface2)", color: done ? "var(--right)" : "var(--mid)" }}>
+              <span style={{ display: "block", fontSize: "var(--t-cap)", fontWeight: 600, color: "var(--low)" }}>{t("lessons.unit_n", { n: i + 1 })}</span>
+              <span style={{ display: "block", fontWeight: 700, color: "var(--head)", fontSize: "var(--t-body)", lineHeight: 1.2 }}>{tx(u.title)}</span>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 4, marginTop: 4, fontSize: "var(--t-cap)", fontWeight: 700, borderRadius: 12, padding: "4px 8px", background: done ? "var(--rightSoft)" : "var(--surface2)", color: done ? "var(--right)" : "var(--mid)" }}>
                 {done && <Icon name="check" size={12} stroke={2.6} />}
                 {meta}
               </span>
@@ -721,12 +741,12 @@ function SeaChart({ t, tx, go, progress, ci, next, all, setAll, opened, toggle, 
       })}
       {list.length < UNITS.length && (
         <div style={{ position: "absolute", left: 0, right: 0, top: pct(H - 150, H), textAlign: "center" }}>
-          <button onClick={() => setAll(true)} className="nv-press" style={{ border: "none", background: "var(--surface)", borderRadius: 8, padding: "8px 16px", fontWeight: 650, fontSize: 14, color: "var(--head)", boxShadow: "var(--lift)", cursor: "pointer", font: "inherit", minHeight: 44 }}>
+          <button onClick={() => setAll(true)} className="nv-press" style={{ border: "none", background: "var(--surface)", borderRadius: 12, padding: "8px 16px", fontWeight: 600, fontSize: "var(--t-sm)", color: "var(--head)", boxShadow: "var(--lift)", cursor: "pointer", font: "inherit", minHeight: 44 }}>
             {t("path.mist", { n: UNITS.length - list.length })}
           </button>
         </div>
       )}
-      <span aria-hidden="true" style={{ position: "absolute", left: 0, right: 0, bottom: pct(46, H), textAlign: "center", fontSize: 13, fontWeight: 650, color: "var(--mid)" }}>
+      <span aria-hidden="true" style={{ position: "absolute", left: 0, right: 0, bottom: pct(46, H), textAlign: "center", fontSize: "var(--t-sm)", fontWeight: 600, color: "var(--mid)" }}>
         {t("path.open")}
       </span>
     </div>
@@ -762,28 +782,28 @@ function Course({ t, locale, go, route, layout }) {
           onClick={() => (st === "locked" ? toast(t("lessons.locked")) : go("lessons", { lesson: l.id }))}
           aria-label={`${tx(l.title)} — ${st === "done" ? t("lessons.done_review") : t("lessons.minutes", { n: Math.round(minutes(l)) })}${now ? ` · ${t("lessons.start")}` : st === "locked" ? ` · ${t("lessons.locked_short")}` : ""}`}
           className="nv-press"
-          style={{ display: "flex", alignItems: "center", gap: 14, flex: 1, minWidth: 0, textAlign: "left", border: "none", background: "transparent", color: "var(--ink)", padding: "10px 16px", cursor: "pointer", minHeight: now ? 68 : 58, font: "inherit" }}
+          style={{ display: "flex", alignItems: "center", gap: 16, flex: 1, minWidth: 0, textAlign: "left", border: "none", background: "transparent", color: "var(--ink)", padding: "12px 16px", cursor: "pointer", minHeight: now ? 68 : 58, font: "inherit" }}
         >
           {now ? (
             <BoatNode id={l.id} playing={playing} />
           ) : (
-            <span data-node={l.id} style={{ width: 30, height: 30, borderRadius: 8, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: st === "done" ? "var(--accent)" : "var(--surface)", border: st === "done" ? "none" : "2px solid var(--line)", color: st === "done" ? "var(--onBrand)" : "var(--low)", position: "relative" }}>
+            <span data-node={l.id} style={{ width: 30, height: 30, borderRadius: 12, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: st === "done" ? "var(--accent)" : "var(--surface)", border: st === "done" ? "none" : "2px solid var(--line)", color: st === "done" ? "var(--onBrand)" : "var(--low)", position: "relative" }}>
               {st === "done" ? <Icon name="check" size={16} stroke={2.6} /> : st === "locked" ? <Icon name="lock" size={13} /> : null}
             </span>
           )}
           <span style={{ flex: 1, minWidth: 0 }}>
-            <span style={{ display: "block", fontSize: now ? 17 : 16, fontWeight: now ? 750 : 600, color: st === "locked" ? "var(--low)" : now ? "var(--head)" : "var(--ink)" }}>{tx(l.title)}</span>{" "}
-            <span style={{ display: "block", fontSize: 14, color: "var(--mid)", marginTop: 1 }}>{st === "done" ? t("lessons.done_review") : t("lessons.minutes", { n: Math.round(minutes(l)) })}</span>
+            <span style={{ display: "block", fontSize: now ? "var(--t-lead)" : "var(--t-body)", fontWeight: now ? 700 : 600, color: st === "locked" ? "var(--low)" : now ? "var(--head)" : "var(--ink)" }}>{tx(l.title)}</span>{" "}
+            <span style={{ display: "block", fontSize: "var(--t-sm)", color: "var(--mid)", marginTop: 0 }}>{st === "done" ? t("lessons.done_review") : t("lessons.minutes", { n: Math.round(minutes(l)) })}</span>
           </span>
           {now && " "}
           {now && (
-            <span className="nv-btn" style={{ background: "var(--brand)", color: "var(--onBrand)", borderRadius: 8, padding: "8px 14px", fontSize: 14, fontWeight: 700, "--btn-edge": "var(--edge)" }} aria-hidden="true">
+            <span style={{ background: "var(--brand)", color: "var(--onBrand)", borderRadius: 12, padding: "8px 16px", fontSize: "var(--t-sm)", fontWeight: 700 }} aria-hidden="true">
               {t("lessons.start")}
             </span>
           )}
         </button>
         {challenge && (
-          <button onClick={() => go("lessons", { challenge: l.id })} className="nv-press" style={{ border: "1px solid var(--line)", background: "var(--bg)", color: "var(--brand)", borderRadius: 8, padding: "6px 12px", marginRight: 14, fontSize: 13, fontWeight: 650, cursor: "pointer", minHeight: 44, flexShrink: 0 }}>
+          <button onClick={() => go("lessons", { challenge: l.id })} className="nv-press" style={{ border: "1px solid var(--line)", background: "var(--bg)", color: "var(--brand)", borderRadius: 12, padding: "8px 12px", marginRight: 16, fontSize: "var(--t-sm)", fontWeight: 600, cursor: "pointer", minHeight: 44, flexShrink: 0 }}>
             {t("challenge.chip")}
           </button>
         )}
@@ -795,20 +815,20 @@ function Course({ t, locale, go, route, layout }) {
   const openedCards = UNITS.filter((u, i) => i !== ci && opened[u.id]);
   const current = ci < UNITS.length ? UNITS[ci] : null;
   return (
-    <section aria-label={t("path.title")} style={{ marginTop: 30 }}>
-      <h2 className="nv-disp" style={{ fontSize: 28, margin: "0 0 4px" }}>{t("path.title")}</h2>
-      <div style={{ fontSize: 14, color: "var(--mid)", marginBottom: 10 }}>{t("path.count", { done: doneCount, total: ALL_LESSONS.length, units: unitsDone, unitsTotal: UNITS.length })}</div>
+    <section id="nv-course" aria-label={t("path.title")} style={{ marginTop: 32 }}>
+      <h2 className="nv-disp" style={{ fontSize: "var(--t-title)", margin: "0 0 4px" }}>{t("path.title")}</h2>
+      <div style={{ fontSize: "var(--t-sm)", color: "var(--mid)", marginBottom: 12 }}>{t("path.count", { done: doneCount, total: ALL_LESSONS.length, units: unitsDone, unitsTotal: UNITS.length })}</div>
       <Progress value={doneCount} max={ALL_LESSONS.length} height={6} label={t("lessons.overall")} />
       <SeaChart layout={layout} t={t} tx={tx} go={go} progress={progress} ci={ci} next={next} all={all} setAll={setAll} opened={opened} toggle={toggle} currentRef={currentRef} />
-      <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 14 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 16 }}>
         {openedCards.map((u) => (
           <Card key={u.id} pad="14px 0 6px">
-            <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "0 12px 4px 18px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "0 12px 4px 16px" }}>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 13, color: "var(--low)", fontWeight: 600 }}>{t("lessons.unit_n", { n: UNITS.indexOf(u) + 1 })}</div>
-                <div style={{ fontSize: 18, fontWeight: 750 }}>{tx(u.title)}</div>
+                <div style={{ fontSize: "var(--t-sm)", color: "var(--low)", fontWeight: 600 }}>{t("lessons.unit_n", { n: UNITS.indexOf(u) + 1 })}</div>
+                <div style={{ fontSize: "var(--t-lead)", fontWeight: 700 }}>{tx(u.title)}</div>
               </div>
-              <button onClick={() => toggle(u.id)} aria-label={`${t("common.close")}: ${tx(u.title)}`} style={{ border: "none", background: "var(--surface2)", color: "var(--ink)", borderRadius: 22, width: 44, height: 44, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+              <button onClick={() => toggle(u.id)} aria-label={`${t("common.close")}: ${tx(u.title)}`} style={{ border: "none", background: "var(--surface2)", color: "var(--ink)", borderRadius: 18, width: 44, height: 44, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
                 <Icon name="close" size={16} />
               </button>
             </div>
@@ -818,12 +838,12 @@ function Course({ t, locale, go, route, layout }) {
         {current && (
           <div ref={currentRef} style={{ scrollMarginTop: 80 }}>
             <Card pad="16px 0 6px">
-              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "0 16px 6px 18px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "0 16px 8px 16px" }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 13, color: "var(--low)", fontWeight: 600 }}>{t("path.now", { n: ci + 1 })}</div>
-                  <div className="nv-disp" style={{ fontSize: 24, lineHeight: 1.15, color: "var(--head)" }}>{tx(current.title)}</div>
+                  <div style={{ fontSize: "var(--t-sm)", color: "var(--low)", fontWeight: 600 }}>{t("path.now", { n: ci + 1 })}</div>
+                  <div className="nv-disp" style={{ fontSize: "var(--t-title)", lineHeight: 1.2, color: "var(--head)" }}>{tx(current.title)}</div>
                 </div>
-                <span style={{ width: 80, height: 62, borderRadius: 10, background: "var(--artSky)", overflow: "hidden", display: "flex", alignItems: "flex-end", justifyContent: "center", flexShrink: 0 }}>
+                <span style={{ width: 80, height: 62, borderRadius: 12, background: "var(--artSky)", overflow: "hidden", display: "flex", alignItems: "flex-end", justifyContent: "center", flexShrink: 0 }}>
                   <UnitArt id={current.id} width={82} />
                 </span>
               </div>
@@ -876,36 +896,36 @@ function Moment({ t, locale, result, unit, onDone }) {
   const list = (items) => new Intl.ListFormat(locale.lang, { type: "conjunction" }).format(items);
   return (
     <>
-      <div data-moment={result.moment} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", gap: 6, padding: "24px 6px" }}>
+      <div data-moment={result.moment} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", gap: 8, padding: "24px 8px" }}>
         {streak ? (
           <>
-            <div className="nv-disp" style={{ width: 168, height: 168, borderRadius: 84, border: "3px solid var(--brand)", boxShadow: "0 0 0 10px var(--warmSoft)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: n >= 100 ? 66 : 84, letterSpacing: -2, color: "var(--brand)", fontVariantNumeric: "tabular-nums" }}>{n}</div>
+            <div className="nv-disp" style={{ width: 168, height: 168, borderRadius: 999, border: "3px solid var(--brand)", boxShadow: "0 0 0 10px var(--warmSoft)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "var(--t-fig)", letterSpacing: -2, color: "var(--brand)", fontVariantNumeric: "tabular-nums" }}>{n}</div>
             {n === 7 && (
-              <div aria-hidden style={{ display: "flex", gap: 8, marginTop: 18 }}>
+              <div aria-hidden style={{ display: "flex", gap: 8, marginTop: 16 }}>
                 {Array.from({ length: 7 }, (_, i) => (
-                  <span key={i} style={{ width: 10, height: 10, borderRadius: 5, background: "var(--warm)" }} />
+                  <span key={i} style={{ width: 10, height: 10, borderRadius: 12, background: "var(--warm)" }} />
                 ))}
               </div>
             )}
-            <h1 className="nv-disp" style={{ fontSize: 34, lineHeight: 1.1, margin: "24px 0 6px" }}>{t(`moment.streak.${n}`)}</h1>
-            <p style={{ fontSize: 17, color: "var(--mid)", lineHeight: 1.5, margin: 0, maxWidth: 340 }}>{t(`moment.streak.${n}.sub`)}</p>
+            <h1 className="nv-disp" style={{ fontSize: "var(--t-disp)", lineHeight: 1.2, margin: "24px 0 8px" }}>{t(`moment.streak.${n}`)}</h1>
+            <p style={{ fontSize: "var(--t-lead)", color: "var(--mid)", lineHeight: 1.5, margin: 0, maxWidth: 340 }}>{t(`moment.streak.${n}.sub`)}</p>
           </>
         ) : (
           <>
-            <span style={{ width: 220, height: 165, borderRadius: 14, background: "var(--artSky)", overflow: "hidden", display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
+            <span style={{ width: 220, height: 165, borderRadius: 12, background: "var(--artSky)", overflow: "hidden", display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
               <UnitArt id={unit.id} width={220} />
             </span>
-            <div style={{ fontSize: 14, fontWeight: 600, color: "var(--low)", marginTop: 22 }}>{t("moment.unit.eyebrow", { n: UNITS.indexOf(unit) + 1, total: UNITS.length })}</div>
-            <h1 className="nv-disp" style={{ fontSize: 34, lineHeight: 1.1, margin: "4px 0 6px" }}>{tx(unit.title)}</h1>
-            <p style={{ fontSize: 16, color: "var(--mid)", lineHeight: 1.5, margin: 0, maxWidth: 360 }}>{t("moment.unit.sub", { lessons: list(unit.lessons.map((l) => `“${tx(l.title)}”`)) })}</p>
-            <div style={{ display: "flex", gap: 28, marginTop: 20, fontSize: 15, color: "var(--mid)" }}>
+            <div style={{ fontSize: "var(--t-sm)", fontWeight: 600, color: "var(--low)", marginTop: 24 }}>{t("moment.unit.eyebrow", { n: UNITS.indexOf(unit) + 1, total: UNITS.length })}</div>
+            <h1 className="nv-disp" style={{ fontSize: "var(--t-disp)", lineHeight: 1.2, margin: "4px 0 8px" }}>{tx(unit.title)}</h1>
+            <p style={{ fontSize: "var(--t-body)", color: "var(--mid)", lineHeight: 1.5, margin: 0, maxWidth: 360 }}>{t("moment.unit.sub", { lessons: list(unit.lessons.map((l) => `“${tx(l.title)}”`)) })}</p>
+            <div style={{ display: "flex", gap: 32, marginTop: 24, fontSize: "var(--t-body)", color: "var(--mid)" }}>
               <span>{t("moment.lessons", { n: unit.lessons.length })}</span>
               {solid > 0 && <span>{t("moment.solid", { n: solid })}</span>}
             </div>
           </>
         )}
       </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <Button full kind="secondary" onClick={() => openShare(streak ? { kind: "streak", n } : { kind: "unit", title: tx(unit.title) })}>
           <Icon name="share" size={18} /> {t("share.button")}
         </Button>
@@ -917,25 +937,11 @@ function Moment({ t, locale, result, unit, onDone }) {
   );
 }
 
-// The finish: the day's ring fills and the XP counts up (instantly with
-// "reduce motion"), then the streak and the day's total.
-// The ring rises like a sun over the sea, with a few small stars (no
-// confetti). The waves drift for a few seconds, then stop.
+// The finish: the day's ring fills and the XP counts up (instantly with "reduce motion").
 // The one red spark on the sea chart: a small pennant on the island you're on.
 const spark = (x, y) => `<path d="M${x} ${y + 26}V${y}" stroke="var(--artInk)" stroke-width="2.4" stroke-linecap="round"/><path d="M${x + 1.2} ${y}L${x + 17} ${y + 6}L${x + 1.2} ${y + 12}Z" fill="var(--spark)"/>`;
-// The finish picture, drawn at the width it is shown (390 on a phone, 640 in the centered column), so the boat stays where it was put.
-const sunrise = (w) => `<defs><linearGradient id="nvsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--bg)"/><stop offset="1" stop-color="var(--warmSoft)"/></linearGradient></defs><rect width="${w}" height="250" fill="url(#nvsky)"/><g class="nv-drift"><path d="${wave(w + 50, 250, 7, 5, 196)}" fill="var(--artSea)"/><path d="${wave(w + 50, 250, 6, 4, 218)}" fill="var(--artSea2)" opacity=".7"/></g>${boat(w - 90, 92, 0.42)}<path d="${wave(w, 250, 8, 5, 240)}" fill="var(--bg)"/>`;
-function Sunrise({ children }) {
-  const w = useLayout() === "phone" ? 390 : 640;
-  return (
-    <div style={{ position: "relative", margin: "-10px -18px 0", padding: "20px 18px 56px" }}>
-      <svg className="nv-sunrise" viewBox={`0 0 ${w} 250`} preserveAspectRatio="xMidYMax slice" aria-hidden="true" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", display: "block" }} dangerouslySetInnerHTML={{ __html: sunrise(w) }} />
-      <div style={{ position: "relative" }}>{children}</div>
-    </div>
-  );
-}
 
-function FinishRing({ t, before, after, goal, gained, streak }) {
+function FinishRing({ before, after, goal, gained, label }) {
   const still = reducedMotion();
   const [shown, setShown] = useState(still ? after : before);
   const [n, setN] = useState(still ? gained : 0);
@@ -950,18 +956,14 @@ function FinishRing({ t, before, after, goal, gained, streak }) {
     const id = setTimeout(() => setShown(after), 30);
     return () => (cancelAnimationFrame(raf), clearTimeout(id));
   }, []);
-  const line = after > goal ? t("finish.today_met", { xp: after, n: streak }) : t("finish.today", { xp: after, goal, n: streak });
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-      <div style={{ borderRadius: "50%", background: "var(--surface)" }}>
-      <Ring value={Math.min(shown, goal)} max={goal} size={150} stroke={8} label={line}>
-        <div style={{ textAlign: "center", lineHeight: 1 }}>
-          <div className="nv-disp" style={{ fontSize: 44, letterSpacing: -1, fontVariantNumeric: "tabular-nums", color: "var(--head)" }}>+{n}</div>
-          <div style={{ fontSize: 13, color: "var(--mid)", marginTop: 4 }}>XP</div>
+    <div style={{ display: "flex", justifyContent: "center" }}>
+      <Ring value={Math.min(shown, goal)} max={goal} size={132} stroke={8} color="var(--ink)" label={label}>
+        <div style={{ textAlign: "center", lineHeight: 1.2 }}>
+          <div className="nv-disp" style={{ fontSize: "var(--t-head)", fontVariantNumeric: "tabular-nums" }}>+{n}</div>
+          <div className="nv-cap">XP</div>
         </div>
       </Ring>
-      </div>
-      <p style={{ fontSize: 14, color: "var(--mid)", margin: "10px 0 0" }}>{line}</p>
     </div>
   );
 }
@@ -1150,29 +1152,39 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
     const toward = service("goals", "buildingToward")();
     const TryCard = service("missions", "TryCard");
     const facts = [...(result.goalJustMet ? [t("lessons.goal_met")] : []), ...(mistakes === 0 ? [t("lessons.perfect")] : [])];
+    const line = result.xpAfter > progress.dailyGoal ? t("finish.today_met", { xp: result.xpAfter, n: result.streak }) : t("finish.today", { xp: result.xpAfter, goal: progress.dailyGoal, n: result.streak });
+    const more = nl && nl.id !== lesson.id;
     return (
       <Overlay label={run.title}>
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "flex-start", gap: 16, paddingBottom: 18 }}>
-          <Sunrise>
-            <FinishRing t={t} before={result.xpBefore} after={result.xpAfter} goal={progress.dailyGoal} gained={result.gained} streak={result.streak} />
-          </Sunrise>
-          <div style={{ textAlign: "center", marginTop: -34, position: "relative" }}>
-            <h1 className="nv-disp" style={{ fontSize: 32, lineHeight: 1.1, margin: 0 }}>{t("lessons.complete")}</h1>
-            <p style={{ color: "var(--mid)", margin: "4px 0 0", fontSize: 16 }}>{tx(lesson.title)}</p>
-            {facts.length > 0 && <p style={{ fontSize: 14, color: "var(--mid)", margin: "8px 0 0" }}>{facts.join("  ·  ")}</p>}
-            {result.courseJustDone && <p className="nv-disp" style={{ fontSize: 22, color: "var(--head)", margin: "16px 0 0", lineHeight: 1.3 }}>{t("lessons.course_done")}</p>}
+        <div className="nv-lhead" style={{ justifyContent: "flex-end" }}>
+          <button onClick={() => go("lessons")} aria-label={t("common.close")} className="nv-iconbtn plain nv-press">
+            <Icon name="close" size={24} />
+          </button>
+        </div>
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 16, paddingBottom: 16 }}>
+          <FinishRing before={result.xpBefore} after={result.xpAfter} goal={progress.dailyGoal} gained={result.gained} label={line} />
+          <div style={{ textAlign: "center" }}>
+            <h1 className="nv-disp" style={{ fontSize: "var(--t-head)", margin: 0 }}>{t("lessons.complete")}</h1>
+            <p style={{ color: "var(--mid)", margin: "4px 0 0", fontSize: "var(--t-lead)" }}>{tx(lesson.title)}</p>
+            {result.courseJustDone && <p className="nv-disp" style={{ fontSize: "var(--t-title)", color: "var(--head)", margin: "16px 0 0" }}>{t("lessons.course_done")}</p>}
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 8 }}>
+            <Tag>{line}</Tag>
+            {facts.map((f) => (
+              <Tag key={f}>{f}</Tag>
+            ))}
           </div>
           <Card>
-            <div style={{ fontSize: 14, fontWeight: 650, color: "var(--mid)", marginBottom: 4 }}>{t("finish.life")}</div>
-            <p style={{ fontSize: 16, lineHeight: 1.5, margin: 0 }}>{tx(lesson.life)}</p>
+            <div className="nv-cap" style={{ marginBottom: 4 }}>{t("finish.life")}</div>
+            <p style={{ fontSize: "var(--t-lead)", margin: 0 }}>{tx(lesson.life)}</p>
             {toward && (
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 10, fontSize: 14, color: "var(--mid)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 12, fontSize: "var(--t-sm)", color: "var(--mid)" }}>
                 <Icon name="target" size={16} /> {t("today.toward", { name: toward })}
               </div>
             )}
           </Card>
           {result.levelUps.length > 0 && (
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 14, color: "var(--mid)", textAlign: "center" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: "var(--t-sm)", color: "var(--mid)", textAlign: "center" }}>
               <Icon name="star" size={16} color="var(--brand)" />
               <span>{result.levelUps.map((x) => t(x.level === "mastered" ? "finish.mastered" : "finish.solid", { name: tx(conceptById(x.c).name) })).join("  ·  ")}</span>
             </div>
@@ -1180,7 +1192,7 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
           <AdaptCard t={t} locale={locale} go={go} mistakes={mistakes} nextUnit={nl && nl.unit} />
           {practiceOpen(progress) && <TryCard t={t} locale={locale} go={go} unit={lesson.unit} />}
           {(result.unitJustDone || result.freezeEarned || result.badges.length > 0) && (
-            <div style={{ fontSize: 14, color: "var(--mid)", lineHeight: 1.6, textAlign: "center" }}>
+            <div style={{ fontSize: "var(--t-sm)", color: "var(--mid)", textAlign: "center" }}>
               {result.unitJustDone && <div>{t("lessons.unit_done", { name: tx(unit.title) })}</div>}
               {result.freezeEarned && <div>{t("lessons.freeze_earned")}</div>}
               {result.badges.map((id) => (
@@ -1191,7 +1203,7 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
         </div>
         {!ctx.session.user && ctx.session.online && (progress.counters.lessons || 0) >= 2 && <SaveOffer t={t} go={go} />}
         {(mistakes === 0 || result.unitJustDone) && (
-          <div style={{ display: "flex", justifyContent: "center", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
+          <div style={{ display: "flex", justifyContent: "center", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
             {mistakes === 0 && (
               <Button kind="ghost" size="md" onClick={() => go("lessons", { challenge: lesson.id })}>
                 {t("challenge.offer")}
@@ -1204,14 +1216,14 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
             )}
           </div>
         )}
-        {/* The way forward stays on screen, however long the cards above it are (same as the buttons in a step). */}
-        <div data-go="" style={{ position: "sticky", bottom: 0, background: "var(--bg)", padding: "8px 0 4px", boxShadow: "0 -10px 12px -6px var(--bg)", display: "flex", flexDirection: "column", gap: 10 }}>
-          {nl && nl.id !== lesson.id && (
+        {/* The way forward stays on screen, however long the cards above it are (same as the buttons in a step): one red button, and a quiet Done. */}
+        <div data-go="" className="nv-dock" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+          {more && (
             <Button full onClick={() => go("lessons", { lesson: nl.id })}>
               {t("lessons.next_named", { title: tx(nl.title) })}
             </Button>
           )}
-          <Button full kind={nl && nl.id !== lesson.id ? "secondary" : "primary"} onClick={() => go("lessons")}>
+          <Button full kind={more ? "ghost" : "primary"} onClick={() => go("lessons")}>
             {t("common.done")}
           </Button>
         </div>
@@ -1220,109 +1232,119 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
   }
 
   const Widget = step.type === "action" ? actionWidget(step.kind) : null;
+  const desk = isDesk(ctx.layout);
+  // Where you are: "3 of 6" (the extra card and the retry after a miss don't count).
+  const stepNo = Math.max(1, queue.slice(0, at + 1).filter((q) => !q.extra && !q.retry).length);
+  const caption = mode === "lesson" ? tx(lesson.title) : null;
+  const stepText = tx(step.title || step.q || step.prompt || "");
+  const ask = () => service("tutor", "open")({ context: stepText });
 
   return (
-    <Overlay label={run.title}>
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-        <button onClick={() => setQuit(true)} aria-label={t("common.close")} style={{ border: "none", background: "transparent", color: "var(--low)", width: 44, height: 44, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
-          <Icon name="close" />
+    <Overlay label={run.title} wide={desk}>
+      <div className="nv-lhead">
+        <button onClick={() => setQuit(true)} aria-label={t("common.close")} className="nv-iconbtn plain nv-press">
+          <Icon name="close" size={24} />
         </button>
-        <div style={{ flex: 1, position: "relative" }}>
-          <Progress value={at} max={total} height={6} label={run.title} />
-          <span aria-hidden="true" style={{ position: "absolute", top: -21, left: `calc(${(Math.min(at, total) / total) * 100}% - 13px)`, transition: "left .6s cubic-bezier(.2,.7,.2,1)" }}>
-            <Mark size={26} color="var(--artInk)" />
-          </span>
-        </div>
-        <button onClick={() => service("tutor", "open")({ context: tx(step.title || step.q || step.prompt || "") })} className="nv-press" style={{ border: "1px solid var(--line)", background: "var(--bg)", color: "var(--ink)", borderRadius: 8, height: 44, padding: "0 14px", display: "inline-flex", alignItems: "center", gap: 6, fontWeight: 650, fontSize: 14, cursor: "pointer", flexShrink: 0 }}>
-          <Icon name="chat" size={16} /> {t("nav.ask")}
-        </button>
-        <button onClick={() => service("feedback", "open")({ kind: "content", context: `${mode === "lesson" ? lesson.id : `${mode} ${step.c || ""}`} · step ${at + 1} · ${tx(step.title || step.q || step.prompt || "")}`.slice(0, 280) })} aria-label={t("lessons.report")} title={t("lessons.report")} style={{ border: "none", background: "transparent", color: "var(--low)", width: 44, height: 44, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
+        <Progress value={at} max={total} height={6} label={run.title} />
+        <span className="count">{t("lessons.step_n", { i: stepNo, n: run.steps.length })}</span>
+        <button onClick={() => service("feedback", "open")({ kind: "content", context: `${mode === "lesson" ? lesson.id : `${mode} ${step.c || ""}`} · step ${at + 1} · ${stepText}`.slice(0, 280) })} aria-label={t("lessons.report")} title={t("lessons.report")} className="nv-iconbtn plain nv-press" style={{ color: "var(--low)" }}>
           <Icon name="flag" size={20} />
         </button>
       </div>
 
-      {/* Where you are: the lesson, and "3 of 12" (the extra card and the retry after a miss don't count). */}
-      <div style={{ fontSize: 13, fontWeight: 600, color: "var(--mid)", margin: "-8px 0 12px" }}>
-        {mode === "lesson" ? tx(lesson.title) : run.title}
-        {!step.extra && !step.retry && ` · ${t("lessons.step_n", { i: queue.slice(0, at + 1).filter((q) => !q.extra && !q.retry).length, n: run.steps.length })}`}
-      </div>
-      <div key={step.key} className="nv-in" style={{ flex: isDesk(ctx.layout) ? "0 0 auto" : 1, overflowY: "auto" }}>
-        {step.type === "card" && (
-          <div>
-            <div style={{ fontSize: 13, fontWeight: 650, color: "var(--mid)", marginBottom: 6 }}>{t("lessons.idea")}</div>
-            <h2 className="nv-disp" style={{ fontSize: 28, margin: "0 0 12px", lineHeight: 1.15 }}>{tx(step.title)}</h2>
-            <p style={{ fontSize: 18, lineHeight: 1.55, margin: 0 }}>{tx(step.body)}</p>
-            {service("tutor", "canExplain")(`${tx(step.title)} ${tx(step.body)}`) && <button onClick={() => service("tutor", "explain")({ question: tx(step.title), context: tx(step.body) })} className="nv-press" style={{ marginTop: 18, border: "1px solid var(--line)", background: "var(--bg)", color: "var(--brand)", borderRadius: 8, padding: "10px 16px", fontWeight: 650, fontSize: 15, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 8, minHeight: 44 }}>
-              <Icon name="chat" size={18} /> {t("lessons.explain")}
-            </button>}
+      <div className="nv-lesson">
+        <div className="nv-main">
+          <div key={step.key} className="nv-in" style={{ flex: desk ? "0 0 auto" : 1, overflowY: "auto" }}>
+            {step.type === "card" && (
+              <div>
+                <div className="nv-cap">
+                  <span>{t("lessons.idea")}</span>
+                  {caption && ` · ${caption}`}
+                </div>
+                <h2 className="nv-disp" style={{ fontSize: "var(--t-head)", margin: "8px 0 16px" }}>{tx(step.title)}</h2>
+                <p style={{ fontSize: "var(--t-lead)", margin: 0 }}>{tx(step.body)}</p>
+                {step.example && <Example t={t} tx={tx} ex={step.example} />}
+                {service("tutor", "canExplain")(`${tx(step.title)} ${tx(step.body)}`) && (
+                  <Button kind="secondary" size="sm" style={{ marginTop: 24 }} onClick={() => service("tutor", "explain")({ question: tx(step.title), context: tx(step.body) })}>
+                    <Icon name="chat" size={18} /> {t("lessons.explain")}
+                  </Button>
+                )}
+              </div>
+            )}
+            {isQuestion(step) && <Question t={t} locale={locale} step={step} value={value} setValue={setPicked} checked={checked} right={checked === "right"} submit={check} caption={caption} label={mode === "challenge" ? t("challenge.chip") : mode === "review" ? t("review.title") : null} />}
+            {step.type === "action" && (
+              <div>
+                <div className="nv-cap">
+                  <span>{t("lessons.do_it")}</span>
+                  {caption && ` · ${caption}`}
+                </div>
+                <h2 className="nv-disp" style={{ fontSize: "var(--t-title)", margin: "8px 0 16px" }}>{tx(step.prompt)}</h2>
+                {Widget ? <Widget params={step.params} t={t} locale={locale} done={actionDone} onDone={() => setActionDone(true)} /> : null}
+              </div>
+            )}
+            {checked && (
+              <div ref={feedbackRef} style={{ scrollMarginBottom: 90, marginTop: 16 }}>
+                <Feedback
+                  t={t}
+                  locale={locale}
+                  step={step}
+                  picked={value}
+                  checked={checked}
+                  heading={Q.heading && Q.heading(step, value, locale.region, t, locale, checked === "right")}
+                  extra={Q.Extra && <Q.Extra step={step} right={checked === "right"} t={t} locale={locale} />}
+                  note={checked === "wrong" && !step.retry && mode !== "challenge" ? t("lessons.wrong.again") : null}
+                />
+              </div>
+            )}
+            {/* On a phone the question can be asked about here; on a laptop it's in the panel beside. */}
+            {!desk && step.type !== "card" && (
+              <Button kind="ghost" size="sm" onClick={ask} style={{ marginTop: 8 }}>
+                <Icon name="chat" size={18} /> {t("lessons.explain")}
+              </Button>
+            )}
           </div>
-        )}
-        {isQuestion(step) && <Question t={t} locale={locale} step={step} value={value} setValue={setPicked} checked={checked} right={checked === "right"} submit={check} label={mode === "challenge" ? t("challenge.chip") : mode === "review" ? t("review.title") : null} />}
-        {step.type === "action" && (
-          <div>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 750, color: "var(--onBrand)", background: "var(--brand)", borderRadius: 8, padding: "6px 12px", marginBottom: 12 }}>
-              <Icon name="target" size={15} /> {t("lessons.do_it")}
-            </div>
-            <h2 style={{ fontSize: 22, fontWeight: 750, margin: "0 0 16px", lineHeight: 1.3 }}>{tx(step.prompt)}</h2>
-            {Widget ? <Widget params={step.params} t={t} locale={locale} done={actionDone} onDone={() => setActionDone(true)} /> : null}
-          </div>
-        )}
-      </div>
 
-      <div style={{ paddingTop: 14 }}>
-        {checked && (
-          <div ref={feedbackRef} style={{ scrollMarginBottom: 90 }}>
-          <Feedback
-            t={t}
-            locale={locale}
-            step={step}
-            picked={value}
-            checked={checked}
-            heading={Q.heading && Q.heading(step, value, locale.region, t, locale, checked === "right")}
-            extra={Q.Extra && <Q.Extra step={step} right={checked === "right"} t={t} locale={locale} />}
-            note={checked === "wrong" && !step.retry && mode !== "challenge" ? t("lessons.wrong.again") : null}
-          />
-          </div>
-        )}
-        {/* The buttons stay on screen, however long the step or its feedback. */}
-        <div data-go="" style={{ position: "sticky", bottom: 0, background: "var(--bg)", padding: "8px 0 4px", boxShadow: "0 -10px 12px -6px var(--bg)" }}>
-        {step.type === "card" && (
-          <Button full onClick={advance}>
-            {t("common.continue")}
-          </Button>
-        )}
-        {isQuestion(step) &&
-          (checked ? (
-            <Button full onClick={advance}>
-              {t("common.continue")}
-            </Button>
-          ) : (
-            <Button full disabled={!canCheck} onClick={check}>
-              {t("common.check")}
-            </Button>
-          ))}
-        {step.type === "action" && (
-          <>
-            {/* One live button at a time: while the tool is waiting there's only "Skip for now"; once it's done, "Done — continue". */}
-            {(actionDone || !Widget) && (
+          {/* The buttons stay on screen, however long the step or its feedback (the dock is a direct child of the column, so it can stay pinned). */}
+          <div data-go="" className="nv-dock">
+            {step.type === "card" && (
               <Button full onClick={advance}>
-                {actionDone ? t("lessons.action_done") : t("common.continue")}
+                {t("common.continue")}
               </Button>
             )}
-            {Widget && !actionDone && (
-              <Button full kind="ghost" onClick={advance}>
-                {t("lessons.skip_action")}
-              </Button>
+            {isQuestion(step) &&
+              (checked ? (
+                <Button full onClick={advance}>
+                  {t("common.continue")}
+                </Button>
+              ) : (
+                <Button full disabled={!canCheck} onClick={check}>
+                  {t("common.check")}
+                </Button>
+              ))}
+            {step.type === "action" && (
+              <>
+                {/* One live button at a time: while the tool is waiting there's only "Skip for now"; once it's done, "Done — continue". */}
+                {(actionDone || !Widget) && (
+                  <Button full onClick={advance}>
+                    {actionDone ? t("lessons.action_done") : t("common.continue")}
+                  </Button>
+                )}
+                {Widget && !actionDone && (
+                  <Button full kind="ghost" onClick={advance}>
+                    {t("lessons.skip_action")}
+                  </Button>
+                )}
+              </>
             )}
-          </>
-        )}
-        {hint && isQuestion(step) && <p style={{ fontSize: 13, color: "var(--mid)", textAlign: "center", margin: "8px 0 0" }}>{t("kb.hint")}</p>}
+            {hint && isQuestion(step) && <p style={{ fontSize: "var(--t-sm)", color: "var(--mid)", textAlign: desk ? "left" : "center", margin: "8px 0 0" }}>{t("kb.hint")}</p>}
+          </div>
         </div>
+        {desk && <LessonSide t={t} tx={tx} steps={run.steps} now={stepNo - 1} onAsk={ask} />}
       </div>
 
       <Sheet open={quit} onClose={() => setQuit(false)} title={t("lessons.quit.title")}>
-        <p style={{ fontSize: 16, marginTop: 0 }}>{t("lessons.quit.body")}</p>
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        <p style={{ marginTop: 0 }}>{t("lessons.quit.body")}</p>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           <Button full onClick={() => setQuit(false)}>
             {t("lessons.quit.no")}
           </Button>
@@ -1335,6 +1357,55 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
   );
 }
 
+// A card's worked example: a total, a bar showing how it splits, and each part named with its amount (so the bar is never the only way to read it).
+function Example({ t, tx, ex }) {
+  const shades = ["var(--ink)", "var(--mid)", "var(--line)"];
+  return (
+    <Card style={{ marginTop: 24 }}>
+      <div className="nv-cap" style={{ marginBottom: 12 }}>{t("lessons.example")}</div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12 }}>
+        <span style={{ color: "var(--mid)" }}>{tx(ex.total[0])}</span>
+        <b style={{ fontSize: "var(--t-title)", fontVariantNumeric: "tabular-nums" }}>{tx(ex.total[1])}</b>
+      </div>
+      <div aria-hidden="true" style={{ display: "flex", height: 16, borderRadius: 999, overflow: "hidden", margin: "12px 0", background: "var(--line)" }}>
+        {ex.split.map(([, , share], i) => (
+          <i key={i} style={{ width: `${share}%`, background: shades[i] }} />
+        ))}
+      </div>
+      <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: "4px 16px", fontSize: "var(--t-sm)", fontVariantNumeric: "tabular-nums" }}>
+        {ex.split.map(([label, amount], i) => (
+          <span key={i}>
+            <b>{tx(label)}</b> <span style={{ color: "var(--mid)" }}>{tx(amount)}</span>
+          </span>
+        ))}
+      </div>
+    </Card>
+  );
+}
+
+// On a laptop, beside the reading column: the steps of this lesson (done, here, still to come) and a way to ask about the one you're on.
+function LessonSide({ t, tx, steps, now, onAsk }) {
+  const label = (s) => (s.type === "card" ? tx(s.title) : s.type === "action" ? t("lessons.do_it") : t(QTYPES[s.type].label));
+  return (
+    <aside className="nv-lside" aria-label={t("lessons.in_this")}>
+      <div className="nv-cap" style={{ marginBottom: 12 }}>{t("lessons.in_this")}</div>
+      <ol style={{ listStyle: "none", margin: 0, padding: 0 }}>
+        {steps.map((s, i) => (
+          <li key={i} aria-current={i === now ? "step" : undefined} style={{ display: "flex", alignItems: "center", gap: 12, padding: "8px 0", color: i > now ? "var(--mid)" : "var(--ink)", fontSize: "var(--t-sm)", fontWeight: i === now ? 700 : 600 }}>
+            <span aria-hidden className={`nv-k${i <= now ? " on" : ""}`} style={{ width: 28, height: 28, fontSize: "var(--t-cap)" }}>
+              {i < now ? <Icon name="check" size={14} stroke={3} /> : i + 1}
+            </span>
+            <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{label(s)}</span>
+          </li>
+        ))}
+      </ol>
+      <Button kind="secondary" size="sm" full style={{ marginTop: 24 }} onClick={onAsk}>
+        <Icon name="chat" size={18} /> {t("lessons.explain")}
+      </Button>
+    </aside>
+  );
+}
+
 // The account offer on a finish screen: not on the very first one, shown once, and only if nothing else has asked in this visit (asks.js).
 function SaveOffer({ t, go }) {
   const seen = useSeen("save");
@@ -1342,9 +1413,9 @@ function SaveOffer({ t, go }) {
   useEffect(() => () => turn && markIntro("save"), [turn]);
   if (seen || !turn) return null;
   return (
-    <Card style={{ margin: "0 0 14px" }}>
-      <div style={{ fontWeight: 650 }}>{t("lessons.save.title")}</div>
-      <p style={{ fontSize: 14, color: "var(--mid)", margin: "4px 0 12px", lineHeight: 1.45 }}>{t("lessons.save.body")}</p>
+    <Card style={{ margin: "0 0 16px" }}>
+      <div style={{ fontWeight: 600 }}>{t("lessons.save.title")}</div>
+      <p style={{ fontSize: "var(--t-sm)", color: "var(--mid)", margin: "4px 0 12px", lineHeight: 1.5 }}>{t("lessons.save.body")}</p>
       <Button full size="md" kind="secondary" onClick={() => go("settings", { section: "account" })}>
         {t("lessons.save.yes")}
       </Button>
@@ -1352,8 +1423,8 @@ function SaveOffer({ t, go }) {
   );
 }
 
-// Full screen, above everything — a lesson is a focused moment.
-function Overlay({ label, children }) {
+// Full screen, above everything — a lesson is a focused moment. `wide`: room for the side panel (a laptop).
+function Overlay({ label, children, wide }) {
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -1364,7 +1435,7 @@ function Overlay({ label, children }) {
   return (
     <Layer>
       <div role="dialog" aria-modal="true" aria-label={label} data-player="" style={{ position: "fixed", inset: 0, zIndex: 40, background: "var(--bg)", color: "var(--ink)", overflowY: "auto", overflowX: "hidden" }}>
-        <div className="nv-ovl" style={{ maxWidth: 640, minHeight: "100%", margin: "0 auto", display: "flex", flexDirection: "column", padding: "calc(10px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom))" }}>{children}</div>
+        <div className={`nv-ovl${wide ? " wide" : ""}`}>{children}</div>
       </div>
     </Layer>
   );
@@ -1429,10 +1500,10 @@ function Screen(ctx) {
       <Learn {...ctx} />
       {key && !ready && (
         <Overlay label={ctx.t("common.loading")}>
-          <div aria-busy={loaded !== `!${key}`} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 18, textAlign: "center" }}>
+          <div aria-busy={loaded !== `!${key}`} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16, textAlign: "center" }}>
             {loaded === `!${key}` ? (
               <>
-                <p role="alert" style={{ fontSize: 17, maxWidth: 320, margin: 0 }}>{ctx.t("common.load_error")}</p>
+                <p role="alert" style={{ fontSize: "var(--t-lead)", maxWidth: 320, margin: 0 }}>{ctx.t("common.load_error")}</p>
                 <Button onClick={() => ctx.go("lessons")}>{ctx.t("common.close")}</Button>
               </>
             ) : (

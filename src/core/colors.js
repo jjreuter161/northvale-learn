@@ -16,6 +16,10 @@ export const TINTS = {
   redDeep: "#A21A22", redDeeper: "#8B141B", redLight: "#FF8E8B", redSoft: "#F6DAD5",
 };
 
+// Profile colors: the avatar is the nickname's first letter on one of these, in cream.
+export const AVATAR_COLORS = [COLORS.navy.hex, TINTS.navyCard2, TINTS.navyLine, TINTS.navyDeep, TINTS.redDeep, TINTS.redDeeper];
+export const AVATAR_INK = COLORS.cream.hex;
+
 const lum = (h) => {
   const c = [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255).map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
   return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
@@ -78,8 +82,10 @@ export function lookFrom(bg, text, hi) {
     "--bad": hi !== "red" ? T : bg === "cream" ? TINTS.redDeep : bg === "navy" ? TINTS.redLight : T, "--badSoft": hi !== "red" ? S.surface2 : bg === "cream" ? TINTS.redSoft : bg === "navy" ? mix(B, COLORS.red.hex, 0.25) : S.surface2,
     "--flame": T, "--gold": T, "--sky": T,
     "--level1": S.line, "--level2": mix(T, B, 0.45), "--level3": T,
-    "--focus": hi === "red" && bg !== "red" ? mark : H,
+    "--focus": T,
     "--shadow": "none", "--lift": dark ? "0 12px 26px -16px rgba(0,0,0,.6)" : "0 1px 0 rgba(27,53,96,.04), 0 12px 26px -16px rgba(27,53,96,.28)",
+    // Depth only: the dim behind a sheet, and the bottom edge of the red button.
+    "--scrim": "rgba(5,12,25,.45)", "--shade": "rgba(0,0,0,.28)",
     "--edge": dark ? TINTS.navyDeep : "#10223F",
     "--warm": T, "--warmSoft": S.surface2, "--warmInk": T,
     // Pictures: ink, paper, water; the "sun" is a cream tint, so the only red in a picture is a deliberate spark.

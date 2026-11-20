@@ -113,17 +113,17 @@ function Overlay({ t, locale, route }) {
       <Sheet open={!!open} onClose={() => setOpen(null)} title={t("fb.title")}>
         {open && (
           <div>
-            <p style={{ margin: "0 0 12px", color: "var(--mid)", lineHeight: 1.45 }}>{t("fb.sub")}</p>
+            <p style={{ margin: "0 0 12px", color: "var(--mid)", lineHeight: 1.5 }}>{t("fb.sub")}</p>
             {open.context && <Note icon="info" style={{ marginBottom: 12 }}>{t("fb.about", { what: open.context })}</Note>}
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
               {["idea", "problem", "content", "other"].map((k) => (
-                <Chip key={k} active={kind === k} onClick={() => setKind(k)} style={{ fontSize: 14 }}>
+                <Chip key={k} active={kind === k} onClick={() => setKind(k)} style={{ fontSize: "var(--t-sm)" }}>
                   {t(`fb.kind.${k}`)}
                 </Chip>
               ))}
             </div>
-            <textarea value={msg} onChange={(e) => setMsg(e.target.value)} maxLength={2000} rows={4} placeholder={t("fb.placeholder")} aria-label={t("fb.title")} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 8, padding: 12, fontSize: 16, background: "var(--surface)", color: "var(--ink)", resize: "vertical" }} />
-            <p style={{ fontSize: 13, color: "var(--low)", margin: "6px 0 12px" }}>{t("fb.private")}</p>
+            <textarea value={msg} onChange={(e) => setMsg(e.target.value)} maxLength={2000} rows={4} placeholder={t("fb.placeholder")} aria-label={t("fb.title")} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 12, padding: 12, fontSize: "var(--t-body)", background: "var(--surface)", color: "var(--ink)", resize: "vertical" }} />
+            <p style={{ fontSize: "var(--t-sm)", color: "var(--low)", margin: "8px 0 12px" }}>{t("fb.private")}</p>
             <Button full disabled={!msg.trim()} onClick={sendFeedback}>
               {t("fb.send")}
             </Button>
@@ -131,15 +131,15 @@ function Overlay({ t, locale, route }) {
         )}
       </Sheet>
       <Sheet open={survey} onClose={() => sendSurvey(true)} title={t("survey.title")}>
-        <p style={{ fontSize: 18, fontWeight: 650, lineHeight: 1.4, margin: "0 0 14px" }}>{t("survey.q")}</p>
+        <p style={{ fontSize: "var(--t-lead)", fontWeight: 600, lineHeight: 1.5, margin: "0 0 16px" }}>{t("survey.q")}</p>
         <div role="radiogroup" style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 }}>
           {["very", "somewhat", "not"].map((k) => (
-            <button key={k} role="radio" aria-checked={answer === k} onClick={() => setAnswer(k)} className="nv-press" style={{ textAlign: "left", ...(answer === k ? SELECTED : { border: "1px solid var(--line)" }), background: answer === k ? "var(--brandSoft)" : "var(--surface)", color: "var(--ink)", borderRadius: 8, padding: "14px 16px", fontSize: 16, fontWeight: 600, cursor: "pointer", minHeight: 52 }}>
+            <button key={k} role="radio" aria-checked={answer === k} onClick={() => setAnswer(k)} className="nv-press" style={{ textAlign: "left", ...(answer === k ? SELECTED : { border: "1px solid var(--line)" }), background: answer === k ? "var(--brandSoft)" : "var(--surface)", color: "var(--ink)", borderRadius: 12, padding: "16px 16px", fontSize: "var(--t-body)", fontWeight: 600, cursor: "pointer", minHeight: 52 }}>
               {t(`survey.${k}`)}
             </button>
           ))}
         </div>
-        {answer && <textarea value={why} onChange={(e) => setWhy(e.target.value)} maxLength={1000} rows={3} placeholder={t("survey.why")} aria-label={t("survey.why")} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 8, padding: 12, fontSize: 16, background: "var(--surface)", color: "var(--ink)", marginBottom: 12 }} />}
+        {answer && <textarea value={why} onChange={(e) => setWhy(e.target.value)} maxLength={1000} rows={3} placeholder={t("survey.why")} aria-label={t("survey.why")} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 12, padding: 12, fontSize: "var(--t-body)", background: "var(--surface)", color: "var(--ink)", marginBottom: 12 }} />}
         <Button full disabled={!answer} onClick={() => sendSurvey(false)}>
           {t("survey.send")}
         </Button>

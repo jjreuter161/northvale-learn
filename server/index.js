@@ -528,9 +528,20 @@ const send = (req, res, status, payload, cookie) => {
   res.writeHead(status, headers(req, { "Content-Type": "application/json", "Cache-Control": "no-store", ...(cookie ? { "Set-Cookie": cookie } : {}) }));
   res.end(JSON.stringify(payload));
 };
+// A page someone typed or followed that isn't here: a calm page in both languages for a browser; JSON for anything else.
+async function notFound(req, res) {
+  if (!/\btext\/html\b/.test(req.headers.accept || "")) return send(req, res, 404, { error: { message: "Not found" } });
+  try {
+    const page = await readFile(resolve(WEB, "404.html"));
+    res.writeHead(404, headers(req, { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store", "Content-Security-Policy": CSP }));
+    res.end(page);
+  } catch {
+    send(req, res, 404, { error: { message: "Not found" } });
+  }
+}
 async function serveFile(req, res, path) {
   const file = resolve(WEB, `.${path === "/" ? "/index.html" : path}`);
-  if (!file.startsWith(WEB + sep)) return send(req, res, 404, { error: { message: "Not found" } });
+  if (!file.startsWith(WEB + sep)) return notFound(req, res);
   try {
     let data = await readFile(file);
     const base = process.env.PUBLIC_URL || `${https(req) ? "https" : "http"}://${req.headers.host}`;
@@ -549,7 +560,7 @@ async function serveFile(req, res, path) {
     res.writeHead(200, headers(req, { "Content-Type": TYPES[extname(file)] || "application/octet-stream", "Cache-Control": file.includes(`${sep}chunks${sep}`) ? "public, max-age=31536000, immutable" : extname(file) === ".jpg" ? "public, max-age=86400" : "no-cache", ...(gzip ? { "Content-Encoding": "gzip", Vary: "Accept-Encoding" } : {}), ...(file.endsWith(".html") ? { "Content-Security-Policy": CSP } : {}) }));
     res.end(data);
   } catch {
-    send(req, res, 404, { error: { message: "Not found" } });
+    notFound(req, res);
   }
 }
 

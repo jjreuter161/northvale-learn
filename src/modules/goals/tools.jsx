@@ -107,26 +107,26 @@ export function BudgetTool({ params = {}, t, locale, onDone, done }) {
   return (
     <Card>
       <Slider label={t("budget.income")} value={income} min={amt([100, 1500], R)} max={amt([4000, 60000], R)} step={amt([50, 500], R)} onChange={setIncome} display={fmt(income)} />
-      <div style={{ display: "flex", height: 26, borderRadius: 8, overflow: "hidden", margin: "4px 0 6px", gap: 2 }} aria-hidden>
+      <div style={{ display: "flex", height: 26, borderRadius: 12, overflow: "hidden", margin: "4px 0 8px", gap: 4 }} aria-hidden>
         {bar.map(([k, v, c]) => (
-          <div key={k} data-seg={k} style={{ width: `${v}%`, background: c, transition: "width .3s" }} />
+          <div key={k} data-seg={k} style={{ width: `${v}%`, background: c, transition: "width var(--m-sheet) ease-out" }} />
         ))}
       </div>
-      <div style={{ display: "flex", gap: 14, margin: "0 0 12px", fontSize: 13, color: "var(--mid)" }} aria-hidden>
+      <div style={{ display: "flex", gap: 16, margin: "0 0 12px", fontSize: "var(--t-sm)", color: "var(--mid)" }} aria-hidden>
         {bar.map(([k, , c]) => (
-          <span key={k} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-            <span style={{ width: 10, height: 10, borderRadius: 3, background: c, display: "inline-block" }} />
+          <span key={k} style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+            <span style={{ width: 10, height: 10, borderRadius: 12, background: c, display: "inline-block" }} />
             {t(`budget.${k}`)}
           </span>
         ))}
       </div>
       <Slider label={t("budget.needs")} value={needs} min={0} max={100 - wants} onChange={setNeeds} display={`${needs}% · ${fmt((income * needs) / 100)}`} />
       <Slider label={t("budget.wants")} value={wants} min={0} max={100 - needs} onChange={setWants} display={`${wants}% · ${fmt((income * wants) / 100)}`} />
-      <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 750, fontSize: 17, padding: "4px 0 10px" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 700, fontSize: "var(--t-lead)", padding: "4px 0 12px" }}>
         <span style={{ color: "var(--good)" }}>{t("budget.save")}</span>
         <span>{save}% · {fmt((income * save) / 100)}</span>
       </div>
-      <p style={{ margin: "0 0 12px", fontSize: 15, lineHeight: 1.45 }}>{save < 10 ? t("budget.tip_low") : t("budget.result", { amount: fmt((income * save) / 100), year: fmt((income * save * 12) / 100) })}</p>
+      <p style={{ margin: "0 0 12px", fontSize: "var(--t-body)", lineHeight: 1.5 }}>{save < 10 ? t("budget.tip_low") : t("budget.result", { amount: fmt((income * save) / 100), year: fmt((income * save * 12) / 100) })}</p>
       <Button
         full
         kind="primary"
@@ -159,16 +159,16 @@ export function LeakTool({ params = {}, t, locale, onDone, done }) {
   const touch = useTouched(onDone, done);
   return (
     <Card>
-      <div style={{ fontWeight: 750, fontSize: 17 }}>{t("leak.what", { amount: fmt(leak), n: perWeek, month: fmt(leakMonth) })}</div>
-      <p style={{ margin: "10px 0", color: "var(--mid)" }}>{t("leak.goal", { name: typeof g.name === "string" ? g.name : text(g.name, locale), target: fmt(g.target), monthly: fmt(base) })}</p>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-        <div style={{ background: "var(--surface2)", borderRadius: 8, padding: 12 }}>
-          <div style={{ fontSize: 13, fontWeight: 650, color: "var(--mid)" }}>{t("leak.before")}</div>
-          <div style={{ fontSize: 20, fontWeight: 750 }}>{dur(t, before)}</div>
+      <div style={{ fontWeight: 700, fontSize: "var(--t-lead)" }}>{t("leak.what", { amount: fmt(leak), n: perWeek, month: fmt(leakMonth) })}</div>
+      <p style={{ margin: "12px 0", color: "var(--mid)" }}>{t("leak.goal", { name: typeof g.name === "string" ? g.name : text(g.name, locale), target: fmt(g.target), monthly: fmt(base) })}</p>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+        <div style={{ background: "var(--surface2)", borderRadius: 12, padding: 12 }}>
+          <div style={{ fontSize: "var(--t-sm)", fontWeight: 600, color: "var(--mid)" }}>{t("leak.before")}</div>
+          <div style={{ fontSize: "var(--t-title)", fontWeight: 700 }}>{dur(t, before)}</div>
         </div>
-        <div style={{ background: cut ? "var(--goodSoft)" : "var(--surface2)", borderRadius: 8, padding: 12, opacity: cut ? 1 : 0.5 }}>
-          <div style={{ fontSize: 13, fontWeight: 650, color: "var(--mid)" }}>{t("leak.after")}</div>
-          <div style={{ fontSize: 20, fontWeight: 750 }}>{cut ? dur(t, after) : "?"}</div>
+        <div style={{ background: cut ? "var(--goodSoft)" : "var(--surface2)", borderRadius: 12, padding: 12, opacity: cut ? 1 : 0.5 }}>
+          <div style={{ fontSize: "var(--t-sm)", fontWeight: 600, color: "var(--mid)" }}>{t("leak.after")}</div>
+          <div style={{ fontSize: "var(--t-title)", fontWeight: 700 }}>{cut ? dur(t, after) : "?"}</div>
         </div>
       </div>
       {cut ? (
@@ -204,14 +204,14 @@ export function CompareTool({ params = {}, t, locale, onDone, done }) {
         <div className="nv-in">
           <LineChart lines={series.map((s) => ({ points: toPts(s.vals), color: PATH_COLORS[s.p], dash: s.p === "cash" }))} height={120} label={t("goals.compare")} />
           <Legend items={series.map((s) => ({ label: `${pathLabel(t, s.p, R)} (${rates[s.p]}%)`, color: PATH_COLORS[s.p] }))} />
-          <p style={{ fontWeight: 750, margin: "12px 0 4px" }}>{t("compare.after", { time: dur(t, years * 12) })}</p>
+          <p style={{ fontWeight: 700, margin: "12px 0 4px" }}>{t("compare.after", { time: dur(t, years * 12) })}</p>
           {series.map((s) => (
-            <div key={s.p} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderTop: "1px solid var(--line)" }}>
-              <span style={{ fontWeight: 650, color: PATH_COLORS[s.p] }}>{pathLabel(t, s.p, R)}</span>
-              <span style={{ fontWeight: 750 }}>{fmt(s.vals[s.vals.length - 1])}</span>
+            <div key={s.p} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderTop: "1px solid var(--line)" }}>
+              <span style={{ fontWeight: 600, color: PATH_COLORS[s.p] }}>{pathLabel(t, s.p, R)}</span>
+              <span style={{ fontWeight: 700 }}>{fmt(s.vals[s.vals.length - 1])}</span>
             </div>
           ))}
-          <Note tone="good" style={{ marginTop: 10 }}>{t("compare.diff", { amount: fmt(series[series.length - 1].vals.at(-1) - monthly * years * 12) })}</Note>
+          <Note tone="good" style={{ marginTop: 12 }}>{t("compare.diff", { amount: fmt(series[series.length - 1].vals.at(-1) - monthly * years * 12) })}</Note>
         </div>
       )}
     </Card>
@@ -239,15 +239,15 @@ export function DebtTool({ params = {}, t, locale, onDone, done }) {
         <Note tone="bad" icon="info">{t("debt.never")}</Note>
       ) : (
         <>
-          <div style={{ fontSize: 18, fontWeight: 750, lineHeight: 1.35 }}>{t("debt.result", { time: dur(t, r.months), interest: fmt(r.interest) })}</div>
-          <div style={{ margin: "10px 0" }}>
+          <div style={{ fontSize: "var(--t-lead)", fontWeight: 700, lineHeight: 1.5 }}>{t("debt.result", { time: dur(t, r.months), interest: fmt(r.interest) })}</div>
+          <div style={{ margin: "12px 0" }}>
             <LineChart lines={[{ points: toPts(r.path), color: "var(--ink)" }, ...(dbl && !dbl.never ? [{ points: toPts(dbl.path), color: "var(--ink)", dash: true }] : []), ...(ext && !ext.never ? [{ points: toPts(ext.path), color: "var(--ink)", dash: "2 4" }] : [])]} height={100} label={t("debt.balance")} />
           </div>
         </>
       )}
-      {dbl && !dbl.never && <p style={{ margin: "8px 0 0", fontWeight: 650, color: "var(--good)" }}>{t("debt.double", { amount: fmt(payment * 2), time: dur(t, dbl.months), interest: fmt(dbl.interest) })}</p>}
-      {ext && !ext.never && !r.never && <p style={{ margin: "8px 0 0", fontWeight: 650, color: "var(--good)" }}>{t("debt.extra", { amount: fmt(extra), time: dur(t, ext.months), interest: fmt(ext.interest), saved: fmt(r.interest - ext.interest) })}</p>}
-      {!done && onDone && <p style={{ fontSize: 14, color: "var(--mid)", margin: "10px 0 0" }}>{t("debt.try")}</p>}
+      {dbl && !dbl.never && <p style={{ margin: "8px 0 0", fontWeight: 600, color: "var(--good)" }}>{t("debt.double", { amount: fmt(payment * 2), time: dur(t, dbl.months), interest: fmt(dbl.interest) })}</p>}
+      {ext && !ext.never && !r.never && <p style={{ margin: "8px 0 0", fontWeight: 600, color: "var(--good)" }}>{t("debt.extra", { amount: fmt(extra), time: dur(t, ext.months), interest: fmt(ext.interest), saved: fmt(r.interest - ext.interest) })}</p>}
+      {!done && onDone && <p style={{ fontSize: "var(--t-sm)", color: "var(--mid)", margin: "12px 0 0" }}>{t("debt.try")}</p>}
     </Card>
   );
 }
@@ -264,7 +264,7 @@ export function EarlyTool({ params = {}, t, locale, onDone, done }) {
   return (
     <Card>
       <Slider label={t("early.monthly")} value={monthly} min={amt([10, 200], R)} max={amt([500, 8000], R)} step={amt([10, 50], R)} onChange={setMonthly} display={fmt(monthly)} />
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
         {ages.map((a, i) => (
           <Slider key={i} label={t("early.age_label")} value={a} min={14} max={until - 5} onChange={(v) => setAges((x) => x.map((y, j) => (j === i ? v : y)))} display={a} />
         ))}
@@ -275,19 +275,19 @@ export function EarlyTool({ params = {}, t, locale, onDone, done }) {
         </Button>
       ) : (
         <div className="nv-in">
-          <p style={{ fontWeight: 750, margin: "4px 0 8px" }}>{t("early.at", { age: until })}</p>
+          <p style={{ fontWeight: 700, margin: "4px 0 8px" }}>{t("early.at", { age: until })}</p>
           {res.map((r, i) => (
             <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", padding: "8px 0", borderTop: "1px solid var(--line)" }}>
               <span>
-                <span style={{ fontWeight: 750, color: i === 0 ? "var(--good)" : "var(--sky)" }}>{t("early.age", { age: r.age })}</span>
-                <span style={{ display: "block", fontSize: 13, color: "var(--mid)" }}>{t("early.put_in", { amount: fmt(r.putIn) })}</span>
+                <span style={{ fontWeight: 700, color: i === 0 ? "var(--good)" : "var(--sky)" }}>{t("early.age", { age: r.age })}</span>
+                <span style={{ display: "block", fontSize: "var(--t-sm)", color: "var(--mid)" }}>{t("early.put_in", { amount: fmt(r.putIn) })}</span>
               </span>
-              <span style={{ fontSize: 20, fontWeight: 750 }}>{fmt(r.value)}</span>
+              <span style={{ fontSize: "var(--t-title)", fontWeight: 700 }}>{fmt(r.value)}</span>
             </div>
           ))}
           <LineChart lines={res.map((r, i) => ({ points: toPts([...Array(Math.max(...res.map((x) => x.months)) - r.months).fill(0), ...r.values]), color: i === 0 ? "var(--good)" : "var(--sky)" }))} height={110} label={t("goals.tool.early")} />
-          {ages[0] !== ages[1] && <Note tone="good" style={{ marginTop: 10 }}>{t("early.gap", { n: Math.abs(ages[1] - ages[0]), amount: fmt(Math.abs(res[0].value - res[1].value)) })}</Note>}
-          <p style={{ fontSize: 13, color: "var(--low)", margin: "10px 0 0" }}>{t("retire.note")}</p>
+          {ages[0] !== ages[1] && <Note tone="good" style={{ marginTop: 12 }}>{t("early.gap", { n: Math.abs(ages[1] - ages[0]), amount: fmt(Math.abs(res[0].value - res[1].value)) })}</Note>}
+          <p style={{ fontSize: "var(--t-sm)", color: "var(--low)", margin: "12px 0 0" }}>{t("retire.note")}</p>
         </div>
       )}
     </Card>
@@ -319,8 +319,8 @@ export function InvestTool({ params = {}, t, locale, onDone, done }) {
         <div className="nv-in">
           <LineChart points={toPts(mid)} color="var(--good)" band={mid.map((_, i) => [i, low[i], high[i]])} lines={params.compareSafe ? [{ points: toPts(safe), color: "var(--sky)", dash: true }] : []} height={130} label={t("goals.tool.invest")} />
           <Legend items={[{ label: `${pathLabel(t, "invest", R)} (${rates.investLow}–${rates.investHigh}%)`, color: "var(--good)" }, ...(params.compareSafe ? [{ label: `${pathLabel(t, "save", R)} (${rates.save}%)`, color: "var(--sky)" }] : [])]} />
-          <p style={{ fontSize: 16, lineHeight: 1.5, margin: "12px 0 6px" }}>{t("invest.result", { time: dur(t, months), putIn: fmt(monthly * months), mid: fmt(mid[months]), low: fmt(low[months]), high: fmt(high[months]) })}</p>
-          {params.compareSafe && <p style={{ fontWeight: 650, margin: "0 0 6px", color: "var(--sky)" }}>{t("invest.safe", { rate: rates.save, amount: fmt(safe[months]) })}</p>}
+          <p style={{ fontSize: "var(--t-body)", lineHeight: 1.5, margin: "12px 0 8px" }}>{t("invest.result", { time: dur(t, months), putIn: fmt(monthly * months), mid: fmt(mid[months]), low: fmt(low[months]), high: fmt(high[months]) })}</p>
+          {params.compareSafe && <p style={{ fontWeight: 600, margin: "0 0 8px", color: "var(--sky)" }}>{t("invest.safe", { rate: rates.save, amount: fmt(safe[months]) })}</p>}
           <Note icon="info">{t("invest.note")}</Note>
         </div>
       )}
@@ -348,9 +348,9 @@ export function RetireTool({ params = {}, t, locale, onDone, done }) {
         </Button>
       ) : (
         <div className="nv-in">
-          <p style={{ fontSize: 18, fontWeight: 750, margin: "4px 0" }}>{t("retire.result", { amount: fmt(r.yours), putIn: fmt(r.putIn) })}</p>
-          {extraPct > 0 && !params.voluntary && <p style={{ fontSize: 18, fontWeight: 750, margin: "4px 0", color: "var(--good)" }}>{t("retire.with_extra", { amount: fmt(r.withExtra) })}</p>}
-          <p style={{ fontSize: 13, color: "var(--low)", margin: "8px 0 0" }}>{t("retire.note")}</p>
+          <p style={{ fontSize: "var(--t-lead)", fontWeight: 700, margin: "4px 0" }}>{t("retire.result", { amount: fmt(r.yours), putIn: fmt(r.putIn) })}</p>
+          {extraPct > 0 && !params.voluntary && <p style={{ fontSize: "var(--t-lead)", fontWeight: 700, margin: "4px 0", color: "var(--good)" }}>{t("retire.with_extra", { amount: fmt(r.withExtra) })}</p>}
+          <p style={{ fontSize: "var(--t-sm)", color: "var(--low)", margin: "8px 0 0" }}>{t("retire.note")}</p>
         </div>
       )}
     </Card>

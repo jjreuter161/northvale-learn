@@ -1,5 +1,5 @@
 // UNIT — Budgeting. Its lessons and the concepts they teach (format in helpers.js).
-import { T, card, choice, tf, act, concept, estimate, number, scenario, fit, match, spot, tap } from "./helpers.js";
+import { T, card, example, choice, tf, act, concept, estimate, number, scenario, fit, match, spot, tap } from "./helpers.js";
 
 export default {
   id: "budget",
@@ -56,7 +56,11 @@ export default {
       life: T("This week, write down three things your money will go to before it arrives.", "Esta semana, anota tres cosas a las que irá tu dinero antes de recibirlo."),
       steps: [
         card(T("A plan for your money", "Un plan para tu dinero"), T("A budget is just a plan: before you spend, you decide where your money goes. It's not about saying no to everything — it's about saying yes to what matters most to you.", "Un presupuesto es solo un plan: antes de gastar, decides a dónde va tu dinero. No se trata de decir que no a todo, sino de decir que sí a lo que más te importa.")),
-        card(T("The 50/30/20 idea", "La idea 50/30/20"), T("A simple starting point: about 50% for needs (things you must pay), 30% for wants (fun stuff), and 20% for saving. On {$1000|15000} a month, that is {$500|7500} for needs, {$300|4500} for wants and {$200|3000} for saving. It's a guide, not a law — adjust it to your life.", "Un punto de partida sencillo: más o menos 50% para necesidades (lo que sí o sí debes pagar), 30% para gustos y 20% para ahorrar. Con {$1000|15000} al mes son {$500|7500} para necesidades, {$300|4500} para gustos y {$200|3000} para ahorrar. Es una guía, no una ley: ajústala a tu vida.")),
+        card(
+          T("The 50/30/20 idea", "La idea 50/30/20"),
+          T("A simple starting point: about 50% for needs (things you must pay), 30% for wants (fun stuff), and 20% for saving. It's a guide, not a law — adjust it to your life.", "Un punto de partida sencillo: más o menos 50% para necesidades (lo que sí o sí debes pagar), 30% para gustos y 20% para ahorrar. Es una guía, no una ley: ajústala a tu vida."),
+          example([T("Each month", "Cada mes"), T("{$1000|15000}", "{$1000|15000}")], [[T("Needs", "Necesidades"), T("{$500|7500}", "{$500|7500}"), 50], [T("Wants", "Gustos"), T("{$300|4500}", "{$300|4500}"), 30], [T("Saving", "Ahorro"), T("{$200|3000}", "{$200|3000}"), 20]]),
+        ),
         match("budgeting", T("Match each part of 50/30/20 to an example.", "Une cada parte del 50/30/20 con un ejemplo."), [[T("50% needs", "50% necesidades"), T("Rent, groceries, the bus to work", "Renta, comida, el camión al trabajo")], [T("30% wants", "30% gustos"), T("Streaming, eating out, a new game", "Streaming, comer fuera, un juego nuevo")], [T("20% saving", "20% ahorro"), T("An emergency fund and your goals", "Un fondo de emergencia y tus metas")]], T("It's a guide, not a law: adjust the split to your life.", "Es una guía, no una ley: ajusta la repartición a tu vida.")),
         choice(
           "budgeting",

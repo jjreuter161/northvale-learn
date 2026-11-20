@@ -51,31 +51,31 @@ function Story({ item, t, onRead, read }) {
   const ago = item.published ? new Date(item.published).toLocaleString(t("locale.tag"), { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : null;
   return (
     <Card>
-      <div style={{ fontSize: 13, fontWeight: 650, color: "var(--low)" }}>
+      <div style={{ fontSize: "var(--t-sm)", fontWeight: 600, color: "var(--low)" }}>
         {item.source}
         {ago ? ` · ${ago}` : ""}
       </div>
-      <h3 style={{ fontSize: 18, fontWeight: 750, lineHeight: 1.3, margin: "6px 0 10px" }}>{item.headline || item.title}</h3>
-      {item.headline && item.headline !== item.title && <p style={{ fontSize: 13, color: "var(--low)", margin: "-4px 0 10px", fontStyle: "italic" }}>“{item.title}”</p>}
+      <h3 style={{ fontSize: "var(--t-lead)", fontWeight: 700, lineHeight: 1.2, margin: "8px 0 12px" }}>{item.headline || item.title}</h3>
+      {item.headline && item.headline !== item.title && <p style={{ fontSize: "var(--t-sm)", color: "var(--low)", margin: "-4px 0 12px", fontStyle: "italic" }}>“{item.title}”</p>}
       {item.summary && (
-        <div style={{ background: "var(--brandSoft)", borderRadius: 8, padding: "12px 14px" }}>
-          <div style={{ fontSize: 13, fontWeight: 750, marginBottom: 4 }}>{t("news.means")}</div>
-          <p style={{ margin: 0, fontSize: 16, lineHeight: 1.5 }}>{item.summary}</p>
+        <div style={{ background: "var(--brandSoft)", borderRadius: 12, padding: "12px 16px" }}>
+          <div style={{ fontSize: "var(--t-sm)", fontWeight: 700, marginBottom: 4 }}>{t("news.means")}</div>
+          <p style={{ margin: 0, fontSize: "var(--t-body)", lineHeight: 1.5 }}>{item.summary}</p>
         </div>
       )}
       {item.terms && item.terms.length > 0 && (
-        <div style={{ marginTop: 10 }}>
-          <div style={{ fontSize: 13, fontWeight: 650, color: "var(--mid)", marginBottom: 6 }}>{t("news.terms")}</div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+        <div style={{ marginTop: 12 }}>
+          <div style={{ fontSize: "var(--t-sm)", fontWeight: 600, color: "var(--mid)", marginBottom: 8 }}>{t("news.terms")}</div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
             {item.terms.map((term) => (
-              <Chip key={term} onClick={() => service("tutor", "open")({ question: term })} style={{ padding: "6px 12px", minHeight: 44, fontSize: 14 }}>
+              <Chip key={term} onClick={() => service("tutor", "open")({ question: term })} style={{ padding: "8px 12px", minHeight: 44, fontSize: "var(--t-sm)" }}>
                 {term}
               </Chip>
             ))}
           </div>
         </div>
       )}
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 14 }}>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 16 }}>
         <Button size="sm" kind={read ? "secondary" : "good"} onClick={onRead}>
           {read ? t("news.read_done") : t("news.got_it")}
         </Button>
@@ -83,7 +83,7 @@ function Story({ item, t, onRead, read }) {
           <Icon name="sparkles" size={16} /> {t("news.ask")}
         </Button>
         {item.link && (
-          <a href={item.link} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 15, fontWeight: 650, color: "var(--sky)", textDecoration: "none", padding: "8px 6px", minHeight: 36 }}>
+          <a href={item.link} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: "var(--t-body)", fontWeight: 600, color: "var(--sky)", textDecoration: "none", padding: "8px 8px", minHeight: 36 }}>
             {t("news.read")} <Icon name="external" size={15} />
           </a>
         )}

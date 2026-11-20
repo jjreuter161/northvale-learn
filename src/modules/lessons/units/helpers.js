@@ -8,7 +8,7 @@
 //   {@fdicLimit}  a number that changes over time, from core/facts.js
 //
 // Steps (3–5 minutes per lesson; every lesson ends with an action):
-//   card(title, body)                               one idea, a few sentences
+//   card(title, body[, example])                    one idea, a few sentences, and optionally the idea in numbers
 //   choice(concept, q, options, answer, why, miss)  miss: why each wrong
 //                                                   option is wrong (null
 //                                                   for the right one)
@@ -35,7 +35,10 @@
 //                                              "ok"|"poor", tradeOff)
 // Concepts: concept(id, name, explain card, easy tf, challenge choice).
 export const T = (en, es, MX) => (MX ? { en, es, MX } : { en, es });
-export const card = (title, body) => ({ type: "card", title, body });
+// An optional worked example under a card (the idea in numbers): a total and how it splits; the shares add up to 100.
+//   example([label, amount], [[label, amount, share], …])    amounts as {$US|MX} text, e.g. T("{$1000|18000}", "{$1000|18000}")
+export const example = (total, split) => ({ total, split });
+export const card = (title, body, ex) => ({ type: "card", title, body, ...(ex ? { example: ex } : {}) });
 export const choice = (c, q, options, answer, why, miss) => ({ type: "choice", c, q, options, answer, why, miss });
 export const tf = (c, q, answer, why) => ({ type: "tf", c, q, answer, why });
 export const act = (kind, prompt, params = {}) => ({ type: "action", kind, prompt, params });

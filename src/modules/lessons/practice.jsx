@@ -88,9 +88,9 @@ export function QuestionView({ t, locale, step, picked, setPicked, checked, labe
   const opts = step.type === "tf" ? [{ v: true, label: t("lessons.true") }, { v: false, label: t("lessons.false") }] : step.options.map((o, i) => ({ v: i, label: x(o) }));
   return (
     <div>
-      {!bare && <div style={{ fontSize: 14, fontWeight: 650, color: "var(--mid)", marginBottom: 8 }}>{label || t("lessons.question")}</div>}
-      {!bare && <h2 className="nv-disp" style={{ fontSize: 26, margin: "0 0 20px", lineHeight: 1.2 }}>{x(step.q)}</h2>}
-      <div role="radiogroup" style={{ display: "flex", flexDirection: step.type === "tf" ? "row" : "column", gap: 10 }}>
+      {!bare && <div className="nv-cap" style={{ marginBottom: 8 }}>{label || t("lessons.question")}</div>}
+      {!bare && <h2 className="nv-disp" style={{ fontSize: "var(--t-title)", margin: "0 0 24px" }}>{x(step.q)}</h2>}
+      <div role="radiogroup" style={{ display: "flex", flexDirection: step.type === "tf" ? "row" : "column", gap: 12 }}>
         {opts.map((o, i) => {
           const sel = picked === o.v;
           const isAnswer = checked && o.v === step.answer;
@@ -102,12 +102,11 @@ export function QuestionView({ t, locale, step, picked, setPicked, checked, labe
               aria-checked={sel}
               disabled={!!checked}
               onClick={() => setPicked(o.v)}
-              className="nv-press"
-              style={{ flex: step.type === "tf" ? 1 : undefined, textAlign: "left", display: "flex", alignItems: "center", gap: 12, border: `2px ${isWrongPick ? "dashed" : "solid"} ${isAnswer ? "var(--right)" : isWrongPick ? "var(--warn)" : sel ? "var(--select)" : "transparent"}`, boxShadow: sel && !isAnswer && !isWrongPick ? SELECTED.boxShadow : undefined, background: isAnswer ? "var(--rightSoft)" : isWrongPick ? "var(--warnSoft)" : sel ? "var(--brandSoft)" : "var(--surface)", color: "var(--ink)", borderRadius: 8, padding: "15px 16px", fontSize: 17, fontWeight: 650, cursor: checked ? "default" : "pointer", minHeight: 58 }}
+              className="nv-press nv-opt"
+              style={{ flex: step.type === "tf" ? 1 : undefined, border: `2px ${isWrongPick ? "dashed" : "solid"} ${isAnswer ? "var(--right)" : isWrongPick ? "var(--warn)" : sel ? "var(--select)" : "var(--line)"}`, boxShadow: sel && !isAnswer && !isWrongPick ? SELECTED.boxShadow : undefined, background: isAnswer ? "var(--rightSoft)" : isWrongPick ? "var(--warnSoft)" : sel ? "var(--brandSoft)" : "var(--surface)" }}
             >
-              <span style={{ width: 28, height: 28, borderRadius: 8, border: "1px solid var(--line)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 650, color: "var(--low)", flexShrink: 0 }}>{i + 1}</span>
+              <span aria-hidden className={`nv-k${sel || isAnswer ? " on" : ""}`}>{sel || isAnswer ? <Icon name="check" size={16} stroke={3} /> : i + 1}</span>
               <span style={{ flex: 1 }}>{o.label}</span>
-              {sel && !checked && <Chosen />}
             </button>
           );
         })}
@@ -126,23 +125,23 @@ export function Feedback({ t, locale, step, picked, checked, note, heading, extr
   const miss = !right && step.type === "choice" && step.miss && step.miss[picked];
   const why = Array.isArray(step.why) ? step.why : [step.why];
   return (
-    <div className="nv-in" role="status" data-right={right} style={{ background: right ? "var(--rightSoft)" : "var(--warnSoft)", border: right ? "2px solid var(--right)" : "2px dashed var(--warn)", borderRadius: 10, padding: "14px 16px", marginBottom: 12 }}>
-      <div className="nv-disp" style={{ fontSize: 22, color: right ? "var(--right)" : "var(--warn)", display: "flex", alignItems: "center", gap: 8 }}>
+    <div className="nv-in nv-fb" role="status" data-right={right} style={{ background: right ? "var(--rightSoft)" : "var(--warnSoft)", border: right ? "2px solid var(--right)" : "2px dashed var(--warn)" }}>
+      <div className="nv-disp" style={{ fontSize: "var(--t-lead)", color: right ? "var(--right)" : "var(--warn)", display: "flex", alignItems: "center", gap: 8 }}>
         {/* A right answer: a soft ripple around the check, once. */}
         <span className={right ? "nv-ripple" : undefined} style={{ display: "inline-flex", borderRadius: "50%" }}>
           <Icon name={right ? "check" : "info"} size={22} stroke={right ? 3 : 2.2} />
         </span>
         {heading || (right ? t("lessons.correct") : t("lessons.wrong"))}
       </div>
-      {miss && <p style={{ margin: "6px 0 0", fontSize: 16, lineHeight: 1.5, fontWeight: 600 }}>{x(miss)}</p>}
-      {extra && <div style={{ fontSize: 15, lineHeight: 1.5 }}>{extra}</div>}
+      {miss && <p style={{ margin: "8px 0 0", fontWeight: 600 }}>{x(miss)}</p>}
+      {extra && <div>{extra}</div>}
       {why.map((w, i) => (
-        <p key={i} style={{ margin: "6px 0 0", fontSize: 16, lineHeight: 1.5 }}>
+        <p key={i} style={{ margin: "8px 0 0" }}>
           {i === 0 && !right && step.type === "choice" && `${t("lessons.answer_is", { answer: x(step.options[step.answer]) })} `}
           {x(w)}
         </p>
       ))}
-      {note && <p style={{ margin: "6px 0 0", fontSize: 14, color: "var(--mid)" }}>{note}</p>}
+      {note && <p style={{ margin: "8px 0 0", fontSize: "var(--t-sm)", color: "var(--mid)" }}>{note}</p>}
     </div>
   );
 }
@@ -151,13 +150,13 @@ export function Feedback({ t, locale, step, picked, checked, note, heading, extr
 
 // One shade per level, from the look (clearly distinct in light and dark).
 const SHADE = { new: "var(--surface2)", learning: "var(--level1)", solid: "var(--level2)", mastered: "var(--level3)" };
-const Dot = ({ level, size = 10 }) => <span aria-hidden style={{ width: size, height: size, borderRadius: 3, background: SHADE[level], flexShrink: 0, display: "inline-block" }} />;
+const Dot = ({ level, size = 10 }) => <span aria-hidden style={{ width: size, height: size, borderRadius: 12, background: SHADE[level], flexShrink: 0, display: "inline-block" }} />;
 function Meter({ level }) {
   const n = M.LEVELS.indexOf(level);
   return (
-    <span aria-hidden style={{ display: "inline-flex", gap: 3 }}>
+    <span aria-hidden style={{ display: "inline-flex", gap: 4 }}>
       {[1, 2, 3].map((i) => (
-        <span key={i} style={{ width: 14, height: 6, borderRadius: 3, background: i <= n ? SHADE[level] : "var(--surface2)" }} />
+        <span key={i} style={{ width: 14, height: 6, borderRadius: 12, background: i <= n ? SHADE[level] : "var(--surface2)" }} />
       ))}
     </span>
   );
@@ -172,20 +171,20 @@ export function ReviewCard({ t, locale, go }) {
   if (!ids.length) return null;
   const next = M.nextDue(concepts);
   return (
-    <Card style={{ marginTop: 14 }}>
+    <Card style={{ marginTop: 16 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-        <span style={{ width: 40, height: 40, borderRadius: 6, background: "var(--brandSoft)", color: "var(--brand)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+        <span style={{ width: 40, height: 40, borderRadius: 12, background: "var(--brandSoft)", color: "var(--brand)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
           <Icon name="refresh" size={20} />
         </span>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontWeight: 650, fontSize: 16 }}>{t("review.title")}</div>
-          <div style={{ fontSize: 13, color: "var(--mid)" }}>{due ? t("review.ready", { n: Math.min(due, M.REVIEW_SIZE) }) : t("review.caught_up", { date: next && next > today ? shortDate(next, locale) : "—" })}</div>
+          <div style={{ fontWeight: 600, fontSize: "var(--t-body)" }}>{t("review.title")}</div>
+          <div style={{ fontSize: "var(--t-sm)", color: "var(--mid)" }}>{due ? t("review.ready", { n: Math.min(due, M.REVIEW_SIZE) }) : t("review.caught_up", { date: next && next > today ? shortDate(next, locale) : "—" })}</div>
         </div>
         <Button size="md" kind={due ? "primary" : "secondary"} style={due ? undefined : { border: "1px solid var(--line)" }} onClick={() => go("lessons", { review: true })}>
           {due ? t("review.start") : t("review.anyway")}
         </Button>
       </div>
-      {due > 0 && <p style={{ fontSize: 13, color: "var(--mid)", margin: "10px 0 0" }}>{t("review.sub")}</p>}
+      {due > 0 && <p style={{ fontSize: "var(--t-sm)", color: "var(--mid)", margin: "12px 0 0" }}>{t("review.sub")}</p>}
     </Card>
   );
 }
@@ -204,29 +203,29 @@ export function SessionDone({ t, locale, mode, result, answers, onDone }) {
   const facts = [t("lessons.xp", { n: result.gained }), t("lessons.streak", { n: result.streak }), ...(result.goalJustMet ? [t("lessons.goal_met")] : [])];
   return (
     <>
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", gap: 18 }}>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", gap: 16 }}>
         <div style={{ textAlign: "center" }}>
-          <div style={{ width: 56, height: 56, borderRadius: 28, margin: "0 auto 14px", background: "var(--accentSoft)", color: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ width: 56, height: 56, borderRadius: 28, margin: "0 auto 16px", background: "var(--accentSoft)", color: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <Icon name="check" size={28} stroke={2.4} />
           </div>
-          <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: -0.4, margin: 0 }}>{t(mode === "challenge" ? "challenge.done" : "review.done")}</h1>
-          <p style={{ color: "var(--mid)", margin: "6px 0 0" }}>{t("challenge.score", { right, total: answers.length })}</p>
-          <p style={{ fontSize: 14, color: "var(--mid)", margin: "10px 0 0" }}>{facts.join("  ·  ")}</p>
+          <h1 style={{ fontSize: "var(--t-head)", fontWeight: 700, letterSpacing: -0.4, margin: 0 }}>{t(mode === "challenge" ? "challenge.done" : "review.done")}</h1>
+          <p style={{ color: "var(--mid)", margin: "8px 0 0" }}>{t("challenge.score", { right, total: answers.length })}</p>
+          <p style={{ fontSize: "var(--t-sm)", color: "var(--mid)", margin: "12px 0 0" }}>{facts.join("  ·  ")}</p>
         </div>
         <Card pad="4px 18px">
           {ids.map((c, i) => {
             const level = M.levelOf(concepts[c]);
             return (
               <div key={c} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 0", borderTop: i ? "1px solid var(--line)" : "none" }}>
-                <span style={{ flex: 1, fontSize: 15 }}>{x(conceptById(c).name)}</span>
+                <span style={{ flex: 1, fontSize: "var(--t-body)" }}>{x(conceptById(c).name)}</span>
                 <Meter level={level} />
-                <span style={{ fontSize: 13, color: "var(--mid)", width: 84, textAlign: "right" }}>{level === "new" ? "" : t(`level.${level}`)}</span>
+                <span style={{ fontSize: "var(--t-sm)", color: "var(--mid)", width: 84, textAlign: "right" }}>{level === "new" ? "" : t(`level.${level}`)}</span>
               </div>
             );
           })}
         </Card>
         {result.badges.length > 0 && (
-          <div style={{ fontSize: 14, color: "var(--mid)", lineHeight: 1.6, textAlign: "center" }}>
+          <div style={{ fontSize: "var(--t-sm)", color: "var(--mid)", lineHeight: 1.5, textAlign: "center" }}>
             {result.badges.map((id) => (
               <div key={id}>{t("badge.earned", { name: t(`badge.${id}`) })}</div>
             ))}
@@ -252,19 +251,19 @@ export function SkillsCard({ t, locale }) {
     <>
       <Label>{t("skills.title")}</Label>
       <Card>
-        <p style={{ fontSize: 14, color: "var(--mid)", margin: "0 0 12px", lineHeight: 1.45 }}>{t("skills.sub")}</p>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "6px 14px", marginBottom: 12 }}>
+        <p style={{ fontSize: "var(--t-sm)", color: "var(--mid)", margin: "0 0 12px", lineHeight: 1.5 }}>{t("skills.sub")}</p>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "8px 16px", marginBottom: 12 }}>
           {[...M.LEVELS].reverse().map((l) => (
-            <span key={l} style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, color: "var(--mid)", fontVariantNumeric: "tabular-nums" }}>
+            <span key={l} style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: "var(--t-sm)", color: "var(--mid)", fontVariantNumeric: "tabular-nums" }}>
               <Dot level={l} />
-              {t(`level.${l}`)} <strong style={{ color: "var(--ink)", fontWeight: 650 }}>{counts[l]}</strong>
+              {t(`level.${l}`)} <strong style={{ color: "var(--ink)", fontWeight: 600 }}>{counts[l]}</strong>
             </span>
           ))}
         </div>
         {UNITS.map((u, i) => (
-          <div key={u.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "9px 0", borderTop: "1px solid var(--line)" }}>
-            <span style={{ flex: 1, fontSize: 15, minWidth: 0 }}>
-              <span style={{ color: "var(--low)", fontSize: 13, marginRight: 6, fontVariantNumeric: "tabular-nums" }}>{i + 1}</span>
+          <div key={u.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "8px 0", borderTop: "1px solid var(--line)" }}>
+            <span style={{ flex: 1, fontSize: "var(--t-body)", minWidth: 0 }}>
+              <span style={{ color: "var(--low)", fontSize: "var(--t-sm)", marginRight: 8, fontVariantNumeric: "tabular-nums" }}>{i + 1}</span>
               {x(u.title)}
             </span>
             <span style={{ display: "inline-flex", gap: 4 }} role="img" aria-label={conceptsOfUnit(u.id).map((c) => `${x(conceptById(c).name)}: ${t(`level.${levelOf(c)}`)}`).join(", ")}>
@@ -280,14 +279,14 @@ export function SkillsCard({ t, locale }) {
       </Card>
       <Sheet open={open} onClose={() => setOpen(false)} title={t("skills.title")} tall>
         {UNITS.map((u) => (
-          <div key={u.id} style={{ marginBottom: 14 }}>
-            <div style={{ fontSize: 13, fontWeight: 650, color: "var(--low)", marginBottom: 4 }}>{x(u.title)}</div>
+          <div key={u.id} style={{ marginBottom: 16 }}>
+            <div style={{ fontSize: "var(--t-sm)", fontWeight: 600, color: "var(--low)", marginBottom: 4 }}>{x(u.title)}</div>
             <Card pad="2px 16px">
               {conceptsOfUnit(u.id).map((c, i) => (
-                <div key={c} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 0", borderTop: i ? "1px solid var(--line)" : "none" }}>
-                  <span style={{ flex: 1, fontSize: 15 }}>{x(conceptById(c).name)}</span>
+                <div key={c} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 0", borderTop: i ? "1px solid var(--line)" : "none" }}>
+                  <span style={{ flex: 1, fontSize: "var(--t-body)" }}>{x(conceptById(c).name)}</span>
                   <Meter level={levelOf(c)} />
-                  <span style={{ fontSize: 13, color: "var(--mid)", width: 84, textAlign: "right" }}>{levelOf(c) === "new" ? "" : t(`level.${levelOf(c)}`)}</span>
+                  <span style={{ fontSize: "var(--t-sm)", color: "var(--mid)", width: 84, textAlign: "right" }}>{levelOf(c) === "new" ? "" : t(`level.${levelOf(c)}`)}</span>
                 </div>
               ))}
             </Card>
@@ -305,7 +304,7 @@ const PLACEMENT_UNITS = PLACEMENT.map((c) => conceptById(c).unit);
 export function SkipAhead({ t, locale, startUnit, onClose, go }) {
   const head = (title, sub) => (
     <>
-      <h2 className="nv-disp" style={{ fontSize: 26, margin: "0 0 6px" }}>{title}</h2>
+      <h2 className="nv-disp" style={{ fontSize: "var(--t-head)", margin: "0 0 8px" }}>{title}</h2>
       {sub && <p style={{ margin: "0 0 16px", color: "var(--mid)" }}>{sub}</p>}
     </>
   );
@@ -367,10 +366,10 @@ export function Placement({ t, locale, header, startUnit, onNext, begin = "ask" 
     setPhase("result");
   };
   const option = (key, label, sub, onClick) => (
-    <button key={key} onClick={onClick} className="nv-press" style={{ display: "flex", alignItems: "center", gap: 14, width: "100%", textAlign: "left", border: "1px solid var(--line)", background: "var(--surface)", color: "var(--ink)", borderRadius: 8, padding: "14px 16px", marginBottom: 10, cursor: "pointer", minHeight: 64 }}>
+    <button key={key} onClick={onClick} className="nv-press" style={{ display: "flex", alignItems: "center", gap: 16, width: "100%", textAlign: "left", border: "1px solid var(--line)", background: "var(--surface)", color: "var(--ink)", borderRadius: 12, padding: "16px 16px", marginBottom: 12, cursor: "pointer", minHeight: 64 }}>
       <span style={{ flex: 1 }}>
-        <span style={{ display: "block", fontSize: 16, fontWeight: 650 }}>{label}</span>
-        <span style={{ display: "block", fontSize: 14, color: "var(--mid)", marginTop: 2 }}>{sub}</span>
+        <span style={{ display: "block", fontSize: "var(--t-body)", fontWeight: 600 }}>{label}</span>
+        <span style={{ display: "block", fontSize: "var(--t-sm)", color: "var(--mid)", marginTop: 4 }}>{sub}</span>
       </span>
       <Icon name="next" size={18} color="var(--low)" />
     </button>
@@ -385,7 +384,7 @@ export function Placement({ t, locale, header, startUnit, onNext, begin = "ask" 
         {plan && (
           <Card style={{ marginTop: 12 }}>
             <div style={{ fontWeight: 700, marginBottom: 4 }}>{t("place.why")}</div>
-            <p style={{ margin: 0, fontSize: 15, lineHeight: 1.5 }}>{t("place.why.body", { name: plan.name, units: new Intl.ListFormat(locale.lang, { type: "conjunction" }).format(plan.units.map((u) => x(UNITS.find((v) => v.id === u).title))) })}</p>
+            <p style={{ margin: 0, fontSize: "var(--t-body)", lineHeight: 1.5 }}>{t("place.why.body", { name: plan.name, units: new Intl.ListFormat(locale.lang, { type: "conjunction" }).format(plan.units.map((u) => x(UNITS.find((v) => v.id === u).title))) })}</p>
           </Card>
         )}
       </>
@@ -398,9 +397,9 @@ export function Placement({ t, locale, header, startUnit, onNext, begin = "ask" 
         {units.length > 0 && (
           <Card pad="4px 18px" style={{ marginBottom: 16 }}>
             {units.map((u, i) => (
-              <div key={u} style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 0", borderTop: i ? "1px solid var(--line)" : "none" }}>
+              <div key={u} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 0", borderTop: i ? "1px solid var(--line)" : "none" }}>
                 <Icon name="check" size={18} color="var(--accent)" stroke={2.4} />
-                <span style={{ fontSize: 15 }}>{x(UNITS.find((v) => v.id === u).title)}</span>
+                <span style={{ fontSize: "var(--t-body)" }}>{x(UNITS.find((v) => v.id === u).title)}</span>
               </div>
             ))}
           </Card>
@@ -434,7 +433,7 @@ export function Placement({ t, locale, header, startUnit, onNext, begin = "ask" 
       <div key={results.length} className="nv-in" style={{ flex: 1 }}>
         <QuestionView t={t} locale={locale} step={step} picked={picked} setPicked={setPicked} checked={checked} label={x(UNITS.find((u) => u.id === PLACEMENT_UNITS[results.length]).title)} />
       </div>
-      <div style={{ paddingTop: 14 }}>
+      <div style={{ paddingTop: 16 }}>
         {checked && <Feedback t={t} locale={locale} step={step} picked={picked} checked={checked} />}
         {checked ? (
           <Button full onClick={next}>

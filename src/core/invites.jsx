@@ -103,14 +103,14 @@ export function InviteCard({ t, session }) {
       <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
         <Icon name="users" size={24} color="var(--mid)" />
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontWeight: 650 }}>{t("inv.title")}</div>
-          <p style={{ fontSize: 14, color: "var(--mid)", lineHeight: 1.45, margin: "2px 0 0" }}>{t("inv.body")}</p>
+          <div style={{ fontWeight: 600 }}>{t("inv.title")}</div>
+          <p style={{ fontSize: "var(--t-sm)", color: "var(--mid)", lineHeight: 1.5, margin: "4px 0 0" }}>{t("inv.body")}</p>
         </div>
       </div>
       {url ? (
         <>
-          <div style={{ marginTop: 12, padding: "10px 12px", borderRadius: 8, background: "var(--surface2)", fontSize: 14, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{url}</div>
-          <div style={{ display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap" }}>
+          <div style={{ marginTop: 12, padding: "12px 12px", borderRadius: 12, background: "var(--surface2)", fontSize: "var(--t-sm)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{url}</div>
+          <div style={{ display: "flex", gap: 8, marginTop: 12, flexWrap: "wrap" }}>
             <Button size="md" kind="secondary" onClick={() => navigator.clipboard.writeText(url).then(() => toast(t("inv.copied"), "good"), () => {})}>
               <Icon name="copy" size={18} /> {t("inv.copy")}
             </Button>
@@ -120,10 +120,10 @@ export function InviteCard({ t, session }) {
               </Button>
             )}
           </div>
-          {g.friendsJoined > 0 && <p style={{ fontSize: 14, color: "var(--mid)", margin: "10px 0 0" }}>{t("inv.joined", { n: g.friendsJoined })}</p>}
+          {g.friendsJoined > 0 && <p style={{ fontSize: "var(--t-sm)", color: "var(--mid)", margin: "12px 0 0" }}>{t("inv.joined", { n: g.friendsJoined })}</p>}
         </>
       ) : failed ? (
-        <p style={{ fontSize: 14, color: "var(--mid)", margin: "10px 0 0" }}>{t("inv.offline")}</p>
+        <p style={{ fontSize: "var(--t-sm)", color: "var(--mid)", margin: "12px 0 0" }}>{t("inv.offline")}</p>
       ) : (
         <Button size="md" kind="secondary" style={{ marginTop: 12 }} onClick={() => ensureInvite().catch(() => setFailed(true))}>
           {t("inv.get")}
@@ -145,9 +145,9 @@ export function FriendOffer({ t, session, onAdded }) {
       (e) => setError(e.message)
     );
   return (
-    <Card style={{ marginBottom: 10 }}>
-      <div style={{ fontWeight: 650 }}>{t("inv.friend.title")}</div>
-      <p style={{ fontSize: 14, color: "var(--mid)", lineHeight: 1.45, margin: "4px 0 12px" }}>{error || t("inv.friend.body")}</p>
+    <Card style={{ marginBottom: 12 }}>
+      <div style={{ fontWeight: 600 }}>{t("inv.friend.title")}</div>
+      <p style={{ fontSize: "var(--t-sm)", color: "var(--mid)", lineHeight: 1.5, margin: "4px 0 12px" }}>{error || t("inv.friend.body")}</p>
       <div style={{ display: "flex", gap: 8 }}>
         {!error && (
           <Button size="md" onClick={add}>

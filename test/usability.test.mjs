@@ -46,15 +46,15 @@ try {
     const { page, top } = app;
     await page.getByRole("button", { name: /^Start/ }).first().click();
     await top().getByText("Idea", { exact: true }).waitFor();
-    const caption = await top().locator("div", { hasText: /^What's a budget\? · 1 of \d+$/ }).count();
-    assert.ok(caption > 0, `${name}: the lesson title and "1 of N" show above the card`);
+    assert.ok(await top().locator("div", { hasText: /^IDEA · What's a budget\?$|^Idea · What's a budget\?$/ }).count(), `${name}: the card says it's an idea, and which lesson`);
+    assert.equal(await top().getByText(/^1 of \d+$/).count(), 1, `${name}: the header says "1 of N"`);
     const heading = await top().getByRole("heading", { level: 2 }).first().boundingBox();
     const go = await top().getByRole("button", { name: "Continue", exact: true }).boundingBox();
     if (name === "laptop") assert.ok(go.y - (heading.y + heading.height) < 330, `${name}: Continue is under the text, not at the bottom of the window (${Math.round(go.y - heading.y)}px below the heading)`);
     else assert.ok(go.y + go.height <= 844, `${name}: Continue is on screen`);
     await top().getByRole("button", { name: "Continue", exact: true }).click();
     await page.waitForTimeout(150);
-    assert.ok(await top().locator("div", { hasText: /^What's a budget\? · 2 of \d+$/ }).count(), `${name}: the count moves on`);
+    assert.equal(await top().getByText(/^2 of \d+$/).count(), 1, `${name}: the count moves on`);
     await app.close();
   }
   ok("items 10 and 22: each step says which lesson and which step it is; idea cards are labelled; Continue sits under the text on a computer");
@@ -93,7 +93,7 @@ try {
     await app.page.getByRole("heading", { name: "Today" }).waitFor();
     await app.page.waitForTimeout(300);
     const h = await app.page.evaluate(() => document.documentElement.scrollHeight);
-    assert.ok(h < 3200, `Today on a laptop is ${h}px tall (it was 6,100)`);
+    assert.ok(h < 3500, `Today on a laptop is ${h}px tall (it was 6,100; the design system's larger type and spacing added a little to the 3,200 it settled at)`);
     assert.ok(await app.page.getByRole("button", { name: /^Show \d+ more units$/ }).count(), "\"Show more units\" on a computer too");
     await app.close();
   }
@@ -261,7 +261,7 @@ try {
     const { page } = app;
     await page.getByRole("navigation").getByRole("button", { name: "Me" }).click();
     await page.getByRole("button", { name: "Settings" }).click();
-    await page.getByRole("button", { name: "More" }).click().catch(() => {});
+    await page.getByRole("button", { name: "About", exact: true }).click();
     await page.locator("[data-build]").waitFor();
     assert.match(await page.locator("[data-build]").innerText(), /^Version [0-9a-f]{7,}\+?, built \d{4}-\d{2}-\d{2}$|^Version unknown, built \d{4}-\d{2}-\d{2}$/);
     await app.close();

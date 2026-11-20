@@ -1,6 +1,7 @@
 // DRAWING A CERTIFICATE — an image (PNG) and a one-page PDF, made on the
 // device from the text it's given. Loaded when someone opens a certificate, so
 // it isn't part of starting the app.
+import { COLORS, TINTS } from "../../core/colors.js";
 import { FONT, SERIF, MARK_PATHS } from "../../core/ui.jsx";
 
 export const CERT_W = 1600;
@@ -36,9 +37,9 @@ export async function drawCertificate(lines, type = "image/png", quality = 0.92)
   c.width = CERT_W;
   c.height = CERT_H;
   const x = c.getContext("2d");
-  const NAVY = cv("--ink", "#1B3560"); // the text color
-  const CREAM = cv("--bg", "#F7F2E8"); // the paper
-  const SAND = cv("--line", "#E3CFA4"); // the quiet rules
+  const NAVY = cv("--ink", COLORS.navy.hex); // the text color
+  const CREAM = cv("--bg", COLORS.cream.hex); // the paper
+  const SAND = cv("--line", TINTS.creamLine); // the quiet rules
   x.fillStyle = CREAM;
   x.fillRect(0, 0, CERT_W, CERT_H);
   x.strokeStyle = NAVY;

@@ -24,12 +24,12 @@ function Md({ text }) {
     }
     list = null;
     const h = /^(#{1,3}) (.*)$/.exec(line);
-    if (h) out.push(h[1].length === 1 ? <h1 key={i} style={{ fontSize: 26, fontWeight: 700, letterSpacing: -0.4, margin: "0 0 10px" }}>{h[2]}</h1> : <h2 key={i} style={{ fontSize: 17, fontWeight: 700, margin: "22px 0 6px" }}>{h[2]}</h2>);
-    else if (line.trim()) out.push(<p key={i} style={{ margin: "0 0 10px", lineHeight: 1.55 }}>{inline(line)}</p>);
+    if (h) out.push(h[1].length === 1 ? <h1 key={i} style={{ fontSize: "var(--t-head)", fontWeight: 700, letterSpacing: -0.4, margin: "0 0 12px" }}>{h[2]}</h1> : <h2 key={i} style={{ fontSize: "var(--t-lead)", fontWeight: 700, margin: "24px 0 8px" }}>{h[2]}</h2>);
+    else if (line.trim()) out.push(<p key={i} style={{ margin: "0 0 12px", lineHeight: 1.5 }}>{inline(line)}</p>);
   });
   return out.map((x) =>
     x.items ? (
-      <ul key={x.key} style={{ margin: "0 0 10px", paddingLeft: 22, lineHeight: 1.55 }}>
+      <ul key={x.key} style={{ margin: "0 0 12px", paddingLeft: 24, lineHeight: 1.5 }}>
         {x.items.map((it, j) => (
           <li key={j} style={{ marginBottom: 4 }}>{inline(it)}</li>
         ))}
@@ -54,7 +54,7 @@ export default function Legal({ route, locale, go, t }) {
   }, [load]);
   return (
     <div>
-      <article style={{ fontSize: 15 }}>{text ? <Md text={text} /> : text === false ? <p role="alert">{t("common.load_error")}</p> : <Loading label={t("common.loading")} />}</article>
+      <article style={{ fontSize: "var(--t-body)" }}>{text ? <Md text={text} /> : text === false ? <p role="alert">{t("common.load_error")}</p> : <Loading label={t("common.loading")} />}</article>
     </div>
   );
 }

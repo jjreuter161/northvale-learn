@@ -1,5 +1,5 @@
 // UNIT — Saving. Its lessons and the concepts they teach (format in helpers.js).
-import { T, card, choice, tf, act, concept, order, match, number, scenario, fit } from "./helpers.js";
+import { T, card, example, choice, tf, act, concept, order, match, number, scenario, fit } from "./helpers.js";
 
 export default {
   id: "save",
@@ -55,7 +55,7 @@ export default {
       title: T("Pay yourself first", "Págate a ti primero"),
       life: T("Next payday, move your savings first, before anything else gets a chance at it.", "El próximo día de pago, aparta tu ahorro primero, antes de que otra cosa lo alcance."),
       steps: [
-        card(T("Save first, spend the rest", "Primero ahorra, luego gasta"), T("Most people save what's left at the end of the month — which is usually nothing. Flip it: the moment money comes in, move your savings out first. Then spend what's left.", "Mucha gente ahorra lo que sobra a fin de mes, que casi siempre es nada. Voltéalo: en cuanto te llegue dinero, aparta primero tu ahorro. Luego gasta lo que queda.")),
+        card(T("Save first, spend the rest", "Primero ahorra, luego gasta"), T("Most people save what's left at the end of the month — which is usually nothing. Flip it: the moment money comes in, move your savings out first. Then spend what's left.", "Mucha gente ahorra lo que sobra a fin de mes, que casi siempre es nada. Voltéalo: en cuanto te llegue dinero, aparta primero tu ahorro. Luego gasta lo que queda."), example([T("Payday", "Día de pago"), T("{$1000|15000}", "{$1000|15000}")], [[T("Save first", "Ahorras primero"), T("{$100|1500}", "{$100|1500}"), 10], [T("Spend the rest", "Gastas el resto"), T("{$900|13500}", "{$900|13500}"), 90]])),
         card(T("Make it automatic", "Hazlo automático"), T("An automatic transfer on payday means you don't have to remember — or resist. Even a small amount builds the habit.", "Una transferencia automática el día de pago hace que no tengas que acordarte ni aguantarte las ganas. Aunque sea poco, construyes el hábito.")),
         choice(
           "pay_yourself_first",

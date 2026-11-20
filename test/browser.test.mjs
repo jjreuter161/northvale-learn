@@ -467,7 +467,7 @@ try {
     await top().getByText(/· 7-day streak$/).waitFor();
     await button("Done", top()).click();
     await menu("Settings");
-    await button(/^More/).click(); // sound is tucked under More
+    await button("Sound and feel").click(); // sound has its own page
     const sound = page.getByRole("switch", { name: "Sounds" });
     assert.equal(await sound.getAttribute("aria-checked"), "false", "sounds are off by default");
     assert.equal(await page.getByRole("switch", { name: "Vibration" }).getAttribute("aria-checked"), "true", "vibration is on by default where it works");
@@ -1043,6 +1043,7 @@ const lessons = Object.fromEntries(track.map((id) => [id, { done: true, at: day(
     // Reminders, in Settings: times outside quiet hours by default.
     await button("Done", top()).click();
     await menu("Settings");
+    await button("Learning").click();
     await page.getByText("Turn on reminders").waitFor();
     const times = await page.getByRole("combobox", { name: "Time" }).evaluate((s) => [...s.options].map((o) => o.value));
     assert.equal(times[0], "08:00");
@@ -1270,6 +1271,7 @@ const lessons = Object.fromEntries(track.map((id) => [id, { done: true, at: day(
     await play(app);
     await button("Done", app.top()).click();
     await menu("Settings");
+    await button("Account").click();
     await button("I already have an account").click();
     await page.getByLabel("Email", { exact: true }).fill("kim@example.test");
     await page.getByLabel("Password", { exact: true }).fill("a long enough password");

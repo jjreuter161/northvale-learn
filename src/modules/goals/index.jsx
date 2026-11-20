@@ -307,7 +307,7 @@ function useDailyBookkeeping(rows, holdings, onMilestone) {
 const TONE = { on_track: ["var(--brandSoft)", "var(--brand)"], ahead: ["var(--accentSoft)", "var(--accent)"], done: ["var(--accent)", "var(--onBrand)"], behind: ["var(--warnSoft)", "var(--warn)"], paused: ["var(--surface2)", "var(--mid)"] };
 function StatusPill({ t, status }) {
   const [bg, fg] = TONE[status];
-  return <span style={{ fontSize: 12, fontWeight: 650, background: bg, color: fg, borderRadius: 8, padding: "4px 10px", whiteSpace: "nowrap", letterSpacing: 0.1 }}>{t(`status.${status}`)}</span>;
+  return <span className="nv-tag" style={{ background: bg, color: fg }}>{t(`status.${status}`)}</span>;
 }
 
 const NUM = { fontVariantNumeric: "tabular-nums" };
@@ -315,9 +315,9 @@ const NUM = { fontVariantNumeric: "tabular-nums" };
 // Saved (solid) and, faintly beyond it, with linked practice investments.
 function Bar({ pct, pctWithInvest = pct, height }) {
   return (
-    <div role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(pct)} style={{ position: "relative", height, borderRadius: height, background: "var(--surface2)", overflow: "hidden" }}>
+    <div role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(pct)} style={{ position: "relative", height, borderRadius: 999, background: "var(--line)", overflow: "hidden" }}>
       {pctWithInvest > pct && <div style={{ position: "absolute", top: 0, bottom: 0, left: 0, width: `${pctWithInvest}%`, background: "var(--accent)", opacity: 0.3 }} />}
-      <div style={{ position: "absolute", top: 0, bottom: 0, left: 0, width: `${pct}%`, background: "var(--accent)", borderRadius: height, transition: "width .6s cubic-bezier(.2,.7,.2,1)" }} />
+      <div style={{ position: "absolute", top: 0, bottom: 0, left: 0, width: `${pct}%`, background: "var(--accent)", borderRadius: 999, transition: "width var(--m-sheet) ease-out" }} />
     </div>
   );
 }
@@ -326,13 +326,13 @@ function Bar({ pct, pctWithInvest = pct, height }) {
 function VoyageBar({ pct, pctWithInvest = pct }) {
   const p = Math.max(0, Math.min(100, pct));
   const pi = Math.max(p, Math.min(100, pctWithInvest));
-  const ease = "cubic-bezier(.2,.7,.2,1)";
+  const ease = "ease-out";
   return (
-    <div role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(pct)} style={{ position: "relative", height: 42, margin: "4px 34px 0 6px" }}>
+    <div role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(pct)} style={{ position: "relative", height: 42, margin: "4px 32px 0 8px" }}>
       <div style={{ position: "absolute", left: 0, right: 0, top: 27, borderTop: "3px dotted var(--artSea2)" }} />
-      {pi > p && <div style={{ position: "absolute", left: 0, top: 26, height: 6, width: `${pi}%`, background: "var(--accent)", opacity: 0.3, borderRadius: 3 }} />}
-      <div style={{ position: "absolute", left: 0, top: 26, height: 6, width: `${p}%`, background: "var(--accent)", borderRadius: 3, transition: `width .6s ${ease}` }} />
-      <span aria-hidden="true" style={{ position: "absolute", top: 1, left: `calc(${p}% - 14px)`, transition: `left .6s ${ease}` }}>
+      {pi > p && <div style={{ position: "absolute", left: 0, top: 26, height: 6, width: `${pi}%`, background: "var(--accent)", opacity: 0.3, borderRadius: 12 }} />}
+      <div style={{ position: "absolute", left: 0, top: 26, height: 6, width: `${p}%`, background: "var(--accent)", borderRadius: 12, transition: `width var(--m-sheet) ${ease}` }} />
+      <span aria-hidden="true" style={{ position: "absolute", top: 1, left: `calc(${p}% - 14px)`, transition: `left var(--m-sheet) ${ease}` }}>
         <Mark size={28} color="var(--artInk)" />
       </span>
       <svg aria-hidden="true" width="40" height="34" viewBox="-20 -26 40 34" style={{ position: "absolute", right: -36, top: 2 }}>
@@ -348,16 +348,16 @@ function Approx({ t, locale, g, amount, fx }) {
   const to = P.currencyOf(locale.region);
   const v = g.currency !== to && fx ? P.convert(amount, g.currency, to, fx.rate) : null;
   if (v == null) return null;
-  return <div style={{ fontSize: 13, color: "var(--low)", marginTop: 2, ...NUM }}>{t(fx.sample ? "goal.approx.sample" : "goal.approx", { amount: money(v, locale) })}</div>;
+  return <div style={{ fontSize: "var(--t-sm)", color: "var(--low)", marginTop: 4, ...NUM }}>{t(fx.sample ? "goal.approx.sample" : "goal.approx", { amount: money(v, locale) })}</div>;
 }
 // The separate line: saved plus linked practice investments (its swatch
 // matches the faint part of the bar).
 const InvestLine = ({ t, row, fmt }) =>
   row.linked > 0 ? (
-    <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8, fontSize: 14, color: "var(--mid)", ...NUM }}>
-      <span style={{ width: 10, height: 10, borderRadius: 3, background: "var(--accent)", opacity: 0.3, flexShrink: 0 }} />
+    <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8, fontSize: "var(--t-sm)", color: "var(--mid)", ...NUM }}>
+      <span style={{ width: 10, height: 10, borderRadius: 12, background: "var(--accent)", opacity: 0.3, flexShrink: 0 }} />
       <span style={{ flex: 1 }}>{t("goal.with_invest")}</span>
-      <span style={{ color: "var(--ink)", fontWeight: 650 }}>{fmt(row.withInvest)}</span>
+      <span style={{ color: "var(--ink)", fontWeight: 600 }}>{fmt(row.withInvest)}</span>
       <span>· {Math.floor(row.pctWithInvest)}%</span>
     </div>
   ) : null;
@@ -368,7 +368,7 @@ const timeLeft = (t, g) => {
 
 function TemplateIcon({ id, size = 40 }) {
   return (
-    <span style={{ width: size, height: size, borderRadius: 6, background: "var(--brandSoft)", color: "var(--brand)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+    <span style={{ width: size, height: size, borderRadius: 12, background: "var(--brandSoft)", color: "var(--brand)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
       <Icon name={P.template(id).icon} size={size / 2} />
     </span>
   );
@@ -376,13 +376,13 @@ function TemplateIcon({ id, size = 40 }) {
 
 function TemplateGrid({ t, onPick, highlight }) {
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 10 }}>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 12 }}>
       {P.TEMPLATES.map((tp) => (
-        <button key={tp.id} onClick={() => onPick(tp.id)} className="nv-press" style={{ textAlign: "left", ...(highlight === tp.id ? SELECTED : { border: "1px solid var(--line)" }), background: "var(--surface)", color: "var(--ink)", borderRadius: 8, padding: 14, cursor: "pointer", minHeight: 112, display: "flex", flexDirection: "column", gap: 10 }}>
+        <button key={tp.id} onClick={() => onPick(tp.id)} className="nv-press" style={{ textAlign: "left", ...(highlight === tp.id ? SELECTED : { border: "1px solid var(--line)" }), background: "var(--surface)", color: "var(--ink)", borderRadius: 12, padding: 16, cursor: "pointer", minHeight: 112, display: "flex", flexDirection: "column", gap: 12 }}>
           <TemplateIcon id={tp.id} size={36} />
           <span>
-            <span style={{ display: "block", fontWeight: 650, fontSize: 15 }}>{t(`tpl.${tp.id}`)}</span>
-            <span style={{ display: "block", fontSize: 13, color: "var(--mid)", marginTop: 2, lineHeight: 1.35 }}>{t(`tpl.${tp.id}.sub`)}</span>
+            <span style={{ display: "block", fontWeight: 600, fontSize: "var(--t-body)" }}>{t(`tpl.${tp.id}`)}</span>
+            <span style={{ display: "block", fontSize: "var(--t-sm)", color: "var(--mid)", marginTop: 4, lineHeight: 1.5 }}>{t(`tpl.${tp.id}.sub`)}</span>
           </span>
         </button>
       ))}
@@ -417,16 +417,16 @@ function GoalForm({ t, locale, templateId = "custom", goal, preset = {}, onSave,
       <Slider label={t("edit.when")} value={months} min={1} max={120} onChange={setMonths} display={`${dur(t, months)} · ${shortDate(preview.targetDate, { ...locale, year: true })}`} />
       {!simple && (
         <>
-          <div style={{ fontSize: 14, fontWeight: 650, color: "var(--mid)", marginBottom: 6 }}>{t("edit.where")}</div>
+          <div style={{ fontSize: "var(--t-sm)", fontWeight: 600, color: "var(--mid)", marginBottom: 8 }}>{t("edit.where")}</div>
           <Segmented label={t("edit.where")} value={path} onChange={setPath} options={PATHS.map((p) => ({ value: p, label: pathLabel(t, p, R) }))} />
         </>
       )}
-      <Card style={{ margin: "14px 0" }}>
-        <div style={{ fontSize: 26, fontWeight: 700, letterSpacing: -0.5, ...NUM }}>{t("edit.result", { amount: fmt(preview.monthly) })}</div>
-        <div style={{ fontSize: 14, color: "var(--mid)", marginTop: 2 }}>{t("edit.result.week", { amount: fmt(Math.ceil((preview.monthly * 12) / 52)), date: shortDate(preview.targetDate, { ...locale, year: true }) })}</div>
-        <p style={{ fontSize: 13, color: "var(--low)", lineHeight: 1.45, margin: "10px 0 0" }}>{t(R === "MX" ? "goals.rates.MX" : "goals.rates", { save: rates.save, invest: rates.invest, low: rates.investLow, high: rates.investHigh })}</p>
+      <Card style={{ margin: "16px 0" }}>
+        <div style={{ fontSize: "var(--t-head)", fontWeight: 700, letterSpacing: -0.5, ...NUM }}>{t("edit.result", { amount: fmt(preview.monthly) })}</div>
+        <div style={{ fontSize: "var(--t-sm)", color: "var(--mid)", marginTop: 4 }}>{t("edit.result.week", { amount: fmt(Math.ceil((preview.monthly * 12) / 52)), date: shortDate(preview.targetDate, { ...locale, year: true }) })}</div>
+        <p style={{ fontSize: "var(--t-sm)", color: "var(--low)", lineHeight: 1.5, margin: "12px 0 0" }}>{t(R === "MX" ? "goals.rates.MX" : "goals.rates", { save: rates.save, invest: rates.invest, low: rates.investLow, high: rates.investHigh })}</p>
       </Card>
-      {goal && <p style={{ fontSize: 13, color: "var(--mid)", margin: "0 0 12px" }}>{t("edit.replan")}</p>}
+      {goal && <p style={{ fontSize: "var(--t-sm)", color: "var(--mid)", margin: "0 0 12px" }}>{t("edit.replan")}</p>}
       <Button full disabled={askName && !name.trim()} onClick={() => onSave({ templateId: tpl.id, name: name.trim(), target, months, start: Math.min(start, target), path, targetDate: preview.targetDate })}>
         {saveLabel || (goal ? t("edit.save") : t("edit.create"))}
       </Button>
@@ -486,8 +486,8 @@ function RecordSheet({ t, locale, open, onClose, goals, goalId }) {
     <Sheet open={open} onClose={onClose} title={t("goal.record.title")}>
       {goals.length > 1 && (
         <div style={{ marginBottom: 12 }}>
-          <div style={{ fontSize: 14, fontWeight: 650, color: "var(--mid)", marginBottom: 6 }}>{t("goal.record.which")}</div>
-          <select value={which || ""} onChange={(e) => setWhich(e.target.value)} aria-label={t("goal.record.which")} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 6, background: "var(--surface)", color: "var(--ink)", padding: "12px 14px", fontSize: 16, minHeight: 48 }}>
+          <div style={{ fontSize: "var(--t-sm)", fontWeight: 600, color: "var(--mid)", marginBottom: 8 }}>{t("goal.record.which")}</div>
+          <select value={which || ""} onChange={(e) => setWhich(e.target.value)} aria-label={t("goal.record.which")} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 12, background: "var(--surface)", color: "var(--ink)", padding: "12px 16px", fontSize: "var(--t-body)", minHeight: 48 }}>
             {goals.map((g) => (
               <option key={g.id} value={g.id}>
                 {nameOf(g, t)}
@@ -496,12 +496,12 @@ function RecordSheet({ t, locale, open, onClose, goals, goalId }) {
           </select>
         </div>
       )}
-      <Field label={t("goal.record.amount")} inputMode="decimal" value={value} onChange={(e) => setValue(e.target.value)} placeholder={sel ? money(amt([50, 500], P.regionOf(sel)), { ...locale, currency: sel.currency }) : ""} autoFocus style={{ fontSize: 22, fontWeight: 650, ...NUM }} />
-      <label style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 15, marginBottom: 14, minHeight: 44, cursor: "pointer" }}>
+      <Field label={t("goal.record.amount")} inputMode="decimal" value={value} onChange={(e) => setValue(e.target.value)} placeholder={sel ? money(amt([50, 500], P.regionOf(sel)), { ...locale, currency: sel.currency }) : ""} autoFocus style={{ fontSize: "var(--t-title)", fontWeight: 600, ...NUM }} />
+      <label style={{ display: "flex", alignItems: "center", gap: 12, fontSize: "var(--t-body)", marginBottom: 16, minHeight: 44, cursor: "pointer" }}>
         <input type="checkbox" checked={out} onChange={(e) => setOut(e.target.checked)} style={{ width: 20, height: 20, accentColor: "var(--brand)" }} />
         {t("goal.record.out")}
       </label>
-      <Note icon="info" style={{ marginBottom: 14 }}>{t("goal.record.note")}</Note>
+      <Note icon="info" style={{ marginBottom: 16 }}>{t("goal.record.note")}</Note>
       <Button full disabled={!ok} onClick={record}>
         {t("goal.record.save")}
       </Button>
@@ -519,25 +519,25 @@ function MilestoneSheet({ t, locale, shown, rows, onClose, onNewGoal }) {
   const next = P.MILESTONES.find((m) => m > shown.m);
   return (
     <Sheet open onClose={onClose} title={t(`ms.${shown.m}`)}>
-      <div style={{ padding: "4px 2px 2px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 16 }}>
+      <div style={{ padding: "4px 4px 4px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 16 }}>
           <TemplateIcon id={g.template} size={48} />
           <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: 28, fontWeight: 700, letterSpacing: -0.5, ...NUM }}>{fmt(saved)}</div>
-            <div style={{ fontSize: 15, color: "var(--mid)" }}>{t("ms.body", { amount: t("goal.of", { target: fmt(g.target) }), name: nameOf(g, t) })}</div>
+            <div style={{ fontSize: "var(--t-head)", fontWeight: 700, letterSpacing: -0.5, ...NUM }}>{fmt(saved)}</div>
+            <div style={{ fontSize: "var(--t-body)", color: "var(--mid)" }}>{t("ms.body", { amount: t("goal.of", { target: fmt(g.target) }), name: nameOf(g, t) })}</div>
           </div>
         </div>
         <div style={{ display: "flex", gap: 4, marginBottom: 16 }} aria-hidden>
           {P.MILESTONES.map((m) => (
-            <div key={m} style={{ flex: 1, height: 6, borderRadius: 3, background: m <= shown.m ? "var(--accent)" : "var(--surface2)", transition: "background .6s" }} />
+            <div key={m} style={{ flex: 1, height: 6, borderRadius: 12, background: m <= shown.m ? "var(--accent)" : "var(--surface2)", transition: "background var(--m-sheet) ease-out" }} />
           ))}
         </div>
-        <p style={{ fontSize: 16, lineHeight: 1.5, margin: "0 0 18px" }}>{next ? t("ms.next", { pct: next, amount: fmt((g.target * next) / 100) }) : t("ms.done")}</p>
+        <p style={{ fontSize: "var(--t-body)", lineHeight: 1.5, margin: "0 0 16px" }}>{next ? t("ms.next", { pct: next, amount: fmt((g.target * next) / 100) }) : t("ms.done")}</p>
         <Button full onClick={onClose}>
           {t("ms.continue")}
         </Button>
         {!next && (
-          <Button full kind="ghost" style={{ marginTop: 6 }} onClick={() => (onClose(), onNewGoal())}>
+          <Button full kind="ghost" style={{ marginTop: 8 }} onClick={() => (onClose(), onNewGoal())}>
             {t("ms.next_goal")}
           </Button>
         )}
@@ -552,25 +552,25 @@ function GoalCard({ t, locale, row, fx, big, onClick }) {
   const { g, saved, pct, pctWithInvest, status } = row;
   const fmt = fmtFor(locale, g);
   return (
-    <Card onClick={onClick} pad={big ? 20 : 16}>
+    <Card onClick={onClick} pad={big ? 24 : 16} hero={big}>
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
         <TemplateIcon id={g.template} size={big ? 40 : 34} />
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontWeight: 650, fontSize: big ? 17 : 16, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{nameOf(g, t)}</div>
-          <div style={{ fontSize: 13, color: "var(--mid)" }}>{timeLeft(t, g)}</div>
+          <div style={{ fontWeight: 600, fontSize: big ? "var(--t-lead)" : "var(--t-body)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{nameOf(g, t)}</div>
+          <div style={{ fontSize: "var(--t-sm)", color: "var(--mid)" }}>{timeLeft(t, g)}</div>
         </div>
         <StatusPill t={t} status={status} />
       </div>
-      {big && <div style={{ fontSize: 13, color: "var(--mid)", marginTop: 16 }}>{t("goal.saved_so_far")}</div>}
-      <div style={{ display: "flex", alignItems: "baseline", flexWrap: "wrap", gap: "0 8px", margin: big ? "2px 0 0" : "12px 0 0", ...NUM }}>
-        <span className={big ? "nv-disp" : undefined} style={{ fontSize: big ? 40 : 22, fontWeight: big ? undefined : 700, letterSpacing: big ? -0.8 : -0.3, lineHeight: 1.15, color: big ? "var(--head)" : undefined }}>{fmt(saved)}</span>
-        <span style={{ fontSize: big ? 15 : 14, color: "var(--mid)" }}>{t("goal.of", { target: fmt(g.target) })}</span>
+      {big && <div style={{ fontSize: "var(--t-sm)", color: "var(--mid)", marginTop: 16 }}>{t("goal.saved_so_far")}</div>}
+      <div style={{ display: "flex", alignItems: "baseline", flexWrap: "wrap", gap: "0 8px", margin: big ? "4px 0 0" : "12px 0 0", ...NUM }}>
+        <span className={big ? "nv-disp" : undefined} style={{ fontSize: big ? "var(--t-fig)" : "var(--t-title)", fontWeight: big ? undefined : 700, letterSpacing: big ? -0.8 : -0.3, lineHeight: 1.2, color: big ? "var(--head)" : undefined }}>{fmt(saved)}</span>
+        <span style={{ fontSize: big ? "var(--t-body)" : "var(--t-sm)", color: "var(--mid)" }}>{t("goal.of", { target: fmt(g.target) })}</span>
       </div>
       <Approx t={t} locale={locale} g={g} amount={saved} fx={fx} />
-      <div style={{ marginTop: big ? 10 : 8 }}>{big ? <VoyageBar pct={pct} pctWithInvest={pctWithInvest} /> : <Bar pct={pct} pctWithInvest={pctWithInvest} height={6} />}</div>
+      <div style={{ marginTop: big ? 12 : 8 }}>{big ? <VoyageBar pct={pct} pctWithInvest={pctWithInvest} /> : <Bar pct={pct} pctWithInvest={pctWithInvest} height={6} />}</div>
       <InvestLine t={t} row={row} fmt={fmt} />
       {big && (
-        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8, fontSize: 14, color: "var(--mid)", ...NUM }}>
+        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8, fontSize: "var(--t-sm)", color: "var(--mid)", ...NUM }}>
           <span>{t("goal.plan_line", { amount: fmt(g.monthly), path: pathLabel(t, g.path, P.regionOf(g)) })}</span>
           <span>{Math.floor(pct)}%</span>
         </div>
@@ -583,25 +583,25 @@ function CheckIn({ t, locale, rows, onRecord, onDone }) {
   const sunday = P.lastSunday(today());
   return (
     <Card>
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
         <Icon name="calendar" size={18} />
-        <span style={{ fontWeight: 650, flex: 1 }}>{t("week.title")}</span>
-        <span style={{ fontSize: 13, color: "var(--mid)" }}>{t("week.ending", { date: shortDate(sunday, locale) })}</span>
+        <span style={{ fontWeight: 600, flex: 1 }}>{t("week.title")}</span>
+        <span style={{ fontSize: "var(--t-sm)", color: "var(--mid)" }}>{t("week.ending", { date: shortDate(sunday, locale) })}</span>
       </div>
       {rows.map(({ g, status }) => {
         const ch = P.weekChange(g, sunday);
         const fmt = (n) => fmtFor(locale, g)(Math.abs(n));
         return (
-          <div key={g.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, padding: "8px 0", borderTop: "1px solid var(--line)" }}>
+          <div key={g.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "8px 0", borderTop: "1px solid var(--line)" }}>
             <span style={{ minWidth: 0 }}>
-              <span style={{ display: "block", fontSize: 15, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{nameOf(g, t)}</span>
-              <span style={{ display: "block", color: "var(--mid)", fontSize: 13, ...NUM }}>{ch ? t("week.change", { amount: `${ch > 0 ? "+" : "−"}${fmt(ch)}` }) : t("week.none")}</span>
+              <span style={{ display: "block", fontSize: "var(--t-body)", fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{nameOf(g, t)}</span>
+              <span style={{ display: "block", color: "var(--mid)", fontSize: "var(--t-sm)", ...NUM }}>{ch ? t("week.change", { amount: `${ch > 0 ? "+" : "−"}${fmt(ch)}` }) : t("week.none")}</span>
             </span>
             <StatusPill t={t} status={status} />
           </div>
         );
       })}
-      <p style={{ margin: "10px 0 12px", fontSize: 15 }}>{t("week.q")}</p>
+      <p style={{ margin: "12px 0 12px", fontSize: "var(--t-body)" }}>{t("week.q")}</p>
       <div style={{ display: "flex", gap: 8 }}>
         <Button size="md" onClick={onRecord} style={{ flex: 1 }}>
           {t("week.record")}
@@ -629,11 +629,11 @@ function Home({ t, locale, go, data, setOpen, sheets, layout }) {
       <Title sub={t("goals.sub")}>{t("goals.nav")}</Title>
       {!leadRow ? (
         <div style={layout !== "phone" ? { maxWidth: 760 } : undefined}>
-          <div style={{ borderRadius: 12, overflow: "hidden", boxShadow: "var(--lift)", marginBottom: 14 }}>
+          <div style={{ borderRadius: 12, overflow: "hidden", boxShadow: "var(--lift)", marginBottom: 16 }}>
             <Scene name="harbor" w={358} h={140} />
           </div>
           <Label style={{ marginTop: 4 }}>{pickedGoal ? t("home.empty.picked", { name: t(`tpl.${pickedGoal}`) }) : t("home.empty.title")}</Label>
-          <p style={{ fontSize: 15, color: "var(--mid)", lineHeight: 1.45, margin: "-4px 0 14px" }}>{pickedGoal ? t("home.empty.picked.sub") : t("home.empty.sub")}</p>
+          <p style={{ fontSize: "var(--t-body)", color: "var(--mid)", lineHeight: 1.5, margin: "-4px 0 16px" }}>{pickedGoal ? t("home.empty.picked.sub") : t("home.empty.sub")}</p>
           <TemplateGrid t={t} onPick={(id) => sheets.newGoal(id)} highlight={goalFor} />
         </div>
       ) : (
@@ -651,13 +651,13 @@ function Home({ t, locale, go, data, setOpen, sheets, layout }) {
           </div>
           <div>
           {others.length > 0 && <Label>{t("home.other_goals")}</Label>}
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {others.map((r) => (
               <GoalCard key={r.g.id} t={t} locale={locale} row={r} fx={data.holdings.fx} onClick={() => setOpen(r.g.id)} />
             ))}
           </div>
           {layout === "phone" ? (
-            <Button full kind="ghost" style={{ marginTop: 10 }} onClick={() => sheets.newGoal()}>
+            <Button full kind="ghost" style={{ marginTop: 12 }} onClick={() => sheets.newGoal()}>
               <Icon name="plus" size={18} /> {t("home.new_goal")}
             </Button>
           ) : (
@@ -669,7 +669,7 @@ function Home({ t, locale, go, data, setOpen, sheets, layout }) {
           </div>
         </div>
       )}
-      <Note icon="shield" style={{ marginTop: 18 }}>{t("goals.disclaimer")}</Note>
+      <Note icon="shield" style={{ marginTop: 16 }}>{t("goals.disclaimer")}</Note>
     </div>
   );
 }
@@ -698,7 +698,7 @@ function ToolsScreen({ t, locale }) {
           <ListRow key={id} icon={icon} title={t(`goals.tool.${id}`)} sub={lesson ? t(open ? "tools.from" : "tools.after", { lesson: text(lesson.title, locale) }) : null} locked={!open} onClick={() => setTool(id)} />
         ))}
       </List>
-      <Note icon="shield" style={{ marginTop: 18 }}>{t("goals.disclaimer")}</Note>
+      <Note icon="shield" style={{ marginTop: 16 }}>{t("goals.disclaimer")}</Note>
       <Sheet open={!!tool} onClose={() => setTool(null)} title={tool ? t(`goals.tool.${tool}`) : ""} tall>
         {Tool && <Tool t={t} locale={locale} params={{}} />}
       </Sheet>
@@ -718,12 +718,12 @@ function PlanPrompt({ t, go }) {
   const id = useAppState((s) => s.profile.goalFor);
   return (
     <Card style={{ marginTop: 12 }}>
-      <div style={{ fontWeight: 750, fontSize: 17 }}>{t("plan.ask.title")}</div>
-      <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "10px 0 6px" }}>
+      <div style={{ fontWeight: 700, fontSize: "var(--t-lead)" }}>{t("plan.ask.title")}</div>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "12px 0 8px" }}>
         <TemplateIcon id={id} size={32} />
-        <span style={{ fontWeight: 650 }}>{t(`tpl.${id}`)}</span>
+        <span style={{ fontWeight: 600 }}>{t(`tpl.${id}`)}</span>
       </div>
-      <p style={{ fontSize: 14, color: "var(--mid)", lineHeight: 1.45, margin: "0 0 12px" }}>{t("plan.ask.sub")}</p>
+      <p style={{ fontSize: "var(--t-sm)", color: "var(--mid)", lineHeight: 1.5, margin: "0 0 12px" }}>{t("plan.ask.sub")}</p>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
         <Button size="md" onClick={() => (markIntro("goalPlan"), go("goals", { newGoal: id }))}>
           {t("plan.ask.yes")}
@@ -765,42 +765,42 @@ function GoalPage({ t, locale, go, row, data, onBack, sheets }) {
     .slice(0, 3);
   return (
     <div>
-      <button onClick={onBack} className="nv-press" style={{ display: "inline-flex", alignItems: "center", gap: 4, border: "none", background: "transparent", color: "var(--mid)", fontSize: 15, fontWeight: 600, padding: "10px 4px", marginLeft: -4, cursor: "pointer", minHeight: 44 }}>
+      <button onClick={onBack} className="nv-press" style={{ display: "inline-flex", alignItems: "center", gap: 4, border: "none", background: "transparent", color: "var(--mid)", fontSize: "var(--t-body)", fontWeight: 600, padding: "12px 4px", marginLeft: -4, cursor: "pointer", minHeight: 44 }}>
         <Icon name="back" size={18} /> {t("goal.back")}
       </button>
-      <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "4px 0 14px" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "4px 0 16px" }}>
         <TemplateIcon id={g.template} size={44} />
         <div style={{ flex: 1, minWidth: 0 }}>
-          <h1 style={{ fontSize: 24, fontWeight: 700, letterSpacing: -0.5, margin: 0, lineHeight: 1.2 }}>{nameOf(g, t)}</h1>
-          <div style={{ fontSize: 14, color: "var(--mid)" }}>
+          <h1 style={{ fontSize: "var(--t-title)", fontWeight: 700, letterSpacing: -0.5, margin: 0, lineHeight: 1.2 }}>{nameOf(g, t)}</h1>
+          <div style={{ fontSize: "var(--t-sm)", color: "var(--mid)" }}>
             {t("goal.by", { date: shortDate(g.targetDate, { ...locale, year: true }) })} · {timeLeft(t, g)}
           </div>
         </div>
         <StatusPill t={t} status={status} />
       </div>
 
-      <Card pad={20}>
-        <div style={{ fontSize: 13, color: "var(--mid)" }}>{t("goal.saved_so_far")}</div>
+      <Card pad={24}>
+        <div style={{ fontSize: "var(--t-sm)", color: "var(--mid)" }}>{t("goal.saved_so_far")}</div>
         <div style={{ display: "flex", alignItems: "baseline", flexWrap: "wrap", gap: "0 8px", ...NUM }}>
-          <span style={{ fontSize: 38, fontWeight: 700, letterSpacing: -1, lineHeight: 1.15 }}>{fmt(saved)}</span>
-          <span style={{ fontSize: 15, color: "var(--mid)" }}>{t("goal.of", { target: fmt(g.target) })}</span>
+          <span style={{ fontSize: "var(--t-disp)", fontWeight: 700, letterSpacing: -1, lineHeight: 1.2 }}>{fmt(saved)}</span>
+          <span style={{ fontSize: "var(--t-body)", color: "var(--mid)" }}>{t("goal.of", { target: fmt(g.target) })}</span>
         </div>
         <Approx t={t} locale={locale} g={g} amount={saved} fx={data.holdings.fx} />
-        <div style={{ display: "flex", gap: 4, margin: "14px 0 6px" }} aria-label={t("goal.milestones")} role="img">
+        <div style={{ display: "flex", gap: 4, margin: "16px 0 8px" }} aria-label={t("goal.milestones")} role="img">
           {P.MILESTONES.map((m, i) => {
             const prev = i ? P.MILESTONES[i - 1] : 0;
             const part = (v) => `${Math.max(0, Math.min(1, (v - prev) / (m - prev))) * 100}%`;
             return (
-              <div key={m} style={{ position: "relative", flex: 1, height: 8, borderRadius: 4, background: "var(--surface2)", overflow: "hidden" }}>
+              <div key={m} style={{ position: "relative", flex: 1, height: 8, borderRadius: 12, background: "var(--surface2)", overflow: "hidden" }}>
                 <div style={{ position: "absolute", top: 0, bottom: 0, left: 0, width: part(row.pctWithInvest), background: "var(--accent)", opacity: 0.3 }} />
-                <div style={{ position: "absolute", top: 0, bottom: 0, left: 0, width: part(pct), background: "var(--accent)", transition: "width .6s cubic-bezier(.2,.7,.2,1)" }} />
+                <div style={{ position: "absolute", top: 0, bottom: 0, left: 0, width: part(pct), background: "var(--accent)", transition: "width var(--m-sheet) ease-out" }} />
               </div>
             );
           })}
         </div>
-        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--low)", ...NUM }}>
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "var(--t-cap)", color: "var(--low)", ...NUM }}>
           {P.MILESTONES.map((m) => (
-            <span key={m} style={{ flex: 1, textAlign: "right", color: g.milestones[m] ? "var(--accent)" : undefined, fontWeight: g.milestones[m] ? 650 : 400 }}>
+            <span key={m} style={{ flex: 1, textAlign: "right", color: g.milestones[m] ? "var(--accent)" : undefined, fontWeight: g.milestones[m] ? 600 : 450 }}>
               {m}%
             </span>
           ))}
@@ -819,12 +819,12 @@ function GoalPage({ t, locale, go, row, data, onBack, sheets }) {
 
       <Label>{t("goal.plan")}</Label>
       <Card>
-        <p style={{ margin: 0, fontSize: 16, lineHeight: 1.5 }}>{t("goal.plan.body", { amount: fmt(g.monthly), where: t(g.path === "save" && R === "MX" ? "goal.in.save.MX" : `goal.in.${g.path}`), target: fmt(g.target), date: shortDate(g.targetDate, { ...locale, year: true }) })}</p>
-        {status === "behind" && <Note style={{ marginTop: 10, background: "var(--warnSoft)" }}>{t("goal.plan.catch_up", { amount: fmt(n.perMonth) })}</Note>}
-        {status === "ahead" && <p style={{ margin: "8px 0 0", fontSize: 14, color: "var(--mid)" }}>{t("goal.plan.ahead", { amount: fmt(n.perMonth) })}</p>}
-        <div style={{ marginTop: 14 }}>
+        <p style={{ margin: 0, fontSize: "var(--t-body)", lineHeight: 1.5 }}>{t("goal.plan.body", { amount: fmt(g.monthly), where: t(g.path === "save" && R === "MX" ? "goal.in.save.MX" : `goal.in.${g.path}`), target: fmt(g.target), date: shortDate(g.targetDate, { ...locale, year: true }) })}</p>
+        {status === "behind" && <Note style={{ marginTop: 12, background: "var(--warnSoft)" }}>{t("goal.plan.catch_up", { amount: fmt(n.perMonth) })}</Note>}
+        {status === "ahead" && <p style={{ margin: "8px 0 0", fontSize: "var(--t-sm)", color: "var(--mid)" }}>{t("goal.plan.ahead", { amount: fmt(n.perMonth) })}</p>}
+        <div style={{ marginTop: 16 }}>
           <LineChart xDomain={[0, span]} lines={[{ points: plan, color: "var(--low)", dash: true }, { points: you.length > 1 ? you : [], color: "var(--accent)" }]} markers={[{ value: g.target, color: "var(--line)" }]} height={130} label={t("goal.chart")} />
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--low)", marginTop: 6, ...NUM }}>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "var(--t-cap)", color: "var(--low)", marginTop: 8, ...NUM }}>
             <span>{shortDate(g.createdAt, { ...locale, year: true })}</span>
             <span>
               {t("goal.chart.target")} {fmt(g.target)} · {shortDate(g.targetDate, { ...locale, year: true })}
@@ -842,22 +842,22 @@ function GoalPage({ t, locale, go, row, data, onBack, sheets }) {
       <Label>{t("goal.paths", { amount: fmt(g.monthly) })}</Label>
       <Card pad="6px 18px">
         {n.byPath.map((p) => (
-          <div key={p.path} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, padding: "12px 0", borderTop: p.path === "cash" ? "none" : "1px solid var(--line)" }}>
-            <span style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 15 }}>
-              <span style={{ width: 10, height: 10, borderRadius: 5, background: PATH_COLORS[p.path] }} />
+          <div key={p.path} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "12px 0", borderTop: p.path === "cash" ? "none" : "1px solid var(--line)" }}>
+            <span style={{ display: "flex", alignItems: "center", gap: 12, fontSize: "var(--t-body)" }}>
+              <span style={{ width: 10, height: 10, borderRadius: 12, background: PATH_COLORS[p.path] }} />
               {pathLabel(t, p.path, R)}
-              <span style={{ color: "var(--low)", fontSize: 13, ...NUM }}>{p.rate}%</span>
+              <span style={{ color: "var(--low)", fontSize: "var(--t-sm)", ...NUM }}>{p.rate}%</span>
               {p.path === g.path && <Icon name="check" size={16} color="var(--accent)" label={t("goal.plan")} />}
             </span>
-            <span style={{ fontWeight: 650, ...NUM }}>{dur(t, p.months)}</span>
+            <span style={{ fontWeight: 600, ...NUM }}>{dur(t, p.months)}</span>
           </div>
         ))}
       </Card>
-      <p style={{ fontSize: 13, color: "var(--mid)", lineHeight: 1.5, margin: "8px 2px 0" }}>{t("goal.paths.note")}</p>
+      <p style={{ fontSize: "var(--t-sm)", color: "var(--mid)", lineHeight: 1.5, margin: "8px 4px 0" }}>{t("goal.paths.note")}</p>
 
       <Label>{t("goal.linked")}</Label>
       <Card>
-        <p style={{ margin: "0 0 10px", fontSize: 14, color: "var(--mid)", lineHeight: 1.45 }}>{t("goal.linked.sub")}</p>
+        <p style={{ margin: "0 0 12px", fontSize: "var(--t-sm)", color: "var(--mid)", lineHeight: 1.5 }}>{t("goal.linked.sub")}</p>
         {data.holdings.list.length === 0 ? (
           <Button size="md" kind="secondary" style={{ border: "1px solid var(--line)" }} onClick={() => go("portfolio")}>
             {t("goal.linked.open")}
@@ -868,24 +868,24 @@ function GoalPage({ t, locale, go, row, data, onBack, sheets }) {
               const other = otherGoal(h.symbol);
               const on = g.linked.includes(h.symbol);
               return (
-                <label key={h.symbol} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 0", borderTop: "1px solid var(--line)", cursor: "pointer", minHeight: 48 }}>
+                <label key={h.symbol} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 0", borderTop: "1px solid var(--line)", cursor: "pointer", minHeight: 48 }}>
                   <input type="checkbox" checked={on} onChange={() => toggleLink(h.symbol)} style={{ width: 20, height: 20, accentColor: "var(--brand)", flexShrink: 0 }} />
                   <span style={{ flex: 1, minWidth: 0 }}>
-                    <span style={{ display: "block", fontWeight: 650, fontSize: 15 }}>{h.symbol}</span>
-                    <span style={{ display: "block", fontSize: 13, color: "var(--mid)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{other && !on ? t("goal.linked.other", { name: nameOf(other.g, t) }) : h.name}</span>
+                    <span style={{ display: "block", fontWeight: 600, fontSize: "var(--t-body)" }}>{h.symbol}</span>
+                    <span style={{ display: "block", fontSize: "var(--t-sm)", color: "var(--mid)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{other && !on ? t("goal.linked.other", { name: nameOf(other.g, t) }) : h.name}</span>
                   </span>
-                  <span style={{ fontWeight: 650, ...NUM }}>{holdingFmt(h.value)}</span>
+                  <span style={{ fontWeight: 600, ...NUM }}>{holdingFmt(h.value)}</span>
                 </label>
               );
             })}
-            <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 10, borderTop: "1px solid var(--line)", fontSize: 15, fontWeight: 650, ...NUM }}>
+            <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 12, borderTop: "1px solid var(--line)", fontSize: "var(--t-body)", fontWeight: 600, ...NUM }}>
               <span>{t("goal.linked.total")}</span>
               <span>
                 {data.holdings.currency !== g.currency && "≈ "}
                 {fmt(linked)}
               </span>
             </div>
-            <div style={{ fontSize: 13, color: "var(--low)", marginTop: 4 }}>{t("goal.linked.pretend")}</div>
+            <div style={{ fontSize: "var(--t-sm)", color: "var(--low)", marginTop: 4 }}>{t("goal.linked.pretend")}</div>
           </>
         )}
       </Card>
@@ -893,10 +893,10 @@ function GoalPage({ t, locale, go, row, data, onBack, sheets }) {
       <Label>{t("goal.saved")}</Label>
       <Card pad="6px 18px">
         {entries.map((c, i) => (
-          <div key={`${c.date}${i}`} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, padding: "10px 0", borderTop: i ? "1px solid var(--line)" : "none", ...NUM }}>
-            <span style={{ fontSize: 14, color: "var(--mid)" }}>{shortDate(c.date, locale)}</span>
+          <div key={`${c.date}${i}`} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "12px 0", borderTop: i ? "1px solid var(--line)" : "none", ...NUM }}>
+            <span style={{ fontSize: "var(--t-sm)", color: "var(--mid)" }}>{shortDate(c.date, locale)}</span>
             <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
-              <span style={{ fontWeight: 650, color: c.amount < 0 ? "var(--mid)" : "var(--ink)" }}>
+              <span style={{ fontWeight: 600, color: c.amount < 0 ? "var(--mid)" : "var(--ink)" }}>
                 {c.amount < 0 ? "−" : "+"}
                 {fmt(Math.abs(c.amount))}
               </span>
@@ -906,7 +906,7 @@ function GoalPage({ t, locale, go, row, data, onBack, sheets }) {
             </span>
           </div>
         ))}
-        <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderTop: entries.length ? "1px solid var(--line)" : "none", fontSize: 14, color: "var(--mid)", ...NUM }}>
+        <div style={{ display: "flex", justifyContent: "space-between", padding: "12px 0", borderTop: entries.length ? "1px solid var(--line)" : "none", fontSize: "var(--t-sm)", color: "var(--mid)", ...NUM }}>
           <span>{t("goal.start_entry")}</span>
           <span>{fmt(g.start)}</span>
         </div>
@@ -920,8 +920,8 @@ function GoalPage({ t, locale, go, row, data, onBack, sheets }) {
               <button key={l.id} onClick={() => go("lessons", { lesson: l.id })} className="nv-press" style={{ display: "flex", alignItems: "center", gap: 12, width: "100%", textAlign: "left", border: "none", borderTop: i ? "1px solid var(--line)" : "none", background: "transparent", color: "var(--ink)", padding: "12px 0", cursor: "pointer", minHeight: 52 }}>
                 <Icon name="book" size={18} color="var(--mid)" />
                 <span style={{ flex: 1, minWidth: 0 }}>
-                  <span style={{ display: "block", fontWeight: 650, fontSize: 15 }}>{text(l.title, locale)}</span>
-                  <span style={{ display: "block", fontSize: 13, color: "var(--mid)" }}>{text(l.unitTitle, locale)}</span>
+                  <span style={{ display: "block", fontWeight: 600, fontSize: "var(--t-body)" }}>{text(l.title, locale)}</span>
+                  <span style={{ display: "block", fontSize: "var(--t-sm)", color: "var(--mid)" }}>{text(l.unitTitle, locale)}</span>
                 </span>
                 <Icon name="next" size={16} color="var(--low)" />
               </button>
@@ -930,7 +930,7 @@ function GoalPage({ t, locale, go, row, data, onBack, sheets }) {
         </>
       )}
 
-      <div style={{ display: "flex", gap: 8, marginTop: 22 }}>
+      <div style={{ display: "flex", gap: 8, marginTop: 24 }}>
         <Button size="md" kind="secondary" style={{ flex: 1, border: "1px solid var(--line)" }} onClick={() => setEditing(true)}>
           {t("goal.edit")}
         </Button>
@@ -943,7 +943,7 @@ function GoalPage({ t, locale, go, row, data, onBack, sheets }) {
           {t("goal.delete")}
         </Button>
       </div>
-      <Note icon="shield" style={{ marginTop: 18 }}>{t("goals.disclaimer")}</Note>
+      <Note icon="shield" style={{ marginTop: 16 }}>{t("goals.disclaimer")}</Note>
 
       <Sheet open={editing} onClose={() => setEditing(false)} title={t("goal.edit")} tall>
         {editing && (
@@ -960,11 +960,11 @@ function GoalPage({ t, locale, go, row, data, onBack, sheets }) {
         )}
       </Sheet>
       <Sheet open={confirm} onClose={() => setConfirm(false)} title={t("goal.delete")}>
-        <p style={{ fontSize: 16, lineHeight: 1.5, margin: "0 0 16px" }}>{t("goal.delete.confirm", { name: nameOf(g, t) })}</p>
+        <p style={{ fontSize: "var(--t-body)", lineHeight: 1.5, margin: "0 0 16px" }}>{t("goal.delete.confirm", { name: nameOf(g, t) })}</p>
         <Button full kind="bad" onClick={() => (save((s) => ({ ...s, goals: s.goals.filter((x) => x.id !== g.id) })), toast(t("goal.deleted")), onBack())}>
           {t("goal.delete")}
         </Button>
-        <Button full kind="ghost" style={{ marginTop: 6 }} onClick={() => setConfirm(false)}>
+        <Button full kind="ghost" style={{ marginTop: 8 }} onClick={() => setConfirm(false)}>
           {t("common.cancel")}
         </Button>
       </Sheet>
@@ -1014,18 +1014,18 @@ function CreateGoal({ params = {}, t, locale, onDone, done }) {
     const fmt = fmtFor(locale, lead);
     return (
       <Card>
-        {!made && <p style={{ margin: "0 0 12px", color: "var(--mid)", lineHeight: 1.45 }}>{t("create.have")}</p>}
+        {!made && <p style={{ margin: "0 0 12px", color: "var(--mid)", lineHeight: 1.5 }}>{t("create.have")}</p>}
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <TemplateIcon id={lead.template} size={36} />
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontWeight: 650 }}>{nameOf(lead, t)}</div>
-            <div style={{ fontSize: 14, color: "var(--mid)", ...NUM }}>
+            <div style={{ fontWeight: 600 }}>{nameOf(lead, t)}</div>
+            <div style={{ fontSize: "var(--t-sm)", color: "var(--mid)", ...NUM }}>
               {fmt(lead.target)} · {t("goal.plan_line", { amount: fmt(lead.monthly), path: pathLabel(t, lead.path, P.regionOf(lead)) })}
             </div>
           </div>
         </div>
         {!made && (
-          <Button full kind="ghost" style={{ marginTop: 10 }} onClick={() => setAnother(true)}>
+          <Button full kind="ghost" style={{ marginTop: 12 }} onClick={() => setAnother(true)}>
             {t("create.another")}
           </Button>
         )}
@@ -1097,18 +1097,18 @@ function WeekStory({ t, locale, go, onClose }) {
   const done = () => save((s) => ({ ...s, checkIn: sunday }));
   const line = (icon, title, sub) => (
     <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px" }}>
-      <span style={{ width: 36, height: 36, borderRadius: 6, background: "var(--bg)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+      <span style={{ width: 36, height: 36, borderRadius: 12, background: "var(--bg)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
         <Icon name={icon} size={19} />
       </span>
       <span style={{ flex: 1, minWidth: 0 }}>
-        <span style={{ display: "block", fontWeight: 650 }}>{title}</span>
-        {sub && <span style={{ display: "block", fontSize: 14, color: "var(--mid)" }}>{sub}</span>}
+        <span style={{ display: "block", fontWeight: 600 }}>{title}</span>
+        {sub && <span style={{ display: "block", fontSize: "var(--t-sm)", color: "var(--mid)" }}>{sub}</span>}
       </span>
     </div>
   );
   return (
     <div>
-      <div style={{ fontSize: 14, color: "var(--low)", fontWeight: 600, marginBottom: 10 }}>
+      <div style={{ fontSize: "var(--t-sm)", color: "var(--low)", fontWeight: 600, marginBottom: 12 }}>
         {shortDate(from, locale)} – {shortDate(sunday, locale)}
       </div>
       <List>
@@ -1119,13 +1119,13 @@ function WeekStory({ t, locale, go, onClose }) {
       </List>
       {next && nextUnit && (
         <Card style={{ marginTop: 12, background: "var(--brandSoft)" }}>
-          <div style={{ fontSize: 14, fontWeight: 650, color: "var(--brand)", marginBottom: 4 }}>{t("mw.next")}</div>
-          <div style={{ fontSize: 16, lineHeight: 1.5 }}>{t("mw.next.body", { lesson: text(next.title, locale), unit: text(nextUnit.title, locale), why: t(`why.${next.unit}`) })}</div>
+          <div style={{ fontSize: "var(--t-sm)", fontWeight: 600, color: "var(--brand)", marginBottom: 4 }}>{t("mw.next")}</div>
+          <div style={{ fontSize: "var(--t-body)", lineHeight: 1.5 }}>{t("mw.next.body", { lesson: text(next.title, locale), unit: text(nextUnit.title, locale), why: t(`why.${next.unit}`) })}</div>
         </Card>
       )}
       {row && (
         <>
-          <p style={{ margin: "18px 0 10px", fontSize: 15, fontWeight: 650 }}>{t("week.q")}</p>
+          <p style={{ margin: "16px 0 12px", fontSize: "var(--t-body)", fontWeight: 600 }}>{t("week.q")}</p>
           <div style={{ display: "flex", gap: 8 }}>
             <Button size="md" style={{ flex: 1 }} onClick={() => (done(), onClose(), go("goals", { record: row.g.id }))}>
               {t("week.record")}
@@ -1190,14 +1190,14 @@ function RealCostCard({ t, locale, go }) {
     else body = t("rc.subs", { each: m(R ? 120 : 10), yearly: m(R ? 2880 : 240) });
     return (
       <Card style={{ marginBottom: 12 }} data-rc="hidden">
-        <div style={{ fontSize: 14, fontWeight: 650, color: "var(--mid)", marginBottom: 4 }}>{t("rc.hidden")}</div>
-        <p style={{ fontSize: 16, lineHeight: 1.5, margin: 0 }}>{body}</p>
+        <div style={{ fontSize: "var(--t-sm)", fontWeight: 600, color: "var(--mid)", marginBottom: 4 }}>{t("rc.hidden")}</div>
+        <p style={{ fontSize: "var(--t-body)", lineHeight: 1.5, margin: 0 }}>{body}</p>
         {lesson && (
-          <button onClick={() => go("lessons", { lesson: lesson.id })} className="nv-press" style={{ display: "inline-flex", alignItems: "center", gap: 6, marginTop: 10, border: "none", background: "transparent", padding: "8px 0", color: "var(--brand)", fontWeight: 650, fontSize: 15, cursor: "pointer", font: "inherit" }}>
+          <button onClick={() => go("lessons", { lesson: lesson.id })} className="nv-press" style={{ display: "inline-flex", alignItems: "center", gap: 8, marginTop: 12, border: "none", background: "transparent", padding: "8px 0", color: "var(--brand)", fontWeight: 600, fontSize: "var(--t-body)", cursor: "pointer", font: "inherit" }}>
             <Icon name="book" size={16} /> {t("rc.lesson", { title: text(lesson.title, locale) })}
           </button>
         )}
-        <p style={{ fontSize: 13, color: "var(--low)", margin: "8px 0 0" }}>{t("rc.fine")}</p>
+        <p style={{ fontSize: "var(--t-sm)", color: "var(--low)", margin: "8px 0 0" }}>{t("rc.fine")}</p>
       </Card>
     );
   }
@@ -1207,26 +1207,26 @@ function RealCostCard({ t, locale, go }) {
   const yearly = price * (item ? item[3] : 260);
   return (
     <Card style={{ marginBottom: 12 }} data-rc="everyday">
-      <div style={{ fontSize: 14, fontWeight: 650, color: "var(--mid)", marginBottom: 4 }}>{t("rc.title")}</div>
-      <div style={{ fontSize: 18, fontWeight: 700, lineHeight: 1.35, color: "var(--head)" }}>{t("rc.pick")}</div>
+      <div style={{ fontSize: "var(--t-sm)", fontWeight: 600, color: "var(--mid)", marginBottom: 4 }}>{t("rc.title")}</div>
+      <div style={{ fontSize: "var(--t-lead)", fontWeight: 700, lineHeight: 1.5, color: "var(--head)" }}>{t("rc.pick")}</div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8, margin: "12px 0" }} role="radiogroup" aria-label={t("rc.pick")}>
         {[...EVERYDAY.map((x) => [x[0], `${t(`rc.${x[0]}`)} · ${m(x[1][R])}`]), ["own", t("rc.own")]].map(([id, label]) => (
-          <button key={id} role="radio" aria-checked={pick === id} onClick={() => setPick(id)} className="nv-press" style={{ ...(pick === id ? SELECTED : { border: "2px solid transparent" }), borderRadius: 8, padding: "6px 14px", minHeight: 44, fontWeight: 650, fontSize: 15, cursor: "pointer", background: pick === id ? "var(--brand)" : "var(--bg)", color: pick === id ? "var(--onBrand)" : "var(--ink)", font: "inherit" }}>
+          <button key={id} role="radio" aria-checked={pick === id} onClick={() => setPick(id)} className="nv-press" style={{ ...(pick === id ? SELECTED : { border: "2px solid transparent" }), borderRadius: 12, padding: "8px 16px", minHeight: 44, fontWeight: 600, fontSize: "var(--t-body)", cursor: "pointer", background: pick === id ? "var(--brand)" : "var(--bg)", color: pick === id ? "var(--onBrand)" : "var(--ink)", font: "inherit" }}>
             {label}
           </button>
         ))}
       </div>
       {pick === "own" && (
-        <label style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10, fontSize: 14, color: "var(--mid)" }}>
+        <label style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, fontSize: "var(--t-sm)", color: "var(--mid)" }}>
           {t("rc.own.label")}
-          <input inputMode="decimal" value={own} onChange={(e) => setOwn(e.target.value.slice(0, 8))} aria-label={t("rc.own.label")} style={{ width: 90, border: "1px solid var(--line)", borderRadius: 6, padding: "8px 10px", background: "var(--bg)", color: "var(--ink)", fontSize: 16 }} />
+          <input inputMode="decimal" value={own} onChange={(e) => setOwn(e.target.value.slice(0, 8))} aria-label={t("rc.own.label")} style={{ width: 90, border: "1px solid var(--line)", borderRadius: 12, padding: "8px 12px", background: "var(--bg)", color: "var(--ink)", fontSize: "var(--t-body)" }} />
         </label>
       )}
-      <p style={{ fontSize: 16, lineHeight: 1.55, margin: 0 }} aria-live="polite">
+      <p style={{ fontSize: "var(--t-body)", lineHeight: 1.5, margin: 0 }} aria-live="polite">
         {t("rc.line", { price: m(price), every: t(`rc.every.${freq}`), yearly: m(Math.round(yearly)), grow: m(Math.round(grow10(yearly / 12) / 10) * 10) })}
       </p>
-      <p style={{ fontSize: 15, color: "var(--mid)", lineHeight: 1.5, margin: "10px 0 0" }}>{t("rc.choose")}</p>
-      <p style={{ fontSize: 13, color: "var(--low)", margin: "8px 0 0" }}>{t("rc.fine")}</p>
+      <p style={{ fontSize: "var(--t-body)", color: "var(--mid)", lineHeight: 1.5, margin: "12px 0 0" }}>{t("rc.choose")}</p>
+      <p style={{ fontSize: "var(--t-sm)", color: "var(--low)", margin: "8px 0 0" }}>{t("rc.fine")}</p>
     </Card>
   );
 }

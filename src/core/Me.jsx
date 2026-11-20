@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { useAppState } from "./store.js";
 import { api } from "./api.js";
 import { level, xpOn, weekXp, weekStart, addDays, dayKey, BADGES, MAX_FREEZES } from "./progress.js";
-import { AVATARS, Badge, Card, Icon, Label, List, ListRow, Loading, Progress, Ring, StreakStar, Title, Button, Segmented, toast } from "./ui.jsx";
+import { AVATARS, AVATAR_INK, Badge, Card, Icon, Label, List, ListRow, Loading, Progress, Ring, StreakStar, Title, Button, Segmented, toast } from "./ui.jsx";
 import { allModules, getModule, service } from "./registry.js";
 import { setLeague as saveLeague } from "./session.js";
 import { InviteCard, FriendOffer } from "./invites.jsx";
@@ -34,21 +34,21 @@ function League({ t, session, go }) {
   }, [mode, progress.xp, reload]);
   const unfriend = (r) => api("/api/friends", { method: "DELETE", body: { link: r.link } }).then(() => setReload((n) => n + 1), (e) => toast(e.message));
   const picker = modes.length > 1 && (
-    <div style={{ marginBottom: 10 }}>
+    <div style={{ marginBottom: 12 }}>
       <Segmented label={t("league.with")} value={mode} onChange={(v) => (session.user ? saveLeague(v).catch((e) => toast(e.message)) : null)} options={modes.map((m) => ({ value: m, label: t(`league.with.${m}`) }))} />
-      {mode !== "everyone" && <p style={{ fontSize: 13, color: "var(--low)", margin: "8px 2px 0", lineHeight: 1.4 }}>{t("league.with.sub")}</p>}
+      {mode !== "everyone" && <p style={{ fontSize: "var(--t-sm)", color: "var(--low)", margin: "8px 4px 0", lineHeight: 1.5 }}>{t("league.with.sub")}</p>}
     </div>
   );
   // The everyone league keeps 13–17 and 18+ apart (server/store.js).
-  const teens = mode === "everyone" && session.user.ageBand === "13-17" && <p style={{ fontSize: 13, color: "var(--low)", margin: "0 2px 8px", lineHeight: 1.4 }}>{t("league.teens")}</p>;
+  const teens = mode === "everyone" && session.user.ageBand === "13-17" && <p style={{ fontSize: "var(--t-sm)", color: "var(--low)", margin: "0 4px 8px", lineHeight: 1.5 }}>{t("league.teens")}</p>;
   if (!mode)
     return (
       <Card>
         <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
           <Icon name="trophy" size={24} color="var(--mid)" />
           <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: 650 }}>{t("league.join")}</div>
-            <div style={{ fontSize: 14, color: "var(--mid)", lineHeight: 1.4 }}>{t("league.join.sub")}</div>
+            <div style={{ fontWeight: 600 }}>{t("league.join")}</div>
+            <div style={{ fontSize: "var(--t-sm)", color: "var(--mid)", lineHeight: 1.5 }}>{t("league.join.sub")}</div>
           </div>
         </div>
         <Button kind="secondary" size="md" full style={{ marginTop: 12 }} onClick={() => go("settings", { section: "account" })}>
@@ -64,12 +64,12 @@ function League({ t, session, go }) {
     {picker}
     {teens}
     <Card pad={0}>
-      <div style={{ padding: "12px 16px 8px", fontSize: 13, color: "var(--mid)" }}>{t("league.resets", { n: resets })}</div>
+      <div style={{ padding: "12px 16px 8px", fontSize: "var(--t-sm)", color: "var(--mid)" }}>{t("league.resets", { n: resets })}</div>
       {league.standings.map((r, i) => (
-        <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 16px", background: r.you ? "var(--brandSoft)" : "transparent", borderTop: "1px solid var(--line)" }}>
-          <span style={{ width: 22, textAlign: "center", fontWeight: 650, color: i < 3 ? "var(--ink)" : "var(--low)", fontVariantNumeric: "tabular-nums" }}>{i + 1}</span>
-          <span style={{ width: 32, height: 32, borderRadius: 16, background: AVATARS[r.avatar % AVATARS.length] || AVATARS[0], color: "#F7F2E8", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 650, fontSize: 14 }}>{(r.nickname || "?")[0].toUpperCase()}</span>
-          <span style={{ flex: 1, fontWeight: r.you ? 650 : 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.you ? t("league.you", { name: r.nickname || t("league.anon") }) : r.nickname || t("league.anon")}</span>
+        <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", background: r.you ? "var(--brandSoft)" : "transparent", borderTop: "1px solid var(--line)" }}>
+          <span style={{ width: 22, textAlign: "center", fontWeight: 600, color: i < 3 ? "var(--ink)" : "var(--low)", fontVariantNumeric: "tabular-nums" }}>{i + 1}</span>
+          <span style={{ width: 32, height: 32, borderRadius: 18, background: AVATARS[r.avatar % AVATARS.length] || AVATARS[0], color: AVATAR_INK, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 600, fontSize: "var(--t-sm)" }}>{(r.nickname || "?")[0].toUpperCase()}</span>
+          <span style={{ flex: 1, fontWeight: r.you ? 600 : 450, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.you ? t("league.you", { name: r.nickname || t("league.anon") }) : r.nickname || t("league.anon")}</span>
           <span style={{ fontWeight: 600, color: "var(--mid)", fontVariantNumeric: "tabular-nums" }}>{r.xp} XP</span>
           {r.link && (
             <button onClick={() => unfriend(r)} aria-label={t("league.remove", { name: r.nickname || t("league.anon") })} style={{ border: "none", background: "transparent", color: "var(--low)", width: 44, height: 44, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
@@ -78,7 +78,7 @@ function League({ t, session, go }) {
           )}
         </div>
       ))}
-      {league.standings.length < 2 && <p style={{ fontSize: 14, color: "var(--mid)", padding: "8px 16px 14px", margin: 0, lineHeight: 1.45 }}>{t(mode === "friends" ? "league.friends.none" : "league.alone")}</p>}
+      {league.standings.length < 2 && <p style={{ fontSize: "var(--t-sm)", color: "var(--mid)", padding: "8px 16px 16px", margin: 0, lineHeight: 1.5 }}>{t(mode === "friends" ? "league.friends.none" : "league.alone")}</p>}
     </Card>
     </>
   );
@@ -94,7 +94,7 @@ function BadgePreview({ t, progress, go }) {
   const got = BADGES.filter((b) => progress.badges[b.id]).length;
   return (
     <Card pad={16} onClick={() => go("me", { section: "achievements" })}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
         <span style={{ fontWeight: 700 }}>{t("me.badges.n", { n: got, total: BADGES.length })}</span>
         <Icon name="next" size={18} color="var(--low)" />
       </div>
@@ -111,17 +111,17 @@ function BadgePreview({ t, progress, go }) {
 
 function Badges({ t, progress }) {
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(96px, 1fr))", gap: 10 }}>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(96px, 1fr))", gap: 12 }}>
       {BADGES.map((b) => {
         const got = progress.badges[b.id];
         const Tile = got ? "button" : "div";
         return (
-          <Tile key={b.id} title={t(`badge.${b.id}.how`)} {...(got ? { onClick: () => openShare({ kind: "badge", name: t(`badge.${b.id}`) }), className: "nv-press" } : {})} style={{ background: "var(--surface)", border: "none", borderRadius: 12, boxShadow: "var(--lift)", padding: "14px 8px", textAlign: "center", color: "var(--ink)", font: "inherit", cursor: got ? "pointer" : "default" }}>
+          <Tile key={b.id} title={t(`badge.${b.id}.how`)} {...(got ? { onClick: () => openShare({ kind: "badge", name: t(`badge.${b.id}`) }), className: "nv-press" } : {})} style={{ background: "var(--surface)", border: "none", borderRadius: 12, boxShadow: "var(--lift)", padding: "16px 8px", textAlign: "center", color: "var(--ink)", font: "inherit", cursor: got ? "pointer" : "default" }}>
             <div style={{ display: "flex", justifyContent: "center" }}>
               <Badge id={b.id} size={64} locked={!got} />
             </div>
-            <div style={{ fontSize: 13, fontWeight: 650, marginTop: 6, lineHeight: 1.2 }}>{t(`badge.${b.id}`)}</div>
-            <div style={{ fontSize: 12, color: "var(--mid)", marginTop: 4, lineHeight: 1.3 }}>{got ? t("badge.got") : t(`badge.${b.id}.how`)}</div>
+            <div style={{ fontSize: "var(--t-sm)", fontWeight: 600, marginTop: 8, lineHeight: 1.2 }}>{t(`badge.${b.id}`)}</div>
+            <div style={{ fontSize: "var(--t-cap)", color: "var(--mid)", marginTop: 4, lineHeight: 1.2 }}>{got ? t("badge.got") : t(`badge.${b.id}.how`)}</div>
             {got && <span className="nv-sr"> · {t("share.button")}</span>}
           </Tile>
         );
@@ -161,41 +161,45 @@ export default function Me({ t, locale, session, go, route, layout }) {
   return (
     <div className="nv-cols">
       <div>
-      <div style={{ display: "flex", alignItems: "center", gap: 14, margin: "4px 0 16px" }}>
-        <span style={{ width: 52, height: 52, borderRadius: 26, background: AVATARS[profile.avatar] || AVATARS[0], color: "#F7F2E8", fontSize: 22, fontWeight: 650, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{name[0].toUpperCase()}</span>
+      <div style={{ display: "flex", alignItems: "center", gap: 16, margin: "4px 0 16px" }}>
+        <span style={{ width: 52, height: 52, borderRadius: 28, background: AVATARS[profile.avatar] || AVATARS[0], color: AVATAR_INK, fontSize: "var(--t-title)", fontWeight: 600, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{name[0].toUpperCase()}</span>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <h1 className="nv-disp" style={{ fontSize: 30, margin: 0, lineHeight: 1.1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{name}</h1>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 6 }}>
-            <span style={{ fontSize: 14, fontWeight: 650, color: "var(--mid)", whiteSpace: "nowrap" }}>{t("me.level", { n: lv.level })}</span>
-            <Progress value={lv.into} max={lv.need} height={6} label={t("me.level", { n: lv.level })} />
-            <span style={{ fontSize: 13, color: "var(--mid)", whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums" }}>{lv.into}/{lv.need}</span>
+          <h1 className="nv-disp" style={{ fontSize: "var(--t-head)", margin: 0, lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{name}</h1>
+          <div style={{ marginTop: 8 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 8, fontSize: "var(--t-sm)", color: "var(--mid)" }}>
+              <span style={{ fontWeight: 600 }}>{t("me.level", { n: lv.level })}</span>
+              <span style={{ fontVariantNumeric: "tabular-nums" }}>{lv.into}/{lv.need}</span>
+            </div>
+            <div style={{ display: "flex", marginTop: 4 }}>
+              <Progress value={lv.into} max={lv.need} height={6} label={t("me.level", { n: lv.level })} />
+            </div>
           </div>
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(86px, 1fr))", gap: 10 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(86px, 1fr))", gap: 12 }}>
         {[
           ["streak", progress.streak.count, t("me.streak")],
           ["bolt", progress.xp, t("me.total_xp")],
           ["snow", `${progress.freezes}/${MAX_FREEZES}`, t("me.freezes")],
         ].map(([icon, value, label]) => (
-          <Card key={label} pad={14}>
+          <Card key={label} pad={16}>
             {icon === "streak" ? <StreakStar count={progress.streak.count} size={20} /> : <Icon name={icon} size={18} color="var(--mid)" />}
-            <div className="nv-disp" style={{ fontSize: 26, marginTop: 6, fontVariantNumeric: "tabular-nums" }}>{value}</div>
-            <div style={{ fontSize: 13, color: "var(--mid)", fontWeight: 500 }}>{label}</div>
+            <div className="nv-disp" style={{ fontSize: "var(--t-head)", marginTop: 8, fontVariantNumeric: "tabular-nums" }}>{value}</div>
+            <div style={{ fontSize: "var(--t-sm)", color: "var(--mid)", fontWeight: 450 }}>{label}</div>
           </Card>
         ))}
       </div>
 
       <Label>{t("me.this_week")}</Label>
       <Card>
-        <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 14 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 16 }}>
           <Ring value={xpOn(progress, today)} max={progress.dailyGoal} size={56} stroke={5} label={t("goal.aria", { xp: xpOn(progress, today), goal: progress.dailyGoal })}>
-            <span style={{ fontSize: 13, fontWeight: 650, fontVariantNumeric: "tabular-nums" }}>{Math.min(100, Math.round((xpOn(progress, today) / progress.dailyGoal) * 100))}%</span>
+            <span style={{ fontSize: "var(--t-sm)", fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>{Math.min(100, Math.round((xpOn(progress, today) / progress.dailyGoal) * 100))}%</span>
           </Ring>
           <div>
-            <div style={{ fontWeight: 650 }}>{xpOn(progress, today) >= progress.dailyGoal ? t("me.today_met", { xp: xpOn(progress, today) }) : t("me.today", { xp: xpOn(progress, today), goal: progress.dailyGoal })}</div>
-            <div style={{ fontSize: 14, color: "var(--mid)" }}>{t("me.week_total", { xp: weekXp(progress, today) })}</div>
+            <div style={{ fontWeight: 600 }}>{xpOn(progress, today) >= progress.dailyGoal ? t("me.today_met", { xp: xpOn(progress, today) }) : t("me.today", { xp: xpOn(progress, today), goal: progress.dailyGoal })}</div>
+            <div style={{ fontSize: "var(--t-sm)", color: "var(--mid)" }}>{t("me.week_total", { xp: weekXp(progress, today) })}</div>
           </div>
         </div>
         <div style={{ display: "flex", alignItems: "flex-end", gap: 8, height: 90 }} aria-label={t("me.this_week")}>
@@ -203,8 +207,8 @@ export default function Me({ t, locale, session, go, route, layout }) {
             const xp = xpOn(progress, d);
             return (
               <div key={d} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4, height: "100%", justifyContent: "flex-end" }}>
-                <div title={`${xp} XP`} style={{ width: "100%", maxWidth: 28, height: `${Math.max(4, (xp / maxDay) * 70)}px`, borderRadius: 4, background: xp ? "var(--accent)" : "var(--surface2)", opacity: d > today ? 0.4 : xp && xp < progress.dailyGoal ? 0.55 : 1 }} />
-                <span style={{ fontSize: 12, fontWeight: 650, color: d === today ? "var(--ink)" : "var(--low)" }}>{dayLetter(d)}</span>
+                <div title={`${xp} XP`} style={{ width: "100%", maxWidth: 28, height: `${Math.max(4, (xp / maxDay) * 70)}px`, borderRadius: 12, background: xp ? "var(--accent)" : "var(--surface2)", opacity: d > today ? 0.4 : xp && xp < progress.dailyGoal ? 0.55 : 1 }} />
+                <span style={{ fontSize: "var(--t-cap)", fontWeight: 600, color: d === today ? "var(--ink)" : "var(--low)" }}>{dayLetter(d)}</span>
               </div>
             );
           })}

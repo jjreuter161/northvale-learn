@@ -113,8 +113,8 @@ export function scheduleReminderUpdate() {
 function TimeSelect({ t, lang, value, quiet, onChange }) {
   return (
     <label style={{ flex: 1, minWidth: 140 }}>
-      <span style={{ display: "block", fontSize: 14, fontWeight: 650, color: "var(--mid)", marginBottom: 6 }}>{t("remind.time")}</span>
-      <select value={value} onChange={(e) => onChange(e.target.value)} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 8, padding: "12px", background: "var(--surface)", color: "var(--ink)", fontSize: 16 }}>
+      <span style={{ display: "block", fontSize: "var(--t-sm)", fontWeight: 600, color: "var(--mid)", marginBottom: 8 }}>{t("remind.time")}</span>
+      <select value={value} onChange={(e) => onChange(e.target.value)} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 12, padding: "12px", background: "var(--surface)", color: "var(--ink)", fontSize: "var(--t-body)" }}>
         {timeOptions(quiet).map((x) => (
           <option key={x} value={x}>
             {timeLabel(x, lang)}
@@ -145,11 +145,11 @@ export function ReminderSettings({ t, calendar }) {
       setBusy(false);
     }
   };
-  const row = { display: "flex", alignItems: "flex-end", gap: 10, flexWrap: "wrap" };
+  const row = { display: "flex", alignItems: "flex-end", gap: 12, flexWrap: "wrap" };
   return (
     <div>
-      <div style={{ fontWeight: 650, marginBottom: 4 }}>{r ? t("remind.at", { time: timeLabel(r.time, lang) }) : t("remind.title")}</div>
-      <p style={{ fontSize: 14, color: "var(--mid)", lineHeight: 1.45, margin: "0 0 10px" }}>{t("remind.how")}</p>
+      <div style={{ fontWeight: 600, marginBottom: 4 }}>{r ? t("remind.at", { time: timeLabel(r.time, lang) }) : t("remind.title")}</div>
+      <p style={{ fontSize: "var(--t-sm)", color: "var(--mid)", lineHeight: 1.5, margin: "0 0 12px" }}>{t("remind.how")}</p>
       {!pushSupported() ? (
         <Note icon="info" style={{ marginBottom: 12 }}>{isIOS() ? t("remind.ios") : t("remind.unsupported")}</Note>
       ) : r ? (
@@ -162,8 +162,8 @@ export function ReminderSettings({ t, calendar }) {
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 12 }}>
             <div style={{ flex: 1 }}>
-              <div style={{ fontWeight: 650 }}>{t("remind.quiet")}</div>
-              <div style={{ fontSize: 14, color: "var(--mid)" }}>{t("remind.quiet.sub")}</div>
+              <div style={{ fontWeight: 600 }}>{t("remind.quiet")}</div>
+              <div style={{ fontSize: "var(--t-sm)", color: "var(--mid)" }}>{t("remind.quiet.sub")}</div>
             </div>
             <Switch label={t("remind.quiet")} checked={r.quiet} onChange={(quiet) => run(() => changeReminder(quiet && QUIET(toMin(r.time)) ? { quiet, time: "18:00" } : { quiet }))} />
           </div>
@@ -176,11 +176,11 @@ export function ReminderSettings({ t, calendar }) {
           </Button>
         </div>
       )}
-      {error && <Note tone="bad" style={{ marginTop: 10 }}>{error}</Note>}
+      {error && <Note tone="bad" style={{ marginTop: 12 }}>{error}</Note>}
       {!r && calendar && (
         <details style={{ marginTop: 12 }}>
-          <summary style={{ cursor: "pointer", fontSize: 14, fontWeight: 650, color: "var(--mid)", minHeight: 44 }}>{t("remind.calendar")}</summary>
-          <div style={{ marginTop: 10 }}>{calendar}</div>
+          <summary style={{ cursor: "pointer", fontSize: "var(--t-sm)", fontWeight: 600, color: "var(--mid)", minHeight: 44 }}>{t("remind.calendar")}</summary>
+          <div style={{ marginTop: 12 }}>{calendar}</div>
         </details>
       )}
     </div>
@@ -201,16 +201,16 @@ export function ReminderCard({ t }) {
   const done = () => update((s) => ({ ...s, profile: { ...s.profile, remindAsked: true } }));
   return (
     <Card style={{ marginTop: 12 }}>
-      <div style={{ fontWeight: 750, fontSize: 17 }}>{t("remind.ask.title")}</div>
-      <p style={{ fontSize: 14, color: "var(--mid)", lineHeight: 1.45, margin: "4px 0 12px" }}>{t("remind.how")}</p>
-      <div style={{ display: "flex", alignItems: "flex-end", gap: 10, flexWrap: "wrap" }}>
+      <div style={{ fontWeight: 700, fontSize: "var(--t-lead)" }}>{t("remind.ask.title")}</div>
+      <p style={{ fontSize: "var(--t-sm)", color: "var(--mid)", lineHeight: 1.5, margin: "4px 0 12px" }}>{t("remind.how")}</p>
+      <div style={{ display: "flex", alignItems: "flex-end", gap: 12, flexWrap: "wrap" }}>
         <TimeSelect t={t} lang={lang} value={time} quiet onChange={setTime} />
         <Button size="md" onClick={() => turnOn({ time }).then(() => (done(), toast(t("remind.saved", { time: timeLabel(time, lang) }), "good")), (e) => setError(failMessage(t, e)))}>
           {t("remind.on")}
         </Button>
       </div>
-      {error && <Note tone="bad" style={{ marginTop: 10 }}>{error}</Note>}
-      <Button kind="ghost" size="md" onClick={done} style={{ marginTop: 6 }}>
+      {error && <Note tone="bad" style={{ marginTop: 12 }}>{error}</Note>}
+      <Button kind="ghost" size="md" onClick={done} style={{ marginTop: 8 }}>
         {t("remind.ask.no")}
       </Button>
     </Card>

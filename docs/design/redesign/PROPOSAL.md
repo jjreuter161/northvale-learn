@@ -1,6 +1,6 @@
 # Redesign proposal (Part 1, for your approval)
 
-**Status: a proposal with mockups. Nothing in the app has changed.** The mockups are static pages drawn from the app's real colors, icons, logo and lesson text. Build starts only after you approve (Part 2 of the brief).
+**Status: approved by the owner on 2026-11-19 (all seven decisions as recommended), and built in Part 2.** What was built, and the rules for changing it, are in [`docs/DESIGN-SYSTEM.md`](../../DESIGN-SYSTEM.md). This page stays as the record of the proposal; the mockups are static pages drawn from the app's real colors, icons, logo and lesson text.
 
 - Before and after: [phone](compare-phone.jpg) · [laptop](compare-laptop.jpg)
 - Mockups, phone: [1: Welcome, Today A and B, idea card A](mockups/overview-phone-1.jpg) · [2: idea card B, question, feedback right and wrong](mockups/overview-phone-2.jpg) · [3: finish, Goals, Settings in English and Spanish](mockups/overview-phone-3.jpg) · [looks: Spanish Today, Navy, Navy & cream, a Navy question](mockups/overview-phone-looks.jpg) · [all in Spanish](mockups/overview-phone-spanish.jpg)

@@ -184,7 +184,20 @@ export function validateContent() {
       if (!last || last.type !== "action") fail(at, "must end with an action");
       steps.forEach((s, i) => {
         const where = `${at} step ${i + 1}`;
-        if (s.type === "card") (text(s.title, `${where} title`), text(s.body, `${where} body`));
+        if (s.type === "card") {
+          text(s.title, `${where} title`);
+          text(s.body, `${where} body`);
+          const ex = s.example;
+          if (ex) {
+            if (!Array.isArray(ex.total) || ex.total.length !== 2) fail(where, "example: total is [label, amount]");
+            else ex.total.forEach((x, i) => text(x, `${where} example total ${i ? "amount" : "label"}`));
+            if (!Array.isArray(ex.split) || ex.split.length < 2 || ex.split.length > 3) fail(where, "example: split into 2 or 3 parts");
+            else {
+              ex.split.forEach(([label, amount], i) => (text(label, `${where} example part ${i + 1} label`), text(amount, `${where} example part ${i + 1} amount`)));
+              if (ex.split.reduce((n, p) => n + p[2], 0) !== 100) fail(where, "example: the shares add up to 100");
+            }
+          }
+        }
         else if (s.type === "action") {
           text(s.prompt, `${where} prompt`);
           if (!kinds.has(s.kind)) fail(where, `no module provides the action "${s.kind}"`);

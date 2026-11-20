@@ -34,8 +34,8 @@ export function RepairOffer({ t, onRepaired }) {
   const broken = useAppState((s) => s.progress.streak.broken);
   if (!repairAvailable()) return null;
   return (
-    <div style={{ background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 8, padding: 14, margin: "0 0 14px", textAlign: "left" }}>
-      <p style={{ fontSize: 15, lineHeight: 1.5, margin: "0 0 10px" }}>{t("repair.offer", { n: broken.count })}</p>
+    <div style={{ background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 12, padding: 16, margin: "0 0 16px", textAlign: "left" }}>
+      <p style={{ fontSize: "var(--t-body)", lineHeight: 1.5, margin: "0 0 12px" }}>{t("repair.offer", { n: broken.count })}</p>
       <Button
         full
         size="md"
@@ -68,20 +68,20 @@ export function OpenNotice({ t, locale, notice, onClose, go }) {
     const next = service("lessons", "nextFor")(service("goals", "recommendedUnits")() || []);
     const row = (label, value, sub) => (
       <div style={{ padding: "12px 0", borderTop: "1px solid var(--line)" }}>
-        <div style={{ fontSize: 12, fontWeight: 650, color: "var(--low)" }}>{label}</div>
-        <div style={{ fontWeight: 700, fontSize: 17, marginTop: 2 }}>{value}</div>
-        {sub && <div style={{ fontSize: 14, color: "var(--mid)", marginTop: 2 }}>{sub}</div>}
+        <div style={{ fontSize: "var(--t-cap)", fontWeight: 600, color: "var(--low)" }}>{label}</div>
+        <div style={{ fontWeight: 700, fontSize: "var(--t-lead)", marginTop: 4 }}>{value}</div>
+        {sub && <div style={{ fontSize: "var(--t-sm)", color: "var(--mid)", marginTop: 4 }}>{sub}</div>}
       </div>
     );
     return (
       <Sheet open onClose={close} title={nickname ? t("back.title.name", { name: nickname }) : t("back.title")}>
-        <p style={{ fontSize: 16, color: "var(--mid)", lineHeight: 1.5, margin: "0 0 6px" }}>{t("back.sub", { n: away })}</p>
-        <div style={{ marginBottom: 14 }}>
+        <p style={{ fontSize: "var(--t-body)", color: "var(--mid)", lineHeight: 1.5, margin: "0 0 8px" }}>{t("back.sub", { n: away })}</p>
+        <div style={{ marginBottom: 16 }}>
           {goal && row(t("back.goal"), goal.name || t(`tpl.${goal.kind}`))}
           {next && row(t("back.next"), text(next.title, locale), t("back.minutes", { unit: text(next.unitTitle, locale) }))}
         </div>
-        {event && event.type === "freeze_used" && <p style={{ fontSize: 15, lineHeight: 1.5, margin: "0 0 14px" }}>{t("streak.saved.body", { n: event.count, streak: event.streak })}</p>}
-        {event && event.type === "streak_reset" && (repaired ? <p style={{ fontSize: 15, lineHeight: 1.5, margin: "0 0 14px" }}>{t("repair.after", { n: streak })}</p> : repairAvailable() ? <RepairOffer t={t} onRepaired={() => setRepaired(true)} /> : <p style={{ fontSize: 15, lineHeight: 1.5, margin: "0 0 14px" }}>{t("streak.reset.body", { n: event.lost })}</p>)}
+        {event && event.type === "freeze_used" && <p style={{ fontSize: "var(--t-body)", lineHeight: 1.5, margin: "0 0 16px" }}>{t("streak.saved.body", { n: event.count, streak: event.streak })}</p>}
+        {event && event.type === "streak_reset" && (repaired ? <p style={{ fontSize: "var(--t-body)", lineHeight: 1.5, margin: "0 0 16px" }}>{t("repair.after", { n: streak })}</p> : repairAvailable() ? <RepairOffer t={t} onRepaired={() => setRepaired(true)} /> : <p style={{ fontSize: "var(--t-body)", lineHeight: 1.5, margin: "0 0 16px" }}>{t("streak.reset.body", { n: event.lost })}</p>)}
         <Button
           full
           onClick={() => {
@@ -103,12 +103,12 @@ export function OpenNotice({ t, locale, notice, onClose, go }) {
   const saved = event.type === "freeze_used";
   return (
     <Sheet open onClose={close} title={saved ? t("streak.saved.title") : t("streak.reset.title")}>
-      <div style={{ textAlign: "center", padding: "6px 4px 4px" }}>
-        <div style={{ width: 64, height: 64, borderRadius: 32, margin: "0 auto", background: "var(--brandSoft)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ textAlign: "center", padding: "8px 4px 4px" }}>
+        <div style={{ width: 64, height: 64, borderRadius: 28, margin: "0 auto", background: "var(--brandSoft)", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <Icon name={saved ? "snow" : "refresh"} size={30} color="var(--sky)" />
         </div>
         {saved || repaired || !repairAvailable() ? (
-          <p style={{ fontSize: 17, lineHeight: 1.5, margin: "8px 0 18px" }}>{saved ? t("streak.saved.body", { n: event.count, streak: event.streak }) : repaired ? t("repair.after", { n: streak }) : t("streak.reset.body", { n: event.lost })}</p>
+          <p style={{ fontSize: "var(--t-lead)", lineHeight: 1.5, margin: "8px 0 16px" }}>{saved ? t("streak.saved.body", { n: event.count, streak: event.streak }) : repaired ? t("repair.after", { n: streak }) : t("streak.reset.body", { n: event.lost })}</p>
         ) : (
           <div style={{ marginTop: 12 }}>
             <RepairOffer t={t} onRepaired={() => setRepaired(true)} />

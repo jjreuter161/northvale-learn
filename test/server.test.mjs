@@ -68,8 +68,8 @@ const server = spawn(process.execPath, [join(import.meta.dirname, "../server/ind
 let serverOut = "";
 await new Promise((resolve) => server.stdout.on("data", (d) => ((serverOut += d), String(d).includes("Northvale Learn on") && resolve())));
 const base = `http://127.0.0.1:${port}`;
-const call = async (path, { method = "GET", body, cookie, header = true } = {}) => {
-  const res = await fetch(base + path, { method, headers: { ...(header ? { "X-Northvale": "1" } : {}), ...(body ? { "Content-Type": "application/json" } : {}), ...(cookie ? { Cookie: cookie } : {}) }, body: body ? JSON.stringify(body) : undefined });
+const call = async (path, { method = "GET", body, cookie, header = true, accept } = {}) => {
+  const res = await fetch(base + path, { method, headers: { ...(header ? { "X-Northvale": "1" } : {}), ...(accept ? { Accept: accept } : {}), ...(body ? { "Content-Type": "application/json" } : {}), ...(cookie ? { Cookie: cookie } : {}) }, body: body ? JSON.stringify(body) : undefined });
   const text = await res.text();
   let json = null;
   try {
@@ -87,6 +87,19 @@ try {
   assert.equal((await call("/api/health", { header: false })).status, 403, "API needs the X-Northvale header");
   assert.equal((await call("/../server/store.js", { header: false })).status, 404);
   console.log("ok: page served with security headers; API guarded");
+
+  // --- a page that isn't there: a calm page in both languages for a browser, plain JSON for anything else ---
+  const lost = await call("/no-such-page", { header: false, accept: "text/html,application/xhtml+xml" });
+  assert.equal(lost.status, 404);
+  assert.match(lost.headers.get("content-type"), /text\/html/);
+  assert.match(lost.text, /We couldn't find that page\./);
+  assert.match(lost.text, /No encontramos esa página\./);
+  assert.match(lost.text, /href="\/"/, "a way back");
+  assert.match(lost.headers.get("content-security-policy"), /default-src 'self'/, "the not-found page carries the same security headers");
+  const lostJson = await call("/no-such-page", { header: false });
+  assert.equal(lostJson.status, 404);
+  assert.equal(lostJson.json.error.message, "Not found", "a program asking gets JSON");
+  console.log("ok: an unknown address gets a calm not-found page in English and Spanish (and JSON for a program)");
 
   // --- accounts ---
   const signup = (b) => call("/api/auth/signup", { method: "POST", body: { email: "dani@example.com", password: "a good long password", nickname: "Dani <script>", ageBand: "13-17", guardian: true, avatar: 2, ...b } });

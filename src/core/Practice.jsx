@@ -56,12 +56,12 @@ export default function Practice(ctx) {
         <Title sub={t("practice.sub")}>{t("nav.practice")}</Title>
         <Card pad={0} style={{ overflow: "hidden" }}>
           <Scene name="harbor" w={358} h={170} />
-          <div style={{ padding: "18px 22px 22px" }}>
-          <div className="nv-disp" style={{ fontSize: 26, lineHeight: 1.15, color: "var(--head)", marginBottom: 6 }}>{t("practice.locked.title")}</div>
+          <div style={{ padding: "16px 24px 24px" }}>
+          <div className="nv-disp" style={{ fontSize: "var(--t-head)", lineHeight: 1.2, color: "var(--head)", marginBottom: 8 }}>{t("practice.locked.title")}</div>
           <p style={{ margin: "0 0 16px", color: "var(--mid)", lineHeight: 1.5 }}>{t("practice.locked.body", { cash })}</p>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
             <Progress value={n} max={3} height={6} label={t("practice.locked.n", { n })} />
-            <span style={{ fontSize: 14, color: "var(--mid)", whiteSpace: "nowrap" }}>{t("practice.locked.n", { n })}</span>
+            <span style={{ fontSize: "var(--t-sm)", color: "var(--mid)", whiteSpace: "nowrap" }}>{t("practice.locked.n", { n })}</span>
           </div>
           <Button full onClick={() => ctx.go("lessons")}>
             {t("practice.locked.go")}
@@ -89,10 +89,10 @@ export default function Practice(ctx) {
           </List>
         </div>
       </div>
-      <p style={{ fontSize: 13, color: "var(--low)", lineHeight: 1.45, margin: "14px 2px 0" }}>{t("practice.fine")}</p>
+      <p style={{ fontSize: "var(--t-sm)", color: "var(--low)", lineHeight: 1.5, margin: "16px 4px 0" }}>{t("practice.fine")}</p>
       <Sheet open={intro} onClose={close} title={t("practice.intro.title")}>
-        <p style={{ margin: "0 0 10px", lineHeight: 1.5 }}>{t("practice.intro.body")}</p>
-        <p style={{ margin: "0 0 18px", lineHeight: 1.5, color: "var(--mid)" }}>{t("practice.intro.more")}</p>
+        <p style={{ margin: "0 0 12px", lineHeight: 1.5 }}>{t("practice.intro.body")}</p>
+        <p style={{ margin: "0 0 16px", lineHeight: 1.5, color: "var(--mid)" }}>{t("practice.intro.more")}</p>
         <Button full onClick={close}>
           {t("practice.intro.go")}
         </Button>

@@ -108,6 +108,9 @@ try {
       sizes[label] = info.size;
       const text = await page.evaluate(() => document.body.innerText);
       assert.ok(!/!/.test(text.replace(/¡/g, "")), `${name}: ${label} has an exclamation mark`);
+      // One red thing per screen: the main button's fill (the signal red) shows once at most (not counting the small pictures of the looks in Settings, which are hidden from screen readers).
+      const reds = await page.evaluate(() => [...document.querySelectorAll("main *")].filter((e) => { const b = e.getBoundingClientRect(); return b.width > 0 && b.height > 0 && !e.closest('[aria-hidden="true"]') && getComputedStyle(e).backgroundColor === "rgb(200, 32, 42)"; }).length);
+      assert.ok(reds <= 1, `${name}: ${label} has ${reds} red buttons (one at most)`);
       assert.doesNotMatch(text, EMOJI, `${name}: ${label} has an emoji`);
     }
     // 7: the same title size everywhere except Today's big title
@@ -130,7 +133,7 @@ try {
       const heights = await page.evaluate(() => [...document.querySelectorAll("main button.nv-btn")].filter((b) => b.getBoundingClientRect().width > 250).map((b) => Math.round(b.getBoundingClientRect().height)));
       heights.forEach((h) => hs.add(h));
     }
-    assert.ok([...hs].every((h) => h === 52 || h === 44 || h === 54), `full-width buttons are 52px (or 44 for small ones): ${[...hs].join(", ")}`);
+    assert.ok([...hs].every((h) => h === 56 || h === 52 || h === 44), `full-width buttons are 56px (the main one), 52 or 44 (the touch tokens): ${[...hs].join(", ")}`);
     await app.close();
   }
   ok("quality 7: full-width buttons are the same height on Today, Goals, Practice and Missions");

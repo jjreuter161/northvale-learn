@@ -14,7 +14,7 @@ import { addStrings, text } from "../../core/i18n.js";
 import { stream } from "../../core/api.js";
 import { useSession } from "../../core/session.js";
 import { level } from "../../core/progress.js";
-import { Button, Chip, Icon, Loading, Note, Segmented, Sheet } from "../../core/ui.jsx";
+import { Button, Card, Chip, Icon, Loading, Note, Segmented, Sheet, Switch } from "../../core/ui.jsx";
 import { redact } from "../../core/redact.js";
 import { sessionNow } from "../../core/session.js";
 import { UNITS, ALL_LESSONS, unitDone, lessonState } from "../lessons/content.js";
@@ -34,6 +34,7 @@ addStrings({
   "tutor.simple": S("Simple", "Sencillo"),
   "tutor.expert": S("Expert", "Experto"),
   "tutor.mode": S("How deep?", "¿Qué tan a fondo?"),
+  "tutor.expert_on": S("Expert answers", "Respuestas de experto"),
   "tutor.placeholder": S("Ask about any money word, chart or headline", "Pregunta por cualquier palabra, gráfica o titular"),
   "tutor.send": S("Send", "Enviar"),
   "tutor.hello": S("Ask about any money word, chart or headline and I'll explain it in plain language. I teach how things work; I don't tell you what to buy.", "Pregunta por cualquier palabra, gráfica o titular de dinero y te lo explico en lenguaje sencillo. Explico cómo funcionan las cosas; no te digo qué comprar."),
@@ -107,9 +108,9 @@ function Rich({ value }) {
   });
   return out.map((x) =>
     x.items ? (
-      <ul key={x.key} style={{ margin: "6px 0", paddingLeft: 20 }}>
+      <ul key={x.key} style={{ margin: "8px 0", paddingLeft: 24 }}>
         {x.items.map((it, j) => (
-          <li key={j} style={{ margin: "3px 0" }}>{inline(it)}</li>
+          <li key={j} style={{ margin: "4px 0" }}>{inline(it)}</li>
         ))}
       </ul>
     ) : (
@@ -146,10 +147,10 @@ function Sections({ value }) {
     const body = p.lines.join("\n");
     if (p.label && WARN.test(p.label))
       return (
-        <div key={i} style={{ display: "flex", gap: 10, margin: "0 0 10px", padding: "10px 12px 10px 10px", borderRadius: 8, background: "var(--badSoft)", borderLeft: "5px solid var(--bad)" }}>
-          <span style={{ paddingTop: 1, color: "var(--bad)" }}><Icon name="flag" size={20} stroke={2.2} /></span>
+        <div key={i} style={{ display: "flex", gap: 12, margin: "0 0 12px", padding: "12px 12px 12px 12px", borderRadius: 12, background: "var(--badSoft)", borderLeft: "5px solid var(--bad)" }}>
+          <span style={{ paddingTop: 0, color: "var(--bad)" }}><Icon name="flag" size={20} stroke={2.2} /></span>
           <div style={{ minWidth: 0 }}>
-            <div style={{ fontWeight: 750 }}>{p.label}</div>
+            <div style={{ fontWeight: 700 }}>{p.label}</div>
             <Rich value={body} />
           </div>
         </div>
@@ -202,12 +203,12 @@ function ExplainPanel({ t, locale, mode, aiReady, session, go, onGlossary, relat
   const showing = out || sent !== null;
   return (
     <div>
-      <div style={{ background: "var(--surface)", borderRadius: 10, padding: 14, fontSize: 16, lineHeight: 1.5, marginBottom: 12 }}>{t("explain.hello")}</div>
+      <div style={{ background: "var(--surface)", borderRadius: 12, padding: 16, fontSize: "var(--t-body)", lineHeight: 1.5, marginBottom: 12 }}>{t("explain.hello")}</div>
       <Note icon="shield" style={{ marginBottom: 12 }}>{t("explain.warn")}</Note>
       {!aiReady && (
         <Note icon="info" style={{ marginBottom: 12 }}>
           <strong style={{ display: "block" }}>{t("explain.offline")}</strong>
-          <div style={{ display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", gap: 8, marginTop: 12, flexWrap: "wrap" }}>
             <Button size="sm" kind="secondary" onClick={onGlossary}>{t("explain.glossary")}</Button>
             {!session.user && session.online && (
               <Button size="sm" kind="secondary" onClick={() => go("settings", { section: "account" })}>{t("tutor.signin")}</Button>
@@ -217,22 +218,22 @@ function ExplainPanel({ t, locale, mode, aiReady, session, go, onGlossary, relat
       )}
       {!showing && (
         <>
-          <textarea value={input} onChange={(e) => setInput(e.target.value)} placeholder={t("explain.placeholder")} aria-label={t("explain.placeholder")} rows={7} maxLength={4000} style={{ width: "100%", boxSizing: "border-box", borderRadius: 10, border: "1px solid var(--line)", background: "var(--surface)", color: "var(--ink)", padding: 12, fontSize: 16, lineHeight: 1.45, fontFamily: "inherit", resize: "vertical" }} />
-          <div aria-live="polite" style={{ fontSize: 13, color: "var(--mid)", minHeight: 20, margin: "6px 2px 10px" }}>{hiddenNow ? t("explain.hidden", { n: hiddenNow }) : ""}</div>
+          <textarea value={input} onChange={(e) => setInput(e.target.value)} placeholder={t("explain.placeholder")} aria-label={t("explain.placeholder")} rows={7} maxLength={4000} style={{ width: "100%", boxSizing: "border-box", borderRadius: 12, border: "1px solid var(--line)", background: "var(--surface)", color: "var(--ink)", padding: 12, fontSize: "var(--t-body)", lineHeight: 1.5, fontFamily: "inherit", resize: "vertical" }} />
+          <div aria-live="polite" style={{ fontSize: "var(--t-sm)", color: "var(--mid)", minHeight: 20, margin: "8px 4px 12px" }}>{hiddenNow ? t("explain.hidden", { n: hiddenNow }) : ""}</div>
           <Button full onClick={run} disabled={!input.trim() || busy || !aiReady}>{t("explain.go")}</Button>
         </>
       )}
       {showing && (
-        <div style={{ background: "var(--surface)", borderRadius: "10px 10px 10px 3px", padding: "12px 14px", fontSize: 16, lineHeight: 1.5 }}>
+        <div style={{ background: "var(--surface)", borderRadius: "12px 12px 12px 12px", padding: "12px 16px", fontSize: "var(--t-body)", lineHeight: 1.5 }}>
           {error ? <p style={{ margin: 0 }}>{error}</p> : out ? <Sections value={stripTopics(out)} /> : <Loading label={t("tutor.thinking")} size={28} />}
           {!busy && lessonIds.map((id) => <div key={id}>{related(id)}</div>)}
           {sent !== null && (
-            <details style={{ marginTop: 10, fontSize: 13, color: "var(--mid)" }}>
+            <details style={{ marginTop: 12, fontSize: "var(--t-sm)", color: "var(--mid)" }}>
               <summary style={{ cursor: "pointer", minHeight: 24 }}>{t("explain.sent")}</summary>
-              <pre style={{ whiteSpace: "pre-wrap", wordBreak: "break-word", fontFamily: "inherit", margin: "6px 0 0" }}>{sent}</pre>
+              <pre style={{ whiteSpace: "pre-wrap", wordBreak: "break-word", fontFamily: "inherit", margin: "8px 0 0" }}>{sent}</pre>
             </details>
           )}
-          <p style={{ margin: "10px 0 0", fontSize: 12, color: "var(--low)" }}>{t("explain.private")}</p>
+          <p style={{ margin: "12px 0 0", fontSize: "var(--t-cap)", color: "var(--low)" }}>{t("explain.private")}</p>
         </div>
       )}
       {showing && !busy && (
@@ -240,7 +241,7 @@ function ExplainPanel({ t, locale, mode, aiReady, session, go, onGlossary, relat
           <Button full kind="secondary" onClick={() => (setInput(""), setOut(""), setTopics([]), setSent(null), setError(null))}>{t("explain.again")}</Button>
         </div>
       )}
-      <p style={{ fontSize: 12, color: "var(--low)", textAlign: "center", margin: "12px 0 0" }}>{t("tutor.disclaimer")}</p>
+      <p style={{ fontSize: "var(--t-cap)", color: "var(--low)", textAlign: "center", margin: "12px 0 0" }}>{t("tutor.disclaimer")}</p>
     </div>
   );
 }
@@ -334,9 +335,9 @@ function Overlay({ t, locale, go }) {
     const u = UNITS.find((x) => x.id === l.unit);
     const open = lessonState(getState().progress, id) !== "locked";
     return (
-      <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 10, paddingTop: 10, borderTop: "1px solid var(--line)" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 12, paddingTop: 12, borderTop: "1px solid var(--line)" }}>
         <Icon name="book" size={18} color="var(--mid)" />
-        <span style={{ flex: 1, fontSize: 14, color: "var(--mid)" }}>{t("tutor.related", { unit: text(u.title, locale), lesson: text(l.title, locale) })}</span>
+        <span style={{ flex: 1, fontSize: "var(--t-sm)", color: "var(--mid)" }}>{t("tutor.related", { unit: text(u.title, locale), lesson: text(l.title, locale) })}</span>
         <Button size="sm" kind="secondary" onClick={() => (setOpen(false), go("lessons", open ? { lesson: id } : {}))}>
           {t("tutor.open")}
         </Button>
@@ -346,104 +347,102 @@ function Overlay({ t, locale, go }) {
 
   return (
     <Sheet open={open} onClose={() => setOpen(false)} title={t("tutor.title")} tall fill>
-      <div style={{ flexShrink: 0 }}>
-      <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 12 }}>
-        <div style={{ flex: 1 }}>
-          <Segmented label={t("tutor.mode")} value={slice.mode} onChange={(mode) => save((s) => ({ ...s, mode }))} options={[{ value: "simple", label: t("tutor.simple") }, { value: "expert", label: t("tutor.expert") }]} />
-        </div>
-        {slice.messages.length > 0 && (
-          <Button kind="ghost" size="sm" onClick={() => save(() => ({ ...DEFAULTS, mode: slice.mode }))} disabled={busy}>
-            {t("tutor.new")}
-          </Button>
-        )}
-      </div>
-
-      <div style={{ marginBottom: 12 }}>
+      {/* One control up top: ask, or explain something you paste. */}
+      <div style={{ flexShrink: 0, marginBottom: 12 }}>
         <Segmented label={t("explain.view")} value={view} onChange={setView} options={[{ value: "chat", label: t("explain.chat") }, { value: "explain", label: t("explain.tab") }]} />
       </div>
-      </div>
       <div ref={listRef} style={{ flex: 1, minHeight: 0, overflowY: "auto" }}>
-      {view === "explain" ? (
-        <ExplainPanel t={t} locale={locale} mode={slice.mode} aiReady={aiReady} session={session} go={(r) => (setOpen(false), go(r))} onGlossary={() => setView("chat")} related={related} />
-      ) : (
-        <>
-      {!aiReady && (
-        <Note icon="info" style={{ marginBottom: 12 }}>
-          <strong style={{ display: "block" }}>{t("tutor.offline.banner")}</strong>
-          {!session.user && session.online && session.ai && (
-            <>
-              <span style={{ display: "block", fontSize: 14, color: "var(--mid)", marginTop: 4 }}>{t("tutor.offline.account")}</span>
-              <Button size="sm" kind="secondary" style={{ marginTop: 10 }} onClick={() => (setOpen(false), go("settings", { section: "account" }))}>
-                {t("tutor.signin")}
-              </Button>
-            </>
-          )}
-        </Note>
-      )}
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        {slice.messages.length === 0 && (
-          <div style={{ background: "var(--surface)", borderRadius: 10, padding: 14, fontSize: 16, lineHeight: 1.5 }}>
-            {t(aiReady ? "tutor.hello" : "tutor.hello.words")}
-          </div>
-        )}
-        {slice.messages.map((m) =>
-          m.role === "user" ? (
-            <div key={m.id} style={{ alignSelf: "flex-end", maxWidth: "86%" }}>
-              {m.about && <div style={{ fontSize: 12, color: "var(--low)", textAlign: "right", marginBottom: 4 }}>{t("tutor.about", { what: m.about })}…</div>}
-              <div style={{ background: "var(--brand)", color: "var(--onBrand)", borderRadius: "10px 10px 3px 10px", padding: "11px 14px", fontSize: 16, lineHeight: 1.45 }}>{m.text}</div>
-            </div>
-          ) : (
-            <div key={m.id} style={{ alignSelf: "flex-start", maxWidth: "94%", background: "var(--surface)", borderRadius: "10px 10px 10px 3px", padding: "12px 14px", fontSize: 16, lineHeight: 1.5, color: "var(--ink)", fontWeight: m.error ? 650 : undefined, overflowWrap: "anywhere" }}>
-              {m.offline ? (
-                <>
-                  <p style={{ margin: "0 0 8px", color: "var(--mid)", fontSize: 14 }}>{m.glossary ? t("tutor.offline") : m.lesson ? t("tutor.offline.lesson") : t("tutor.offline.none")}</p>
-                  {m.text && <p style={{ margin: 0, fontWeight: 650 }}>{m.text}</p>}
-                </>
-              ) : m.text ? (
-                <Rich value={m.text} />
-              ) : (
-                <Loading label={t("tutor.thinking")} size={28} />
+        {view === "explain" ? (
+          <ExplainPanel t={t} locale={locale} mode={slice.mode} aiReady={aiReady} session={session} go={(r) => (setOpen(false), go(r))} onGlossary={() => setView("chat")} related={related} />
+        ) : (
+          <>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {slice.messages.length === 0 && (
+                <Card>
+                  <p style={{ margin: 0 }}>{t(aiReady ? "tutor.hello" : "tutor.hello.words")}</p>
+                  {!aiReady && (
+                    <>
+                      <p style={{ fontSize: "var(--t-sm)", color: "var(--mid)", margin: "12px 0 0" }}>{t("tutor.offline.banner")}</p>
+                      {!session.user && session.online && session.ai && (
+                        <>
+                          <p style={{ fontSize: "var(--t-sm)", color: "var(--mid)", margin: "4px 0 0" }}>{t("tutor.offline.account")}</p>
+                          <Button size="sm" kind="secondary" style={{ marginTop: 12 }} onClick={() => (setOpen(false), go("settings", { section: "account" }))}>
+                            {t("tutor.signin")}
+                          </Button>
+                        </>
+                      )}
+                    </>
+                  )}
+                </Card>
               )}
-              {m.lesson && !m.error && (m.offline || m.text) && related(m.lesson)}
+              {slice.messages.map((m) =>
+                m.role === "user" ? (
+                  <div key={m.id} style={{ alignSelf: "flex-end", maxWidth: "86%" }}>
+                    {m.about && <div style={{ fontSize: "var(--t-cap)", color: "var(--low)", textAlign: "right", marginBottom: 4 }}>{t("tutor.about", { what: m.about })}…</div>}
+                    <div style={{ background: "var(--brand)", color: "var(--onBrand)", borderRadius: 18, padding: "12px 16px" }}>{m.text}</div>
+                  </div>
+                ) : (
+                  <div key={m.id} style={{ alignSelf: "flex-start", maxWidth: "94%", background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 18, padding: "12px 16px", color: "var(--ink)", fontWeight: m.error ? 600 : undefined, overflowWrap: "anywhere" }}>
+                    {m.offline ? (
+                      <>
+                        <p style={{ margin: "0 0 8px", color: "var(--mid)", fontSize: "var(--t-sm)" }}>{m.glossary ? t("tutor.offline") : m.lesson ? t("tutor.offline.lesson") : t("tutor.offline.none")}</p>
+                        {m.text && <p style={{ margin: 0, fontWeight: 600 }}>{m.text}</p>}
+                      </>
+                    ) : m.text ? (
+                      <Rich value={m.text} />
+                    ) : (
+                      <Loading label={t("tutor.thinking")} size={28} />
+                    )}
+                    {m.lesson && !m.error && (m.offline || m.text) && related(m.lesson)}
+                  </div>
+                )
+              )}
             </div>
-          )
+
+            {(slice.messages.length === 0 || missed) && (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, margin: "16px 0 4px" }}>
+                {(aiReady ? suggestions : glossaryWords.slice(0, 5)).map((s) => (
+                  <Chip key={s} onClick={() => ask(s)} style={{ fontSize: "var(--t-sm)" }}>
+                    {s}
+                  </Chip>
+                ))}
+              </div>
+            )}
+
+            {about && (
+              <Note icon="sparkles" style={{ marginTop: 12 }}>
+                <strong>{t("tutor.about", { what: about.question || about.context })}</strong>
+                <div style={{ fontSize: "var(--t-sm)", color: "var(--mid)", marginTop: 4, maxHeight: 60, overflow: "hidden" }}>{about.context}</div>
+              </Note>
+            )}
+          </>
         )}
-      </div>
-
-      {(slice.messages.length === 0 || missed) && (
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, margin: "14px 0 4px" }}>
-          {(aiReady ? suggestions : glossaryWords.slice(0, 5)).map((s) => (
-            <Chip key={s} onClick={() => ask(s)} style={{ fontSize: 14 }}>
-              {s}
-            </Chip>
-          ))}
-        </div>
-      )}
-
-      {about && (
-        <Note icon="sparkles" style={{ marginTop: 12 }}>
-          <strong>{t("tutor.about", { what: about.question || about.context })}</strong>
-          <div style={{ fontSize: 13, color: "var(--mid)", marginTop: 4, maxHeight: 60, overflow: "hidden" }}>{about.context}</div>
-        </Note>
-      )}
-        </>
-      )}
       </div>
       {view !== "explain" && (
         <div style={{ flexShrink: 0 }}>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          ask();
-        }}
-        style={{ display: "flex", gap: 8, marginTop: 8 }}
-      >
-        <input value={input} onChange={(e) => setInput(e.target.value)} placeholder={t("tutor.placeholder")} aria-label={t("tutor.placeholder")} enterKeyHint="send" maxLength={2000} style={{ flex: 1, minWidth: 0, border: "1px solid var(--line)", borderRadius: 8, padding: "12px 16px", fontSize: 16, background: "var(--surface)", color: "var(--ink)" }} />
-        <button type="submit" disabled={busy || !input.trim()} aria-label={t("tutor.send")} style={{ width: 48, height: 48, borderRadius: 24, border: "none", background: "var(--brand)", color: "var(--onBrand)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", opacity: busy || !input.trim() ? 0.5 : 1, flexShrink: 0 }}>
-          <Icon name="send" size={20} />
-        </button>
-      </form>
-      <p style={{ fontSize: 12, color: "var(--low)", textAlign: "center", margin: "8px 0 0" }}>{t("tutor.disclaimer")}</p>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              ask();
+            }}
+            style={{ display: "flex", gap: 8, marginTop: 8 }}
+          >
+            <input value={input} onChange={(e) => setInput(e.target.value)} placeholder={t("tutor.placeholder")} aria-label={t("tutor.placeholder")} enterKeyHint="send" maxLength={2000} className="nv-field" style={{ flex: 1, minWidth: 0 }} />
+            <button type="submit" disabled={busy || !input.trim()} aria-label={t("tutor.send")} className="nv-press" style={{ width: 52, height: 52, borderRadius: 999, border: "none", background: "var(--brand)", color: "var(--onBrand)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", opacity: busy || !input.trim() ? 0.5 : 1, flexShrink: 0 }}>
+              <Icon name="send" size={20} />
+            </button>
+          </form>
+          {/* How deep the answers go, and starting over, stay out of the way down here. */}
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 8 }}>
+            <Switch label={t("tutor.expert_on")} checked={slice.mode === "expert"} onChange={(on) => save((s) => ({ ...s, mode: on ? "expert" : "simple" }))} />
+            <span style={{ flex: 1, fontSize: "var(--t-sm)", color: "var(--mid)" }}>{t("tutor.expert_on")}</span>
+            {slice.messages.length > 0 && (
+              <Button kind="ghost" size="sm" onClick={() => save(() => ({ ...DEFAULTS, mode: slice.mode }))} disabled={busy}>
+                {t("tutor.new")}
+              </Button>
+            )}
+          </div>
+          <p style={{ fontSize: "var(--t-cap)", color: "var(--low)", textAlign: "center", margin: "8px 0 0" }}>{t("tutor.disclaimer")}</p>
         </div>
       )}
     </Sheet>

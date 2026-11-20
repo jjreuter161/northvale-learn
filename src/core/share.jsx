@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { useAppState } from "./store.js";
 import { addStrings } from "./i18n.js";
 import { track } from "./analytics.js";
+import { COLORS, TINTS } from "./colors.js";
 import { FONT, SERIF, MARK_PATHS, Button, Note, Sheet, Switch } from "./ui.jsx";
 import { inviteUrl } from "./invites.jsx";
 
@@ -65,9 +66,9 @@ async function draw([big, sub], footer) {
   const c = document.createElement("canvas");
   c.width = c.height = 1080;
   const x = c.getContext("2d");
-  x.fillStyle = cv("--bg", "#1B3560");
+  x.fillStyle = cv("--bg", COLORS.navy.hex);
   x.fillRect(0, 0, 1080, 1080);
-  x.fillStyle = cv("--ink", "#F7F2E8");
+  x.fillStyle = cv("--ink", COLORS.cream.hex);
   x.textBaseline = "alphabetic";
   x.save();
   x.translate(92, 104);
@@ -84,9 +85,9 @@ async function draw([big, sub], footer) {
   const lines = wrap(x, big, 888).slice(0, 4);
   let y = 560 - (lines.length - 1) * 58;
   for (const l of lines) (x.fillText(l, 96, y), (y += 116));
-  x.fillStyle = cv("--mid", "#E3CFA4");
+  x.fillStyle = cv("--mid", TINTS.creamLine);
   x.fillRect(96, y - 70, 120, 10);
-  x.fillStyle = cv("--ink", "#F7F2E8");
+  x.fillStyle = cv("--ink", COLORS.cream.hex);
   x.font = `500 46px ${FONT}`;
   x.globalAlpha = 0.9;
   for (const l of wrap(x, sub, 888).slice(0, 3)) (x.fillText(l, 96, y + 10), (y += 60));
@@ -139,12 +140,12 @@ export function ShareHost({ t }) {
     );
   return (
     <Sheet open onClose={() => setCard(null)} title={t("share.title")}>
-      <div style={{ aspectRatio: "1", borderRadius: 10, overflow: "hidden", background: "var(--bg)", marginBottom: 12 }}>{image && <img src={image.url} alt={lines.join(" — ")} style={{ width: "100%", height: "100%", display: "block" }} />}</div>
+      <div style={{ aspectRatio: "1", borderRadius: 12, overflow: "hidden", background: "var(--bg)", marginBottom: 12 }}>{image && <img src={image.url} alt={lines.join(" — ")} style={{ width: "100%", height: "100%", display: "block" }} />}</div>
       {card.kind === "goal" && adult(ageBand) ? (
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
           <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: 650 }}>{t("share.details")}</div>
-            <div style={{ fontSize: 14, color: "var(--mid)" }}>{t("share.details.sub")}</div>
+            <div style={{ fontWeight: 600 }}>{t("share.details")}</div>
+            <div style={{ fontSize: "var(--t-sm)", color: "var(--mid)" }}>{t("share.details.sub")}</div>
           </div>
           <Switch label={t("share.details")} checked={details} onChange={setDetails} />
         </div>

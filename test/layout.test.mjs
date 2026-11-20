@@ -142,9 +142,16 @@ try {
       assert.ok(await page.getByRole("switch").count(), `${name}: the parts under “More” are in the list`);
     } else {
       assert.equal(await page.getByRole("navigation", { name: "Settings" }).count(), 0, `${name}: no section list`);
-      assert.ok(await page.getByRole("heading", { name: "Account" }).count(), `${name}: Settings is one page`);
+      // A short first page: language and country, colors, then a list of rows that open their own pages.
       const order = await page.locator("main h2").evaluateAll((hs) => hs.map((h) => h.innerText.trim()));
-      assert.ok(order.indexOf("Language and country") < order.indexOf("Account"), `${name}: language and country come before the account (${order.join(" > ")})`);
+      assert.ok(order.indexOf("Language and country") >= 0 && order.indexOf("Language and country") < order.indexOf("Colors"), `${name}: language and country, then colors (${order.join(" > ")})`);
+      for (const row of ["Profile", "Learning", "Account", "Sound and feel", "Privacy", "Legal", "About"]) assert.equal(await page.getByRole("button", { name: row, exact: true }).count(), 1, `${name}: a "${row}" row`);
+      assert.equal(await page.getByText("Create a free account").count(), 0, `${name}: the account form is not on the first page`);
+      await page.getByRole("button", { name: "Account", exact: true }).click();
+      await page.getByRole("heading", { name: "Account", level: 1 }).waitFor();
+      assert.equal(await page.getByRole("radiogroup", { name: "Language" }).count(), 0, `${name}: a page shows only its own part`);
+      await page.getByRole("button", { name: /^Back: Settings/ }).click();
+      await page.getByRole("radiogroup", { name: "Language" }).waitFor();
     }
     await fits(page, `${name}: Settings`);
 
@@ -158,11 +165,15 @@ try {
     else assert.ok(box.bottom >= h - 2, `${name}: the sheet comes up from the bottom (${JSON.stringify(box)})`);
     await page.keyboard.press("Escape");
 
-    // --- a lesson: a calm centered column ---
+    // --- a lesson: a calm centered reading column (on a computer, with the "In this lesson" panel beside it) ---
     await startLesson(page);
     const col = await rectOf(page, ".nv-ovl");
-    assert.ok(col.width <= 641, `${name}: the lesson column is ${Math.round(col.width)}px (at most 640)`);
-    assert.ok(Math.abs((col.left + col.right) / 2 - w / 2) < 3, `${name}: the lesson column is centered`);
+    const reading = w >= 1024 ? await rectOf(page, ".nv-main") : col;
+    const most = w >= 1024 ? 712 : 640;
+    assert.ok(reading.width <= most + 1, `${name}: the lesson column is ${Math.round(reading.width)}px (at most ${most})`);
+    assert.ok(Math.abs((col.left + col.right) / 2 - w / 2) < 3, `${name}: the lesson is centered`);
+    if (w >= 1024) assert.ok(await page.locator(".nv-lside").isVisible(), `${name}: the lesson shows the "In this lesson" panel`);
+    else assert.equal(await page.locator(".nv-lside").count(), 0, `${name}: no side panel on a phone or a tablet`);
     const hint = page.getByText(/Tip: press 1–4/);
 
     if (name === "laptop") {
@@ -213,7 +224,7 @@ try {
       await p2.getByRole("button", { name: /^Unit \d/ }).first().hover().catch(() => {});
       await c2.close();
     }
-    console.log(`ok: ${name} (${w}px): ${computer ? "sidebar" : "bottom tabs"}${wide ? " and the panel on Today" : ""}; every tab and Settings fit${w >= 600 ? "; two columns" : ""}; the dialog ${w >= 700 ? "centered" : "from the bottom"}; the lesson in a ≤640px column${name === "laptop" ? "; the keyboard (1–4, Enter) and hover" : ""}`);
+    console.log(`ok: ${name} (${w}px): ${computer ? "sidebar" : "bottom tabs"}${wide ? " and the panel on Today" : ""}; every tab and Settings fit${w >= 600 ? "; two columns" : ""}; the dialog ${w >= 700 ? "centered" : "from the bottom"}; the lesson in a ≤${w >= 1024 ? "712px column with its side panel" : "640px column"}${name === "laptop" ? "; the keyboard (1–4, Enter) and hover" : ""}`);
   }
 
   // --- 200% zoom on a laptop (1366px at double size is 683px wide): the tablet layout, nothing off the side ---
@@ -286,7 +297,7 @@ try {
   console.log("ok: Spanish fits too, on a phone and a laptop");
 
   // --- the public pages ---
-  for (const path of ["welcome", "bienvenida", "admin", "verify", "verificar", "teacher-guide", "guia-docente"]) {
+  for (const path of ["welcome", "bienvenida", "admin", "verify", "verificar", "teacher-guide", "guia-docente", "no-such-page"]) {
     for (const [name, w, h] of SIZES) {
       const ctx = await browser.newContext({ viewport: { width: w, height: h }, serviceWorkers: "block", reducedMotion: "reduce" });
       const page = await ctx.newPage();
@@ -297,7 +308,7 @@ try {
       await ctx.close();
     }
   }
-  console.log("ok: the landing, admin, check-a-certificate and teacher-guide pages fit at all four sizes");
+  console.log("ok: the landing, admin, check-a-certificate, teacher-guide and not-found pages fit at all four sizes");
 } finally {
   await browser.close();
   server.kill();

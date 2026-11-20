@@ -6,7 +6,7 @@ import { Suspense, lazy, useEffect, useMemo, useRef, useState } from "react";
 import { useAppState, update, on } from "./store.js";
 import { makeT } from "./i18n.js";
 import { allModules, getModule } from "./registry.js";
-import { SELECTED, lookFrom, GLOBAL_CSS, Icon, Wordmark, BetaTag, StreakStar, Toasts, Sheet, toast, Button, Loading, useLookSpec } from "./ui.jsx";
+import { lookFrom, GLOBAL_CSS, Icon, Wordmark, BetaTag, StreakStar, Toasts, Sheet, toast, Button, Loading, useLookSpec } from "./ui.jsx";
 import { useSession, refreshSession, schedulePush, verifyEmail } from "./session.js";
 import { settleOnOpen } from "./game.js";
 import { OpenNotice, RepairOffer, COMEBACK_DAYS } from "./Comeback.jsx";
@@ -204,9 +204,9 @@ export default function App() {
   const logo = <Wordmark size={desk ? 27 : 25} mark play fill={Math.min(1, ((progress.days || {})[today] || 0) / (progress.dailyGoal || 20))} />;
 
   const header = (
-    <header style={{ position: "sticky", top: 0, zIndex: 20, background: "var(--bg)", padding: desk ? "14px 32px 6px" : "calc(8px + env(safe-area-inset-top)) 12px 6px 16px", display: "flex", alignItems: "center", gap: 6 }}>
+    <header style={{ position: "sticky", top: 0, zIndex: 20, background: "var(--bg)", padding: desk ? "14px 32px 6px" : "calc(8px + env(safe-area-inset-top)) 12px 6px 16px", display: "flex", alignItems: "center", gap: 8 }}>
       {!isRoot && (
-        <button onClick={() => go(from || tab.route)} aria-label={`${t("common.back")}: ${t(back)}`} className="nv-press" style={{ ...iconBtn, width: "auto", gap: 2, padding: "0 10px 0 2px", marginLeft: -8, fontSize: 16, fontWeight: 650, minWidth: 0 }}>
+        <button onClick={() => go(from || tab.route)} aria-label={`${t("common.back")}: ${t(back)}`} className="nv-press" style={{ ...iconBtn, width: "auto", gap: 4, padding: "0 12px 0 4px", marginLeft: -8, fontSize: "var(--t-body)", fontWeight: 600, minWidth: 0 }}>
           <Icon name="back" /> <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t(back)}</span>
         </button>
       )}
@@ -219,10 +219,10 @@ export default function App() {
       </div>
       <button onClick={() => setStreakOpen(true)} aria-label={t("streak.aria", { n: progress.streak.count })} className="nv-press" style={{ ...chip, color: "var(--mid)" }}>
         <StreakStar count={progress.streak.count} size={18} color={progress.streak.last === today ? "var(--flame)" : "var(--low)"} />
-        <span style={{ fontWeight: 650, fontSize: 15, fontVariantNumeric: "tabular-nums" }}>{progress.streak.count}</span>
+        <span style={{ fontWeight: 600, fontSize: "var(--t-body)", fontVariantNumeric: "tabular-nums" }}>{progress.streak.count}</span>
       </button>
       {getModule("tutor") && !desk && (
-        <button onClick={() => getModule("tutor").services.open({})} aria-label={t("nav.ask")} className="nv-press" style={{ display: "inline-flex", alignItems: "center", gap: 6, border: "none", background: "var(--surface)", color: "var(--ink)", borderRadius: 8, height: 44, padding: "0 14px", fontSize: 15, fontWeight: 650, cursor: "pointer", flexShrink: 0 }}>
+        <button onClick={() => getModule("tutor").services.open({})} aria-label={t("nav.ask")} className="nv-press" style={{ display: "inline-flex", alignItems: "center", gap: 8, border: "none", background: "var(--surface)", color: "var(--ink)", borderRadius: 12, height: 44, padding: "0 16px", fontSize: "var(--t-body)", fontWeight: 600, cursor: "pointer", flexShrink: 0 }}>
           <Icon name="chat" size={17} /> <span className="nv-word">{t("nav.ask")}</span>
         </button>
       )}
@@ -233,12 +233,12 @@ export default function App() {
   const tutor = getModule("tutor");
   const sidebar = (
     <aside className="nv-side">
-      <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "2px 10px 20px" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 12px 24px" }}>
         {logo} <BetaTag label={t("common.beta")} />
       </div>
       <nav aria-label={t("nav.menu")} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
         {TABS.map((x) => (
-          <button key={x.id} onClick={() => openTab(x)} aria-current={tab.id === x.id ? "page" : undefined} className="nv-sidebtn nv-press" style={tab.id === x.id ? { ...SELECTED, background: "var(--brandSoft)", color: "var(--brand)" } : undefined}>
+          <button key={x.id} onClick={() => openTab(x)} aria-current={tab.id === x.id ? "page" : undefined} className="nv-sidebtn nv-press">
             <Icon name={x.icon} size={24} /> {t(x.label)}
           </button>
         ))}
@@ -253,12 +253,12 @@ export default function App() {
   );
 
   const tabBar = (
-    <nav aria-label={t("nav.menu")} style={{ position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 30, background: "var(--bg)", borderTop: "1px solid var(--line)", paddingBottom: "env(safe-area-inset-bottom)" }}>
-      <div style={{ display: "flex", maxWidth: 640, margin: "0 auto" }}>
+    <nav aria-label={t("nav.menu")} className="nv-tabs">
+      <div>
         {TABS.map((x) => (
-          <button key={x.id} onClick={() => openTab(x)} aria-current={tab.id === x.id ? "page" : undefined} className="nv-press" style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 3, border: "none", background: "transparent", color: tab.id === x.id ? "var(--brand)" : "var(--low)", padding: "8px 2px 6px", minHeight: 58, fontSize: 12, lineHeight: 1.15, fontWeight: 650, cursor: "pointer", textAlign: "center", hyphens: "auto", overflowWrap: "anywhere" }}>
-            <span style={{ width: "100%", maxWidth: 60, height: 32, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", background: tab.id === x.id ? "var(--brandSoft)" : "transparent", ...(tab.id === x.id ? SELECTED : { border: "2px solid transparent" }), transition: "background .2s" }}>
-              <Icon name={x.icon} size={23} />
+          <button key={x.id} onClick={() => openTab(x)} aria-current={tab.id === x.id ? "page" : undefined} className="nv-press nv-tab">
+            <span className="pill">
+              <Icon name={x.icon} size={24} />
             </span>
             {t(x.label)}
           </button>
@@ -299,8 +299,8 @@ export default function App() {
   );
 }
 
-const iconBtn = { border: "none", background: "transparent", color: "var(--ink)", width: 44, height: 44, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 };
-const chip = { border: "none", background: "transparent", display: "flex", alignItems: "center", gap: 4, height: 44, padding: "0 8px", borderRadius: 8, cursor: "pointer", flexShrink: 0 };
+const iconBtn = { border: "none", background: "transparent", color: "var(--ink)", width: 44, height: 44, borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 };
+const chip = { border: "none", background: "transparent", display: "flex", alignItems: "center", gap: 4, height: 44, padding: "0 8px", borderRadius: 12, cursor: "pointer", flexShrink: 0 };
 
 function StreakSheet({ open, onClose, t, progress, today }) {
   const s = progress.streak;
@@ -308,37 +308,37 @@ function StreakSheet({ open, onClose, t, progress, today }) {
   const lessonDays = new Set(progress.lessonDays || []);
   return (
     <Sheet open={open} onClose={onClose} title={t("streak.title")}>
-      <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 16 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 16 }}>
         <StreakStar count={s.count} size={54} />
         <div>
-          <div className="nv-disp" style={{ fontSize: 36, lineHeight: 1 }}>{t("streak.days", { n: s.count })}</div>
-          <div style={{ fontSize: 14, color: "var(--mid)", marginTop: 4 }}>{t("streak.best", { n: s.best })}</div>
+          <div className="nv-disp" style={{ fontSize: "var(--t-disp)", lineHeight: 1.2 }}>{t("streak.days", { n: s.count })}</div>
+          <div style={{ fontSize: "var(--t-sm)", color: "var(--mid)", marginTop: 4 }}>{t("streak.best", { n: s.best })}</div>
         </div>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 6, marginBottom: 16 }} aria-label={t("streak.calendar")}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 8, marginBottom: 16 }} aria-label={t("streak.calendar")}>
         {days.map((d) => {
           const lesson = lessonDays.has(d);
           const frozen = s.frozen.includes(d);
           return (
-            <div key={d} title={d} style={{ aspectRatio: "1", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 650, background: frozen ? "var(--brandSoft)" : lesson ? "var(--flame)" : "var(--surface2)", color: lesson && !frozen ? "var(--onBrand)" : "var(--mid)", outline: d === today ? "1px solid var(--ink)" : "none" }}>
+            <div key={d} title={d} style={{ aspectRatio: "1", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "var(--t-sm)", fontWeight: 600, background: frozen ? "var(--brandSoft)" : lesson ? "var(--flame)" : "var(--surface2)", color: lesson && !frozen ? "var(--onBrand)" : "var(--mid)", outline: d === today ? "1px solid var(--ink)" : "none" }}>
               {frozen ? <Icon name="snow" size={16} color="var(--sky)" /> : Number(d.slice(8))}
             </div>
           );
         })}
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 12, background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 10, padding: 14 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 12, padding: 16 }}>
         <Icon name="snow" size={28} color="var(--sky)" />
         <div style={{ flex: 1 }}>
-          <div style={{ fontWeight: 750 }}>{t("streak.freezes", { n: progress.freezes, max: MAX_FREEZES })}</div>
-          <div style={{ fontSize: 14, color: "var(--mid)", lineHeight: 1.4 }}>{t("streak.freezes.how")}</div>
+          <div style={{ fontWeight: 700 }}>{t("streak.freezes", { n: progress.freezes, max: MAX_FREEZES })}</div>
+          <div style={{ fontSize: "var(--t-sm)", color: "var(--mid)", lineHeight: 1.5 }}>{t("streak.freezes.how")}</div>
         </div>
       </div>
-      <div style={{ marginTop: 14 }}>
+      <div style={{ marginTop: 16 }}>
         <RepairOffer t={t} />
       </div>
-      <p style={{ fontSize: 14, color: "var(--mid)", lineHeight: 1.5, margin: "0 2px" }}>{t("streak.rule")}</p>
+      <p style={{ fontSize: "var(--t-sm)", color: "var(--mid)", lineHeight: 1.5, margin: "0 4px" }}>{t("streak.rule")}</p>
       {s.count >= 2 && (
-        <Button full kind="secondary" style={{ marginTop: 14 }} onClick={() => (onClose(), openShare({ kind: "streak", n: s.count }))}>
+        <Button full kind="secondary" style={{ marginTop: 16 }} onClick={() => (onClose(), openShare({ kind: "streak", n: s.count }))}>
           <Icon name="share" size={18} /> {t("share.button")}
         </Button>
       )}

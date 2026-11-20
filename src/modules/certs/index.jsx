@@ -32,12 +32,12 @@ function MeCard({ t, locale, go }) {
     <>
       <Card pad={16} onClick={() => setOpen(true)}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <span style={{ width: 38, height: 38, borderRadius: 8, background: "var(--bg)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <span style={{ width: 38, height: 38, borderRadius: 12, background: "var(--bg)", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <Icon name="trophy" size={19} />
           </span>
           <div style={{ flex: 1 }}>
             <div style={{ fontWeight: 700 }}>{t("cert.title")}</div>
-            <div style={{ fontSize: 14, color: "var(--mid)" }}>{finished ? t("cert.card.some", { n: finished, total: TRACKS.length }) : t("cert.card.none")}</div>
+            <div style={{ fontSize: "var(--t-sm)", color: "var(--mid)" }}>{finished ? t("cert.card.some", { n: finished, total: TRACKS.length }) : t("cert.card.none")}</div>
           </div>
         </div>
       </Card>

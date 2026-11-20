@@ -51,14 +51,17 @@ addStrings({
 
 const at = (v, region) => (Array.isArray(v) ? v[region === "MX" ? 1 : 0] : v);
 const tx = (locale) => (x, vars) => text(x, locale, vars);
-const btn = { textAlign: "left", display: "flex", alignItems: "center", gap: 12, width: "100%", borderRadius: 8, padding: "14px 16px", fontSize: 16, fontWeight: 650, minHeight: 56, color: "var(--ink)", font: "inherit" };
+// An answer option is `.nv-opt` (ui.jsx); this adds what state it's in. A pick is outlined in the text color; right is solid, a miss is dashed (and never red).
 const tone = (state) =>
-  state === "right" ? { border: "2px solid var(--right)", background: "var(--rightSoft)" } : state === "wrong" ? { border: "2px dashed var(--warn)", background: "var(--warnSoft)" } : state === "on" ? { ...SELECTED, background: "var(--brandSoft)" } : { border: "2px solid transparent", background: "var(--surface)" };
-const Badge = ({ n, on }) => (
-  <span aria-hidden style={{ width: 28, height: 28, borderRadius: 14, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 750, background: on ? "var(--brand)" : "var(--bg)", color: on ? "var(--onBrand)" : "var(--low)", border: on ? "none" : "1.5px solid var(--line)" }}>{n || ""}</span>
+  state === "right" ? { border: "2px solid var(--right)", background: "var(--rightSoft)" } : state === "wrong" ? { border: "2px dashed var(--warn)", background: "var(--warnSoft)" } : state === "on" ? { ...SELECTED, background: "var(--brandSoft)" } : {};
+// The number of an option (or its place in an order); `check` shows a check once it's picked.
+const Badge = ({ n, on, check }) => (
+  <span aria-hidden className={`nv-k${on ? " on" : ""}`}>
+    {on && check ? <Icon name="check" size={16} stroke={3} /> : n || ""}
+  </span>
 );
 const Mark = ({ right }) => <Icon name={right ? "check" : "info"} size={18} color={right ? "var(--right)" : "var(--warn)"} stroke={2.6} />;
-const Hint = ({ children }) => <p style={{ fontSize: 14, color: "var(--mid)", margin: "10px 2px 0" }}>{children}</p>;
+const Hint = ({ children }) => <p style={{ fontSize: "var(--t-sm)", color: "var(--mid)", margin: "12px 4px 0" }}>{children}</p>;
 
 // A shuffle that's the same every time for the same question (so it doesn't
 // jump around on re-render), and never leaves everything in place.
@@ -82,12 +85,12 @@ function OrderView({ step, value, setValue, checked, t, locale }) {
   const shown = useMemo(() => shuffled(step.items.length, seedOf(step)), [step]);
   return (
     <div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {shown.map((i) => {
           const pos = value.indexOf(i);
           const state = checked ? (pos === i ? "right" : "wrong") : pos >= 0 ? "on" : null;
           return (
-            <button key={i} data-q="order-item" data-i={i} disabled={!!checked} aria-pressed={pos >= 0} aria-label={`${pos >= 0 ? `${t("q.order.pos", { n: pos + 1 })}: ` : ""}${x(step.items[i])}`} onClick={() => setValue(pos >= 0 ? value.slice(0, pos) : [...value, i])} className="nv-press" style={{ ...btn, ...tone(state), cursor: checked ? "default" : "pointer" }}>
+            <button key={i} data-q="order-item" data-i={i} disabled={!!checked} aria-pressed={pos >= 0} aria-label={`${pos >= 0 ? `${t("q.order.pos", { n: pos + 1 })}: ` : ""}${x(step.items[i])}`} onClick={() => setValue(pos >= 0 ? value.slice(0, pos) : [...value, i])} className="nv-press nv-opt" style={tone(state)}>
               <Badge n={pos >= 0 ? pos + 1 : null} on={pos >= 0} />{" "}
               <span style={{ flex: 1 }}>{x(step.items[i])}</span>
               {checked && <Mark right={pos === i} />}
@@ -101,9 +104,9 @@ function OrderView({ step, value, setValue, checked, t, locale }) {
 }
 const OrderExtra = ({ step, right, t, locale }) =>
   right ? null : (
-    <div style={{ marginTop: 6 }}>
-      <div style={{ fontWeight: 650 }}>{t("q.order.right")}:</div>
-      <ol style={{ margin: "4px 0 0", paddingLeft: 22 }}>
+    <div style={{ marginTop: 8 }}>
+      <div style={{ fontWeight: 600 }}>{t("q.order.right")}:</div>
+      <ol style={{ margin: "4px 0 0", paddingLeft: 24 }}>
         {step.items.map((it, i) => (
           <li key={i}>{text(it, locale)}</li>
         ))}
@@ -134,7 +137,7 @@ function GrowthChart({ grow, guess, label }) {
     return `${(W * k) / 20},${y(fv(grow.monthly, grow.rate, yr))}`;
   }).join(" ");
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} width="100%" height={H} role="img" aria-label={label} style={{ display: "block", margin: "6px 0" }}>
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" height={H} role="img" aria-label={label} style={{ display: "block", margin: "8px 0" }}>
       <line x1="0" y1={H} x2={W} y2={H} stroke="var(--line)" />
       <line x1="0" y1={H} x2={W} y2={y(grow.monthly * 12 * grow.years)} stroke="var(--low)" strokeWidth="2" strokeDasharray="5 4" />
       <polyline points={pts} fill="none" stroke="var(--brand)" strokeWidth="3" />
@@ -146,20 +149,20 @@ function EstimateView({ step, value, setValue, checked, t, locale, submit }) {
   const s = spec(step, locale.region);
   const fmt = fmtFor(s.unit, locale, t);
   const line = (label, v, strong) => (
-    <div style={{ display: "flex", justifyContent: "space-between", fontSize: strong ? 16 : 14, marginTop: 2, color: strong ? "var(--brand)" : "var(--ink)", fontWeight: strong ? 650 : 400 }}>
+    <div style={{ display: "flex", justifyContent: "space-between", fontSize: strong ? "var(--t-body)" : "var(--t-sm)", marginTop: 4, color: strong ? "var(--brand)" : "var(--ink)", fontWeight: strong ? 600 : 450 }}>
       <span style={{ color: strong ? "var(--brand)" : "var(--mid)" }}>{label}</span>
       <b>{fmt(v)}</b>
     </div>
   );
   return (
-    <div style={{ background: "var(--surface)", borderRadius: 10, padding: 18 }}>
+    <div style={{ background: "var(--surface)", borderRadius: 12, padding: 16 }}>
       {!checked ? (
         <>
-          <div style={{ fontSize: 32, fontWeight: 750, letterSpacing: -0.6, textAlign: "center", fontVariantNumeric: "tabular-nums" }} aria-hidden>
+          <div style={{ fontSize: "var(--t-disp)", fontWeight: 700, letterSpacing: -0.6, textAlign: "center", fontVariantNumeric: "tabular-nums" }} aria-hidden>
             {fmt(value)}
           </div>
-          <input type="range" data-q="estimate" min={s.min} max={s.max} step={s.step} value={value} onChange={(e) => setValue(Number(e.target.value))} onKeyDown={(e) => e.key === "Enter" && submit()} aria-label={text(step.q, locale)} aria-valuetext={fmt(value)} style={{ width: "100%", accentColor: "var(--brand)", margin: "14px 0 4px", height: 32 }} />
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--low)" }}>
+          <input type="range" data-q="estimate" min={s.min} max={s.max} step={s.step} value={value} onChange={(e) => setValue(Number(e.target.value))} onKeyDown={(e) => e.key === "Enter" && submit()} aria-label={text(step.q, locale)} aria-valuetext={fmt(value)} style={{ width: "100%", accentColor: "var(--brand)", margin: "16px 0 4px", height: 32 }} />
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "var(--t-sm)", color: "var(--low)" }}>
             <span>{fmt(s.min)}</span>
             <span>{fmt(s.max)}</span>
           </div>
@@ -199,7 +202,7 @@ function MatchView({ step, value, setValue, checked, t, locale }) {
     const pair = value[k];
     const state = checked ? (pair && pair[0] === pair[1] ? "right" : "wrong") : (side === 0 && sel === i) || k >= 0 ? "on" : null;
     return (
-      <button key={`${side}${i}`} data-q={side ? "match-right" : "match-left"} data-i={i} disabled={!!checked} aria-pressed={k >= 0 || (side === 0 && sel === i)} aria-label={`${label}${k >= 0 ? `, ${t("q.match.pair", { n: k + 1 })}` : ""}`} onClick={() => (side ? tapRight(i) : tapLeft(i))} className="nv-press" style={{ ...btn, ...tone(state), fontSize: side ? 14 : 15, padding: "12px", minHeight: 60, cursor: checked ? "default" : "pointer" }}>
+      <button key={`${side}${i}`} data-q={side ? "match-right" : "match-left"} data-i={i} disabled={!!checked} aria-pressed={k >= 0 || (side === 0 && sel === i)} aria-label={`${label}${k >= 0 ? `, ${t("q.match.pair", { n: k + 1 })}` : ""}`} onClick={() => (side ? tapRight(i) : tapLeft(i))} className="nv-press nv-opt" style={{ ...tone(state), fontSize: side ? "var(--t-sm)" : "var(--t-body)", padding: 12, minHeight: 60 }}>
         {k >= 0 && <Badge n={k + 1} on />}
         <span style={{ flex: 1 }}>{label}</span>
       </button>
@@ -207,7 +210,7 @@ function MatchView({ step, value, setValue, checked, t, locale }) {
   };
   return (
     <div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1.4fr", gap: 10 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1.4fr", gap: 12 }}>
         {step.pairs.map((p, r) => [cell(0, r, x(step.pairs[r][0])), cell(1, rights[r], x(step.pairs[rights[r]][1]))])}
       </div>
       {!checked && <Hint>{t("q.match.hint")}</Hint>}
@@ -216,9 +219,9 @@ function MatchView({ step, value, setValue, checked, t, locale }) {
 }
 const MatchExtra = ({ step, right, t, locale }) =>
   right ? null : (
-    <div style={{ marginTop: 6 }}>
-      <div style={{ fontWeight: 650 }}>{t("q.match.right")}:</div>
-      <ul style={{ margin: "4px 0 0", paddingLeft: 20 }}>
+    <div style={{ marginTop: 8 }}>
+      <div style={{ fontWeight: 600 }}>{t("q.match.right")}:</div>
+      <ul style={{ margin: "4px 0 0", paddingLeft: 24 }}>
         {step.pairs.map((p, i) => (
           <li key={i}>
             <b>{text(p[0], locale)}</b>: {text(p[1], locale)}
@@ -235,10 +238,10 @@ const parseNum = (v) => Number(String(v).replace(/[,\s$%]/g, ""));
 function NumberView({ step, value, setValue, checked, right, t, locale, submit }) {
   const s = spec(step, locale.region);
   return (
-    <label style={{ display: "flex", alignItems: "center", gap: 8, borderRadius: 8, padding: "10px 16px", ...tone(checked ? (right ? "right" : "wrong") : value ? "on" : null) }}>
-      {s.unit === "money" && <span style={{ fontSize: 24, color: "var(--mid)", fontWeight: 650 }}>$</span>}
-      <input data-q="number" inputMode="decimal" autoComplete="off" value={value} disabled={!!checked} onChange={(e) => setValue(e.target.value.slice(0, 14))} onKeyDown={(e) => e.key === "Enter" && submit()} aria-label={t("q.number.label")} placeholder="0" style={{ flex: 1, minWidth: 0, border: "none", background: "transparent", fontSize: 26, fontWeight: 750, color: "var(--ink)", outline: "none", fontVariantNumeric: "tabular-nums" }} />
-      {s.unit === "percent" && <span style={{ fontSize: 24, color: "var(--mid)", fontWeight: 650 }}>%</span>}
+    <label style={{ display: "flex", alignItems: "center", gap: 8, border: "2px solid var(--line)", background: "var(--surface)", borderRadius: 18, padding: "12px 16px", ...tone(checked ? (right ? "right" : "wrong") : value ? "on" : null) }}>
+      {s.unit === "money" && <span style={{ fontSize: "var(--t-title)", color: "var(--mid)", fontWeight: 600 }}>$</span>}
+      <input data-q="number" inputMode="decimal" autoComplete="off" value={value} disabled={!!checked} onChange={(e) => setValue(e.target.value.slice(0, 14))} onKeyDown={(e) => e.key === "Enter" && submit()} aria-label={t("q.number.label")} placeholder="0" style={{ flex: 1, minWidth: 0, border: "none", background: "transparent", fontSize: "var(--t-head)", fontWeight: 700, color: "var(--ink)", outline: "none", fontVariantNumeric: "tabular-nums" }} />
+      {s.unit === "percent" && <span style={{ fontSize: "var(--t-title)", color: "var(--mid)", fontWeight: 600 }}>%</span>}
     </label>
   );
 }
@@ -256,18 +259,18 @@ function SpotView({ step, value, setValue, checked, t, locale }) {
   const lines = step.frame === "receipt";
   return (
     <div>
-      <div style={{ background: "var(--surface)", borderRadius: 10, padding: 14 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "var(--mid)", marginBottom: 8 }}>
+      <div style={{ background: "var(--surface)", borderRadius: 12, padding: 16 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "var(--t-sm)", color: "var(--mid)", marginBottom: 8 }}>
           <Icon name={FRAME_ICON[step.frame] || "chat"} size={15} /> {x(step.from)}
         </div>
-        <div style={{ background: "var(--bg)", borderRadius: step.frame === "sms" ? "16px 16px 16px 4px" : 12, padding: lines ? 6 : "12px 14px", fontSize: 16, lineHeight: 1.9, display: lines ? "flex" : "block", flexDirection: "column", gap: 4 }}>
+        <div style={{ background: "var(--bg)", borderRadius: step.frame === "sms" ? "18px 18px 18px 12px" : 12, padding: lines ? 8 : "12px 16px", fontSize: "var(--t-body)", lineHeight: 1.5, display: lines ? "flex" : "block", flexDirection: "column", gap: 4 }}>
           {step.parts.map((p, i) => {
             if (!p.tap) return <span key={i}>{x(p)}</span>;
             const on = value.includes(i);
             const state = checked ? (p.flag && on ? "right" : p.flag || on ? "wrong" : null) : on ? "on" : null;
             const border = state === "right" ? "var(--right)" : state === "wrong" ? "var(--warn)" : state === "on" ? "var(--select)" : "var(--line)";
             return (
-              <button key={i} data-q="spot-part" data-i={i} disabled={!!checked} aria-pressed={on} aria-label={`${x(p.tap)}${checked && p.flag ? `, ${t("q.spot.flag")}` : ""}`} onClick={() => tap(i)} style={{ font: "inherit", color: "var(--ink)", background: state === "right" ? "var(--rightSoft)" : state === "wrong" ? "var(--warnSoft)" : state === "on" ? "var(--brandSoft)" : "transparent", border: `2px ${(checked && p.flag && !on) || state === "wrong" ? "dashed" : "solid"} ${lines && !state ? "transparent" : border}`, borderRadius: lines ? 10 : 6, padding: lines ? "8px 10px" : "0 3px", margin: lines ? 0 : "0 1px", textAlign: "left", width: lines ? "100%" : undefined, cursor: checked ? "default" : "pointer", lineHeight: 1.5, fontVariantNumeric: "tabular-nums" }}>
+              <button key={i} data-q="spot-part" data-i={i} disabled={!!checked} aria-pressed={on} aria-label={`${x(p.tap)}${checked && p.flag ? `, ${t("q.spot.flag")}` : ""}`} onClick={() => tap(i)} style={{ font: "inherit", color: "var(--ink)", background: state === "right" ? "var(--rightSoft)" : state === "wrong" ? "var(--warnSoft)" : state === "on" ? "var(--brandSoft)" : "transparent", border: `2px ${(checked && p.flag && !on) || state === "wrong" ? "dashed" : "solid"} ${lines && !state ? "transparent" : border}`, borderRadius: lines ? 12 : 12, padding: lines ? "8px 12px" : "0 4px", margin: lines ? 0 : "0 0px", textAlign: "left", width: lines ? "100%" : undefined, cursor: checked ? "default" : "pointer", lineHeight: 1.5, fontVariantNumeric: "tabular-nums" }}>
                 {x(p.tap)}
               </button>
             );
@@ -285,13 +288,13 @@ function SpotView({ step, value, setValue, checked, t, locale }) {
 function ScenarioView({ step, value, setValue, checked, t, locale }) {
   const x = tx(locale);
   return (
-    <div role="radiogroup" data-q="scenario" aria-label={x(step.q)} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+    <div role="radiogroup" data-q="scenario" aria-label={x(step.q)} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
       {step.options.map((o, i) => {
         const sel = value === i;
         const state = checked ? (sel ? (o.fit === "poor" ? "wrong" : "right") : null) : sel ? "on" : null;
         return (
-          <button key={i} role="radio" aria-checked={sel} disabled={!!checked} onClick={() => setValue(i)} className="nv-press" style={{ ...btn, ...tone(state), opacity: checked && !sel ? 0.55 : 1, cursor: checked ? "default" : "pointer" }}>
-            <Badge n={i + 1} on={sel} />
+          <button key={i} role="radio" aria-checked={sel} disabled={!!checked} onClick={() => setValue(i)} className="nv-press nv-opt" style={{ ...tone(state), opacity: checked && !sel ? 0.55 : 1 }}>
+            <Badge n={i + 1} on={sel} check />
             <span style={{ flex: 1 }}>{x(o.text)}</span>
           </button>
         );
@@ -300,7 +303,7 @@ function ScenarioView({ step, value, setValue, checked, t, locale }) {
   );
 }
 const ScenarioExtra = ({ step, t, locale }) => (
-  <ul style={{ margin: "6px 0 0", paddingLeft: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 6 }}>
+  <ul style={{ margin: "8px 0 0", paddingLeft: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 8 }}>
     {step.options.map((o, i) => (
       <li key={i}>
         <b>{text(o.text, locale)}</b> ({t(`q.fit.${o.fit}`).toLowerCase()}): {text(o.why, locale)}
@@ -360,13 +363,16 @@ export const QTYPES = {
 export const startValue = (step, region) => (QTYPES[step.type].initial ? QTYPES[step.type].initial(step, region) : null);
 
 // One question: its label, the question, and its own way of answering.
-export function Question({ t, locale, step, value, setValue, checked, right, label, submit }) {
+export function Question({ t, locale, step, value, setValue, checked, right, label, caption, submit }) {
   const Q = QTYPES[step.type];
   const pick = step.type === "choice" || step.type === "tf";
   return (
     <div>
-      <div style={{ fontSize: 14, fontWeight: 650, color: "var(--mid)", marginBottom: 8 }}>{label || t(Q.label)}</div>
-      <h2 className="nv-disp" style={{ fontSize: step.q && text(step.q, locale).length > 110 ? 22 : 26, margin: "0 0 18px", lineHeight: 1.22 }}>{text(step.q, locale)}</h2>
+      <div className="nv-cap">
+        <span>{label || t(Q.label)}</span>
+        {caption && ` · ${caption}`}
+      </div>
+      <h2 className="nv-disp" style={{ fontSize: "var(--t-title)", margin: "8px 0 24px" }}>{text(step.q, locale)}</h2>
       <Q.View t={t} locale={locale} step={step} value={value} setValue={setValue} checked={checked} right={right} submit={submit} label={label} bare={pick} />
     </div>
   );

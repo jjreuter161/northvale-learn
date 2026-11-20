@@ -169,7 +169,7 @@ export default function CertSheet({ t, locale, go, onClose }) {
   };
 
   const chip = (value, label) => (
-    <button key={value} role="radio" aria-checked={choice === value} onClick={() => setChoice(value)} className="nv-press" style={{ display: "block", width: "100%", textAlign: "left", minHeight: 48, padding: "10px 14px", borderRadius: 8, ...(choice === value ? SELECTED : { border: "2px solid var(--line)" }), background: choice === value ? "var(--brandSoft)" : "var(--surface)", color: "var(--ink)", fontSize: 16, fontWeight: 650, cursor: "pointer" }}>
+    <button key={value} role="radio" aria-checked={choice === value} onClick={() => setChoice(value)} className="nv-press" style={{ display: "block", width: "100%", textAlign: "left", minHeight: 48, padding: "12px 16px", borderRadius: 12, ...(choice === value ? SELECTED : { border: "2px solid var(--line)" }), background: choice === value ? "var(--brandSoft)" : "var(--surface)", color: "var(--ink)", fontSize: "var(--t-body)", fontWeight: 600, cursor: "pointer" }}>
       {label}
     </button>
   );
@@ -183,13 +183,13 @@ export default function CertSheet({ t, locale, go, onClose }) {
             <Note icon="info" style={{ marginBottom: 12 }}>
               <strong style={{ display: "block" }}>{session.online ? t("cert.account") : t("cert.offline")}</strong>
               {session.online && (
-                <Button size="sm" kind="secondary" style={{ marginTop: 10 }} onClick={() => (onClose(), go("settings", { section: "account" }))}>
+                <Button size="sm" kind="secondary" style={{ marginTop: 12 }} onClick={() => (onClose(), go("settings", { section: "account" }))}>
                   {t("cert.signin")}
                 </Button>
               )}
             </Note>
           )}
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {TRACKS.map((tr0) => {
               const p = progressOf(tr0, lessons);
               const complete = p.done === p.total;
@@ -197,14 +197,14 @@ export default function CertSheet({ t, locale, go, onClose }) {
               return (
                 <Card key={tr0.id} pad={16}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <div style={{ flex: 1, fontWeight: 700, fontSize: 17 }}>{text(tr0.title, locale)}</div>
-                    {have && <span style={{ fontSize: 13, fontWeight: 700, color: "var(--good)" }}>✓ {t("cert.earned")}</span>}
+                    <div style={{ flex: 1, fontWeight: 700, fontSize: "var(--t-lead)" }}>{text(tr0.title, locale)}</div>
+                    {have && <span style={{ fontSize: "var(--t-sm)", fontWeight: 700, color: "var(--good)" }}>✓ {t("cert.earned")}</span>}
                   </div>
-                  <div style={{ fontSize: 14, color: "var(--mid)", lineHeight: 1.4, margin: "4px 0 10px" }}>{text(tr0.blurb, locale)}</div>
+                  <div style={{ fontSize: "var(--t-sm)", color: "var(--mid)", lineHeight: 1.5, margin: "4px 0 12px" }}>{text(tr0.blurb, locale)}</div>
                   {!complete && (
                     <>
                       <Progress value={p.done} max={p.total} height={8} label={text(tr0.title, locale)} />
-                      <div style={{ fontSize: 13, color: "var(--low)", marginTop: 6 }}>{t("cert.progress", p)}</div>
+                      <div style={{ fontSize: "var(--t-sm)", color: "var(--low)", marginTop: 8 }}>{t("cert.progress", p)}</div>
                     </>
                   )}
                   {complete && signedIn && (
@@ -216,13 +216,13 @@ export default function CertSheet({ t, locale, go, onClose }) {
               );
             })}
           </div>
-          <p style={{ fontSize: 12, color: "var(--low)", margin: "14px 0 0" }}>{t("cert.fine")}</p>
+          <p style={{ fontSize: "var(--t-cap)", color: "var(--low)", margin: "16px 0 0" }}>{t("cert.fine")}</p>
         </>
       )}
 
       {view.id === "name" && (
         <>
-          <h2 className="nv-disp" style={{ fontSize: 24, margin: "0 0 4px" }}>{text(tr.title, locale)}</h2>
+          <h2 className="nv-disp" style={{ fontSize: "var(--t-title)", margin: "0 0 4px" }}>{text(tr.title, locale)}</h2>
           <p style={{ margin: "0 0 12px", color: "var(--mid)" }}>{t("cert.name.title")}</p>
           <div role="radiogroup" aria-label={t("cert.name.title")} style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {profile.nickname && chip("nick", t("cert.name.nick", { name: profile.nickname }))}
@@ -230,11 +230,11 @@ export default function CertSheet({ t, locale, go, onClose }) {
             {chip("none", t("cert.name.none"))}
           </div>
           {isAdult && choice === "real" && (
-            <input value={realName} onChange={(e) => setRealName(e.target.value)} placeholder={t("cert.name.real.ph")} aria-label={t("cert.name.real.ph")} maxLength={60} autoComplete="name" style={{ width: "100%", boxSizing: "border-box", marginTop: 10, minHeight: 48, borderRadius: 8, border: "1px solid var(--line)", background: "var(--surface)", color: "var(--ink)", padding: "0 14px", fontSize: 16 }} />
+            <input value={realName} onChange={(e) => setRealName(e.target.value)} placeholder={t("cert.name.real.ph")} aria-label={t("cert.name.real.ph")} maxLength={60} autoComplete="name" style={{ width: "100%", boxSizing: "border-box", marginTop: 12, minHeight: 48, borderRadius: 12, border: "1px solid var(--line)", background: "var(--surface)", color: "var(--ink)", padding: "0 16px", fontSize: "var(--t-body)" }} />
           )}
           <Note icon="shield" style={{ marginTop: 12 }}>{t(isAdult ? "cert.name.adult" : "cert.name.teen")}</Note>
-          {error && <p role="alert" style={{ color: "var(--ink)", fontWeight: 650, margin: "10px 0 0" }}>{error}</p>}
-          <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 14 }}>
+          {error && <p role="alert" style={{ color: "var(--ink)", fontWeight: 600, margin: "12px 0 0" }}>{error}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 16 }}>
             <Button full onClick={create} disabled={busy || (isAdult && choice === "real" && realName.trim().length < 2)}>{t("cert.create")}</Button>
             <Button full kind="ghost" onClick={() => setView({ id: "list" })}>{t("cert.back")}</Button>
           </div>
@@ -244,12 +244,12 @@ export default function CertSheet({ t, locale, go, onClose }) {
       {view.id === "cert" && !cert && <Loading label={t("cert.title")} size={30} />}
       {view.id === "cert" && cert && (
         <>
-          <div style={{ aspectRatio: "1600 / 1131", borderRadius: 8, overflow: "hidden", background: "var(--bg)", border: "1px solid var(--line)", marginBottom: 12 }}>
+          <div style={{ aspectRatio: "1600 / 1131", borderRadius: 12, overflow: "hidden", background: "var(--bg)", border: "1px solid var(--line)", marginBottom: 12 }}>
             {img ? <img src={img.url} alt={t("cert.img.alt", { title: text(tr.title, locale), date: dateText })} style={{ width: "100%", height: "100%", display: "block" }} /> : <Loading label={t("cert.title")} size={30} />}
           </div>
-          <p style={{ margin: "0 0 2px", fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>{t("cert.code", { code: pretty(cert.code) })}</p>
-          <p style={{ margin: "0 0 12px", fontSize: 14, color: "var(--mid)" }}>{t("cert.verify", { url: verifyUrl })}</p>
-          {error && <p role="alert" style={{ color: "var(--ink)", fontWeight: 650 }}>{error}</p>}
+          <p style={{ margin: "0 0 4px", fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>{t("cert.code", { code: pretty(cert.code) })}</p>
+          <p style={{ margin: "0 0 12px", fontSize: "var(--t-sm)", color: "var(--mid)" }}>{t("cert.verify", { url: verifyUrl })}</p>
+          {error && <p role="alert" style={{ color: "var(--ink)", fontWeight: 600 }}>{error}</p>}
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             <Button full disabled={!img} onClick={() => (download(img.url, `northvale-learn-${cert.track}.png`), logEvent("share", { kind: "cert-image" }))}>{t("cert.save.img")}</Button>
             <Button full kind="secondary" disabled={!img} onClick={savePdf}>{t("cert.save.pdf")}</Button>
@@ -260,7 +260,7 @@ export default function CertSheet({ t, locale, go, onClose }) {
             ) : (
               <Note tone="bad" icon="info">
                 <strong style={{ display: "block" }}>{t("cert.delete.sure")}</strong>
-                <Button size="sm" kind="secondary" style={{ marginTop: 10 }} onClick={remove}>{t("cert.delete.yes")}</Button>
+                <Button size="sm" kind="secondary" style={{ marginTop: 12 }} onClick={remove}>{t("cert.delete.yes")}</Button>
               </Note>
             )}
             <Button full kind="ghost" onClick={() => setView({ id: "list" })}>{t("cert.back")}</Button>

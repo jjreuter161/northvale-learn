@@ -71,7 +71,7 @@ const howFor = (m, ctx) => (m.teen && !adult(ctx.ageBand) ? m.teen : m.how);
 function TimeTag({ t, m }) {
   const label = typeof m.time === "number" ? t("mi.time.min", { n: m.time }) : t(`mi.time.${m.time}`);
   return (
-    <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, color: "var(--mid)" }}>
+    <span style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: "var(--t-sm)", color: "var(--mid)" }}>
       <Icon name="clock" size={14} />
       {label}
       {m.repeat && <span>· {t("mi.weekly")}</span>}
@@ -82,19 +82,19 @@ function TimeTag({ t, m }) {
 function Head({ t, locale, m, sub }) {
   return (
     <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
-      <span style={{ width: 40, height: 40, borderRadius: 6, background: "var(--surface2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+      <span style={{ width: 40, height: 40, borderRadius: 12, background: "var(--surface2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
         <Icon name={m.icon} size={20} />
       </span>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontWeight: 650, fontSize: 16, lineHeight: 1.35 }}>{text(m.title, locale)}</div>
-        <div style={{ marginTop: 3 }}>{sub || <TimeTag t={t} m={m} />}</div>
+        <div style={{ fontWeight: 600, fontSize: "var(--t-body)", lineHeight: 1.5 }}>{text(m.title, locale)}</div>
+        <div style={{ marginTop: 4 }}>{sub || <TimeTag t={t} m={m} />}</div>
       </div>
     </div>
   );
 }
 
-const body = { fontSize: 15, lineHeight: 1.55, margin: "12px 0 14px" };
-const textBtn = { display: "block", margin: "8px auto 0", border: "none", background: "transparent", color: "var(--mid)", fontSize: 14, fontWeight: 600, cursor: "pointer", padding: "10px 12px", minHeight: 44 };
+const body = { fontSize: "var(--t-body)", lineHeight: 1.5, margin: "12px 0 16px" };
+const textBtn = { display: "block", margin: "8px auto 0", border: "none", background: "transparent", color: "var(--mid)", fontSize: "var(--t-sm)", fontWeight: 600, cursor: "pointer", padding: "12px 12px", minHeight: 44 };
 
 // Finishing: an optional note, then XP and (for "set money aside") a way
 // to record the amount on the goal.
@@ -108,11 +108,11 @@ function DoneSheet({ t, locale, go, id, onClose }) {
     <Sheet open={!!m} onClose={close} title={result ? t("mi.finished") : m ? text(m.title, locale) : ""}>
       {m && !result && (
         <>
-          <label htmlFor="ms-note" style={{ display: "block", fontWeight: 650, fontSize: 15, marginBottom: 8 }}>
+          <label htmlFor="ms-note" style={{ display: "block", fontWeight: 600, fontSize: "var(--t-body)", marginBottom: 8 }}>
             {text(m.ask, locale)}
           </label>
-          <textarea id="ms-note" value={note} onChange={(e) => setNote(e.target.value)} maxLength={NOTE_MAX} rows={3} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 8, padding: 12, fontSize: 16, background: "var(--surface)", color: "var(--ink)", resize: "vertical" }} />
-          <p style={{ fontSize: 13, color: "var(--low)", lineHeight: 1.45, margin: "6px 0 14px" }}>{t("mi.note.hint")}</p>
+          <textarea id="ms-note" value={note} onChange={(e) => setNote(e.target.value)} maxLength={NOTE_MAX} rows={3} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 12, padding: 12, fontSize: "var(--t-body)", background: "var(--surface)", color: "var(--ink)", resize: "vertical" }} />
+          <p style={{ fontSize: "var(--t-sm)", color: "var(--low)", lineHeight: 1.5, margin: "8px 0 16px" }}>{t("mi.note.hint")}</p>
           <Button
             full
             onClick={() => {
@@ -127,13 +127,13 @@ function DoneSheet({ t, locale, go, id, onClose }) {
         </>
       )}
       {m && result && (
-        <div style={{ textAlign: "center", padding: "4px 0 2px" }}>
+        <div style={{ textAlign: "center", padding: "4px 0 4px" }}>
           <div style={{ width: 56, height: 56, borderRadius: 28, margin: "0 auto 12px", background: "var(--accentSoft)", color: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <Icon name="check" size={28} stroke={2.4} />
           </div>
-          <p style={{ fontSize: 17, fontWeight: 650, margin: "0 0 4px" }}>{text(m.title, locale)}</p>
-          <p style={{ fontSize: 15, color: "var(--mid)", margin: "0 0 18px" }}>{result.gained ? t("mi.xp", { n: result.gained }) : t(m.repeat ? "mi.no_xp.weekly" : "mi.no_xp")}</p>
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <p style={{ fontSize: "var(--t-lead)", fontWeight: 600, margin: "0 0 4px" }}>{text(m.title, locale)}</p>
+          <p style={{ fontSize: "var(--t-body)", color: "var(--mid)", margin: "0 0 16px" }}>{result.gained ? t("mi.xp", { n: result.gained }) : t(m.repeat ? "mi.no_xp.weekly" : "mi.no_xp")}</p>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {goal && (
               <Button full onClick={() => (close(), go("goals", { record: goal.id }))}>
                 {t("mi.record", { name: goal.name })}
@@ -163,7 +163,7 @@ function WeekCard({ t, locale, go, label = true }) {
     const m = w.active;
     card = (
       <Card>
-        <Head t={t} locale={locale} m={m} sub={<span style={{ fontSize: 13, color: "var(--mid)" }}>{t("mi.started", { date: shortDate(slice.active.day, locale) })}</span>} />
+        <Head t={t} locale={locale} m={m} sub={<span style={{ fontSize: "var(--t-sm)", color: "var(--mid)" }}>{t("mi.started", { date: shortDate(slice.active.day, locale) })}</span>} />
         <p style={body}>{text(howFor(m, ctx), locale)}</p>
         <Button full onClick={() => setDoneId(m.id)}>
           {t("mi.mark")}
@@ -177,15 +177,15 @@ function WeekCard({ t, locale, go, label = true }) {
     card = (
       <Card>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <span style={{ width: 40, height: 40, borderRadius: 20, background: "var(--accentSoft)", color: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+          <span style={{ width: 40, height: 40, borderRadius: 18, background: "var(--accentSoft)", color: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
             <Icon name="check" size={22} stroke={2.4} />
           </span>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontWeight: 650, fontSize: 16 }}>{t("mi.week_done")}</div>
-            <div style={{ fontSize: 14, color: "var(--mid)", lineHeight: 1.4 }}>{w.done.map((e) => text(missionById(e.id).title, locale)).join(" · ")}</div>
+            <div style={{ fontWeight: 600, fontSize: "var(--t-body)" }}>{t("mi.week_done")}</div>
+            <div style={{ fontSize: "var(--t-sm)", color: "var(--mid)", lineHeight: 1.5 }}>{w.done.map((e) => text(missionById(e.id).title, locale)).join(" · ")}</div>
           </div>
         </div>
-        <p style={{ fontSize: 14, color: "var(--mid)", margin: "12px 0" }}>{t("mi.week_done.sub")}</p>
+        <p style={{ fontSize: "var(--t-sm)", color: "var(--mid)", margin: "12px 0" }}>{t("mi.week_done.sub")}</p>
         {w.suggestion && (
           <Button full kind="secondary" style={{ border: "1px solid var(--line)" }} onClick={() => setMore(true)}>
             {t("mi.do_another")}
@@ -234,9 +234,9 @@ function MissionSheet({ t, locale, id, onClose, onDone }) {
         <>
           <TimeTag t={t} m={m} />
           <p style={body}>{text(howFor(m, ctx), locale)}</p>
-          <p style={{ fontSize: 14, color: "var(--mid)", lineHeight: 1.5, margin: "0 0 16px" }}>{t("mi.ask", { q: text(m.ask, locale) })}</p>
+          <p style={{ fontSize: "var(--t-sm)", color: "var(--mid)", lineHeight: 1.5, margin: "0 0 16px" }}>{t("mi.ask", { q: text(m.ask, locale) })}</p>
           {last && (
-            <Note icon="check" style={{ marginBottom: 14 }}>
+            <Note icon="check" style={{ marginBottom: 16 }}>
               {t("mi.done_on", { date: shortDate(last.day, locale) })}
               {last.note ? ` — “${last.note}”` : ""}
             </Note>
@@ -272,7 +272,7 @@ function Screen({ t, locale, go, route }) {
   const rest = recommend(ctx, slice.log, today).filter((m) => m !== shown);
   const done = [...slice.log].reverse();
   const row = (m, sub, key) => (
-    <Card key={key} pad={14} onClick={() => setOpen(m.id)}>
+    <Card key={key} pad={16} onClick={() => setOpen(m.id)}>
       <Head t={t} locale={locale} m={m} sub={sub} />
     </Card>
   );
@@ -281,9 +281,9 @@ function Screen({ t, locale, go, route }) {
       <Title sub={t("mi.sub")}>{t("mi.title")}</Title>
       <WeekCard t={t} locale={locale} go={go} />
       {rest.length > 0 && <Label>{t("mi.all")}</Label>}
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>{rest.map((m) => row(m, null, m.id))}</div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>{rest.map((m) => row(m, null, m.id))}</div>
       {done.length > 0 && <Label>{t("mi.done")}</Label>}
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {done.map((e, i) => {
           const m = missionById(e.id);
           return (
@@ -291,15 +291,15 @@ function Screen({ t, locale, go, route }) {
             row(
               m,
               <>
-                <span style={{ display: "block", fontSize: 13, color: "var(--mid)" }}>{t("mi.done_on", { date: shortDate(e.day, locale) })}</span>
-                {e.note && <span style={{ display: "block", fontSize: 14, color: "var(--ink)", lineHeight: 1.45, marginTop: 4 }}>“{e.note}”</span>}
+                <span style={{ display: "block", fontSize: "var(--t-sm)", color: "var(--mid)" }}>{t("mi.done_on", { date: shortDate(e.day, locale) })}</span>
+                {e.note && <span style={{ display: "block", fontSize: "var(--t-sm)", color: "var(--ink)", lineHeight: 1.5, marginTop: 4 }}>“{e.note}”</span>}
               </>,
               `${e.id}-${i}`
             )
           );
         })}
       </div>
-      <Note icon="shield" style={{ marginTop: 18 }}>{t("mi.private")}</Note>
+      <Note icon="shield" style={{ marginTop: 16 }}>{t("mi.private")}</Note>
       <MissionSheet t={t} locale={locale} id={open} onClose={() => setOpen(null)} onDone={setDoneId} />
       <DoneSheet t={t} locale={locale} go={go} id={doneId} onClose={() => setDoneId(null)} />
     </div>
@@ -313,7 +313,7 @@ function TryCard({ t, locale, go, unit }) {
   if (!m) return null;
   return (
     <Card>
-      <div style={{ fontSize: 12, fontWeight: 650, color: "var(--low)", marginBottom: 10 }}>{t("mi.try")}</div>
+      <div style={{ fontSize: "var(--t-cap)", fontWeight: 600, color: "var(--low)", marginBottom: 12 }}>{t("mi.try")}</div>
       <Head t={t} locale={locale} m={m} />
       <Button full size="md" kind="secondary" style={{ marginTop: 12, border: "1px solid var(--line)" }} onClick={() => go("missions", { id: m.id })}>
         {t("mi.see")}

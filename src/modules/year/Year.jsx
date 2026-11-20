@@ -87,7 +87,7 @@ function Voyage({ month, t }) {
 function Meter({ label, value, max = 100, pct = true, fmt, tone }) {
   return (
     <div style={{ flex: "1 1 140px", minWidth: 0 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 8, fontSize: 13, color: "var(--mid)", marginBottom: 4 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 8, fontSize: "var(--t-sm)", color: "var(--mid)", marginBottom: 4 }}>
         <span>{label}</span>
         <strong style={{ color: "var(--ink)", fontVariantNumeric: "tabular-nums" }}>{pct ? Math.round(value) : fmt(value)}</strong>
       </div>
@@ -117,9 +117,9 @@ export default function Year({ t, locale, go }) {
     if (!l) return null;
     const open = lessonState(getState().progress, lessonId) !== "locked";
     return (
-      <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 14, paddingTop: 12, borderTop: "1px solid var(--line)" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 16, paddingTop: 12, borderTop: "1px solid var(--line)" }}>
         <Icon name="book" size={18} color="var(--mid)" />
-        <span style={{ flex: 1, fontSize: 14, color: "var(--mid)" }}>{t("yr.lesson", { lesson: text(l.title, locale) })}</span>
+        <span style={{ flex: 1, fontSize: "var(--t-sm)", color: "var(--mid)" }}>{t("yr.lesson", { lesson: text(l.title, locale) })}</span>
         <Button size="sm" kind="secondary" onClick={() => go("lessons", open ? { lesson: lessonId } : {})}>{t("yr.lesson.open")}</Button>
       </div>
     );
@@ -136,25 +136,25 @@ export default function Year({ t, locale, go }) {
         <Title sub={t("yr.sub")}>{t("yr.title")}</Title>
         <Card pad={0} style={{ overflow: "hidden", marginBottom: 12 }}>
           <Scene name="harbor" w={358} h={150} />
-          <div style={{ padding: "14px 18px 18px" }}>
-            <p style={{ margin: "0 0 6px", color: "var(--mid)", lineHeight: 1.5 }}>{t("yr.disclaimer")}</p>
-            <p style={{ margin: 0, fontSize: 13, color: "var(--low)" }}>{t("yr.country", { country })}</p>
+          <div style={{ padding: "16px 16px 16px" }}>
+            <p style={{ margin: "0 0 8px", color: "var(--mid)", lineHeight: 1.5 }}>{t("yr.disclaimer")}</p>
+            <p style={{ margin: 0, fontSize: "var(--t-sm)", color: "var(--low)" }}>{t("yr.country", { country })}</p>
           </div>
         </Card>
-        <Label style={{ marginTop: 18 }}>{t("yr.pick")}</Label>
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        <Label style={{ marginTop: 16 }}>{t("yr.pick")}</Label>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {STARTS.map((s) => (
             <Card key={s} pad={16} onClick={() => (setReport(null), track("year_start", { start: s }), save((x) => ({ ...x, run: newRun(s, locale.region) })))}>
-              <div style={{ fontWeight: 700, fontSize: 17 }}>{text(STARTS_TEXT[s].title, locale)}</div>
-              <div style={{ fontSize: 14, color: "var(--mid)", lineHeight: 1.45, margin: "4px 0 6px" }}>{text(STARTS_TEXT[s].body, locale)}</div>
-              <div style={{ fontSize: 13, color: "var(--low)" }}>{t("yr.pay", { income: fmt(amt(SITUATIONS[s].income, locale.region)) })}</div>
+              <div style={{ fontWeight: 700, fontSize: "var(--t-lead)" }}>{text(STARTS_TEXT[s].title, locale)}</div>
+              <div style={{ fontSize: "var(--t-sm)", color: "var(--mid)", lineHeight: 1.5, margin: "4px 0 8px" }}>{text(STARTS_TEXT[s].body, locale)}</div>
+              <div style={{ fontSize: "var(--t-sm)", color: "var(--low)" }}>{t("yr.pay", { income: fmt(amt(SITUATIONS[s].income, locale.region)) })}</div>
             </Card>
           ))}
         </div>
         {slice.history.length > 0 && (
           <>
             <Label>{t("yr.history")}</Label>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {[...slice.history].reverse().map((h, i) => (
                 <ListRow key={i} icon="flag" title={text(STARTS_TEXT[h.start].title, locale)} sub={t("yr.history.row", { net: money(h.net, { ...locale, currency: h.currency }), peace: h.peace })} />
               ))}
@@ -173,8 +173,8 @@ export default function Year({ t, locale, go }) {
         <Meter label={t("yr.peace")} value={r.peace} tone="var(--good)" />
         <Meter label={t("yr.credit")} value={r.credit} />
       </div>
-      <p style={{ margin: "8px 0 0", fontSize: 12, color: "var(--low)", lineHeight: 1.4 }}>{t("yr.meters.note")}</p>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "10px 16px", marginTop: 12 }}>
+      <p style={{ margin: "8px 0 0", fontSize: "var(--t-cap)", color: "var(--low)", lineHeight: 1.5 }}>{t("yr.meters.note")}</p>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "12px 16px", marginTop: 12 }}>
         <Meter label={t("yr.cash")} value={r.cash} pct={false} fmt={fmt} />
         <Meter label={t("yr.savings")} value={r.savings} pct={false} fmt={fmt} />
         <Meter label={t("yr.debt")} value={r.debt} pct={false} fmt={fmt} />
@@ -190,7 +190,7 @@ export default function Year({ t, locale, go }) {
     const swings = biggestSwings(run, EVENTS, 2);
     const up = me.change >= 0;
     const row = (label, a, b) => (
-      <div style={{ display: "flex", gap: 8, padding: "8px 0", borderTop: "1px solid var(--line)", fontSize: 15 }}>
+      <div style={{ display: "flex", gap: 8, padding: "8px 0", borderTop: "1px solid var(--line)", fontSize: "var(--t-body)" }}>
         <span style={{ flex: 1.2, color: "var(--mid)" }}>{label}</span>
         <strong style={{ flex: 1, textAlign: "right", fontVariantNumeric: "tabular-nums" }}>{a}</strong>
         <strong style={{ flex: 1, textAlign: "right", fontVariantNumeric: "tabular-nums" }}>{b}</strong>
@@ -201,14 +201,14 @@ export default function Year({ t, locale, go }) {
         <Title sub={t("yr.disclaimer")}>{t("yr.end.title")}</Title>
         <Card pad={0} style={{ overflow: "hidden" }}>
           <Scene name="open" w={358} h={150} />
-          <div style={{ padding: "14px 18px 18px" }}>
+          <div style={{ padding: "16px 16px 16px" }}>
             <Voyage month={MONTHS} t={t} />
-            <p style={{ margin: "10px 0 0", fontSize: 17, lineHeight: 1.45, fontWeight: 650 }}>{t(up ? "yr.end.up" : "yr.end.down", { net: fmt(me.net), change: fmt(Math.abs(me.change)) })}</p>
+            <p style={{ margin: "12px 0 0", fontSize: "var(--t-lead)", lineHeight: 1.5, fontWeight: 600 }}>{t(up ? "yr.end.up" : "yr.end.down", { net: fmt(me.net), change: fmt(Math.abs(me.change)) })}</p>
           </div>
         </Card>
         <Label>{t("yr.compare")}</Label>
         <Card pad={16}>
-          <div style={{ display: "flex", gap: 8, fontSize: 13, fontWeight: 700, color: "var(--mid)", paddingBottom: 6 }}>
+          <div style={{ display: "flex", gap: 8, fontSize: "var(--t-sm)", fontWeight: 700, color: "var(--mid)", paddingBottom: 8 }}>
             <span style={{ flex: 1.2 }} />
             <span style={{ flex: 1, textAlign: "right" }}>{t("yr.you")}</span>
             <span style={{ flex: 1, textAlign: "right" }}>{t("yr.steady")}</span>
@@ -218,26 +218,26 @@ export default function Year({ t, locale, go }) {
           {row(t("yr.debt"), fmt(run.debt), fmt(steady.debt))}
           {row(t("yr.peace"), Math.round(run.peace), Math.round(steady.peace))}
           {row(t("yr.credit"), Math.round(run.credit), Math.round(steady.credit))}
-          <p style={{ fontSize: 13, color: "var(--low)", lineHeight: 1.45, margin: "10px 0 0" }}>{t("yr.steady.how")}</p>
+          <p style={{ fontSize: "var(--t-sm)", color: "var(--low)", lineHeight: 1.5, margin: "12px 0 0" }}>{t("yr.steady.how")}</p>
         </Card>
         <Label>{t("yr.swings")}</Label>
         {swings.length === 0 ? (
           <Note tone="good" icon="check">{t("yr.same")}</Note>
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {swings.map((s) => {
               const e = EVENTS[s.month].find((x) => x.id === s.event);
               return (
                 <Card key={s.month} pad={16}>
                   <div style={{ fontWeight: 700 }}>{t("yr.swing", { n: s.month + 1, title: text(e.title, locale) })}</div>
-                  <div style={{ fontSize: 14, color: "var(--mid)", margin: "4px 0 0", lineHeight: 1.45 }}>{t("yr.swing.how", { gain: fmt(Math.round(s.gain / 10) * 10) })}</div>
+                  <div style={{ fontSize: "var(--t-sm)", color: "var(--mid)", margin: "4px 0 0", lineHeight: 1.5 }}>{t("yr.swing.how", { gain: fmt(Math.round(s.gain / 10) * 10) })}</div>
                   {lessonRow(e.lesson)}
                 </Card>
               );
             })}
           </div>
         )}
-        <div style={{ marginTop: 20 }}>
+        <div style={{ marginTop: 24 }}>
           <Button
             full
             onClick={() => {
@@ -281,20 +281,20 @@ export default function Year({ t, locale, go }) {
         <Title sub={t("yr.disclaimer")}>{t("yr.title")}</Title>
         <Card pad={16}>
           <Voyage month={run.month} t={t} />
-          <div style={{ fontSize: 13, color: "var(--mid)", marginTop: 6 }}>{t("yr.voyage", { n: report.from + 1 })} · {monthName(report.from)}</div>
-          <p style={{ margin: "6px 0 0", fontSize: 17, lineHeight: 1.5 }}>{text(report.choiceResult, locale, report.vars)}</p>
-          <div style={{ marginTop: 14, fontSize: 13, fontWeight: 700, color: "var(--mid)" }}>{t("yr.changed")}</div>
+          <div style={{ fontSize: "var(--t-sm)", color: "var(--mid)", marginTop: 8 }}>{t("yr.voyage", { n: report.from + 1 })} · {monthName(report.from)}</div>
+          <p style={{ margin: "8px 0 0", fontSize: "var(--t-lead)", lineHeight: 1.5 }}>{text(report.choiceResult, locale, report.vars)}</p>
+          <div style={{ marginTop: 16, fontSize: "var(--t-sm)", fontWeight: 700, color: "var(--mid)" }}>{t("yr.changed")}</div>
           {rows.length === 0 ? (
-            <p style={{ margin: "6px 0 0", fontSize: 14, color: "var(--mid)" }}>{t("yr.nothing")}</p>
+            <p style={{ margin: "8px 0 0", fontSize: "var(--t-sm)", color: "var(--mid)" }}>{t("yr.nothing")}</p>
           ) : (
             rows.map(([k, label, f]) => (
-              <div key={k} style={{ display: "flex", justifyContent: "space-between", gap: 8, padding: "6px 0", borderTop: "1px solid var(--line)", fontSize: 15, fontVariantNumeric: "tabular-nums" }}>
+              <div key={k} style={{ display: "flex", justifyContent: "space-between", gap: 8, padding: "8px 0", borderTop: "1px solid var(--line)", fontSize: "var(--t-body)", fontVariantNumeric: "tabular-nums" }}>
                 <span style={{ color: "var(--mid)" }}>{label}</span>
                 <span>{f(report.before[k])} → <strong>{f(report.after[k])}</strong></span>
               </div>
             ))
           )}
-          <p style={{ margin: "10px 0 0", fontSize: 12, color: "var(--low)" }}>{t("yr.month.note")}</p>
+          <p style={{ margin: "12px 0 0", fontSize: "var(--t-cap)", color: "var(--low)" }}>{t("yr.month.note")}</p>
           {lessonRow(report.lesson)}
         </Card>
         {meters(run)}
@@ -311,20 +311,20 @@ export default function Year({ t, locale, go }) {
       <Title sub={t("yr.disclaimer")}>{t("yr.title")}</Title>
       <Card pad={16}>
         <Voyage month={run.month} t={t} />
-        <div style={{ fontSize: 13, color: "var(--mid)", marginTop: 6 }}>{t("yr.voyage", { n: run.month + 1 })} · {monthName(run.month)}</div>
-        <h2 className="nv-disp" style={{ fontSize: 26, lineHeight: 1.15, margin: "6px 0 8px", color: "var(--head)" }}>{text(ev.title, locale, vars)}</h2>
-        <p style={{ margin: 0, fontSize: 17, lineHeight: 1.5 }}>{text(ev.body, locale, vars)}</p>
+        <div style={{ fontSize: "var(--t-sm)", color: "var(--mid)", marginTop: 8 }}>{t("yr.voyage", { n: run.month + 1 })} · {monthName(run.month)}</div>
+        <h2 className="nv-disp" style={{ fontSize: "var(--t-head)", lineHeight: 1.2, margin: "8px 0 8px", color: "var(--head)" }}>{text(ev.title, locale, vars)}</h2>
+        <p style={{ margin: 0, fontSize: "var(--t-lead)", lineHeight: 1.5 }}>{text(ev.body, locale, vars)}</p>
       </Card>
       {meters(run)}
-      <Label style={{ marginTop: 20 }}>{t("yr.pick.choice")}</Label>
-      <div role="group" aria-label={t("yr.pick.choice")} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      <Label style={{ marginTop: 24 }}>{t("yr.pick.choice")}</Label>
+      <div role="group" aria-label={t("yr.pick.choice")} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {ev.choices.map((c, i) => (
           <Card key={i} pad={16} onClick={() => choose(i)}>
-            <span style={{ fontSize: 16, fontWeight: 650, lineHeight: 1.4 }}>{text(c.label, locale, vars)}</span>
+            <span style={{ fontSize: "var(--t-body)", fontWeight: 600, lineHeight: 1.5 }}>{text(c.label, locale, vars)}</span>
           </Card>
         ))}
       </div>
-      <div style={{ textAlign: "center", marginTop: 14 }}>
+      <div style={{ textAlign: "center", marginTop: 16 }}>
         <Button kind="ghost" size="sm" onClick={() => go("practice")}>{t("yr.leave")}</Button>
       </div>
     </div>

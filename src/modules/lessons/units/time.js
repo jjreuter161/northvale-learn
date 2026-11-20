@@ -14,7 +14,7 @@ export function minutesOf(lesson, lang = "en") {
   let w = 0;
   let q = 0;
   for (const s of lesson.steps) {
-    if (s.type === "card") w += words(s.title, lang) + words(s.body, lang);
+    if (s.type === "card") w += words(s.title, lang) + words(s.body, lang) + (s.example ? [...s.example.total, ...s.example.split.flatMap(([a, b]) => [a, b])].reduce((n, x) => n + words(x, lang), 0) : 0);
     if (isQuestion(s)) (q++, (w += stepTexts(s).reduce((t, x) => t + words(x, lang), 0)));
     if (s.type === "action") w += words(s.prompt, lang);
   }

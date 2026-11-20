@@ -31,10 +31,10 @@ export class Boundary extends Component {
   render() {
     if (!this.state.broken) return this.props.children;
     return (
-      <div style={{ padding: "40px 8px", textAlign: "center" }}>
-        <p style={{ fontSize: 18, fontWeight: 650, margin: "0 0 8px" }}>{this.props.t("error.title")}</p>
+      <div style={{ padding: "48px 8px", textAlign: "center" }}>
+        <p style={{ fontSize: "var(--t-lead)", fontWeight: 600, margin: "0 0 8px" }}>{this.props.t("error.title")}</p>
         <p style={{ color: "var(--mid)", margin: "0 0 16px" }}>{this.props.t("error.body")}</p>
-        <button onClick={() => location.reload()} style={{ border: "none", borderRadius: 8, padding: "12px 18px", background: "var(--brand)", color: "var(--onBrand)", fontWeight: 650, fontSize: 15, cursor: "pointer" }}>
+        <button onClick={() => location.reload()} style={{ border: "none", borderRadius: 12, padding: "12px 16px", background: "var(--brand)", color: "var(--onBrand)", fontWeight: 600, fontSize: "var(--t-body)", cursor: "pointer" }}>
           {this.props.t("error.reload")}
         </button>
       </div>

@@ -127,7 +127,7 @@ function SourceNote({ t, quotes, locale, pfCurrency }) {
   if (!quotes) return null;
   const time = new Date(quotes.asOf).toLocaleString(t("locale.tag"), { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
   return (
-    <p style={{ fontSize: 13, color: "var(--low)", lineHeight: 1.45, margin: "8px 2px 0" }}>
+    <p style={{ fontSize: "var(--t-sm)", color: "var(--low)", lineHeight: 1.5, margin: "8px 4px 0" }}>
       {quotes.source === "sample" ? t("pf.source.sample") : t("pf.source.real", { source: quotes.sourceName || quotes.source, time })}
       {pfCurrency === "MXN" && quotes.fx && ` ${t(quotes.fx.sample ? "pf.fx.sample" : "pf.fx.real", { rate: quotes.fx.USDMXN.toFixed(2) })}`}
       {locale.region === "MX" && quotes.cetes && ` ${t("pf.cetes", { rate: quotes.cetes.rate, sample: quotes.cetes.sample ? t("pf.cetes.sample") : "" })}`}
@@ -189,11 +189,11 @@ function AssetPanel({ t, locale, symbol, pf, prices, quotes, onTraded, compact, 
 
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
         <div style={{ minWidth: 0 }}>
-          {compact && <div style={{ fontSize: 14, fontWeight: 750, color: "var(--low)" }}>{symbol}</div>}
-          <div style={{ fontSize: 20, fontWeight: 750, lineHeight: 1.2 }}>{a.name}</div>
-          <div style={{ fontSize: 14, color: "var(--mid)", marginTop: 2 }}>{text(a.short, locale)}</div>
+          {compact && <div style={{ fontSize: "var(--t-sm)", fontWeight: 700, color: "var(--low)" }}>{symbol}</div>}
+          <div style={{ fontSize: "var(--t-title)", fontWeight: 700, lineHeight: 1.2 }}>{a.name}</div>
+          <div style={{ fontSize: "var(--t-sm)", color: "var(--mid)", marginTop: 4 }}>{text(a.short, locale)}</div>
         </div>
         {!compact && (
           <Chip active={watching} onClick={() => (savePf((p) => ({ ...p, watchlist: watching ? p.watchlist.filter((x) => x !== symbol) : [...p.watchlist, symbol] })), !watching && recordPractice("watch"))}>
@@ -202,24 +202,24 @@ function AssetPanel({ t, locale, symbol, pf, prices, quotes, onTraded, compact, 
         )}
       </div>
       {q && (
-        <div style={{ margin: "12px 0 4px", display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
-          <span style={{ fontSize: 30, fontWeight: 750 }}>{fmtA(q.price)}</span>
-          <span style={{ fontWeight: 650, color: "var(--ink)" }}>
+        <div style={{ margin: "12px 0 4px", display: "flex", alignItems: "baseline", gap: 12, flexWrap: "wrap" }}>
+          <span style={{ fontSize: "var(--t-head)", fontWeight: 700 }}>{fmtA(q.price)}</span>
+          <span style={{ fontWeight: 600, color: "var(--ink)" }}>
             {q.change >= 0 ? "▲" : "▼"} {percent(Math.abs(q.changePct), { ...locale, digits: 2 })} {t("pf.today")}
           </span>
-          {quotes && <span style={{ fontSize: 12, fontWeight: 650, color: "var(--mid)", background: "var(--surface2)", borderRadius: 6, padding: "3px 7px" }}>{quotes.source === "sample" ? t("pf.sample_badge") : t("pf.delayed_badge")}</span>}
+          {quotes && <span style={{ fontSize: "var(--t-cap)", fontWeight: 600, color: "var(--mid)", background: "var(--surface2)", borderRadius: 12, padding: "4px 8px" }}>{quotes.source === "sample" ? t("pf.sample_badge") : t("pf.delayed_badge")}</span>}
         </div>
       )}
       {pts && pts.length > 1 && (
         <div style={{ margin: "8px 0 4px" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, fontWeight: 650, color: "var(--mid)", marginBottom: 6 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "var(--t-sm)", fontWeight: 600, color: "var(--mid)", marginBottom: 8 }}>
             <span>
               {t("pf.year")}: <span style={{ color: "var(--ink)" }}>{yearChange >= 0 ? "▲ +" : "▼ "}{yearChange.toFixed(1)}%</span>
             </span>
             <span>{t("pf.price_in", { cur: a.currency })}</span>
           </div>
           <LineChart points={pts} height={140} color="var(--ink)" label={`${symbol} ${t("pf.year")}`} markers={[{ value: hi[1], color: "var(--good)" }, { value: lo[1], color: "var(--bad)" }]} />
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--low)", marginTop: 6 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "var(--t-sm)", color: "var(--low)", marginTop: 8 }}>
             <span>{shortDate(pts[0][0], { ...locale, year: true })}</span>
             <span>{t("pf.high_low", { high: fmtA(hi[1]), low: fmtA(lo[1]) })}</span>
             <span>{shortDate(pts[pts.length - 1][0], { ...locale, year: true })}</span>
@@ -229,41 +229,41 @@ function AssetPanel({ t, locale, symbol, pf, prices, quotes, onTraded, compact, 
           </Button>
         </div>
       )}
-      {own && price && <p style={{ fontWeight: 650, margin: "14px 0 0" }}>{t("pf.you_own", { n: sharesFmt(own.shares), value: fmt(own.shares * price) })}</p>}
+      {own && price && <p style={{ fontWeight: 600, margin: "16px 0 0" }}>{t("pf.you_own", { n: sharesFmt(own.shares), value: fmt(own.shares * price) })}</p>}
       {lockedBy ? (
-        <Note icon="lock" style={{ marginTop: 14 }}>
+        <Note icon="lock" style={{ marginTop: 16 }}>
           <div>{t("pf.unlock_buy", { lesson: text(lockedBy.title, locale) })}</div>
           {go && (
-            <Button size="sm" kind="secondary" style={{ marginTop: 10 }} onClick={() => go("lessons", { lesson: lockedBy.id })}>
+            <Button size="sm" kind="secondary" style={{ marginTop: 12 }} onClick={() => go("lessons", { lesson: lockedBy.id })}>
               {t("pf.unlock.go")}
             </Button>
           )}
         </Note>
       ) : (
-      <div style={{ marginTop: 14 }}>
+      <div style={{ marginTop: 16 }}>
         {own && (
-          <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+          <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
             <Chip active={mode === "buy"} onClick={() => setMode("buy")}>{t("pf.buy")}</Chip>
             <Chip active={mode === "sell"} onClick={() => setMode("sell")}>{t("pf.sell")}</Chip>
           </div>
         )}
         <label style={{ display: "block" }}>
-          <span style={{ display: "block", fontSize: 14, fontWeight: 650, color: "var(--mid)", marginBottom: 6 }}>
+          <span style={{ display: "block", fontSize: "var(--t-sm)", fontWeight: 600, color: "var(--mid)", marginBottom: 8 }}>
             {t("pf.amount")} ({pf.currency}) · {t("pf.cash")}: {fmt(pf.cash)}
           </span>
-          <input inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0" aria-label={t("pf.amount")} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 8, padding: "13px 14px", fontSize: 20, fontWeight: 650, background: "var(--surface)", color: "var(--ink)" }} />
+          <input inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0" aria-label={t("pf.amount")} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 12, padding: "12px 16px", fontSize: "var(--t-title)", fontWeight: 600, background: "var(--surface)", color: "var(--ink)" }} />
         </label>
         {mode === "buy" && (
-          <div style={{ display: "flex", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", gap: 8, marginTop: 8, flexWrap: "wrap" }}>
             {[0.05, 0.1, 0.25, 0.5].map((f) => (
-              <Chip key={f} onClick={() => setAmount(String(Math.floor(pf.cash * f)))} style={{ padding: "6px 12px", minHeight: 44, fontSize: 14 }}>
+              <Chip key={f} onClick={() => setAmount(String(Math.floor(pf.cash * f)))} style={{ padding: "8px 12px", minHeight: 44, fontSize: "var(--t-sm)" }}>
                 {Math.round(f * 100)}%
               </Chip>
             ))}
           </div>
         )}
-        {price && Number(amount) > 0 && <p style={{ fontSize: 14, color: "var(--mid)", margin: "8px 0 0" }}>{t("pf.shares_est", { n: sharesFmt(Number(amount) / price) })}</p>}
-        {err && <Note tone="bad" style={{ marginTop: 10 }}>{err}</Note>}
+        {price && Number(amount) > 0 && <p style={{ fontSize: "var(--t-sm)", color: "var(--mid)", margin: "8px 0 0" }}>{t("pf.shares_est", { n: sharesFmt(Number(amount) / price) })}</p>}
+        {err && <Note tone="bad" style={{ marginTop: 12 }}>{err}</Note>}
         <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
           <Button full kind={mode === "buy" ? "good" : "bad"} disabled={!price || !(Number(amount) > 0)} onClick={trade}>
             {t(mode === "buy" ? "pf.buy" : "pf.sell")}
@@ -274,7 +274,7 @@ function AssetPanel({ t, locale, symbol, pf, prices, quotes, onTraded, compact, 
             </Button>
           )}
         </div>
-        {!price && <p style={{ fontSize: 13, color: "var(--low)" }}>{t("pf.err.no_price")}</p>}
+        {!price && <p style={{ fontSize: "var(--t-sm)", color: "var(--low)" }}>{t("pf.err.no_price")}</p>}
       </div>
       )}
     </div>
@@ -284,15 +284,15 @@ function AssetPanel({ t, locale, symbol, pf, prices, quotes, onTraded, compact, 
 function AssetRow({ t, locale, a, price, q, pf, onClick, right, tag, first }) {
   return (
     <button onClick={onClick} className="nv-press" style={{ display: "flex", alignItems: "center", gap: 12, width: "100%", textAlign: "left", border: "none", borderTop: first ? "none" : "1px solid var(--line)", background: "transparent", color: "var(--ink)", padding: "12px 0", cursor: "pointer", minHeight: 56 }}>
-      <span style={{ width: 42, height: 42, borderRadius: 8, background: "var(--surface2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 750, letterSpacing: -0.2, flexShrink: 0 }}>{a.symbol.slice(0, 5)}</span>
+      <span style={{ width: 42, height: 42, borderRadius: 12, background: "var(--surface2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "var(--t-cap)", fontWeight: 700, letterSpacing: -0.2, flexShrink: 0 }}>{a.symbol.slice(0, 5)}</span>
       <span style={{ flex: 1, minWidth: 0 }}>
-        <span style={{ display: "block", fontWeight: 650, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{a.name}</span>
-        <span style={{ display: "block", fontSize: 13, color: tag ? "var(--accent)" : "var(--mid)", fontWeight: tag ? 650 : 400, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{tag ? t("pf.for_goal", { name: tag }) : text(a.short, locale)}</span>
+        <span style={{ display: "block", fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{a.name}</span>
+        <span style={{ display: "block", fontSize: "var(--t-sm)", color: tag ? "var(--accent)" : "var(--mid)", fontWeight: tag ? 600 : 450, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{tag ? t("pf.for_goal", { name: tag }) : text(a.short, locale)}</span>
       </span>
       {right || (
         <span style={{ textAlign: "right", flexShrink: 0 }}>
-          <span style={{ display: "block", fontWeight: 650 }}>{q ? money(q.price, { ...locale, currency: a.currency, cents: true }) : "—"}</span>
-          {q && <span style={{ display: "block", fontSize: 13, fontWeight: 650, color: "var(--ink)" }}>{q.change >= 0 ? "▲ +" : "▼ −"}{Math.abs(q.changePct).toFixed(2)}%</span>}
+          <span style={{ display: "block", fontWeight: 600 }}>{q ? money(q.price, { ...locale, currency: a.currency, cents: true }) : "—"}</span>
+          {q && <span style={{ display: "block", fontSize: "var(--t-sm)", fontWeight: 600, color: "var(--ink)" }}>{q.change >= 0 ? "▲ +" : "▼ −"}{Math.abs(q.changePct).toFixed(2)}%</span>}
         </span>
       )}
     </button>
@@ -326,29 +326,29 @@ function Screen({ t, locale, go }) {
       {pf.currency !== regionCur && (
         <Note icon="globe" style={{ marginBottom: 12 }}>
           <strong>{t("pf.currency.title", { cur: pf.currency })}</strong>
-          <div style={{ margin: "4px 0 10px" }}>{t("pf.currency.body", { cur: regionCur })}</div>
+          <div style={{ margin: "4px 0 12px" }}>{t("pf.currency.body", { cur: regionCur })}</div>
           <Button size="sm" onClick={() => savePf(() => newPortfolio(locale.region, dayKey()))}>
             {t("pf.currency.restart", { cur: regionCur })}
           </Button>
         </Note>
       )}
       <Card>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
-          <span style={{ fontSize: 14, fontWeight: 650, color: "var(--mid)" }}>{t("pf.total")}</span>
-          <span style={{ fontSize: 12, fontWeight: 650, background: "var(--surface2)", color: "var(--mid)", borderRadius: 8, padding: "4px 10px", whiteSpace: "nowrap" }}>{t("pf.pretend")}</span>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+          <span style={{ fontSize: "var(--t-sm)", fontWeight: 600, color: "var(--mid)" }}>{t("pf.total")}</span>
+          <span style={{ fontSize: "var(--t-cap)", fontWeight: 600, background: "var(--surface2)", color: "var(--mid)", borderRadius: 12, padding: "4px 12px", whiteSpace: "nowrap" }}>{t("pf.pretend")}</span>
         </div>
-        <div style={{ fontSize: 36, fontWeight: 700, letterSpacing: -0.8, lineHeight: 1.15, fontVariantNumeric: "tabular-nums" }}>{fmt(v.total)}</div>
-        <div style={{ fontWeight: 650, fontSize: 15, color: "var(--ink)", fontVariantNumeric: "tabular-nums" }}>
-          {v.change >= 0 ? "▲ +" : "▼ −"}{fmt(Math.abs(v.change))} ({percent(Math.abs(v.changePct), { ...locale, digits: 2 })}) <span style={{ color: "var(--mid)", fontWeight: 500 }}>{t("pf.since_start")}</span>
+        <div style={{ fontSize: "var(--t-disp)", fontWeight: 700, letterSpacing: -0.8, lineHeight: 1.2, fontVariantNumeric: "tabular-nums" }}>{fmt(v.total)}</div>
+        <div style={{ fontWeight: 600, fontSize: "var(--t-body)", color: "var(--ink)", fontVariantNumeric: "tabular-nums" }}>
+          {v.change >= 0 ? "▲ +" : "▼ −"}{fmt(Math.abs(v.change))} ({percent(Math.abs(v.changePct), { ...locale, digits: 2 })}) <span style={{ color: "var(--mid)", fontWeight: 450 }}>{t("pf.since_start")}</span>
         </div>
         {pf.snapshots.length > 1 ? (
           <div style={{ marginTop: 12 }}>
             <LineChart points={pf.snapshots} height={110} color="var(--ink)" label={t("pf.value_chart")} markers={[{ value: pf.start }]} minSpan={pf.start * 0.02} />
           </div>
         ) : (
-          <p style={{ fontSize: 13, color: "var(--low)", margin: "8px 0 0" }}>{t("pf.value_chart.wait")}</p>
+          <p style={{ fontSize: "var(--t-sm)", color: "var(--low)", margin: "8px 0 0" }}>{t("pf.value_chart.wait")}</p>
         )}
-        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 12, paddingTop: 12, borderTop: "1px solid var(--line)", fontWeight: 650 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 12, paddingTop: 12, borderTop: "1px solid var(--line)", fontWeight: 600 }}>
           <span style={{ color: "var(--mid)" }}>{t("pf.cash")}</span>
           <span>{fmt(v.cash)}</span>
         </div>
@@ -374,8 +374,8 @@ function Screen({ t, locale, go }) {
                 onClick={() => setOpen(x.symbol)}
                 right={
                   <span style={{ textAlign: "right", flexShrink: 0 }}>
-                    <span style={{ display: "block", fontWeight: 650 }}>{fmt(x.value)}</span>
-                    <span style={{ display: "block", fontSize: 13, fontWeight: 650, color: "var(--ink)" }}>
+                    <span style={{ display: "block", fontWeight: 600 }}>{fmt(x.value)}</span>
+                    <span style={{ display: "block", fontSize: "var(--t-sm)", fontWeight: 600, color: "var(--ink)" }}>
                       {x.gain >= 0 ? "▲ +" : "▼ −"}{Math.abs(x.gainPct).toFixed(2)}% · {Math.round(x.share * 100)}%
                     </span>
                   </span>
@@ -387,24 +387,24 @@ function Screen({ t, locale, go }) {
       </Card>
 
       <Label>{t("pf.invest")}</Label>
-      <p style={{ fontSize: 13, color: "var(--low)", margin: "-4px 2px 10px" }}>{t("pf.examples")}</p>
+      <p style={{ fontSize: "var(--t-sm)", color: "var(--low)", margin: "-4px 4px 12px" }}>{t("pf.examples")}</p>
       {TYPES.map((type) => {
         const open_ = unlocked(progress, type);
         const list = assets.filter((a) => a.type === type);
         const lesson = lessonById(UNLOCKS[type]);
         return (
-          <Card key={type} pad={"14px 16px 4px"} style={{ marginBottom: 12 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
-              <span style={{ width: 36, height: 36, borderRadius: 6, background: "var(--brandSoft)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+          <Card key={type} pad={"16px 16px 4px"} style={{ marginBottom: 12 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
+              <span style={{ width: 36, height: 36, borderRadius: 12, background: "var(--brandSoft)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                 <Icon name={type === "safe" ? "shield" : type === "etf" ? "layers" : "building"} size={20} />
               </span>
               <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 750 }}>{t(`pf.type.${type}`)}</div>
-                <div style={{ fontSize: 13, color: "var(--mid)" }}>{t(`pf.type.${type}.sub`)}</div>
+                <div style={{ fontWeight: 700 }}>{t(`pf.type.${type}`)}</div>
+                <div style={{ fontSize: "var(--t-sm)", color: "var(--mid)" }}>{t(`pf.type.${type}.sub`)}</div>
               </div>
               {!open_ && <Icon name="lock" size={20} color="var(--low)" />}
             </div>
-            {!open_ && <p style={{ fontSize: 13, color: "var(--mid)", margin: "2px 0 8px" }}>{t("pf.unlock", { lesson: text(lesson.title, locale) })}</p>}
+            {!open_ && <p style={{ fontSize: "var(--t-sm)", color: "var(--mid)", margin: "4px 0 8px" }}>{t("pf.unlock", { lesson: text(lesson.title, locale) })}</p>}
             {list.map((a) => (
               <AssetRow key={a.symbol} t={t} locale={locale} a={a} q={quotes && quotes.quotes[a.symbol]} pf={pf} onClick={() => setOpen(a.symbol)} />
             ))}
@@ -428,20 +428,20 @@ function Screen({ t, locale, go }) {
           <Label>{t("pf.history")}</Label>
           <Card pad={"4px 16px"}>
             {pf.trades.slice(0, 8).map((x) => (
-              <div key={x.id} style={{ display: "flex", justifyContent: "space-between", gap: 10, padding: "11px 0", borderTop: "1px solid var(--line)", fontSize: 15 }}>
+              <div key={x.id} style={{ display: "flex", justifyContent: "space-between", gap: 12, padding: "12px 0", borderTop: "1px solid var(--line)", fontSize: "var(--t-body)" }}>
                 <span>
                   <strong>{t(x.side === "buy" ? "pf.buy" : "pf.sell")}</strong> {x.symbol}
-                  <span style={{ display: "block", fontSize: 13, color: "var(--low)" }}>{shortDate(x.at.slice(0, 10), locale)}</span>
+                  <span style={{ display: "block", fontSize: "var(--t-sm)", color: "var(--low)" }}>{shortDate(x.at.slice(0, 10), locale)}</span>
                 </span>
-                <span style={{ fontWeight: 650 }}>{fmt(x.amount)}</span>
+                <span style={{ fontWeight: 600 }}>{fmt(x.amount)}</span>
               </div>
             ))}
           </Card>
         </>
       )}
 
-      <Note icon="shield" style={{ marginTop: 18 }}>{t("pf.disclaimer")}</Note>
-      <div style={{ textAlign: "center", marginTop: 10 }}>
+      <Note icon="shield" style={{ marginTop: 16 }}>{t("pf.disclaimer")}</Note>
+      <div style={{ textAlign: "center", marginTop: 12 }}>
         <Button kind="ghost" size="sm" onClick={() => setRestart(true)}>
           {t("pf.restart")}
         </Button>
@@ -451,7 +451,7 @@ function Screen({ t, locale, go }) {
         {open && <AssetPanel t={t} locale={locale} symbol={open} pf={pf} prices={prices} quotes={quotes} go={(...x) => (setOpen(null), go(...x))} />}
       </Sheet>
       <Sheet open={restart} onClose={() => setRestart(false)} title={t("pf.restart")}>
-        <p style={{ fontSize: 16, lineHeight: 1.5, marginTop: 0 }}>{t("pf.restart.body", { cash: fmt(newPortfolio(locale.region).start, false) })}</p>
+        <p style={{ fontSize: "var(--t-body)", lineHeight: 1.5, marginTop: 0 }}>{t("pf.restart.body", { cash: fmt(newPortfolio(locale.region).start, false) })}</p>
         <Button full kind="bad" onClick={() => (savePf(() => newPortfolio(locale.region, dayKey())), setRestart(false))}>
           {t("pf.restart")}
         </Button>
@@ -480,18 +480,18 @@ function BuyAction({ params, t, locale, onDone, done }) {
   const total = valuation(pf, prices).total;
   return (
     <div>
-      {!unlocked(progress, params.type) && <Note icon="sparkles" style={{ marginBottom: 10 }}>{t("pf.act.unlocked_now")}</Note>}
-      {params.maxShare && <Note icon="info" style={{ marginBottom: 10 }}>{t("pf.act.max_share", { pct: `${Math.round(params.maxShare * 100)}%`, amount: fmt(total * params.maxShare, false) })}</Note>}
+      {!unlocked(progress, params.type) && <Note icon="sparkles" style={{ marginBottom: 12 }}>{t("pf.act.unlocked_now")}</Note>}
+      {params.maxShare && <Note icon="info" style={{ marginBottom: 12 }}>{t("pf.act.max_share", { pct: `${Math.round(params.maxShare * 100)}%`, amount: fmt(total * params.maxShare, false) })}</Note>}
       {!sym ? (
-        <Card pad={"6px 16px"}>
-          <p style={{ fontWeight: 650, margin: "8px 0 4px" }}>{params.different ? t("pf.act.different") : t("pf.act.pick")}</p>
+        <Card pad={"8px 16px"}>
+          <p style={{ fontWeight: 600, margin: "8px 0 4px" }}>{params.different ? t("pf.act.different") : t("pf.act.pick")}</p>
           {list.map((a) => (
             <AssetRow key={a.symbol} t={t} locale={locale} a={a} q={quotes && quotes.quotes[a.symbol]} pf={pf} onClick={() => setSym(a.symbol)} />
           ))}
         </Card>
       ) : (
         <Card>
-          <button onClick={() => setSym(null)} style={{ border: "none", background: "none", color: "var(--sky)", fontWeight: 650, padding: 0, marginBottom: 8, cursor: "pointer", minHeight: 44 }}>
+          <button onClick={() => setSym(null)} style={{ border: "none", background: "none", color: "var(--sky)", fontWeight: 600, padding: 0, marginBottom: 8, cursor: "pointer", minHeight: 44 }}>
             ← {t("pf.act.pick")}
           </button>
           <AssetPanel
@@ -511,7 +511,7 @@ function BuyAction({ params, t, locale, onDone, done }) {
           />
         </Card>
       )}
-      {done && <Note tone="good" icon="check" style={{ marginTop: 10 }}>{t("lessons.done_it")}</Note>}
+      {done && <Note tone="good" icon="check" style={{ marginTop: 12 }}>{t("lessons.done_it")}</Note>}
     </div>
   );
 }
@@ -526,8 +526,8 @@ function WatchAction({ params, t, locale, onDone, done }) {
   const stocks = assetsFor(locale.region).filter((a) => a.type === "stock");
   const n = pf.watchlist.filter((s) => (assetBySymbol(s) || {}).type === "stock").length;
   return (
-    <Card pad={"6px 16px"}>
-      <p style={{ fontWeight: 650, margin: "8px 0 4px" }}>{t("pf.act.watch_n", { n: Math.min(n, need), need })}</p>
+    <Card pad={"8px 16px"}>
+      <p style={{ fontWeight: 600, margin: "8px 0 4px" }}>{t("pf.act.watch_n", { n: Math.min(n, need), need })}</p>
       {stocks.map((a) => {
         const on = pf.watchlist.includes(a.symbol);
         return (
@@ -559,15 +559,15 @@ function ChartAction({ params, t, locale, onDone }) {
   const list = assetsFor(locale.region).filter((a) => a.type !== "safe");
   return sym ? (
     <Card>
-      <button onClick={() => setSym(null)} style={{ border: "none", background: "none", color: "var(--sky)", fontWeight: 650, padding: 0, marginBottom: 8, cursor: "pointer", minHeight: 44 }}>
+      <button onClick={() => setSym(null)} style={{ border: "none", background: "none", color: "var(--sky)", fontWeight: 600, padding: 0, marginBottom: 8, cursor: "pointer", minHeight: 44 }}>
         ← {t("pf.act.chart_pick")}
       </button>
       <AssetPanel t={t} locale={locale} symbol={sym} pf={pf} prices={prices} quotes={quotes} compact explainDone={onDone} />
       <Note icon="info" style={{ marginTop: 12 }}>{t("pf.act.chart_q")}</Note>
     </Card>
   ) : (
-    <Card pad={"6px 16px"}>
-      <p style={{ fontWeight: 650, margin: "8px 0 4px" }}>{t("pf.act.chart_pick")}</p>
+    <Card pad={"8px 16px"}>
+      <p style={{ fontWeight: 600, margin: "8px 0 4px" }}>{t("pf.act.chart_pick")}</p>
       {list.map((a) => (
         <AssetRow key={a.symbol} t={t} locale={locale} a={a} q={quotes && quotes.quotes[a.symbol]} pf={pf} onClick={() => setSym(a.symbol)} />
       ))}
@@ -588,17 +588,17 @@ function DiversifyAction({ params, t, locale, onDone, done }) {
   const list = assetsFor(locale.region).filter((a) => (unlocked(progress, a.type) || a.type !== "stock") && !pf.holdings[a.symbol]);
   return (
     <div>
-      <p style={{ fontWeight: 750, fontSize: 18, margin: "0 0 10px" }}>{t("pf.act.holdings", { n: Math.min(n, need), need })}</p>
+      <p style={{ fontWeight: 700, fontSize: "var(--t-lead)", margin: "0 0 12px" }}>{t("pf.act.holdings", { n: Math.min(n, need), need })}</p>
       {sym ? (
         <Card>
-          <button onClick={() => setSym(null)} style={{ border: "none", background: "none", color: "var(--sky)", fontWeight: 650, padding: 0, marginBottom: 8, cursor: "pointer", minHeight: 44 }}>
+          <button onClick={() => setSym(null)} style={{ border: "none", background: "none", color: "var(--sky)", fontWeight: 600, padding: 0, marginBottom: 8, cursor: "pointer", minHeight: 44 }}>
             ← {t("pf.act.pick")}
           </button>
           <AssetPanel t={t} locale={locale} symbol={sym} pf={pf} prices={prices} quotes={quotes} compact allowBuy onTraded={() => setSym(null)} />
         </Card>
       ) : (
         n < need && (
-          <Card pad={"6px 16px"}>
+          <Card pad={"8px 16px"}>
             {list.map((a) => (
               <AssetRow key={a.symbol} t={t} locale={locale} a={a} q={quotes && quotes.quotes[a.symbol]} pf={pf} onClick={() => setSym(a.symbol)} />
             ))}
@@ -623,12 +623,12 @@ function ReviewAction({ params, t, locale, onDone, done }) {
   const fmt = fmtFor(locale, pf.currency);
   return (
     <Card>
-      <div style={{ fontSize: 30, fontWeight: 750 }}>{fmt(v.total)}</div>
-      <p style={{ fontWeight: 650, color: "var(--ink)", margin: "4px 0 10px" }}>{t("pf.act.review", { change: `${v.change >= 0 ? "▲ +" : "▼ −"}${fmt(Math.abs(v.change))}`, pct: `${v.change >= 0 ? "+" : "−"}${Math.abs(v.changePct).toFixed(2)}%` })}</p>
+      <div style={{ fontSize: "var(--t-head)", fontWeight: 700 }}>{fmt(v.total)}</div>
+      <p style={{ fontWeight: 600, color: "var(--ink)", margin: "4px 0 12px" }}>{t("pf.act.review", { change: `${v.change >= 0 ? "▲ +" : "▼ −"}${fmt(Math.abs(v.change))}`, pct: `${v.change >= 0 ? "+" : "−"}${Math.abs(v.changePct).toFixed(2)}%` })}</p>
       {v.positions.slice(0, 5).map((x) => (
-        <div key={x.symbol} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderTop: "1px solid var(--line)", fontSize: 15 }}>
-          <span style={{ fontWeight: 650 }}>{x.symbol}</span>
-          <span style={{ fontWeight: 650 }}>{x.gain >= 0 ? "▲ +" : "▼ −"}{Math.abs(x.gainPct).toFixed(2)}%</span>
+        <div key={x.symbol} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderTop: "1px solid var(--line)", fontSize: "var(--t-body)" }}>
+          <span style={{ fontWeight: 600 }}>{x.symbol}</span>
+          <span style={{ fontWeight: 600 }}>{x.gain >= 0 ? "▲ +" : "▼ −"}{Math.abs(x.gainPct).toFixed(2)}%</span>
         </div>
       ))}
       {params.decide && (

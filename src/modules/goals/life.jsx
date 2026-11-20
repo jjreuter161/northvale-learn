@@ -68,8 +68,8 @@ addStrings({
   "hu.note.MX": S("Earning on your own means registering with the SAT and paying taxes on it; small earners can use a simplified regime (RESICO), with rates of roughly {@resicoRateLow} to {@resicoRateHigh}. Set aside part of your profit for that.", "Ganar por tu cuenta implica darte de alta en el SAT y pagar impuestos por eso; quienes ganan poco pueden usar un régimen simplificado (RESICO), con tasas de alrededor de {@resicoRateLow} a {@resicoRateHigh}. Aparta parte de tu ganancia para eso."),
 });
 
-const row = { display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 10, padding: "8px 0", borderTop: "1px solid var(--line)", fontVariantNumeric: "tabular-nums" };
-const big = { fontSize: 22, fontWeight: 700, fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" };
+const row = { display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12, padding: "8px 0", borderTop: "1px solid var(--line)", fontVariantNumeric: "tabular-nums" };
+const big = { fontSize: "var(--t-title)", fontWeight: 700, fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" };
 const pct = (n, locale) => `${Number(n.toFixed(1)).toLocaleString(locale.lang === "es" ? "es-MX" : "en-US")}%`;
 
 // ---- Paycheck: gross → take-home ------------------------------------------
@@ -88,7 +88,7 @@ export function PaycheckTool({ params = {}, t, locale, onDone, done }) {
       <Slider label={t("pay.gross")} value={gross} min={amt([400, 3000], R)} max={amt([6000, 50000], R)} step={amt([50, 500], R)} onChange={set(setGross)} display={money(gross, locale)} />
       <Slider label={t(R === "MX" ? "pay.income.MX" : "pay.income")} value={income} min={0} max={25} step={0.5} onChange={set(setIncome)} display={`${income}%`} />
       {R !== "MX" && <Slider label={t("pay.state")} value={state} min={0} max={10} step={0.5} onChange={set(setState)} display={`${state}%`} />}
-      <div style={{ display: "flex", height: 10, borderRadius: 5, overflow: "hidden", margin: "4px 0 12px", background: "var(--surface2)" }} aria-hidden>
+      <div style={{ display: "flex", height: 10, borderRadius: 12, overflow: "hidden", margin: "4px 0 12px", background: "var(--surface2)" }} aria-hidden>
         <div style={{ width: `${(p.net / gross) * 100}%`, background: "var(--accent)" }} />
         <div style={{ flex: 1, background: "var(--warn)", opacity: 0.55 }} />
       </div>
@@ -98,11 +98,11 @@ export function PaycheckTool({ params = {}, t, locale, onDone, done }) {
           <span style={{ whiteSpace: "nowrap" }}>−{fmt(v)}</span>
         </div>
       ))}
-      <div style={{ ...row, fontWeight: 650 }}>
+      <div style={{ ...row, fontWeight: 600 }}>
         <span>{t("pay.net")}</span>
         <span style={big}>{fmt(p.net)}</span>
       </div>
-      <p style={{ fontSize: 13, color: "var(--low)", lineHeight: 1.45, margin: "10px 0 0" }}>{t(R === "MX" ? "pay.note.MX" : "pay.note")}</p>
+      <p style={{ fontSize: "var(--t-sm)", color: "var(--low)", lineHeight: 1.5, margin: "12px 0 0" }}>{t(R === "MX" ? "pay.note.MX" : "pay.note")}</p>
     </Card>
   );
 }
@@ -123,7 +123,7 @@ export function SalesTaxTool({ t, locale, onDone, done }) {
             <span style={{ color: "var(--mid)" }}>{t("tax.inside", { pct: `${rate}%` })}</span>
             <span style={big}>{fmt(taxInside(price, rate))}</span>
           </div>
-          <p style={{ fontSize: 13, color: "var(--low)", lineHeight: 1.45, margin: "10px 0 0" }}>{t("tax.inside.note")}</p>
+          <p style={{ fontSize: "var(--t-sm)", color: "var(--low)", lineHeight: 1.5, margin: "12px 0 0" }}>{t("tax.inside.note")}</p>
         </>
       ) : (
         <>
@@ -131,7 +131,7 @@ export function SalesTaxTool({ t, locale, onDone, done }) {
             <span style={{ color: "var(--mid)" }}>{t("tax.added", { pct: `${rate}%` })}</span>
             <span style={big}>{fmt(withTaxAdded(price, rate))}</span>
           </div>
-          <p style={{ fontSize: 13, color: "var(--low)", lineHeight: 1.45, margin: "10px 0 0" }}>{t("tax.added.note")}</p>
+          <p style={{ fontSize: "var(--t-sm)", color: "var(--low)", lineHeight: 1.5, margin: "12px 0 0" }}>{t("tax.added.note")}</p>
         </>
       )}
     </Card>
@@ -156,12 +156,12 @@ export function BracketTool({ t, locale, onDone, done }) {
           <span style={{ whiteSpace: "nowrap" }}>{fmt(r.tax)}</span>
         </div>
       ))}
-      <div style={{ ...row, fontWeight: 650 }}>
+      <div style={{ ...row, fontWeight: 600 }}>
         <span>{t("br.total")}</span>
         <span style={big}>{fmt(b.total)}</span>
       </div>
       <p style={{ margin: "8px 0 0", fontWeight: 600 }}>{t("br.effective", { pct: pct(b.effective, locale) })}</p>
-      <p style={{ fontSize: 13, color: "var(--low)", lineHeight: 1.45, margin: "8px 0 0" }}>{t("br.note")}</p>
+      <p style={{ fontSize: "var(--t-sm)", color: "var(--low)", lineHeight: 1.5, margin: "8px 0 0" }}>{t("br.note")}</p>
     </Card>
   );
 }
@@ -194,19 +194,19 @@ export function RemitTool({ t, locale, onDone, done }) {
   return (
     <Card>
       <Slider label={t("remit.amount")} value={amount} min={50} max={1000} step={10} display={usd(amount)} onChange={(v) => (setAmount(v), touch())} />
-      <div style={{ display: "flex", gap: 10, marginBottom: 12 }}>
+      <div style={{ display: "flex", gap: 12, marginBottom: 12 }}>
         {svc.map((x, i) => (
-          <div key={x.n} style={{ flex: 1, border: `1px solid ${i === best ? "var(--accent)" : "var(--line)"}`, borderRadius: 8, padding: 12, background: i === best ? "var(--accentSoft)" : "var(--surface)" }}>
-            <div style={{ fontWeight: 650, marginBottom: 6 }}>{t("remit.service", { n: x.n })}{i === best ? ` · ${t("remit.best")}` : ""}</div>
-            <div style={{ fontSize: 13, color: "var(--mid)", lineHeight: 1.4 }}>{t("remit.fee", { amount: usd(x.fee) })}</div>
-            <div style={{ fontSize: 13, color: "var(--mid)", lineHeight: 1.4, minHeight: 52 }}>{t("remit.markup", { pct: pct(x.markupPct, locale), amount: usd((amount * x.markupPct) / 100) })}</div>
+          <div key={x.n} style={{ flex: 1, border: `1px solid ${i === best ? "var(--accent)" : "var(--line)"}`, borderRadius: 12, padding: 12, background: i === best ? "var(--accentSoft)" : "var(--surface)" }}>
+            <div style={{ fontWeight: 600, marginBottom: 8 }}>{t("remit.service", { n: x.n })}{i === best ? ` · ${t("remit.best")}` : ""}</div>
+            <div style={{ fontSize: "var(--t-sm)", color: "var(--mid)", lineHeight: 1.5 }}>{t("remit.fee", { amount: usd(x.fee) })}</div>
+            <div style={{ fontSize: "var(--t-sm)", color: "var(--mid)", lineHeight: 1.5, minHeight: 52 }}>{t("remit.markup", { pct: pct(x.markupPct, locale), amount: usd((amount * x.markupPct) / 100) })}</div>
             <div style={{ fontWeight: 700, fontVariantNumeric: "tabular-nums", marginTop: 4 }}>{t("remit.arrives", { amount: mxn(x.arrives) })}</div>
-            <div style={{ fontSize: 13, fontVariantNumeric: "tabular-nums", marginTop: 4 }}>{t("remit.cost", { amount: usd(x.costUsd), pct: pct(x.costPct, locale) })}</div>
+            <div style={{ fontSize: "var(--t-sm)", fontVariantNumeric: "tabular-nums", marginTop: 4 }}>{t("remit.cost", { amount: usd(x.costUsd), pct: pct(x.costPct, locale) })}</div>
           </div>
         ))}
       </div>
       <p style={{ margin: "0 0 8px", fontWeight: 600 }}>{t("remit.gap", { usd: usd(other.costUsd - svc[best].costUsd), mxn: mxn(svc[best].arrives - other.arrives) })}</p>
-      <p style={{ fontSize: 13, color: "var(--low)", lineHeight: 1.45, margin: 0 }}>{t("remit.note")}</p>
+      <p style={{ fontSize: "var(--t-sm)", color: "var(--low)", lineHeight: 1.5, margin: 0 }}>{t("remit.note")}</p>
     </Card>
   );
 }
@@ -224,24 +224,24 @@ export function FeeTool({ t, locale, onDone, done }) {
   const yA = accountYear(A);
   const yB = accountYear(B);
   const box = (title, desc, year, best) => (
-    <div style={{ flex: 1, border: `1px solid ${best ? "var(--accent)" : "var(--line)"}`, borderRadius: 8, padding: 12, background: best ? "var(--accentSoft)" : "var(--surface)" }}>
-      <div style={{ fontWeight: 650 }}>{title}</div>
-      <div style={{ fontSize: 13, color: "var(--mid)", lineHeight: 1.35, margin: "4px 0 8px", minHeight: 52 }}>{desc}</div>
+    <div style={{ flex: 1, border: `1px solid ${best ? "var(--accent)" : "var(--line)"}`, borderRadius: 12, padding: 12, background: best ? "var(--accentSoft)" : "var(--surface)" }}>
+      <div style={{ fontWeight: 600 }}>{title}</div>
+      <div style={{ fontSize: "var(--t-sm)", color: "var(--mid)", lineHeight: 1.5, margin: "4px 0 8px", minHeight: 52 }}>{desc}</div>
       <div style={{ fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>{t("fee.year", { amount: fmt(year) })}</div>
     </div>
   );
   return (
     <Card>
-      <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
+      <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
         {box(t("fee.title.a"), t("fee.a", { fee: fmt(A.monthly), min: fmt(min) }), yA, yA < yB)}
         {box(t("fee.title.b"), t("fee.b", { fee: fmt(B.atmFee) }), yB, yB < yA)}
       </div>
-      <label style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 15, marginBottom: 10, minHeight: 44, cursor: "pointer" }}>
+      <label style={{ display: "flex", alignItems: "center", gap: 12, fontSize: "var(--t-body)", marginBottom: 12, minHeight: 44, cursor: "pointer" }}>
         <input type="checkbox" checked={keep} onChange={(e) => (setKeep(e.target.checked), touch())} style={{ width: 20, height: 20, accentColor: "var(--brand)" }} />
         {t("fee.keep", { min: fmt(min) })}
       </label>
       <Slider label={t("fee.atm")} value={atm} min={0} max={10} onChange={(v) => (setAtm(v), touch())} />
-      <p style={{ fontSize: 13, color: "var(--low)", lineHeight: 1.45, margin: 0 }}>{t("fee.note")}</p>
+      <p style={{ fontSize: "var(--t-sm)", color: "var(--low)", lineHeight: 1.5, margin: 0 }}>{t("fee.note")}</p>
     </Card>
   );
 }
@@ -320,23 +320,23 @@ export function ScamTool({ params = {}, t, locale, onDone, done }) {
   const found = set.lines.filter((l, i) => l.flag && picked[i]).length;
   return (
     <Card>
-      <p style={{ margin: "0 0 10px", fontWeight: 600, lineHeight: 1.4 }}>{x(set.ask)}</p>
-      {set.from && <div style={{ fontSize: 13, color: "var(--mid)", margin: "0 0 8px", wordBreak: "break-word" }}>{x(set.from)}</div>}
+      <p style={{ margin: "0 0 12px", fontWeight: 600, lineHeight: 1.5 }}>{x(set.ask)}</p>
+      {set.from && <div style={{ fontSize: "var(--t-sm)", color: "var(--mid)", margin: "0 0 8px", wordBreak: "break-word" }}>{x(set.from)}</div>}
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         {set.lines.map((l, i) => {
           const on = picked[i];
           const verdict = checked && (l.flag ? (on ? "flag" : "missed") : on ? "fine" : null);
           const tone = verdict === "flag" ? ["var(--accent)", "var(--accentSoft)"] : verdict === "missed" || verdict === "fine" ? ["var(--warn)", "var(--warnSoft)"] : on ? ["var(--brand)", "var(--brandSoft)"] : ["var(--line)", "var(--surface)"];
           return (
-            <button key={i} disabled={checked} onClick={() => setPicked((p) => p.map((v, j) => (j === i ? !v : v)))} aria-pressed={on} className="nv-press" style={{ textAlign: "left", border: `${verdict === "flag" ? 2 : 1}px ${verdict === "missed" || verdict === "fine" ? "dashed" : "solid"} ${tone[0]}`, background: tone[1], color: "var(--ink)", borderRadius: 8, padding: "12px 14px", fontSize: 15, lineHeight: 1.4, cursor: checked ? "default" : "pointer", minHeight: 48 }}>
-              <span style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                <span style={{ flexShrink: 0, marginTop: 2, color: tone[0] }}>
+            <button key={i} disabled={checked} onClick={() => setPicked((p) => p.map((v, j) => (j === i ? !v : v)))} aria-pressed={on} className="nv-press" style={{ textAlign: "left", border: `${verdict === "flag" ? 2 : 1}px ${verdict === "missed" || verdict === "fine" ? "dashed" : "solid"} ${tone[0]}`, background: tone[1], color: "var(--ink)", borderRadius: 12, padding: "12px 16px", fontSize: "var(--t-body)", lineHeight: 1.5, cursor: checked ? "default" : "pointer", minHeight: 48 }}>
+              <span style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                <span style={{ flexShrink: 0, marginTop: 4, color: tone[0] }}>
                   <Icon name={on ? "flag" : "plus"} size={16} />
                 </span>
                 <span>
                   {x(l.text)}
                   {checked && (l.flag || on) && (
-                    <span style={{ display: "block", fontSize: 13, color: "var(--mid)", marginTop: 6 }}>
+                    <span style={{ display: "block", fontSize: "var(--t-sm)", color: "var(--mid)", marginTop: 8 }}>
                       <strong style={{ color: tone[0] }}>{t(verdict === "flag" ? "scam.flag" : verdict === "missed" ? "scam.missed" : "scam.fine")}.</strong> {x(l.why)}
                     </span>
                   )}
@@ -368,8 +368,8 @@ export function InsuranceTool({ t, locale, onDone, done }) {
   const yA = insuranceYear(A, costs);
   const yB = insuranceYear(B, costs);
   const plan = (name, p, y, best) => (
-    <div style={{ border: `1px solid ${best ? "var(--accent)" : "var(--line)"}`, background: best ? "var(--accentSoft)" : "var(--surface)", borderRadius: 8, padding: 12, marginBottom: 8 }}>
-      <div style={{ fontSize: 14, color: "var(--mid)" }}>{t(name, { premium: fmt(p.premium), deductible: fmt(p.deductible) })}</div>
+    <div style={{ border: `1px solid ${best ? "var(--accent)" : "var(--line)"}`, background: best ? "var(--accentSoft)" : "var(--surface)", borderRadius: 12, padding: 12, marginBottom: 8 }}>
+      <div style={{ fontSize: "var(--t-sm)", color: "var(--mid)" }}>{t(name, { premium: fmt(p.premium), deductible: fmt(p.deductible) })}</div>
       <div style={{ fontWeight: 700, marginTop: 4, fontVariantNumeric: "tabular-nums" }}>{t("ins.year", { amount: fmt(y) })}</div>
     </div>
   );
@@ -378,8 +378,8 @@ export function InsuranceTool({ t, locale, onDone, done }) {
       <Slider label={t("ins.costs")} value={costs} min={0} max={amt([10000, 150000], R)} step={amt([100, 1500], R)} onChange={(v) => (setCosts(v), touch())} display={fmt(costs)} />
       {plan("ins.a", A, yA, yA < yB)}
       {plan("ins.b", B, yB, yB < yA)}
-      <p style={{ margin: "6px 0 0", fontWeight: 600 }}>{t("ins.cheaper", { plan: yA <= yB ? "A" : "B" })}</p>
-      <p style={{ fontSize: 13, color: "var(--low)", lineHeight: 1.45, margin: "8px 0 0" }}>{t("ins.note")}</p>
+      <p style={{ margin: "8px 0 0", fontWeight: 600 }}>{t("ins.cheaper", { plan: yA <= yB ? "A" : "B" })}</p>
+      <p style={{ fontSize: "var(--t-sm)", color: "var(--low)", lineHeight: 1.5, margin: "8px 0 0" }}>{t("ins.note")}</p>
     </Card>
   );
 }
@@ -398,18 +398,18 @@ export function SwingTool({ t, locale, onDone, done }) {
   const toPts = (v) => v.map((y, i) => [i, y]);
   return (
     <Card>
-      <div style={{ fontSize: 14, color: "var(--mid)" }}>
+      <div style={{ fontSize: "var(--t-sm)", color: "var(--mid)" }}>
         {t("sw.invest")}: <strong style={{ color: "var(--ink)" }}>{fmt(start)}</strong>
       </div>
-      <div style={{ marginTop: 10 }}>
+      <div style={{ marginTop: 12 }}>
         <LineChart lines={[{ points: toPts(a.pts), color: "var(--ink)", dash: true }, { points: toPts(b.pts), color: "var(--ink)" }]} markers={[{ value: start }]} height={130} label={t("sw.volatile")} />
         <Legend items={[{ label: t("sw.volatile"), color: "var(--ink)", dash: true }, { label: t("sw.fund"), color: "var(--ink)" }]} />
       </div>
-      <p style={{ margin: "10px 0", lineHeight: 1.5 }}>{t("sw.result", { a: fmt(a.end), b: fmt(b.end), da: `${Math.round(a.maxDrop)}%`, db: `${Math.round(b.maxDrop)}%` })}</p>
+      <p style={{ margin: "12px 0", lineHeight: 1.5 }}>{t("sw.result", { a: fmt(a.end), b: fmt(b.end), da: `${Math.round(a.maxDrop)}%`, db: `${Math.round(b.maxDrop)}%` })}</p>
       <Button full kind="secondary" style={{ border: "1px solid var(--line)" }} onClick={() => (setSeed((s) => s + 7), touch())}>
         <Icon name="refresh" size={18} /> {t("sw.another")}
       </Button>
-      <p style={{ fontSize: 13, color: "var(--low)", lineHeight: 1.45, margin: "10px 0 0" }}>{t("sw.note")}</p>
+      <p style={{ fontSize: "var(--t-sm)", color: "var(--low)", lineHeight: 1.5, margin: "12px 0 0" }}>{t("sw.note")}</p>
     </Card>
   );
 }
@@ -431,8 +431,8 @@ export function HustleTool({ params = {}, t, locale, onDone, done }) {
       <Slider label={t("hu.cost")} value={Math.min(cost, price)} min={0} max={price} step={amt([1, 10], R)} onChange={set(setCost)} display={fmt(Math.min(cost, price))} />
       <Slider label={t("hu.count")} value={count} min={1} max={30} onChange={set(setCount)} />
       <Slider label={t("hu.hours")} value={hours} min={0.25} max={8} step={0.25} onChange={set(setHours)} display={`${hours} h`} />
-      <p style={{ margin: "4px 0 0", fontSize: 16, fontWeight: 600, lineHeight: 1.45 }}>{t("hu.result", { revenue: fmt(h.revenue), profit: fmt(h.profit), hour: fmt(h.perHour) })}</p>
-      <p style={{ fontSize: 13, color: "var(--low)", lineHeight: 1.45, margin: "10px 0 0" }}>{t(R === "MX" ? "hu.note.MX" : "hu.note")}</p>
+      <p style={{ margin: "4px 0 0", fontSize: "var(--t-body)", fontWeight: 600, lineHeight: 1.5 }}>{t("hu.result", { revenue: fmt(h.revenue), profit: fmt(h.profit), hour: fmt(h.perHour) })}</p>
+      <p style={{ fontSize: "var(--t-sm)", color: "var(--low)", lineHeight: 1.5, margin: "12px 0 0" }}>{t(R === "MX" ? "hu.note.MX" : "hu.note")}</p>
     </Card>
   );
 }
