@@ -15,3 +15,8 @@ learn*.json
 test-results/
 .DS_Store
 src/core/build.gen.js
+
+# Usability screenshots: only the compact before/after set and the README are kept in git
+docs/usability/*
+!docs/usability/compare/
+!docs/usability/README.md
