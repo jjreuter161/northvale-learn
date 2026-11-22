@@ -38,12 +38,12 @@ export default {
     concept(
       "hype",
       T("Spotting hype", "Detectar el hype"),
-      card(T("Loud isn't the same as good", "Ruidoso no es lo mismo que bueno"), T("Hype sounds like: \"100× soon\", \"get in before it explodes\", \"never sell\", celebrity endorsements, and countdowns. Real information sounds like: who runs it, how it works, what the risks are. Influencers are often paid to promote.", "El hype suena así: \"100× pronto\", \"entra antes de que explote\", \"nunca vendas\", famosos que la promueven y cuentas regresivas. La información real suena así: quién lo dirige, cómo funciona, cuáles son los riesgos. A los influencers muchas veces les pagan por promocionar.")),
+      card(T("Loud isn't the same as good", "Ruidoso no es lo mismo que bueno"), T("Hype sounds like: “100× soon”, “get in before it explodes”, “never sell”, celebrity endorsements, and countdowns. Real information sounds like: who runs it, how it works, what the risks are. Influencers are often paid to promote.", "El hype suena así: “100× pronto”, “entra antes de que explote”, “nunca vendas”, famosos que la promueven y cuentas regresivas. La información real suena así: quién lo dirige, cómo funciona, cuáles son los riesgos. A los influencers muchas veces les pagan por promocionar.")),
       tf("hype", T("A celebrity promoting a coin is good evidence it's a sound investment.", "Que una celebridad promueva una moneda es buena prueba de que es una inversión sólida."), false, T("Celebrities are often paid to promote. Fame isn't research.", "A las celebridades muchas veces les pagan por promocionar. La fama no es investigación.")),
       choice(
         "hype",
         T("Which is a sign of hype rather than information?", "¿Cuál es señal de hype y no de información?"),
-        [T("\"Buy now before it goes to the moon!\"", "\"¡Compra ya antes de que se vaya a la luna!\""), T("\"Here's who runs the project and how it makes money\"", "\"Esto es quién dirige el proyecto y cómo gana dinero\""), T("\"Here are the main risks\"", "\"Estos son los principales riesgos\"")],
+        [T("“Buy now before it goes to the moon!”", "“¡Compra ya antes de que se vaya a la luna!”"), T("“Here's who runs the project and how it makes money”", "“Esto es quién dirige el proyecto y cómo gana dinero”"), T("“Here are the main risks”", "“Estos son los principales riesgos”")],
         0,
         T("Urgency and big promises are hype. Facts about who, how and the risks are information.", "La urgencia y las promesas grandes son hype. Los datos sobre quién, cómo y los riesgos son información."),
         [null, T("Explaining who's behind it and how it works is real information.", "Explicar quién está detrás y cómo funciona es información real."), T("Being open about risks is a good sign, not hype.", "Ser claro sobre los riesgos es buena señal, no hype.")]
@@ -120,14 +120,14 @@ export default {
       title: T("Spotting hype", "Cómo detectar el hype"),
       life: T("When a post promises fast, huge gains, look for who's selling.", "Cuando una publicación prometa ganancias enormes y rápidas, busca quién está vendiendo."),
       steps: [
-        card(T("What hype sounds like", "Cómo suena el hype"), T("\"It'll 100×!\", \"get in early\", \"everyone's buying\", \"never sell.\" Urgency plus big promises plus social proof — the same tactics as ads and scams.", "\"¡Se va a multiplicar 100 veces!\", \"entra temprano\", \"todos están comprando\", \"nunca vendas\". Urgencia más promesas grandes más prueba social: las mismas tácticas que los anuncios y los fraudes.")),
+        card(T("What hype sounds like", "Cómo suena el hype"), T("“It'll 100×!”, “get in early”, “everyone's buying”, “never sell.” Urgency plus big promises plus social proof — the same tactics as ads and scams.", "“¡Se va a multiplicar 100 veces!”, “entra temprano”, “todos están comprando”, “nunca vendas”. Urgencia más promesas grandes más prueba social: las mismas tácticas que los anuncios y los fraudes.")),
         card(T("What information sounds like", "Cómo suena la información"), T("Who runs it, how it works, what problem it solves, what could go wrong. If you can't find these, that tells you something.", "Quién lo dirige, cómo funciona, qué problema resuelve, qué podría salir mal. Si no encuentras esto, eso ya te dice algo.")),
         choice(
           "hype",
-          T("An influencer says a coin \"can't lose.\" What should you assume?", "Un influencer dice que una moneda \"no puede perder\". ¿Qué deberías suponer?"),
+          T("An influencer says a coin “can't lose.” What should you assume?", "Un influencer dice que una moneda “no puede perder”. ¿Qué deberías suponer?"),
           [T("It's hype — every investment can lose, and they may be paid to promote it", "Es hype: toda inversión puede perder, y quizá le pagan por promocionarla"), T("It's safe because many people follow them", "Es segura porque mucha gente lo sigue"), T("You should buy before others do", "Deberías comprar antes que los demás")],
           0,
-          T("\"Can't lose\" is never true in investing.", "\"No puede perder\" nunca es cierto al invertir."),
+          T("“Can't lose” is never true in investing.", "“No puede perder” nunca es cierto al invertir."),
           [null, T("Followers aren't evidence. Popular can still crash.", "Los seguidores no son evidencia. Lo popular también se puede desplomar."), T("Rushing is exactly what hype wants.", "Apresurarte es justo lo que quiere el hype.")]
         ),
         tf("hype", T("If you can't find who runs a crypto project, that's a warning sign.", "Si no encuentras quién dirige un proyecto de cripto, eso es una señal de alerta."), true, T("Anonymous projects make it easy to disappear with the money.", "Los proyectos anónimos hacen fácil desaparecer con el dinero.")),

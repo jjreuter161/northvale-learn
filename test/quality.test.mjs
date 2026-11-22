@@ -82,16 +82,19 @@ try {
     ["Your Money Year", async (p) => (await nav(p, "Practice"), p.getByRole("button", { name: /^Your Money Year/ }).click())],
     ["Tools from your lessons", async (p) => (await nav(p, "Practice"), p.getByRole("button", { name: /^Tools from your lessons/ }).click())],
     ["Settings", async (p) => (await nav(p, "Me"), p.getByRole("button", { name: /^Settings/ }).click())],
-    ["Achievements", async (p) => (await nav(p, "Me"), p.getByRole("button", { name: /^Achievements/ }).click())],
-    ["Skills", async (p) => (await nav(p, "Me"), p.getByRole("button", { name: /^Skills/ }).click())],
+    // (On a phone, rows lead to Achievements and Skills. On a laptop the left column of Me shows both, and the
+    // achievements card opens the full list; there is no separate Skills screen to reach there.)
+    ["Achievements", async (p) => (await nav(p, "Me"), p.getByRole("button", { name: /^Achievements| of \d+ earned/ }).first().click())],
+    ["Skills", async (p) => (await nav(p, "Me"), p.getByRole("button", { name: /^Skills/ }).click()), "phone"],
   ];
+  const at = (size) => screens.filter(([, , only]) => !only || only === size);
   for (const [name, size] of [["phone", PHONE], ["laptop", LAPTOP]]) {
     const app = await open(learner(), size);
     await app.goto();
     const { page } = app;
     await page.getByRole("heading", { name: "Today" }).waitFor();
     const sizes = {};
-    for (const [label, go] of screens) {
+    for (const [label, go] of at(name)) {
       await go(page);
       await page.waitForTimeout(300);
       const info = await page.evaluate(() => {
@@ -171,7 +174,7 @@ try {
     const app = await open(learner(), size);
     await app.goto();
     const { page } = app;
-    for (const [label, go] of screens.filter(([l]) => !["Today", "Goals", "Practice"].includes(l))) {
+    for (const [label, go] of at(name).filter(([l]) => !["Today", "Goals", "Practice"].includes(l))) {
       await go(page);
       const back = page.getByRole("button", { name: /^Back: / }).first();
       await back.waitFor();
@@ -193,7 +196,7 @@ try {
     assert.ok(await page.locator("aside nav, aside").first().isVisible(), "a sidebar");
     const bar = await page.evaluate(() => [...document.querySelectorAll("nav")].filter((n) => getComputedStyle(n).position === "fixed" && n.getBoundingClientRect().bottom >= innerHeight - 2).length);
     assert.equal(bar, 0, "no phone tab bar at the bottom");
-    for (const [label, go] of screens) {
+    for (const [label, go] of at("laptop")) {
       await go(page);
       await page.waitForTimeout(250);
       const m = await page.evaluate(() => ({ over: document.documentElement.scrollWidth > innerWidth + 1, lines: Math.max(0, ...[...document.querySelectorAll("main p")].flatMap((p) => { const r = document.createRange(); r.selectNodeContents(p); return [...r.getClientRects()].map((x) => x.width); })) }));

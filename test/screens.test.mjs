@@ -71,7 +71,7 @@ try {
       await page.getByRole("navigation", { name: "Main tabs" }).waitFor();
       assert.equal(await page.locator(".nv-split").count(), 0, `${at("after setup")}: the split is only for setup`);
       const panel = await page.getByRole("complementary", { name: "At a glance" }).innerText();
-      for (const text of ["0-day streak", "Today: 0 / 20 XP", "Set a goal", "Opens after your first three lessons", "A daily question, starting tomorrow"]) assert.ok(panel.includes(text), `${at("Today, brand new")}: the panel says what goes there: "${text}"`);
+      for (const text of ["0-day streak", "Today: 0 / 20 XP", "You picked Emergency fund. Give it an amount and a date.", "Make a plan", "Opens after your first three lessons", "A daily question, starting tomorrow"]) assert.ok(panel.includes(text), `${at("Today, brand new")}: the panel says what goes there: "${text}"`);
       await look(page, trouble, at("Today, brand new"));
       for (const name of ["Goals", "Practice", "Me"]) (await tab(page, name), await look(page, trouble, at(`${name}, brand new`)));
       await ctx.close();
@@ -109,10 +109,12 @@ try {
       // Me: its sections.
       await tab(page, "Me");
       await look(page, trouble, at("Me"));
-      for (const name of [/^Achievements/, /^Skills/]) {
+      // (On a wide screen the left column holds Achievements and Skills; there are no rows for them on the right.)
+      for (const [name, sheet] of [[/ of \d+ earned/, false], [/^See all skills/, true]]) {
         await tab(page, "Me");
         await page.locator("main").getByRole("button", { name }).first().click();
         await look(page, trouble, at(`Me › ${name}`));
+        if (sheet) await page.keyboard.press("Escape");
       }
       // Settings: every section on the left, then the legal pages.
       await tab(page, "Me");

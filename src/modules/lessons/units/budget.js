@@ -84,7 +84,7 @@ export default {
           T("You can live without a third streaming app. Wants aren't bad — they're just the first thing to trim when money is tight.", "Puedes vivir sin una tercera app de streaming. Los gustos no son malos; solo son lo primero que se recorta cuando el dinero no alcanza."),
           [T("Getting to work is usually a need — without it, you can't earn.", "Llegar al trabajo suele ser una necesidad: sin eso no puedes ganar dinero."), null, T("Food is a need. (Fancy extras in the cart can be wants.)", "La comida es una necesidad. (Los antojos extra del carrito sí pueden ser gustos.)")]
         ),
-        card(T("Goals make it easier", "Las metas lo hacen más fácil"), T("Saying no to a want is easier when you're saying yes to a goal. \"I'm saving for a phone\" beats \"I'm not allowed to spend.\"", "Decirle que no a un gusto es más fácil cuando le dices que sí a una meta. \"Estoy ahorrando para un celular\" funciona mejor que \"no puedo gastar\".")),
+        card(T("Goals make it easier", "Las metas lo hacen más fácil"), T("Saying no to a want is easier when you're saying yes to a goal. “I'm saving for a phone” beats “I'm not allowed to spend.”", "Decirle que no a un gusto es más fácil cuando le dices que sí a una meta. “Estoy ahorrando para un celular” funciona mejor que “no puedo gastar”.")),
         tf("needs_wants", T("The same thing can be a need for one person and a want for another.", "Una misma cosa puede ser necesidad para una persona y gusto para otra."), true, T("A car is a need if there's no other way to get to work — and a want if the bus works fine. Context matters.", "Un coche es necesidad si no hay otra forma de llegar al trabajo, y es gusto si el transporte público te sirve bien. Depende de tu situación.")),
         scenario(
           "needs_wants",
@@ -104,7 +104,7 @@ export default {
       title: T("Small leaks", "Gastos hormiga"),
       life: T("Find one small thing you buy often and multiply it by 52.", "Busca una cosa pequeña que compres seguido y multiplícala por 52."),
       steps: [
-        card(T("Tiny costs add up", "Lo pequeño suma"), T("Small, frequent buys — snacks, delivery fees, in-game coins — feel like nothing. But {$5|80} a few times a week becomes hundreds a year.", "Las compras pequeñas y frecuentes —botanas, envíos, monedas en juegos— parecen nada. Pero {$5|80} unas veces por semana se vuelven cientos al año.", { en: "In Mexico they're called \"gastos hormiga\" — ant expenses: tiny, but there are a lot of them. {$5|80} a few times a week becomes thousands of pesos a year.", es: "En México les decimos gastos hormiga: pequeñitos, pero son muchos. {$5|80} unas veces por semana se vuelven miles de pesos al año." })),
+        card(T("Tiny costs add up", "Lo pequeño suma"), T("Small, frequent buys — snacks, delivery fees, in-game coins — feel like nothing. But {$5|80} a few times a week becomes hundreds a year.", "Las compras pequeñas y frecuentes —botanas, envíos, monedas en juegos— parecen nada. Pero {$5|80} unas veces por semana se vuelven cientos al año.", { en: "In Mexico they're called “gastos hormiga” — ant expenses: tiny, but there are a lot of them. {$5|80} a few times a week becomes thousands of pesos a year.", es: "En México les decimos gastos hormiga: pequeñitos, pero son muchos. {$5|80} unas veces por semana se vuelven miles de pesos al año." })),
         choice(
           "small_leaks",
           T("{$5|80} three times a week. About how much is that in a year?", "{$5|80} tres veces por semana. ¿Cuánto es más o menos al año?"),

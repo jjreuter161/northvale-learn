@@ -232,12 +232,16 @@ export default function Me({ t, locale, session, go, route, layout }) {
         </>
       )}
 
-      <List style={{ marginTop: 24 }}>
-        <ListRow icon="trophy" title={t("me.section.achievements")} sub={t("me.badges.n", { n: got, total: BADGES.length })} onClick={() => go("me", { section: "achievements" })} />
-        {cards.length > 0 && <ListRow icon="target" title={t("me.section.skills")} sub={t("me.skills.sub")} onClick={() => go("me", { section: "skills" })} />}
-        {(days >= 3 || invited) && <ListRow icon="share" title={t("me.section.invite")} sub={t("me.invite.sub")} onClick={() => go("me", { section: "invite" })} />}
-        {showClasses && <ListRow icon="users" title={t(classes.nav.label)} onClick={() => go("classroom")} />}
-      </List>
+      {/* On a phone these rows lead to Achievements and Skills; a wider screen already shows both in the left column,
+          so the rows would only repeat them. */}
+      {(layout === "phone" || days >= 3 || invited || showClasses) && (
+        <List style={{ marginTop: 24 }}>
+          {layout === "phone" && <ListRow icon="trophy" title={t("me.section.achievements")} sub={t("me.badges.n", { n: got, total: BADGES.length })} onClick={() => go("me", { section: "achievements" })} />}
+          {layout === "phone" && cards.length > 0 && <ListRow icon="target" title={t("me.section.skills")} sub={t("me.skills.sub")} onClick={() => go("me", { section: "skills" })} />}
+          {(days >= 3 || invited) && <ListRow icon="share" title={t("me.section.invite")} sub={t("me.invite.sub")} onClick={() => go("me", { section: "invite" })} />}
+          {showClasses && <ListRow icon="users" title={t(classes.nav.label)} onClick={() => go("classroom")} />}
+        </List>
+      )}
       <List style={{ marginTop: 12 }}>
         <ListRow icon="settings" title={t("nav.settings")} onClick={() => go("settings")} />
         <ListRow icon="chat" title={t("fb.title")} onClick={() => service("feedback", "open")({})} />

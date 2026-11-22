@@ -271,7 +271,7 @@ const SETS = {
     ],
   },
   pyramid: {
-    ask: T("A friend invites you to a \"business.\" Tap the red flags.", "Un amigo te invita a un \"negocio\". Toca las señales de alerta."),
+    ask: T("A friend invites you to a “business.” Tap the red flags.", "Un amigo te invita a un “negocio”. Toca las señales de alerta."),
     lines: [
       L(T("Join for just {$100|1500} and start earning.", "Entra con solo {$100|1500} y empieza a ganar."), true, T("Paying to join is a classic sign: the money comes from new members.", "Pagar para entrar es una señal clásica: el dinero viene de los nuevos miembros.")),
       L(T("You earn {$50|750} for every friend you sign up.", "Ganas {$50|750} por cada amigo que inscribas."), true, T("Pay that comes from recruiting, not from selling anything, is how pyramids work.", "Ganar por reclutar y no por vender algo es como funcionan las pirámides.")),
@@ -282,7 +282,7 @@ const SETS = {
   security: {
     ask: T("Advice you got today. Tap the risky ones.", "Consejos que te dieron hoy. Toca los riesgosos."),
     lines: [
-      L(T("\"I sent you a code by mistake — can you send it back?\"", "\"Te mandé un código por error, ¿me lo reenvías?\""), true, T("That code is almost certainly your login code. Sharing it hands over your account.", "Ese código casi seguro es tu código de acceso. Compartirlo entrega tu cuenta.")),
+      L(T("“I sent you a code by mistake — can you send it back?”", "“Te mandé un código por error, ¿me lo reenvías?”"), true, T("That code is almost certainly your login code. Sharing it hands over your account.", "Ese código casi seguro es tu código de acceso. Compartirlo entrega tu cuenta.")),
       L(T("Use one password for everything so you don't forget it.", "Usa la misma contraseña para todo para no olvidarla."), true, T("One leak opens everything. Different passwords (a password manager helps) keep a leak small.", "Una filtración abre todo. Contraseñas distintas (un administrador de contraseñas ayuda) hacen pequeña una filtración.")),
       L(T("Turn on two-step verification.", "Activa la verificación en dos pasos."), false, T("Good advice — a second step stops most account takeovers.", "Buen consejo: un segundo paso frena la mayoría de los robos de cuenta.")),
       L(T("Post a photo of your new debit card.", "Publica una foto de tu tarjeta de débito nueva."), true, T("Anyone can copy the number from a photo.", "Cualquiera puede copiar el número de una foto.")),

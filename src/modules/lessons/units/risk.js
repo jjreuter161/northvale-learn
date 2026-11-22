@@ -16,7 +16,7 @@ export default {
         T("Which is the biggest warning sign of an investment scam?", "¿Cuál es la señal de alerta más grande de un fraude de inversión?"),
         [T("A guaranteed high return with no risk", "Un rendimiento alto garantizado y sin riesgo"), T("A fund that publishes its fees", "Un fondo que publica sus comisiones"), T("Deposits insured by the government", "Depósitos asegurados por el gobierno", { en: "Deposits protected by IPAB", es: "Depósitos protegidos por el IPAB" })],
         0,
-        T("Real investments can't guarantee high returns. \"Guaranteed\" plus \"high\" plus \"no risk\" is the classic scam pitch.", "Las inversiones reales no pueden garantizar rendimientos altos. \"Garantizado\" más \"alto\" más \"sin riesgo\" es la promesa clásica de un fraude."),
+        T("Real investments can't guarantee high returns. “Guaranteed” plus “high” plus “no risk” is the classic scam pitch.", "Las inversiones reales no pueden garantizar rendimientos altos. “Garantizado” más “alto” más “sin riesgo” es la promesa clásica de un fraude."),
         [null, T("Publishing fees is a good sign — honest investments are clear about costs.", "Publicar las comisiones es buena señal: las inversiones honestas son claras con sus costos."), T("Deposit protection is real and useful, not a warning sign.", "La protección de depósitos es real y útil, no una señal de alerta.")]
       )
     ),
@@ -59,7 +59,7 @@ export default {
         card(T("Time changes risk", "El tiempo cambia el riesgo"), T("Over one year, stocks can lose a lot. Over 20 years, they've historically done much better than cash — but there are no guarantees.", "En un año, las acciones pueden perder mucho. En 20 años, históricamente les ha ido mucho mejor que al efectivo, pero no hay garantías.")),
         choice(
           "risk_reward",
-          T("Someone promises 30% a month with \"no risk.\" That's most likely…", "Alguien te promete 30% al mes \"sin riesgo\". Lo más probable es que sea…"),
+          T("Someone promises 30% a month with “no risk.” That's most likely…", "Alguien te promete 30% al mes “sin riesgo”. Lo más probable es que sea…"),
           [T("A great deal", "Una gran oportunidad"), T("A scam", "Una estafa"), T("A savings account", "Una cuenta de ahorro")],
           1,
           T("High return + no risk = a red flag. Real investments don't work that way.", "Mucha ganancia + cero riesgo = foco rojo. Las inversiones reales no funcionan así."),

@@ -521,7 +521,10 @@ try {
     const seed = learner({ ageBand: "18-25" }, { lessonDays: [d(1)], days: { [d(1)]: 10 }, xp: 30, counters: { lessons: 3 }, streak: { count: 1, last: d(1), best: 1, frozen: [] } }, { goals: { goals: [newGoal({ id: "w1", templateId: "car", target: 5000, start: 300, months: 24, today: d(12) })] } });
     const app = await open(seed);
     const { page, top, button, clean, menu } = app;
-    // Myth or fact: two plain buttons, an answer, +2 XP; then one line until tomorrow.
+    // Myth or fact: two plain buttons, an answer, +2 XP; then one line until tomorrow. (On a Sunday the money week
+    // comes first and the myth waits until it is done, so on a Sunday this runs after the money week.)
+    const sunday = new Date(`${d(0)}T12:00:00`).getDay() === 0;
+    const myth = async () => {
     const card = page.locator("[data-myth]");
     await card.getByText("Myth or fact?").waitFor();
     await clean("myth card");
@@ -532,6 +535,8 @@ try {
     await page.reload();
     await page.getByText("Today's myth: answered · another one tomorrow").waitFor();
     console.log("ok: Money Myth or Fact on Today: not on day 1, +2 XP, then one line until tomorrow");
+    };
+    if (!sunday) await myth();
     // Your money week: a short look back, then the check-in.
     await page.getByRole("button", { name: /^Your money week/ }).click();
     await top().getByText("You learned").waitFor();
@@ -542,6 +547,7 @@ try {
     await page.waitForFunction(() => !!JSON.parse(localStorage.getItem("northvale-learn-v1")).modules.goals.checkIn);
     assert.equal(await page.getByRole("button", { name: /^Your money week/ }).count(), 0, "done for the week");
     console.log("ok: Your money week: what you learned, the streak, the goal, next week's lesson, then the check-in");
+    if (sunday) await myth();
     // The real cost, in Practice: an everyday choice or a hidden cost, by week.
     await menu("Practice");
     const rc = page.locator("[data-rc]");
@@ -588,7 +594,9 @@ try {
     assert.ok(!/NaN|undefined|\{/.test(await other.innerText()), "the other week's card reads cleanly");
     await later.close();
     console.log("ok: The real cost in Practice: everyday choices one week, a hidden cost with its lesson the next");
-    const es = await open({ ...seed, settings: { lang: "es", region: "MX", look: "white", reduceMotion: true } });
+    // (This week's money check-in already done, so on a Sunday the myth is not waiting behind it.)
+    const lastSun = d(new Date(`${d(0)}T12:00:00`).getDay());
+    const es = await open({ ...seed, settings: { lang: "es", region: "MX", look: "white", reduceMotion: true }, modules: { ...seed.modules, goals: { ...seed.modules.goals, checkIn: lastSun } } });
     await es.page.locator("[data-myth]").getByText("¿Mito o realidad?").waitFor();
     await es.clean("mito o realidad");
     await es.close();

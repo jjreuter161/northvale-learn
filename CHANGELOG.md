@@ -1,5 +1,24 @@
 # Changelog
 
+## Unreleased — Round 3 and a bug bash
+
+- **Keyboard:** Enter on a focused Check no longer checks and then skips the feedback; Escape in a lesson does what the X does ("Leave now?", or close on the finish screen).
+- **Offline:** a lesson whose unit hasn't downloaded yet shows "Try again" and "Close", tries again by itself when the connection is back, and Back or Escape close it without leaving the app.
+- **Words:** a review is "N ideas to refresh · 2–3 min" on Today, Me and Practice (it said "concepts" in two places).
+- **Goals:** the goal picked at the start is the first card, so "tap it below" needs no scrolling on a phone.
+- Tests: `test/bugbash.test.mjs` (fast taps, Back and Forward, reload mid-lesson, offline, long names on a 320 px phone, language and look switched mid-session, keyboard only, 200% zoom, a 2560 px monitor) runs in `npm test`; `test/usability.test.mjs` has R3 checks.
+
+## Unreleased — usability audit, Round 2
+
+- **The goal you picked is remembered everywhere.** Goals and Today's side panel named nothing ("No goal yet") after setup had asked what you are saving for; both now name it and lead to giving it an amount and a date.
+- **News is calm.** Every headline had a filled navy "Mark as read" button (the only place that color filled a button); it is now a plain button that turns into a quiet "Read".
+- **Me on a computer says things once.** Achievements and Skills were in the left column and again as rows on the right; the rows now show on a phone only.
+- **Curly quotes.** 372 straight quote marks in lessons, missions, Your Money Year, a practice set, the glossary and What's new became “ ” in both languages.
+- **A plainer toast:** "Goal saved." instead of "Goal saved. Future you says thanks."
+- **Firefox and Safari's engine:** installed for testing (`node node_modules/playwright-core/cli.js install firefox webkit`); `test/browsers.test.mjs` now runs the main flows in Chrome, Firefox and WebKit on a phone and a laptop.
+- Tests: `test/usability.test.mjs` has an "R2" check per fix. The browser test's daily-hooks check no longer fails on Sundays (the money week comes first that day, by design), and the screens test follows the new Me layout and Today panel wording.
+- `docs/TESTER-SCRIPT.md`: what to ask a new person to do in 10 minutes, what to watch, and five questions after, in English and Spanish.
+
 ## Unreleased — usability audit, items 10 to 32
 
 - **Lessons:** every step says which lesson and which step ("3 of 12"; an extra card and a retry don't count), idea cards are labelled, and on a computer Continue sits under the text. A goal step that finds a goal already made is done at once; the goal wording no longer says "first".

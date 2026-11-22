@@ -276,6 +276,100 @@ try {
     assert.equal(launch.configurations[0].port, Number(srv.match(/process\.env\.PORT\) \|\| (\d+)/)[1]), "launch.json port = the server's default port");
   }
   ok("item 29: .claude/launch.json uses the server's default port");
+
+  // ===== ROUND 2 (docs/USABILITY-AUDIT.md, "Round 2") =====
+
+  // --- R2-1: the goal picked at the start is named on Goals (phone) and in Today's side panel (laptop), not "No goal yet" ---
+  {
+    const seed = learner({ goalFor: "travel" }, { counters: { lessons: 1 }, lessons: { "budget-1": { done: true, at: day(-1), last: day(-1), best: 0, times: 1 } } });
+    const phone = await open(seed);
+    await phone.page.getByRole("navigation").getByRole("button", { name: "Goals" }).click();
+    await phone.page.getByText("Your goal: Travel", { exact: true }).waitFor();
+    assert.equal(await phone.page.getByText(/no goal yet/i).count(), 0, "Goals does not say there is no goal");
+    await phone.close();
+    const laptop = await open(seed, LAPTOP);
+    await laptop.page.getByText("You picked Travel. Give it an amount and a date.").waitFor();
+    assert.equal(await laptop.page.getByText(/no goal yet/i).count(), 0, "Today's panel does not say there is no goal");
+    assert.deepEqual([...phone.errors, ...laptop.errors], []);
+    await laptop.close();
+  }
+  ok("R2-1: the goal picked at the start shows as 'Your goal: Travel' on Goals and 'You picked Travel' on Today");
+
+  // --- R2-3: on a laptop, Me shows Achievements once (the left column), not again as a row on the right ---
+  {
+    const app = await open(learner({}, { counters: { lessons: 1 } }), LAPTOP);
+    const { page } = app;
+    await page.getByRole("navigation").getByRole("button", { name: "Me" }).click();
+    await page.getByText("This week", { exact: true }).waitFor();
+    const main = page.locator("main");
+    assert.equal(await main.getByText(/^\d+ of \d+ earned$/).count(), 1, "the earned count shows once on a laptop");
+    await app.close();
+    const phone = await open(learner({}, { counters: { lessons: 1 } }));
+    await phone.page.getByRole("navigation").getByRole("button", { name: "Me" }).click();
+    await phone.page.getByRole("button", { name: /^Achievements/ }).waitFor();
+    await phone.close();
+  }
+  ok("R2-3: Me on a laptop shows Achievements once; a phone still has the Achievements row");
+
+  // --- R2-2: News has no filled buttons: a list of headlines is not a wall of main buttons ---
+  {
+    const done5 = Object.fromEntries(["budget-1", "budget-2", "budget-3", "save-1", "save-2"].map((id) => [id, { done: true, at: day(-1), last: day(-1), best: 0, times: 1 }]));
+    const app = await open(learner({ seenIntros: { keys: "x", practice: "x", save: "x", news: "x" } }, { counters: { lessons: 5 }, lessons: done5 }));
+    const { page } = app;
+    await page.route("**/api/news**", (r) => r.fulfill({ contentType: "application/json", body: JSON.stringify({ items: [1, 2, 3].map((n) => ({ id: `n${n}`, title: `Headline number ${n}`, link: "https://example.com/", source: "Wire", published: new Date().toISOString(), headline: null, summary: null, terms: [] })) }) }));
+    await page.getByRole("navigation").getByRole("button", { name: "Practice" }).click();
+    await page.getByRole("button", { name: /^News, explained/ }).click();
+    await page.getByText("Headline number 1").waitFor();
+    const filled = await page.evaluate(() => {
+      const probe = (v) => { const d = document.createElement("div"); d.style.background = `var(${v})`; document.body.append(d); const c = getComputedStyle(d).backgroundColor; d.remove(); return c; };
+      const fills = [probe("--fill"), probe("--good"), probe("--red")];
+      return [...document.querySelectorAll("main button")].filter((b) => fills.includes(getComputedStyle(b).backgroundColor)).map((b) => b.innerText.trim());
+    });
+    assert.deepEqual(filled, [], "no filled buttons among the headlines");
+    await page.getByRole("button", { name: "Mark as read" }).first().click();
+    await page.getByRole("button", { name: "Read", exact: true }).first().waitFor();
+    assert.deepEqual(app.errors, []);
+    await app.close();
+  }
+  ok("R2-2: News headlines have plain buttons, and Mark as read turns into a quiet Read");
+
+  // --- R2-4: quotes in what a learner reads are curly, in both languages (no straight "…" in lessons, missions, Money Year) ---
+  {
+    const files = ["src/modules/lessons/units", "src/modules/missions/catalog.js", "src/modules/year/content.js", "src/modules/goals/life.jsx", "src/modules/tutor/glossary.js", "src/core/whatsnew.jsx"];
+    const { readdirSync, statSync } = await import("node:fs");
+    const all = files.flatMap((f) => (statSync(join(ROOT, f)).isDirectory() ? readdirSync(join(ROOT, f)).filter((x) => x.endsWith(".js") && x !== "index.gen.js").map((x) => join(f, x)) : [f]));
+    const bad = all.flatMap((f) => readFileSync(join(ROOT, f), "utf8").split("\n").map((l, i) => [f, i + 1, l]).filter(([, , l]) => /\\"/.test(l)).map(([f, n]) => `${f}:${n}`));
+    assert.deepEqual(bad, [], "straight double quotes inside learner-facing text");
+  }
+  ok("R2-4: lessons, missions, Money Year and practice sets use curly quotes in both languages");
+
+  // ===== ROUND 3 =====
+  // --- R3-1: Today and Me say the same thing about a review ("ideas", "2–3 min"), never "concepts" ---
+  {
+    const three = Object.fromEntries(["budget-1", "budget-2", "budget-3"].map((id) => [id, { done: true, at: day(-1), last: day(-1), best: 0, times: 1 }]));
+    // (On a laptop the review card is on Me itself; on a phone it is under Me, Skills.)
+    const app = await open(learner({}, { counters: { lessons: 3 }, lessons: three, lessonDays: [day(-1)] }), LAPTOP);
+    const { page } = app;
+    await page.getByRole("navigation").getByRole("button", { name: "Me" }).click();
+    await page.getByText(/^\d+ ideas? to refresh · 2–3 min$/).first().waitFor();
+    assert.doesNotMatch(await page.locator("main").innerText(), /concept/i, "Me does not say concepts");
+    await app.close();
+  }
+  ok("R3-1: a review is \"N ideas to refresh · 2–3 min\" on Me as on Today");
+
+  // --- R3-2: the goal picked at the start is the first card on Goals, so "tap it below" needs no scrolling ---
+  {
+    const app = await open(learner({ goalFor: "travel" }));
+    const { page } = app;
+    await page.getByRole("navigation").getByRole("button", { name: "Goals" }).click();
+    await page.getByText("Your goal: Travel", { exact: true }).waitFor();
+    const first = page.locator("main").getByRole("button", { name: /^(Emergency fund|Car|College|First investment|Travel|Debt payoff|Something else|Custom)/ }).first();
+    assert.match(await first.innerText(), /^Travel/);
+    const b = await first.boundingBox();
+    assert.ok(b && b.y + b.height <= 844, "the picked goal is on screen without scrolling");
+    await app.close();
+  }
+  ok("R3-2: the goal picked at the start is the first card on Goals, on screen without scrolling");
 } finally {
   await browser.close();
   server.kill();

@@ -18,7 +18,7 @@ const S = (en, es) => ({ en, es });
 addStrings({
   "lessons.answer_is": S("The answer: {answer}.", "La respuesta: {answer}."),
   "review.title": S("Review", "Repaso"),
-  "review.ready": S("{n} {n|concept|concepts} ready · 2–3 min", "{n} {n|concepto listo|conceptos listos} · 2–3 min"),
+  "review.ready": S("{n} {n|idea|ideas} to refresh · 2–3 min", "{n} {n|idea|ideas} para refrescar · 2–3 min"),
   "review.caught_up": S("Nothing to review. Your memory's in good shape until {date}.", "Nada que repasar. Tu memoria está en forma hasta el {date}."),
   "review.start": S("Review", "Repasar"),
   "review.anyway": S("Practice anyway", "Practicar de todos modos"),

@@ -91,9 +91,9 @@ export const MISSIONS = [
     icon: "building",
     time: 15,
     title: T("Find the fees on a bank account", "Encuentra las comisiones de una cuenta"),
-    how: T("Open a bank's public fee schedule (search \"[bank name] fee schedule\" — no need to sign in). Find the monthly fee, the overdraft fee and the out-of-network ATM fee, and how to avoid each one.", "Abre la lista pública de comisiones de un banco (busca \"[nombre del banco] fee schedule\"; no necesitas iniciar sesión). Encuentra la comisión mensual, la de sobregiro (overdraft) y la de cajeros fuera de la red, y cómo evitar cada una.", {
-      en: "Open a bank's public fee page (search \"[bank name] comisiones\" — no need to sign in) or CONDUSEF's Buró de Entidades Financieras, which compares banks and other financial institutions on complaints, fines and fees. Find the account-management fee, the minimum-balance fee and the fee for other banks' ATMs.",
-      es: "Abre la página pública de comisiones de un banco (busca \"[nombre del banco] comisiones\"; no necesitas iniciar sesión) o el Buró de Entidades Financieras de la CONDUSEF, que compara a bancos y otras instituciones financieras por quejas, multas y comisiones. Encuentra la comisión por manejo de cuenta, la de saldo mínimo y la de cajeros de otros bancos.",
+    how: T("Open a bank's public fee schedule (search “[bank name] fee schedule” — no need to sign in). Find the monthly fee, the overdraft fee and the out-of-network ATM fee, and how to avoid each one.", "Abre la lista pública de comisiones de un banco (busca “[nombre del banco] fee schedule”; no necesitas iniciar sesión). Encuentra la comisión mensual, la de sobregiro (overdraft) y la de cajeros fuera de la red, y cómo evitar cada una.", {
+      en: "Open a bank's public fee page (search “[bank name] comisiones” — no need to sign in) or CONDUSEF's Buró de Entidades Financieras, which compares banks and other financial institutions on complaints, fines and fees. Find the account-management fee, the minimum-balance fee and the fee for other banks' ATMs.",
+      es: "Abre la página pública de comisiones de un banco (busca “[nombre del banco] comisiones”; no necesitas iniciar sesión) o el Buró de Entidades Financieras de la CONDUSEF, que compara a bancos y otras instituciones financieras por quejas, multas y comisiones. Encuentra la comisión por manejo de cuenta, la de saldo mínimo y la de cajeros de otros bancos.",
     }),
     ask: T("Which fee would be easiest to pay by accident?", "¿Qué comisión sería más fácil de pagar sin querer?"),
   }),
@@ -141,7 +141,7 @@ export const MISSIONS = [
     icon: "card",
     time: 15,
     title: T("Find the real cost of a credit card", "Encuentra el costo real de una tarjeta"),
-    how: T("Open a credit card's public terms (search \"[card name] pricing and terms\"). Find the APR, the annual fee and the late fee. Just reading — don't apply.", "Abre los términos públicos de una tarjeta de crédito (busca \"[nombre de la tarjeta] pricing and terms\"). Encuentra la APR, la cuota anual y el cargo por pago tardío. Solo lee; no la solicites.", {
+    how: T("Open a credit card's public terms (search “[card name] pricing and terms”). Find the APR, the annual fee and the late fee. Just reading — don't apply.", "Abre los términos públicos de una tarjeta de crédito (busca “[nombre de la tarjeta] pricing and terms”). Encuentra la APR, la cuota anual y el cargo por pago tardío. Solo lee; no la solicites.", {
       en: "Open a credit card's public page and find its CAT, its annual fee (anualidad) and its late-payment fee. CONDUSEF's comparison tools help. Just reading — don't apply.",
       es: "Abre la página pública de una tarjeta de crédito y encuentra su CAT, la anualidad y la comisión por pago tardío. Las herramientas de comparación de la CONDUSEF ayudan. Solo lee; no la solicites.",
     }),
@@ -198,7 +198,7 @@ export const MISSIONS = [
     icon: "chat",
     time: "week",
     title: T("Ask someone older about saving", "Pregúntale a alguien mayor sobre ahorrar"),
-    how: T("Ask a parent, grandparent or another adult you trust: \"What do you wish you'd known about money at my age?\" Listen for anything about starting early.", "Pregúntale a tu mamá, papá, abuelo, abuela u otro adulto de confianza: \"¿Qué te hubiera gustado saber sobre el dinero a mi edad?\" Pon atención a lo que diga sobre empezar temprano."),
+    how: T("Ask a parent, grandparent or another adult you trust: “What do you wish you'd known about money at my age?” Listen for anything about starting early.", "Pregúntale a tu mamá, papá, abuelo, abuela u otro adulto de confianza: “¿Qué te hubiera gustado saber sobre el dinero a mi edad?” Pon atención a lo que diga sobre empezar temprano."),
     ask: T("What did they say?", "¿Qué te dijeron?"),
   }),
 
@@ -251,7 +251,7 @@ export const MISSIONS = [
     icon: "sparkles",
     time: "days",
     title: T("Spot 3 ads that use FOMO", "Detecta 3 anuncios que usan FOMO"),
-    how: T("Over the next few days, notice ads or posts with countdown timers, \"only 2 left\" or \"everyone's getting this.\" Screenshot or write down three.", "En los próximos días, fíjate en anuncios o publicaciones con cuentas regresivas, \"solo quedan 2\" o \"todos lo están comprando\". Toma captura o anota tres."),
+    how: T("Over the next few days, notice ads or posts with countdown timers, “only 2 left” or “everyone's getting this.” Screenshot or write down three.", "En los próximos días, fíjate en anuncios o publicaciones con cuentas regresivas, “solo quedan 2” o “todos lo están comprando”. Toma captura o anota tres."),
     ask: T("Which trick works best on you?", "¿Qué truco te funciona más a ti?"),
   }),
   m("wait48", {
@@ -297,8 +297,8 @@ export const MISSIONS = [
     unit: "crypto",
     icon: "bulb",
     time: 10,
-    title: T("Spot a \"guaranteed returns\" claim", "Detecta una promesa de \"ganancias garantizadas\""),
-    how: T("Find a post, video or ad that promises big or guaranteed returns — crypto, trading courses, \"passive income.\" List its red flags. Don't click, sign up or pay.", "Encuentra una publicación, video o anuncio que prometa ganancias grandes o garantizadas: cripto, cursos de trading, \"ingresos pasivos\". Haz una lista de sus señales de alerta. No abras enlaces, no te registres ni pagues."),
+    title: T("Spot a “guaranteed returns” claim", "Detecta una promesa de “ganancias garantizadas”"),
+    how: T("Find a post, video or ad that promises big or guaranteed returns — crypto, trading courses, “passive income.” List its red flags. Don't click, sign up or pay.", "Encuentra una publicación, video o anuncio que prometa ganancias grandes o garantizadas: cripto, cursos de trading, “ingresos pasivos”. Haz una lista de sus señales de alerta. No abras enlaces, no te registres ni pagues."),
     ask: T("What red flags did you find?", "¿Qué señales de alerta encontraste?"),
   }),
 
@@ -309,7 +309,7 @@ export const MISSIONS = [
     time: 10,
     title: T("Find the benefits in a job posting", "Encuentra las prestaciones de una vacante"),
     how: T("Open a few job postings that interest you. Look for a 401(k) and whether the employer adds a match, plus health insurance and paid time off.", "Abre algunas vacantes que te interesen. Busca si ofrecen 401(k) y si el empleador aporta (match), además de seguro médico y días de descanso pagados.", {
-      en: "Open a few job postings that interest you. Look for the prestaciones: IMSS, aguinaldo, vacation days, and anything \"above the law\" like a savings fund or grocery vouchers.",
+      en: "Open a few job postings that interest you. Look for the prestaciones: IMSS, aguinaldo, vacation days, and anything “above the law” like a savings fund or grocery vouchers.",
       es: "Abre algunas vacantes que te interesen. Busca las prestaciones: IMSS, aguinaldo, vacaciones y cualquier prestación superior a la ley, como fondo de ahorro o vales de despensa.",
     }),
     ask: T("Which benefit would matter most to you?", "¿Qué prestación te importaría más?"),

@@ -31,7 +31,7 @@ export default {
         [T("Investors expected even higher profits", "Los inversionistas esperaban ganancias todavía más altas"), T("Higher profits always make stocks fall", "Más ganancias siempre hacen que las acciones bajen"), T("The market was closed", "El mercado estaba cerrado")],
         0,
         T("Prices react to news compared with expectations. Good news that's less good than expected can still disappoint.", "Los precios reaccionan a la noticia comparada con lo esperado. Una buena noticia, menos buena de lo esperado, puede decepcionar."),
-        [null, T("There's no \"always\" — it depends on what people expected.", "No hay un \"siempre\": depende de lo que la gente esperaba."), T("If the market were closed, the price wouldn't have moved.", "Si el mercado estuviera cerrado, el precio no se habría movido.")]
+        [null, T("There's no “always” — it depends on what people expected.", "No hay un “siempre”: depende de lo que la gente esperaba."), T("If the market were closed, the price wouldn't have moved.", "Si el mercado estuviera cerrado, el precio no se habría movido.")]
       )
     ),
     concept(

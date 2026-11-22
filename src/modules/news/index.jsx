@@ -76,7 +76,8 @@ function Story({ item, t, onRead, read }) {
         </div>
       )}
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 14 }}>
-        <Button size="sm" kind={read ? "secondary" : "good"} onClick={onRead}>
+        {/* One headline among many: no filled button here (a screen has one main button, and a list of filled buttons shouts). */}
+        <Button size="sm" kind={read ? "ghost" : "secondary"} onClick={onRead}>
           {read ? t("news.read_done") : t("news.got_it")}
         </Button>
         <Button size="sm" kind="secondary" onClick={() => service("tutor", "open")({ question: t("news.ask"), context: `${item.title}${item.summary ? ` — ${item.summary}` : ""}` })}>

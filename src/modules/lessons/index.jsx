@@ -115,7 +115,7 @@ addStrings({
   "today.title": S("Today", "Hoy"),
   "today.lesson_n": S("Lesson {i} of {n} · {min} min", "Lección {i} de {n} · {min} min"),
   "today.toward": S("Building toward: {name}", "Aprendes para: {name}"),
-  "today.review.sub": S("{n} {n|idea|ideas} to refresh · 2 min", "{n} {n|idea|ideas} para refrescar · 2 min"),
+  "today.review.sub": S("{n} {n|idea|ideas} to refresh · 2–3 min", "{n} {n|idea|ideas} para refrescar · 2–3 min"),
   "today.streak.none": S("Start a streak", "Empieza una racha"),
   "today.streak.done": S("Done for today. See you tomorrow.", "Listo por hoy. Nos vemos mañana."),
   "today.streak.keep": S("Today's lesson keeps it going", "La lección de hoy la mantiene"),
@@ -1035,6 +1035,12 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
       if (!top || !top.hasAttribute("data-player")) return; // a sheet is open on top: it keeps its keys
       const el = e.target;
       if (el && (/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) || el.isContentEditable)) return;
+      // Escape does what the X does (a lesson is a dialog): "Leave now?" mid-lesson, close on the finish screen.
+      if (e.key === "Escape") {
+        e.preventDefault();
+        const b = back.current;
+        return b.finished ? b.finish() : b.ask();
+      }
       if (/^[1-9]$/.test(e.key)) {
         const o = top.querySelectorAll('[role="radio"]:not(:disabled)')[Number(e.key) - 1];
         if (o) (e.preventDefault(), o.click());
@@ -1117,6 +1123,9 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
     const k = (e) => {
       if (result || quit || !step) return;
       if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA" || (e.target.closest && e.target.closest("[data-q]"))) return;
+      // A focused button (Check, Continue, Close) does its own thing on Enter. Acting here too made Enter on a focused
+      // Check check the answer and then, as the button turned into Continue, skip the feedback.
+      if (e.key === "Enter" && e.target.tagName === "BUTTON" && e.target.getAttribute("role") !== "radio") return;
       if ((step.type === "choice" || step.type === "tf") && !checked && /^[1-4]$/.test(e.key)) {
         const n = Number(e.key) - 1;
         if (step.type === "tf" && n < 2) setPicked(n === 0);
@@ -1353,7 +1362,8 @@ function SaveOffer({ t, go }) {
 }
 
 // Full screen, above everything — a lesson is a focused moment.
-function Overlay({ label, children }) {
+// `onClose` (the loading screen; the player handles its own keys): Back and Escape close it.
+function Overlay({ label, children, onClose }) {
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -1361,8 +1371,16 @@ function Overlay({ label, children }) {
       document.body.style.overflow = prev;
     };
   }, []);
+  const close = useRef(onClose);
+  close.current = onClose;
+  useEffect(() => {
+    if (!onClose) return undefined;
+    const k = (e) => e.key === "Escape" && close.current && close.current();
+    window.addEventListener("keydown", k);
+    return () => window.removeEventListener("keydown", k);
+  }, [!onClose]);
   return (
-    <Layer>
+    <Layer onBack={onClose ? () => close.current && close.current() : undefined}>
       <div role="dialog" aria-modal="true" aria-label={label} data-player="" style={{ position: "fixed", inset: 0, zIndex: 40, background: "var(--bg)", color: "var(--ink)", overflowY: "auto", overflowX: "hidden" }}>
         <div className="nv-ovl" style={{ maxWidth: 640, minHeight: "100%", margin: "0 auto", display: "flex", flexDirection: "column", padding: "calc(10px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom))" }}>{children}</div>
       </div>
@@ -1414,6 +1432,7 @@ function Screen(ctx) {
   // the lesson opens at once; otherwise the boat shows for a moment.
   const needs = key ? unitsFor(p).filter(Boolean) : [];
   const [loaded, setLoaded] = useState(null); // the key whose units arrived, or "!key" if they couldn't
+  const [tries, setTries] = useState(0);
   useEffect(() => {
     if (!key || needs.every(unitLoaded)) return undefined;
     let on = true;
@@ -1421,19 +1440,30 @@ function Screen(ctx) {
     return () => {
       on = false;
     };
-  }, [key]);
+  }, [key, tries]);
+  const failed = loaded === `!${key}`;
+  const retry = () => (setLoaded(null), setTries((n) => n + 1));
+  // Offline: it tries again by itself as soon as the connection is back.
+  useEffect(() => {
+    if (!failed) return undefined;
+    addEventListener("online", retry);
+    return () => removeEventListener("online", retry);
+  }, [failed]);
   const ready = !!key && (loaded === key || needs.every(unitLoaded));
   const session = useMemo(() => (ready ? sessionFor(p, ctx.t, ctx.locale) : null), [key, ready]);
   return (
     <>
       <Learn {...ctx} />
       {key && !ready && (
-        <Overlay label={ctx.t("common.loading")}>
-          <div aria-busy={loaded !== `!${key}`} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 18, textAlign: "center" }}>
-            {loaded === `!${key}` ? (
+        <Overlay label={ctx.t("common.loading")} onClose={() => ctx.go("lessons")}>
+          <div aria-busy={!failed} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 18, textAlign: "center" }}>
+            {failed ? (
               <>
                 <p role="alert" style={{ fontSize: 17, maxWidth: 320, margin: 0 }}>{ctx.t("common.load_error")}</p>
-                <Button onClick={() => ctx.go("lessons")}>{ctx.t("common.close")}</Button>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10, width: "100%", maxWidth: 320 }}>
+                  <Button full onClick={retry}>{ctx.t("common.try_again")}</Button>
+                  <Button full kind="secondary" onClick={() => ctx.go("lessons")}>{ctx.t("common.close")}</Button>
+                </div>
               </>
             ) : (
               <Loading label={ctx.t("common.loading")} />

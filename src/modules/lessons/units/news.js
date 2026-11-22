@@ -9,11 +9,11 @@ export default {
     concept(
       "market_terms",
       T("Market words", "Palabras del mercado"),
-      card(T("Bull, bear and indexes", "Toro, oso e índices"), T("A bull market is a long rise; a bear market is a fall of 20% or more from a high. Indexes like the S&P 500 are scoreboards for a group of stocks, so \"the market fell 2%\" usually means an index did.", "Un mercado alcista (toro) es una subida larga; uno bajista (oso) es una caída de 20% o más desde un máximo. Índices como el S&P 500 son marcadores de un grupo de acciones, así que \"el mercado cayó 2%\" suele significar que un índice cayó.", { en: "A bull market is a long rise; a bear market is a fall of 20% or more from a high. Indexes like Mexico's S&P/BMV IPC are scoreboards for a group of stocks, so \"the market fell 2%\" usually means an index did.", es: "Un mercado alcista (toro) es una subida larga; uno bajista (oso) es una caída de 20% o más desde un máximo. Índices como el S&P/BMV IPC son marcadores de un grupo de acciones, así que \"el mercado cayó 2%\" suele significar que un índice cayó." })),
+      card(T("Bull, bear and indexes", "Toro, oso e índices"), T("A bull market is a long rise; a bear market is a fall of 20% or more from a high. Indexes like the S&P 500 are scoreboards for a group of stocks, so “the market fell 2%” usually means an index did.", "Un mercado alcista (toro) es una subida larga; uno bajista (oso) es una caída de 20% o más desde un máximo. Índices como el S&P 500 son marcadores de un grupo de acciones, así que “el mercado cayó 2%” suele significar que un índice cayó.", { en: "A bull market is a long rise; a bear market is a fall of 20% or more from a high. Indexes like Mexico's S&P/BMV IPC are scoreboards for a group of stocks, so “the market fell 2%” usually means an index did.", es: "Un mercado alcista (toro) es una subida larga; uno bajista (oso) es una caída de 20% o más desde un máximo. Índices como el S&P/BMV IPC son marcadores de un grupo de acciones, así que “el mercado cayó 2%” suele significar que un índice cayó." })),
       tf("market_terms", T("A bear market means prices have fallen a lot.", "Un mercado bajista significa que los precios cayeron mucho."), true, T("Usually 20% or more from a recent high.", "Normalmente 20% o más desde un máximo reciente.")),
       choice(
         "market_terms",
-        T("The S&P 500 is \"up 1%\" today. What does that mean?", "El S&P 500 \"sube 1%\" hoy. ¿Qué significa?", { en: "The IPC is \"up 1%\" today. What does that mean?", es: "El IPC \"sube 1%\" hoy. ¿Qué significa?" }),
+        T("The S&P 500 is “up 1%” today. What does that mean?", "El S&P 500 “sube 1%” hoy. ¿Qué significa?", { en: "The IPC is “up 1%” today. What does that mean?", es: "El IPC “sube 1%” hoy. ¿Qué significa?" }),
         [T("The group of stocks it tracks rose about 1% overall", "El grupo de acciones que sigue subió cerca de 1% en conjunto"), T("Every stock rose 1%", "Todas las acciones subieron 1%"), T("Savings accounts paid 1%", "Las cuentas de ahorro pagaron 1%")],
         0,
         T("An index is an overall score for a group. Some stocks rose more, some fell.", "Un índice es un marcador general de un grupo. Algunas acciones subieron más y otras bajaron."),
@@ -44,7 +44,7 @@ export default {
         T("Markets drop 5% in a day on scary news. What do many long-term investors do?", "Los mercados caen 5% en un día por una noticia alarmante. ¿Qué hacen muchos inversionistas de largo plazo?"),
         [T("Stick to their plan and avoid selling in a panic", "Siguen su plan y evitan vender por pánico"), T("Sell everything and wait for good news", "Venden todo y esperan buenas noticias"), T("Borrow money to buy as much as they can", "Piden prestado para comprar todo lo que puedan")],
         0,
-        T("Sharp daily drops happen. Panic-selling locks in losses, and waiting for \"good news\" often means buying back higher.", "Las caídas fuertes en un día pasan. Vender por pánico vuelve reales las pérdidas, y esperar \"buenas noticias\" suele significar volver a comprar más caro."),
+        T("Sharp daily drops happen. Panic-selling locks in losses, and waiting for “good news” often means buying back higher.", "Las caídas fuertes en un día pasan. Vender por pánico vuelve reales las pérdidas, y esperar “buenas noticias” suele significar volver a comprar más caro."),
         [null, T("Selling after a drop locks in the loss, and good news often comes after prices have already recovered.", "Vender después de una caída vuelve real la pérdida, y las buenas noticias suelen llegar cuando los precios ya se recuperaron."), T("Borrowing to invest magnifies losses as well as gains.", "Pedir prestado para invertir hace más grandes tanto las pérdidas como las ganancias.")]
       )
     ),
@@ -55,11 +55,11 @@ export default {
       title: T("Headlines decoded", "Titulares sin misterio"),
       life: T("Read one market headline this week and say it in plain words.", "Lee un titular de la bolsa esta semana y dilo con palabras sencillas."),
       steps: [
-        card(T("The words you'll see", "Las palabras que vas a ver"), T("A \"bull market\" is a long stretch of rising prices; a \"bear market\" is a drop of 20% or more. A \"rally\" is a quick rise; a \"sell-off\" is a quick fall.", "Un \"mercado alcista\" (bull market) es una racha larga de precios al alza; un \"mercado bajista\" (bear market) es una caída de 20% o más. Un \"rally\" es una subida rápida; un \"sell-off\", una caída rápida.")),
-        card(T("Indexes are the scoreboard", "Los índices son el marcador"), T("When the news says \"the market,\" it usually means an index like the S&P 500 or the Dow.", "Cuando las noticias dicen \"el mercado\", casi siempre hablan de un índice como el S&P 500 o el Dow.", { en: "In Mexico, \"the market\" usually means the S&P/BMV IPC — the main index of the Mexican Stock Exchange.", es: "En México, \"la bolsa\" casi siempre se refiere al S&P/BMV IPC, el índice principal de la Bolsa Mexicana de Valores." })),
+        card(T("The words you'll see", "Las palabras que vas a ver"), T("A “bull market” is a long stretch of rising prices; a “bear market” is a drop of 20% or more. A “rally” is a quick rise; a “sell-off” is a quick fall.", "Un “mercado alcista” (bull market) es una racha larga de precios al alza; un “mercado bajista” (bear market) es una caída de 20% o más. Un “rally” es una subida rápida; un “sell-off”, una caída rápida.")),
+        card(T("Indexes are the scoreboard", "Los índices son el marcador"), T("When the news says “the market,” it usually means an index like the S&P 500 or the Dow.", "Cuando las noticias dicen “el mercado”, casi siempre hablan de un índice como el S&P 500 o el Dow.", { en: "In Mexico, “the market” usually means the S&P/BMV IPC — the main index of the Mexican Stock Exchange.", es: "En México, “la bolsa” casi siempre se refiere al S&P/BMV IPC, el índice principal de la Bolsa Mexicana de Valores." })),
         choice(
           "market_terms",
-          T("\"Stocks enter bear market territory.\" What happened?", "\"Las acciones entran en terreno bajista.\" ¿Qué pasó?"),
+          T("“Stocks enter bear market territory.” What happened?", "“Las acciones entran en terreno bajista.” ¿Qué pasó?"),
           [T("Prices fell 20% or more from a high", "Los precios cayeron 20% o más desde un máximo"), T("Prices hit a record", "Los precios llegaron a un récord"), T("The market closed early", "La bolsa cerró temprano")],
           0,
           T("Bear = down 20%+. Scary headline, normal event — it has happened many times before.", "Bajista = 20% abajo o más. Titular que asusta, evento normal: ha pasado muchas veces."),
@@ -102,7 +102,7 @@ export default {
         card(T("Use news to learn, not to react", "Usa las noticias para aprender, no para reaccionar"), T("Good questions: What does this mean for my long-term plan? Does it change why I own this? Usually the answer is: nothing to do.", "Buenas preguntas: ¿qué significa esto para mi plan a largo plazo? ¿Cambia la razón por la que tengo esta inversión? Casi siempre la respuesta es: no hay que hacer nada.")),
         choice(
           "news_reactions",
-          T("A headline says a company you own is \"plunging.\" Best first move?", "Un titular dice que una empresa que tienes \"se desploma\". ¿Mejor primer paso?"),
+          T("A headline says a company you own is “plunging.” Best first move?", "Un titular dice que una empresa que tienes “se desploma”. ¿Mejor primer paso?"),
           [T("Sell immediately", "Vender de inmediato"), T("Read past the headline and check your plan", "Leer más allá del titular y revisar tu plan"), T("Post about it", "Publicarlo en redes")],
           1,
           T("Headlines exaggerate. Get the facts, then decide calmly — often by doing nothing.", "Los titulares exageran. Infórmate y luego decide con calma; muchas veces, sin hacer nada."),

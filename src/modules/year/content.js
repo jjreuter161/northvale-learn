@@ -89,7 +89,7 @@ export const EVENTS = [
     ev("purchase", "psychology-1", {
       amounts: { cost: [240, 3800] },
       title: T("A tempting sale", "Una oferta tentadora"),
-      body: T("Something you've wanted is on sale for {cost}. The ad says \"today only!\"", "Algo que querías está en oferta por {cost}. El anuncio dice \"¡solo hoy!\""),
+      body: T("Something you've wanted is on sale for {cost}. The ad says “today only!”", "Algo que querías está en oferta por {cost}. El anuncio dice “¡solo hoy!”"),
       choices: [
         ch(T("Buy it on the card", "Comprarlo con la tarjeta"), T("It feels great now, and the bill follows you with interest.", "Se siente genial ahora, y la cuenta te sigue con intereses."), (r, a) => credit(feel(owe(r, a("cost")), 5), -1)),
         ch(T("Buy it with cash", "Comprarlo en efectivo"), T("You enjoy it without debt, and your cash is lower.", "Lo disfrutas sin deuda, y tu efectivo baja."), (r, a) => feel(payFrom(r, a("cost"), ["cash"]).run, 4)),
@@ -102,12 +102,12 @@ export const EVENTS = [
     ev("invest", "etf-3", {
       amounts: { monthly: [50, 500], lump: [150, 2000] },
       title: T("The market dipped", "El mercado cayó"),
-      body: T("Stocks fell this spring. A friend says it's a great time to invest, and tells you about a stock that \"will double.\" What do you do?", "Las acciones bajaron esta primavera. Un amigo dice que es buen momento para invertir y te cuenta de una acción que \"se va a duplicar\". ¿Qué haces?"),
+      body: T("Stocks fell this spring. A friend says it's a great time to invest, and tells you about a stock that “will double.” What do you do?", "Las acciones bajaron esta primavera. Un amigo dice que es buen momento para invertir y te cuenta de una acción que “se va a duplicar”. ¿Qué haces?"),
       choices: [
         ch(T("Invest {monthly} a month in a broad index fund", "Invertir {monthly} al mes en un fondo indexado amplio"), T("A little every month in many companies. Ups and downs come, and time helps.", "Un poco cada mes en muchas empresas. Habrá altas y bajas, y el tiempo ayuda."), (r, a) => feel(patch(r, { investMonthly: a("monthly") }), -1), true),
         ch(T("Keep everything in savings", "Dejar todo en ahorros"), T("Safe and calm, and it grows slowly.", "Seguro y tranquilo, y crece despacio."), (r) => feel(r, 1)),
         ch(
-          T("Put {lump} into the stock that \"will double\"", "Poner {lump} en la acción que \"se va a duplicar\""),
+          T("Put {lump} into the stock that “will double”", "Poner {lump} en la acción que “se va a duplicar”"),
           T("Exciting. But nobody knows what one stock will do.", "Emociona. Pero nadie sabe qué hará una sola acción."),
           (r, a) => {
             const put = Math.min(a("lump"), Math.max(0, r.cash) + Math.max(0, r.savings));
@@ -136,7 +136,7 @@ export const EVENTS = [
     ev("scam", "scams-1", {
       amounts: { fee: [30, 500] },
       title: T("A text says you won", "Un mensaje dice que ganaste"),
-      body: T("A text says you won a prize, but you must pay a {fee} \"fee\" with gift cards first, right now.", "Un mensaje dice que ganaste un premio, pero primero debes pagar una \"comisión\" de {fee} con tarjetas de regalo, ya."),
+      body: T("A text says you won a prize, but you must pay a {fee} “fee” with gift cards first, right now.", "Un mensaje dice que ganaste un premio, pero primero debes pagar una “comisión” de {fee} con tarjetas de regalo, ya."),
       choices: [
         ch(T("Pay the fee to get the prize", "Pagar la comisión para recibir el premio"), T("There's no prize. The money is gone, and so is some of your peace of mind.", "No hay premio. El dinero se fue, y también parte de tu tranquilidad."), (r, a) => feel(payFrom(r, a("fee"), ["cash", "savings"]).run, -6)),
         ch(T("Ignore it", "Ignorarlo"), T("Nothing lost. Real prizes never ask you to pay first.", "No pierdes nada. Los premios de verdad nunca piden que pagues primero.")  , (r) => r),

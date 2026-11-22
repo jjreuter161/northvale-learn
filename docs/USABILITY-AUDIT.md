@@ -1,5 +1,12 @@
 # Northvale Learn: usability audit
 
+| Round | Date | Found | Fixed | Left |
+|---|---|---|---|---|
+| 1 | 18 Nov 2026 | 32 | 26 fully, 3 partly (10, 12, 24) | 3 by decision: 21 (not reproducible in normal use), 25 (how mastery works), 26 (a new feature, frozen) |
+| 2 | 19–22 Nov | 5 | 5 | 0 |
+| 3 | 22 Nov | 5 | 2 | 3 minor polish |
+| Bug bash | 22 Nov | 3 | 3 | 0 |
+
 ## Status of Round 1 (updated as fixes land on `fix/first-lesson-usability`)
 
 The audit text below is the original, written before any fix. This table says what happened to each problem. Tests for items 10 to 32 are in `test/usability.test.mjs`; items 1 to 9 are covered in `test/browser.test.mjs`, `test/layout.test.mjs` and `test/colors.test.mjs`.
@@ -38,6 +45,64 @@ The audit text below is the original, written before any fix. This table says wh
 | 30 | macOS blocks the preview from ~/Downloads | Fixed by moving the project (and its worktrees) to `~/Projects/northvale-learn`, which macOS does not protect; `.claude/launch.json` runs `npm run dev` there |
 | 31 | "1 days" | Fixed |
 | 32 | Flag emoji | Fixed (with 15) |
+
+## Round 2 (19 to 22 November 2026, after the Round 1 fixes)
+
+**How.** A fresh build of `fix/first-lesson-usability`, used as a brand-new person in Chrome for about 25 minutes: on a phone (390 × 844) in Spanish with Mexico and in the dark Navy look, then on a laptop (1366 × 768) in English. Path: welcome, first lesson, Today, Goals and a new goal, recording money, Practice, Missions, Tools, News, Me, Settings and the streak dialog. Screenshots: `docs/usability/round2/` (kept out of git; a compact before-and-after set is in `docs/usability/compare/`).
+
+**Result.** Five new problems, none severe. Round 1's big ones (lost buttons, Back leaving the app, red meaning "chosen", interruptions) did not come back. All five are fixed and tested (`test/usability.test.mjs`, the "R2" checks).
+
+| # | Problem, worst first | Where | Fix | Status |
+|---|---|---|---|---|
+| R2-1 | **The goal you picked at the start is forgotten on two screens.** Welcome asks "What are you saving for?" and you pick Travel. Goals then says "No goal yet" and Today's side panel on a laptop says the same, which reads as if the app lost your answer | Goals, Today (laptop) | Both now name it ("Your goal: Travel", "You picked Travel. Give it an amount and a date.") and lead to making the plan | Fixed (f53773c) |
+| R2-2 | **News is a wall of main buttons.** Every headline has a filled navy "Mark as read" button: ten headlines, ten filled buttons, in a color no other screen uses for buttons. It shouts, and it is the only place the app breaks "one main button per screen" | Practice › News | "Mark as read" is a plain outlined button, and turns into a quiet "Read" once pressed | Fixed |
+| R2-3 | **Me on a laptop says everything twice.** The left column shows "Achievements, 2 of 20 earned" with the badges and the Skills card; the right column repeats both as rows | Me (laptop and wider) | The two rows show on a phone only, where the left column is not there | Fixed |
+| R2-4 | **Straight typewriter quotes in what you read.** For example `¿Cuál es la idea principal de "págate a ti primero"?`. 372 straight quote marks across 15 lesson units, missions, Your Money Year, a practice set, the glossary and What's new, in both languages. Small, but it is what makes text look typed rather than set | Lessons, Missions, Money Year | All turned into curly quotes (“ ”) in both languages; a test fails if a straight one comes back | Fixed |
+| R2-5 | **A cute toast.** Saving a goal said "Goal saved. Future you says thanks." The rest of the app is calm and plain; this line was the odd one out | Goals | "Goal saved." / "Meta guardada." | Fixed (f53773c) |
+
+**Seen and left alone:** headlines in News are the publisher's own words, so they keep the publisher's quotes.
+
+## Round 3 (22 November 2026, after Round 2's fixes)
+
+**How.** The same path again on a fresh build, as a new person and as someone three lessons in: phone in English, phone in Spanish with Mexico, laptop in English, laptop in the Navy look. Welcome, the first lesson to the end, Today, a review, Goals, Practice (missions, the real cost, tools), Me and Settings. Screenshots: the "after" half of `docs/usability/compare/`.
+
+**Result.** Nothing worse than minor polish. Two small things were fixed; three are left as polish.
+
+| # | Problem | Fix | Status |
+|---|---|---|---|
+| R3-1 | **Two words for one thing.** Today said "3 ideas to refresh · 2 min"; the review card on Me and Practice said "3 concepts ready · 2–3 min" | Both say "N ideas to refresh · 2–3 min" (Spanish: "N ideas para refrescar") | Fixed |
+| R3-2 | **The picked goal was below the fold.** Goals says "Your goal: Travel. Tap it below", but Travel was the fifth card, under the tab bar on a phone | The picked goal is the first card | Fixed |
+
+**Left as minor polish (not worth changing during the freeze):**
+- In a Spanish review the word "Repaso" shows twice at the top ("Repaso · 1 de 3", then the step label "Repaso").
+- In "The real cost", the chosen amount is a filled chip, where other choices in the app are outlined. It reads clearly either way.
+- On a laptop the lesson is a 640 px column with space around it (a judgement for the owner, as noted in `docs/QUALITY-BAR.md`).
+
+Because Round 3 found only polish, there is no Round 4.
+
+## Bug bash (Part 4, 22 November 2026)
+
+Trying to break the app on purpose, now a test that runs in `npm test`: `test/bugbash.test.mjs`. It covers:
+- tapping fast (a double tap on Start, six taps on Continue at once, a double tap on Check);
+- Back and Forward pressed over and over in and out of a lesson;
+- reloading in the middle of a lesson;
+- losing the connection with a lesson open, and before a unit has loaded;
+- a 40-letter goal name and a 24-letter nickname on a 320 × 568 phone;
+- switching every look, then Spanish and Mexico, in the middle;
+- the keyboard only;
+- a laptop at 200% zoom (683 × 384 at 2×), a 320 px phone (also the width a 200% zoom gives a small phone) and a 2560 × 1440 monitor.
+
+**Held up without changes:** fast taps (no double lesson, no skipped step, no double answer), Back and Forward (the app never left, Today was always one close away), reload (the lesson goes on at the same step), long names (nothing ran off the side), switching language and look mid-session (no raw text, the lesson reopens in Spanish), all three sizes (no sideways scrolling, lines stay under 900 px on a huge screen, Continue stays on screen in a lesson).
+
+**Broke, now fixed:**
+
+| # | What broke | Fix |
+|---|---|---|
+| B-1 | **The keyboard skipped the feedback.** With Check focused (after tabbing to it), Enter checked the answer and then, as the same button turned into Continue, went straight on: the learner never saw whether they were right | The step's own Enter handler leaves a focused button alone; the button does its one job |
+| B-2 | **Escape did nothing in a lesson.** A lesson is a full-screen dialog, and keyboard users expect Escape to close it | Escape does what the X does: "Leave now?" mid-lesson (Escape again keeps going), close on the finish screen |
+| B-3 | **Offline, an unloaded lesson was a dead end.** Opening a lesson from a unit not yet downloaded showed "This didn't load. Check your connection, then try again." with only a Close button: no way to try again, Escape did nothing, and the phone's Back took no step there, so it could leave the app | "Try again" and "Close" buttons; it also tries again by itself the moment the connection is back; Back and Escape close it and stay in the app |
+
+**Could not be tested here:** real phones (the on-screen keyboard, iOS Safari's own Back swipe, a real flaky network), and a screen reader. These are for the tester script (`docs/TESTER-SCRIPT.md`) and a real device.
 
 Audit date: Wednesday 18 November 2026. Nothing was fixed. No app code was changed, nothing was committed or pushed.
 

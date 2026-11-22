@@ -377,7 +377,8 @@ function TemplateIcon({ id, size = 40 }) {
 function TemplateGrid({ t, onPick, highlight }) {
   return (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 10 }}>
-      {P.TEMPLATES.map((tp) => (
+      {/* The one picked at the start comes first, so "tap it below" finds it without scrolling on a phone. */}
+      {[...P.TEMPLATES].sort((a, b) => (b.id === highlight) - (a.id === highlight)).map((tp) => (
         <button key={tp.id} onClick={() => onPick(tp.id)} className="nv-press" style={{ textAlign: "left", ...(highlight === tp.id ? SELECTED : { border: "1px solid var(--line)" }), background: "var(--surface)", color: "var(--ink)", borderRadius: 8, padding: 14, cursor: "pointer", minHeight: 112, display: "flex", flexDirection: "column", gap: 10 }}>
           <TemplateIcon id={tp.id} size={36} />
           <span>
