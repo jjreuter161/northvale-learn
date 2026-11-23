@@ -400,6 +400,16 @@ export const MISSIONS = [
     ask: T("What would you need to bring or know to request it?", "¿Qué necesitarías saber o tener a la mano para pedirlo?"),
   }),
 
+  m("twooffers", {
+    unit: "joboffer",
+    icon: "scale",
+    time: 20,
+    title: T("Line up two job posts, benefits included", "Compara dos ofertas de empleo, con sus prestaciones"),
+    how: T("Find two real job posts for work you could do. Write the pay, hours and benefits of each side by side, and note what's missing. Just reading, don't apply.", "Encuentra dos ofertas de empleo reales de un trabajo que podrías hacer. Anota lado a lado el sueldo, el horario y las prestaciones de cada una, y qué falta. Solo leer, no solicites nada."),
+    teen: T("Find two real job posts for work you could do one day. Write the pay, hours and benefits of each side by side. Just reading, don't apply. Talk about what you find with a parent or guardian.", "Encuentra dos ofertas de empleo reales de un trabajo que podrías hacer algún día. Anota lado a lado el sueldo, el horario y las prestaciones de cada una. Solo leer, no solicites nada. Platica lo que encuentres con tu mamá, papá o tutor."),
+    ask: T("Which one would you pick, and what made the difference?", "¿Cuál elegirías y qué hizo la diferencia?"),
+  }),
+
   // Reading the news
   m("headline", {
     unit: "news",

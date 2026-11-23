@@ -182,6 +182,7 @@ addStrings({
   "why.borderscams": S("Scammers target people with family and money on both sides. A pause and a call to a number you already have stops most of them.", "Los estafadores buscan a quienes tienen familia y dinero en los dos lados. Una pausa y una llamada a un número que ya tienes detienen a casi todos."),
   "why.payments": S("Most spending is by card or phone now. Knowing the difference between debit, credit and apps keeps fees and fraud away.", "Casi todo el gasto es con tarjeta o celular. Conocer la diferencia entre débito, crédito y apps te aleja de comisiones y fraudes."),
   "why.score": S("Lenders read your credit report before they decide. Knowing what's on it, and fixing mistakes, makes borrowing cheaper.", "Los prestamistas leen tu reporte de crédito antes de decidir. Saber qué contiene, y corregir errores, hace más barato pedir prestado."),
+  "why.joboffer": S("A job is more than its pay. Benefits, costs and written terms decide what you really take home.", "Un empleo es más que su sueldo. Las prestaciones, los costos y los términos por escrito deciden lo que de verdad te llevas."),
   "why.news": S("The news moves rates and prices that touch your money.", "Las noticias mueven tasas y precios que afectan tu dinero."),
 });
 

@@ -44,4 +44,5 @@ export const LOADERS = {
   borderscams: () => import("./borderscams.js"),
   payments: () => import("./payments.js"),
   score: () => import("./score.js"),
+  joboffer: () => import("./joboffer.js"),
 };

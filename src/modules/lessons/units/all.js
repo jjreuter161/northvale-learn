@@ -30,7 +30,8 @@ import crosswork from "./crosswork.js";
 import borderscams from "./borderscams.js";
 import payments from "./payments.js";
 import score from "./score.js";
+import joboffer from "./joboffer.js";
 
-export const UNITS = [budget, save, banking, paycheck, credit, scams, compound, taxes, insurance, psychology, stocks, etf, risk, crypto, retire, earning, news, borders, remit, twobanks, crosswork, borderscams, payments, score];
+export const UNITS = [budget, save, banking, paycheck, credit, scams, compound, taxes, insurance, psychology, stocks, etf, risk, crypto, retire, earning, news, borders, remit, twobanks, crosswork, borderscams, payments, score, joboffer];
 
 export { PLACEMENT } from "./placement.js";

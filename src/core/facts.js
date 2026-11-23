@@ -56,6 +56,9 @@ export const FACTS = {
   ivaBorderEnds: { value: { en: "December 31, 2026", es: "31 de diciembre de 2026" }, kind: "text", check: "the decree published Dec 31, 2025 extended the border incentive through this date; update or remove the border rate when it changes", review: "each December" },
   isrWithholdingExample: { value: 8, kind: "pct", check: "an example share of pay withheld for ISR for a young worker; real withholding depends on the ISR table and income", review: "rarely" },
   imssWorkerExample: { value: 2.5, kind: "pct", check: "IMSS — the worker's share of cuotas is roughly 2–3% of salary depending on salary; an example, verify", review: "yearly" },
+  vacationDaysFirstYearMX: { value: 12, kind: "number", check: "Ley Federal del Trabajo art. 76 (2023 reform): a worker with one year of service gets at least this many paid vacation days, rising with each year", review: "rarely (set by law)" },
+  primaVacacionalPct: { value: 25, kind: "pct", check: "Ley Federal del Trabajo art. 80 — the prima vacacional is at least this share of the pay for the vacation days", review: "rarely (set by law)" },
+  ptuPct: { value: 10, kind: "pct", check: "Ley Federal del Trabajo art. 117 and Constitución art. 123 — workers share this part of a company's taxable profit (PTU), with limits", review: "rarely (set by law)" },
   aguinaldoDays: { value: 15, kind: "number", check: "Ley Federal del Trabajo art. 87 — minimum aguinaldo in days of salary, paid by Dec 20 (proposals for 30 days exist; none had passed as of Oct 2026)", review: "yearly (watch for the 30-day reform)" },
   resicoIncomeCap: { value: 3500000, kind: "mxn", check: "LISR art. 113-E — RESICO is for individuals earning up to this much a year", review: "yearly" },
   resicoRateLow: { value: 1, kind: "pct", check: "LISR art. 113-E — lowest RESICO ISR rate", review: "yearly" },
@@ -71,6 +74,7 @@ export const FACTS = {
   remitFeeExampleB: { value: 0, kind: "usd", check: "an example of a service advertising no fee; teaching number", review: "yearly" },
   remitMarkupExampleB: { value: 5, kind: "pct", check: "an example bigger markup hidden in the exchange rate; teaching number", review: "yearly" },
   remitCancelMinutes: { value: 30, kind: "number", check: "consumerfinance.gov — the Remittance Rule: a sender can usually cancel within 30 minutes of paying, if the money hasn't been picked up or deposited", review: "rarely (set by law)" },
+  cashDeclareUsd: { value: 10000, kind: "usd", check: "cbp.gov (FinCEN Form 105) and sat.gob.mx / aduanas — carrying more than this in cash (or its equivalent) across the US–Mexico border must be declared, in either direction", review: "yearly (set by law)" },
   fbarThreshold: { value: 10000, kind: "usd", check: "fincen.gov — people in the US must report foreign accounts if together they top this at any time in the year (FBAR)", review: "rarely (set by law)" },
   f1WorkHours: { value: 20, kind: "number", check: "studyinthestates.dhs.gov — an F-1 student can usually work on campus up to this many hours a week while classes are in session", review: "rarely (set by law)" },
   // Sample market data (used only when no market data key is set)
