@@ -64,7 +64,7 @@ npm test
 **Demo data and the preview:**
 
 - `npm run seed:demo` makes the demo people on a running local server (default `http://localhost:8950`; `-- --url …` for another port): Dani (the demo learner, with goals, three weeks of lessons, a streak and a practice fund) and this week's league (Maya, Leo and Ari; Sofía and Teo in the 13–17 league). Running it again resets them. It refuses any other address, a server that says it's production, and a machine set up as the live one. Sign in as `dani@example.test` (the test password is in `scripts/seed-demo.mjs`).
-- `PREVIEW_DIR=/path npm run preview:sync` builds the app and copies it into a preview's own folder (for a preview that can't read this one), keeping that copy's data. It makes the demo people too if they're missing, so an emptied preview folder comes back with one command. Restart the preview server afterwards.
+- The project lives in `~/Projects/northvale-learn` (not `~/Downloads`, which macOS keeps some tools out of), so Claude's preview runs straight from it: `.claude/launch.json` starts `npm run dev` on port 8950. `PREVIEW_DIR=/path npm run preview:sync` is only for a preview that still can't read the project folder: it builds the app and copies it into the preview's own folder, keeping that copy's data. It makes the demo people too if they're missing, so an emptied preview folder comes back with one command. Restart the preview server afterwards.
 
 Tests and the demo scripts set `NORTHVALE_DOTENV=0`, so the servers they start never read your real `.env`.
 
