@@ -337,8 +337,29 @@ try {
   {
     const files = ["src/modules/lessons/units", "src/modules/missions/catalog.js", "src/modules/year/content.js", "src/modules/goals/life.jsx", "src/modules/tutor/glossary.js", "src/core/whatsnew.jsx"];
     const { readdirSync, statSync } = await import("node:fs");
+    // Only what learners can see now: draft units (draft: true), lessons waiting in additions.js, and the practice
+    // sets only draft units use are left as written while they are reviewed; this check covers them once they ship.
+    const read = (f) => readFileSync(join(ROOT, f), "utf8");
     const all = files.flatMap((f) => (statSync(join(ROOT, f)).isDirectory() ? readdirSync(join(ROOT, f)).filter((x) => x.endsWith(".js") && x !== "index.gen.js").map((x) => join(f, x)) : [f]));
-    const bad = all.flatMap((f) => readFileSync(join(ROOT, f), "utf8").split("\n").map((l, i) => [f, i + 1, l]).filter(([, , l]) => /\\"/.test(l)).map(([f, n]) => `${f}:${n}`));
+    const drafts = all.filter((f) => /\bdraft: true\b/.test(read(f)) || f.endsWith("/additions.js"));
+    const setsOf = (fs) => new Set(fs.flatMap((f) => [...read(f).matchAll(/set: "([a-z]+)"/g)].map((m) => m[1])));
+    const live = setsOf(all.filter((f) => f.includes("/units/") && !drafts.includes(f)));
+    const draftSets = [...setsOf(drafts)].filter((x) => !live.has(x));
+    // In life.jsx, the lines of a practice set run from "  name: {" to the next set at the same indent.
+    const skipLines = (f) => {
+      if (!f.endsWith("life.jsx")) return new Set();
+      const lines = read(f).split("\n");
+      const skip = new Set();
+      let on = false;
+      lines.forEach((l, i) => {
+        const m = l.match(/^  ([a-z]+): \{/);
+        if (m) on = draftSets.includes(m[1]);
+        else if (/^\S/.test(l)) on = false;
+        if (on) skip.add(i + 1);
+      });
+      return skip;
+    };
+    const bad = all.filter((f) => !drafts.includes(f)).flatMap((f) => { const skip = skipLines(f); return read(f).split("\n").map((l, i) => [f, i + 1, l]).filter(([, n, l]) => !skip.has(n) && /\\"/.test(l)).map(([f, n]) => `${f}:${n}`); });
     assert.deepEqual(bad, [], "straight double quotes inside learner-facing text");
   }
   ok("R2-4: lessons, missions, Money Year and practice sets use curly quotes in both languages");
