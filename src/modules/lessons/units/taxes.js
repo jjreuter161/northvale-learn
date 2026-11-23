@@ -40,7 +40,7 @@ export default {
       card(
         T("Settling up once a year", "Hacer cuentas una vez al año"),
         T("Withholding is an estimate. Once a year you file a return (Form 1040) — usually by {@usTaxDeadline} — to settle up: if too much was withheld you get a refund; if too little, you owe the rest. Even if you don't have to file, filing can get your withheld tax back.", "La retención es un cálculo aproximado. Una vez al año presentas tu declaración (formulario 1040), normalmente a más tardar el {@usTaxDeadline}, para hacer cuentas: si te retuvieron de más, te devuelven; si fue de menos, pagas lo que falta. Aunque no estés obligado, declarar puede devolverte lo que te retuvieron.", {
-          en: "Your employer's ISR withholding usually settles things. You must file a \"declaración anual\" (by {@mxTaxDeadline}) if, for example, you earned more than {@mxSalaryFilingMin} in a year or had two employers at once. Filing can also get you a refund (\"saldo a favor\").",
+          en: "Your employer's ISR withholding usually settles things. You must file a “declaración anual” (by {@mxTaxDeadline}) if, for example, you earned more than {@mxSalaryFilingMin} in a year or had two employers at once. Filing can also get you a refund (“saldo a favor”).",
           es: "La retención de ISR de tu patrón normalmente lo resuelve. Debes presentar la declaración anual (a más tardar el {@mxTaxDeadline}) si, por ejemplo, ganaste más de {@mxSalaryFilingMin} en el año o tuviste dos patrones al mismo tiempo. Declarar también te puede dar un saldo a favor.",
         })
       ),
@@ -50,7 +50,7 @@ export default {
         T("{$900|9000} was withheld from your pay this year, but you only owed {$400|5000}. What happens when you file?", "Este año te retuvieron {$900|9000}, pero solo debías {$400|5000}. ¿Qué pasa al declarar?"),
         [T("You get about {$500|4000} back", "Te devuelven unos {$500|4000}"), T("You owe {$500|4000} more", "Debes {$500|4000} más"), T("Nothing changes", "No cambia nada")],
         0,
-        T("You paid more than you owed, so the difference comes back to you as a refund.", "Pagaste más de lo que debías, así que la diferencia te regresa como devolución.", { en: "You paid more than you owed, so the difference is a \"saldo a favor\" you can get back.", es: "Pagaste más de lo que debías, así que la diferencia es un saldo a favor que puedes recuperar." }),
+        T("You paid more than you owed, so the difference comes back to you as a refund.", "Pagaste más de lo que debías, así que la diferencia te regresa como devolución.", { en: "You paid more than you owed, so the difference is a “saldo a favor” you can get back.", es: "Pagaste más de lo que debías, así que la diferencia es un saldo a favor que puedes recuperar." }),
         [null, T("You'd owe more only if too little had been withheld.", "Deberías más solo si te hubieran retenido de menos."), T("Withholding over what you owe comes back only if you file.", "Lo retenido de más solo regresa si presentas tu declaración.")]
       )
     ),
@@ -61,7 +61,7 @@ export default {
       tf("tax_id", T("You should share your Social Security number only when it's truly required.", "Solo debes compartir tu número de Seguro Social cuando de verdad lo piden por ley.", { en: "You can get your RFC from the SAT for free.", es: "Puedes sacar tu RFC en el SAT gratis." }), true, T("Employers, banks and the IRS need it; most others don't.", "Lo necesitan empleadores, bancos y el IRS; casi nadie más.", { en: "Online with your CURP, or at an SAT office — no fee.", es: "En línea con tu CURP o en una oficina del SAT, sin costo." })),
       choice(
         "tax_id",
-        T("A website offering a free gift asks for your Social Security number. What should you do?", "Un sitio que regala algo te pide tu número de Seguro Social. ¿Qué haces?", { en: "Someone offers to \"get your RFC for you\" for a fee, if you send your e.firma password. What should you do?", es: "Alguien te ofrece \"sacarte tu RFC\" por un pago, si le mandas la contraseña de tu e.firma. ¿Qué haces?" }),
+        T("A website offering a free gift asks for your Social Security number. What should you do?", "Un sitio que regala algo te pide tu número de Seguro Social. ¿Qué haces?", { en: "Someone offers to “get your RFC for you” for a fee, if you send your e.firma password. What should you do?", es: "Alguien te ofrece “sacarte tu RFC” por un pago, si le mandas la contraseña de tu e.firma. ¿Qué haces?" }),
         [T("Don't give it — a giveaway has no reason to need it", "No darlo: un regalo no tiene por qué necesitarlo", { en: "Don't — the RFC is free from the SAT, and your e.firma must stay private", es: "No: el RFC es gratis en el SAT y tu e.firma debe ser privada" }), T("Give it if the site looks professional", "Darlo si el sitio se ve profesional", { en: "Pay, if they seem trustworthy", es: "Pagar, si parecen confiables" }), T("Give only the last four digits, then the rest later", "Dar solo los últimos cuatro dígitos y luego el resto", { en: "Send the password but not the file", es: "Mandar la contraseña, pero no el archivo" })],
         0,
         T("Your SSN unlocks credit in your name. Share it only with employers, banks and tax authorities.", "Tu SSN abre la puerta a créditos a tu nombre. Compártelo solo con empleadores, bancos y autoridades fiscales.", { en: "Your e.firma works like a legal signature. With it, someone can act in your name before the SAT.", es: "Tu e.firma funciona como una firma legal. Con ella, alguien puede actuar a tu nombre ante el SAT." }),
@@ -104,7 +104,7 @@ export default {
       title: T("How tax brackets work", "Cómo funcionan los tramos"),
       life: T("When someone says a raise “puts you in a higher bracket”, remember: only the part above the line pays more.", "Cuando alguien diga que un aumento “te sube de tramo”, recuerda: solo la parte de arriba paga más."),
       steps: [
-        card(T("A myth to drop", "Un mito que hay que soltar"), T("\"If I earn more, I'll move into a higher bracket and take home less.\" Not true. Higher rates apply only to the income inside the higher bracket.", "\"Si gano más, paso a un tramo más alto y me queda menos.\" No es cierto. Las tasas más altas solo se aplican al ingreso dentro de ese tramo.")),
+        card(T("A myth to drop", "Un mito que hay que soltar"), T("“If I earn more, I'll move into a higher bracket and take home less.” Not true. Higher rates apply only to the income inside the higher bracket.", "“Si gano más, paso a un tramo más alto y me queda menos.” No es cierto. Las tasas más altas solo se aplican al ingreso dentro de ese tramo.")),
         card(T("Marginal vs. effective", "Marginal vs. efectiva"), T("Your marginal rate is the rate on your last dollar. Your effective rate is your total tax divided by your income — always lower than your top rate.", "Tu tasa marginal es la tasa de tu último peso. Tu tasa efectiva es tu impuesto total entre tu ingreso, y siempre es menor que tu tasa más alta.")),
         choice(
           "tax_brackets",
@@ -131,7 +131,7 @@ export default {
         card(T("Refund or owe", "Devolución o pago"), T("Filing compares what was withheld with what you actually owe. Too much withheld? Refund. Too little? You pay the difference.", "Declarar compara lo que te retuvieron con lo que realmente debes. ¿Te retuvieron de más? Te devuelven. ¿De menos? Pagas la diferencia.")),
         choice(
           "tax_filing",
-          T("Why might a teen with a part-time job want to file even if they don't have to?", "¿Por qué un joven con trabajo de medio tiempo querría declarar aunque no esté obligado?", { en: "What's a \"saldo a favor\"?", es: "¿Qué es un saldo a favor?" }),
+          T("Why might a teen with a part-time job want to file even if they don't have to?", "¿Por qué un joven con trabajo de medio tiempo querría declarar aunque no esté obligado?", { en: "What's a “saldo a favor”?", es: "¿Qué es un saldo a favor?" }),
           [T("To get back tax that was withheld from their pay", "Para recuperar el impuesto que le retuvieron", { en: "Tax you paid beyond what you owed, which you can get back", es: "Impuesto que pagaste de más y puedes recuperar" }), T("Filing doubles your pay", "Declarar duplica tu sueldo", { en: "A fine for filing late", es: "Una multa por declarar tarde" }), T("It's the only way to keep your job", "Es la única forma de conservar el trabajo", { en: "A discount at stores", es: "Un descuento en tiendas" })],
           0,
           T("If more was withheld than they owe, filing is how they get it back.", "Si le retuvieron más de lo que debe, declarar es la forma de recuperarlo.", { en: "If more was withheld than you owe, the difference is yours — you request it in your return.", es: "Si te retuvieron más de lo que debes, la diferencia es tuya: la pides en tu declaración." }),

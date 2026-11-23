@@ -16,7 +16,7 @@ addStrings({
   "news.nav": S("News", "Noticias"),
   "news.title": S("News, explained", "Noticias explicadas"),
   "news.row.sub": S("Real headlines in plain words", "Noticias reales en palabras sencillas"),
-  "news.row.locked": S("Opens after 5 lessons", "Se abre después de 5 lecciones"),
+  "news.row.locked": S("Opens after 5 lessons · {n} done", "Se abre después de 5 lecciones · {n} hechas"),
   "news.sub": S("Today's money headlines in plain words.", "Los titulares de dinero de hoy, en palabras sencillas."),
   "news.means": S("What this means", "Qué significa"),
   "news.terms": S("Words to know", "Palabras clave"),
@@ -68,7 +68,7 @@ function Story({ item, t, onRead, read }) {
           <div style={{ fontSize: 13, fontWeight: 650, color: "var(--mid)", marginBottom: 6 }}>{t("news.terms")}</div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
             {item.terms.map((term) => (
-              <Chip key={term} onClick={() => service("tutor", "open")({ question: term })} style={{ padding: "6px 12px", minHeight: 36, fontSize: 14 }}>
+              <Chip key={term} onClick={() => service("tutor", "open")({ question: term })} style={{ padding: "6px 12px", minHeight: 44, fontSize: 14 }}>
                 {term}
               </Chip>
             ))}
@@ -76,7 +76,8 @@ function Story({ item, t, onRead, read }) {
         </div>
       )}
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 14 }}>
-        <Button size="sm" kind={read ? "secondary" : "good"} onClick={onRead}>
+        {/* One headline among many: no filled button here (a screen has one main button, and a list of filled buttons shouts). */}
+        <Button size="sm" kind={read ? "ghost" : "secondary"} onClick={onRead}>
           {read ? t("news.read_done") : t("news.got_it")}
         </Button>
         <Button size="sm" kind="secondary" onClick={() => service("tutor", "open")({ question: t("news.ask"), context: `${item.title}${item.summary ? ` — ${item.summary}` : ""}` })}>
@@ -138,7 +139,7 @@ function PracticeRow({ t, go }) {
   const p = useAppState((s) => s.progress);
   const seen = useSeen("news");
   const open = lessonsDone(p) >= 5 || (p.practiced.news || []).length > 0;
-  return <ListRow icon="news" title={t("news.title")} sub={open ? t("news.row.sub") : t("news.row.locked")} locked={!open} isNew={open && !seen && t("common.new")} onClick={() => (markIntro("news"), go("news"))} />;
+  return <ListRow icon="news" title={t("news.title")} sub={open ? t("news.row.sub") : t("news.row.locked", { n: Math.min(5, lessonsDone(p)) })} locked={!open} isNew={open && !seen && t("common.new")} onClick={() => (markIntro("news"), go("news"))} />;
 }
 
 registerModule({

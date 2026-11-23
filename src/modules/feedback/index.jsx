@@ -7,6 +7,7 @@ import { registerModule } from "../../core/registry.js";
 import { useSlice, setSlice, getState, useAppState } from "../../core/store.js";
 import { addStrings } from "../../core/i18n.js";
 import { api } from "../../core/api.js";
+import { claimAsk } from "../../core/asks.js";
 import { installId, track } from "../../core/analytics.js";
 import { SELECTED, Button, Chip, Note, Sheet, toast } from "../../core/ui.jsx";
 
@@ -71,17 +72,18 @@ function Overlay({ t, locale, route }) {
     setSlice("feedback", (s) => ({ ...s, pending: [] }), DEFAULTS);
     pending.forEach((p) => sendOrKeep(p.path, p.body).catch(() => {}));
   }, []);
-  // The survey, once, after the 3rd finished lesson. It's due from what's
+  // The survey, once, after the 5th finished lesson. It's due from what's
   // saved (not a one-off timer), so it can't be lost: it waits until no
-  // lesson or other window is open, and if the app closes first, it shows
-  // the next time the app opens.
-  const due = useAppState((s) => (s.progress.counters.lessons || 0) >= 3 && !(s.modules.feedback || {}).survey);
+  // lesson or other window is open, and only if nothing else has asked
+  // something in this visit (asks.js); otherwise it shows the next time the
+  // app opens.
+  const due = useAppState((s) => (s.progress.counters.lessons || 0) >= 5 && !(s.modules.feedback || {}).survey);
   useEffect(() => {
     if (!due || survey) return;
     const id = setInterval(() => {
       if (document.querySelector('[role="dialog"]')) return;
       clearInterval(id);
-      setSurvey(true);
+      if (claimAsk()) setSurvey(true);
     }, 1500);
     return () => clearInterval(id);
   }, [due, survey]);

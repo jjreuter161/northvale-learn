@@ -133,9 +133,10 @@ async function play({ page, top, button }, { untilAction = false, untilMoment = 
     if (untilMoment && (await d.locator("[data-moment]").count())) return;
     const names = await d.getByRole("button").evaluateAll((bs) => bs.map((b) => b.getAttribute("aria-label") || b.innerText.trim()));
     if (process.env.DEBUG) console.log(i, JSON.stringify(names));
-    if (names.includes("Skip for now") || names.includes("Saltar por ahora")) {
+    if (names.includes("Done — continue") || names.includes("Listo, continuar")) await button(/^(Done — continue|Listo, continuar)$/, d).click(); // a tool step that is already done (a goal was already made)
+    else if (names.includes("Skip for now") || names.includes("Saltar por ahora")) {
       if (untilAction) return;
-      await button(/^(Skip for now|Saltar por ahora)$/, d).click();
+      await button(/^(Skip for now|Saltar por ahora)$/, d).click().catch(() => {}); // (a step that completes itself can take it away as we click)
     } else if (names.includes("Check") || names.includes("Comprobar")) {
       await answerAny(d);
       await button(/^(Check|Comprobar)$/, d).click();
@@ -252,10 +253,11 @@ try {
       }
       await button("Done", top()).click();
     }
-    // After the third lesson: the one-question survey, once back from the lesson.
-    await page.getByRole("dialog", { name: "Quick question" }).waitFor({ timeout: 10000 });
-    await page.keyboard.press("Escape");
-    await page.waitForFunction(() => (JSON.parse(localStorage.getItem("northvale-learn-v1")).modules.feedback || {}).survey === "skipped");
+    // After the third lesson: no survey yet (it waits for the fifth lesson). It is marked skipped here so the rest of this run isn't interrupted by it.
+    await page.waitForTimeout(3500);
+    assert.equal(await page.getByRole("dialog", { name: "Quick question" }).count(), 0, "no survey after three lessons");
+    await page.evaluate(() => { const k = "northvale-learn-v1"; const x = JSON.parse(localStorage.getItem(k)); x.modules.feedback = { ...(x.modules.feedback || {}), survey: "skipped" }; localStorage.setItem(k, JSON.stringify(x)); });
+    await page.reload();
     await button("Practice", page.getByRole("navigation")).click();
     await page.getByRole("dialog", { name: "New: Practice" }).waitFor();
     await clean("practice intro");
@@ -521,7 +523,10 @@ try {
     const seed = learner({ ageBand: "18-25" }, { lessonDays: [d(1)], days: { [d(1)]: 10 }, xp: 30, counters: { lessons: 3 }, streak: { count: 1, last: d(1), best: 1, frozen: [] } }, { goals: { goals: [newGoal({ id: "w1", templateId: "car", target: 5000, start: 300, months: 24, today: d(12) })] } });
     const app = await open(seed);
     const { page, top, button, clean, menu } = app;
-    // Myth or fact: two plain buttons, an answer, +2 XP; then one line until tomorrow.
+    // Myth or fact: two plain buttons, an answer, +2 XP; then one line until tomorrow. (On a Sunday the money week
+    // comes first and the myth waits until it is done, so on a Sunday this runs after the money week.)
+    const sunday = new Date(`${d(0)}T12:00:00`).getDay() === 0;
+    const myth = async () => {
     const card = page.locator("[data-myth]");
     await card.getByText("Myth or fact?").waitFor();
     await clean("myth card");
@@ -532,6 +537,8 @@ try {
     await page.reload();
     await page.getByText("Today's myth: answered · another one tomorrow").waitFor();
     console.log("ok: Money Myth or Fact on Today: not on day 1, +2 XP, then one line until tomorrow");
+    };
+    if (!sunday) await myth();
     // Your money week: a short look back, then the check-in.
     await page.getByRole("button", { name: /^Your money week/ }).click();
     await top().getByText("You learned").waitFor();
@@ -542,6 +549,7 @@ try {
     await page.waitForFunction(() => !!JSON.parse(localStorage.getItem("northvale-learn-v1")).modules.goals.checkIn);
     assert.equal(await page.getByRole("button", { name: /^Your money week/ }).count(), 0, "done for the week");
     console.log("ok: Your money week: what you learned, the streak, the goal, next week's lesson, then the check-in");
+    if (sunday) await myth();
     // The real cost, in Practice: an everyday choice or a hidden cost, by week.
     await menu("Practice");
     const rc = page.locator("[data-rc]");
@@ -588,7 +596,9 @@ try {
     assert.ok(!/NaN|undefined|\{/.test(await other.innerText()), "the other week's card reads cleanly");
     await later.close();
     console.log("ok: The real cost in Practice: everyday choices one week, a hidden cost with its lesson the next");
-    const es = await open({ ...seed, settings: { lang: "es", region: "MX", look: "white", reduceMotion: true } });
+    // (This week's money check-in already done, so on a Sunday the myth is not waiting behind it.)
+    const lastSun = d(new Date(`${d(0)}T12:00:00`).getDay());
+    const es = await open({ ...seed, settings: { lang: "es", region: "MX", look: "white", reduceMotion: true }, modules: { ...seed.modules, goals: { ...seed.modules.goals, checkIn: lastSun } } });
     await es.page.locator("[data-myth]").getByText("¿Mito o realidad?").waitFor();
     await es.clean("mito o realidad");
     await es.close();
@@ -624,9 +634,9 @@ try {
     console.log("ok: the brand: “Our promise” (English, and Spanish by link), the tagline on the welcome screen in Spanish");
   }
 
-  // --- the lesson-3 survey can't be lost: missed (app closed first), it shows on the next open; answered, never again ---
+  // --- the lesson-5 survey can't be lost: missed (app closed first), it shows on the next open; answered, never again ---
   {
-    const app = await open(learner({ ageBand: "18-25" }, { counters: { lessons: 3 } }, { feedback: { pending: [], survey: null } }));
+    const app = await open(learner({ ageBand: "18-25" }, { counters: { lessons: 5 } }, { feedback: { pending: [], survey: null } }));
     const { page, top, button, clean } = app;
     await page.getByRole("dialog", { name: "Quick question" }).waitFor({ timeout: 10000 });
     await clean("the survey");
@@ -638,8 +648,27 @@ try {
     await page.reload();
     await page.waitForTimeout(3500);
     assert.equal(await page.getByRole("dialog", { name: "Quick question" }).count(), 0, "answered surveys don't come back");
-    console.log("ok: the lesson-3 survey shows even if its moment was missed (on the next open), sends the answer, and never comes back");
+    console.log("ok: the lesson-5 survey shows even if its moment was missed (on the next open), sends the answer, and never comes back");
     await app.close();
+  }
+
+  // --- at most one ask per visit: the survey waits for the fifth lesson, and when two asks are due the first one takes the turn; the other comes on the next visit ---
+  {
+    const app = await open(learner({ ageBand: "18-25" }, { counters: { lessons: 3 } }, { feedback: { pending: [], survey: null } }));
+    const { page, top, button } = app;
+    await page.waitForTimeout(3500);
+    assert.equal(await page.getByRole("dialog", { name: "Quick question" }).count(), 0, "three lessons: no survey yet");
+    await app.close();
+    const two = await open(learner({ ageBand: "18-25" }, { counters: { lessons: 5 } }, { feedback: { pending: [], survey: null } }));
+    await two.button("Practice", two.page.getByRole("navigation")).click(); // the "New: Practice" sheet is due too: opened first, it takes the turn
+    await two.page.getByRole("dialog", { name: "New: Practice" }).waitFor();
+    await two.page.keyboard.press("Escape");
+    await two.page.waitForTimeout(3500);
+    assert.equal(await two.page.getByRole("dialog", { name: "Quick question" }).count(), 0, "one ask per visit: no survey after the Practice sheet");
+    await two.page.reload();
+    await two.page.getByRole("dialog", { name: "Quick question" }).waitFor({ timeout: 10000 });
+    console.log("ok: at most one ask per visit (the survey waits for lesson 5; of two due asks the first takes the turn, the other comes next visit)");
+    await two.close();
   }
 
   // --- the tab bar and the header never cover what's scrolled into view ---
@@ -830,7 +859,7 @@ try {
     await app.close();
   }
 
-  // --- A chosen answer is outlined in the main button's color, with a check, in every look ---
+  // --- A chosen answer is outlined in the text color (not the red), with a check, in every look ---
   for (const [name, settings] of [["Navy", { look: "navy" }], ["Cream", { look: "white" }], ["Navy & cream", { look: "navy-cream" }], ["Cream & navy", { look: "cream-navy" }], ["a red page", { look: "custom", colors: { bg: "red", text: "cream", hi: "cream" } }]]) {
     const lessons = Object.fromEntries([...["budget", "save", "banking"].flatMap((u) => ALL_LESSONS.filter((l) => l.unit === u).map((l) => l.id)), "paycheck-1"].map((id) => [id, { done: true, at: day(-5), last: day(-5), best: 0, times: 1 }]));
     const app = await open({ ...learner({ ageBand: "18-25" }, { lessons }), settings: { lang: "en", region: "US", reduceMotion: true, ...settings } });
@@ -844,12 +873,12 @@ try {
     await option.click();
     const got = await option.evaluate((el) => ({ border: getComputedStyle(el).borderTopColor, select: getComputedStyle(document.documentElement).getPropertyValue("--select").trim(), width: parseFloat(getComputedStyle(el).borderTopWidth), shadow: getComputedStyle(el).boxShadow, check: !!el.querySelector("svg path[d^='M5 13']") || el.querySelectorAll("svg").length > 0 }));
     const hex = (c) => "#" + c.match(/\d+/g).slice(0, 3).map((n) => Number(n).toString(16).padStart(2, "0")).join("").toUpperCase();
-    assert.equal(hex(got.border), got.select.toUpperCase(), `${name}: the chosen answer's outline is the button color`);
+    assert.equal(hex(got.border), got.select.toUpperCase(), `${name}: the chosen answer's outline is the text color`);
     assert.ok(got.width >= 2 && got.shadow !== "none", `${name}: the outline is thick`);
     assert.ok(got.check, `${name}: a check shows too`);
     await app.close();
   }
-  console.log("ok: a chosen answer is outlined in the main button's color, thick, with a check, in Navy, Cream, Navy & cream, Cream & navy and a red page");
+  console.log("ok: a chosen answer is outlined in the text color, thick, with a check, in Navy, Cream, Navy & cream, Cream & navy and a red page");
 
   // --- Smart: after a tricky lesson (three misses) the finish screen offers a quick review first ---
   {

@@ -18,7 +18,7 @@ const S = (en, es) => ({ en, es });
 addStrings({
   "lessons.answer_is": S("The answer: {answer}.", "La respuesta: {answer}."),
   "review.title": S("Review", "Repaso"),
-  "review.ready": S("{n} {n|concept|concepts} ready · 2–3 min", "{n} {n|concepto listo|conceptos listos} · 2–3 min"),
+  "review.ready": S("{n} {n|idea|ideas} to refresh · 2–3 min", "{n} {n|idea|ideas} para refrescar · 2–3 min"),
   "review.caught_up": S("Nothing to review. Your memory's in good shape until {date}.", "Nada que repasar. Tu memoria está en forma hasta el {date}."),
   "review.start": S("Review", "Repasar"),
   "review.anyway": S("Practice anyway", "Practicar de todos modos"),
@@ -220,7 +220,7 @@ export function SessionDone({ t, locale, mode, result, answers, onDone }) {
               <div key={c} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 0", borderTop: i ? "1px solid var(--line)" : "none" }}>
                 <span style={{ flex: 1, fontSize: 15 }}>{x(conceptById(c).name)}</span>
                 <Meter level={level} />
-                <span style={{ fontSize: 13, color: "var(--mid)", width: 84, textAlign: "right" }}>{t(`level.${level}`)}</span>
+                <span style={{ fontSize: 13, color: "var(--mid)", width: 84, textAlign: "right" }}>{level === "new" ? "" : t(`level.${level}`)}</span>
               </div>
             );
           })}
@@ -287,7 +287,7 @@ export function SkillsCard({ t, locale }) {
                 <div key={c} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 0", borderTop: i ? "1px solid var(--line)" : "none" }}>
                   <span style={{ flex: 1, fontSize: 15 }}>{x(conceptById(c).name)}</span>
                   <Meter level={levelOf(c)} />
-                  <span style={{ fontSize: 13, color: "var(--mid)", width: 84, textAlign: "right" }}>{t(`level.${levelOf(c)}`)}</span>
+                  <span style={{ fontSize: 13, color: "var(--mid)", width: 84, textAlign: "right" }}>{levelOf(c) === "new" ? "" : t(`level.${levelOf(c)}`)}</span>
                 </div>
               ))}
             </Card>

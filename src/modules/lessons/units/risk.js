@@ -16,7 +16,7 @@ export default {
         T("Which is the biggest warning sign of an investment scam?", "¿Cuál es la señal de alerta más grande de un fraude de inversión?"),
         [T("A guaranteed high return with no risk", "Un rendimiento alto garantizado y sin riesgo"), T("A fund that publishes its fees", "Un fondo que publica sus comisiones"), T("Deposits insured by the government", "Depósitos asegurados por el gobierno", { en: "Deposits protected by IPAB", es: "Depósitos protegidos por el IPAB" })],
         0,
-        T("Real investments can't guarantee high returns. \"Guaranteed\" plus \"high\" plus \"no risk\" is the classic scam pitch.", "Las inversiones reales no pueden garantizar rendimientos altos. \"Garantizado\" más \"alto\" más \"sin riesgo\" es la promesa clásica de un fraude."),
+        T("Real investments can't guarantee high returns. “Guaranteed” plus “high” plus “no risk” is the classic scam pitch.", "Las inversiones reales no pueden garantizar rendimientos altos. “Garantizado” más “alto” más “sin riesgo” es la promesa clásica de un fraude."),
         [null, T("Publishing fees is a good sign — honest investments are clear about costs.", "Publicar las comisiones es buena señal: las inversiones honestas son claras con sus costos."), T("Deposit protection is real and useful, not a warning sign.", "La protección de depósitos es real y útil, no una señal de alerta.")]
       )
     ),
@@ -59,7 +59,7 @@ export default {
         card(T("Time changes risk", "El tiempo cambia el riesgo"), T("Over one year, stocks can lose a lot. Over 20 years, they've historically done much better than cash — but there are no guarantees.", "En un año, las acciones pueden perder mucho. En 20 años, históricamente les ha ido mucho mejor que al efectivo, pero no hay garantías.")),
         choice(
           "risk_reward",
-          T("Someone promises 30% a month with \"no risk.\" That's most likely…", "Alguien te promete 30% al mes \"sin riesgo\". Lo más probable es que sea…"),
+          T("Someone promises 30% a month with “no risk.” That's most likely…", "Alguien te promete 30% al mes “sin riesgo”. Lo más probable es que sea…"),
           [T("A great deal", "Una gran oportunidad"), T("A scam", "Una estafa"), T("A savings account", "Una cuenta de ahorro")],
           1,
           T("High return + no risk = a red flag. Real investments don't work that way.", "Mucha ganancia + cero riesgo = foco rojo. Las inversiones reales no funcionan así."),
@@ -111,7 +111,7 @@ export default {
         ),
         tf("stock_picking", T("In this app you're unlocking individual stocks. Real stock trading usually needs an adult's help until you're 18.", "En esta app desbloqueas acciones individuales. En la vida real, comprar acciones normalmente requiere ayuda de un adulto hasta que tengas 18."), true, T("In real life, under-18s usually invest through an account an adult opens for them (a custodial account).", "En la vida real, los menores de 18 normalmente invierten con una cuenta que abre un adulto por ellos.")),
         number("stock_picking", T("You put {$1000|10000} into one stock. It falls 50%, then rises 50%. How much do you have now?", "Pones {$1000|10000} en una acción. Baja 50% y luego sube 50%. ¿Cuánto tienes ahora?"), { unit: "money", answer: [750, 7500] }, [T("After the fall: {$500|5000}.", "Después de la caída: {$500|5000}."), T("50% of {$500|5000} is {$250|2500}, so {$750|7500}. The rise is figured on a smaller amount.", "El 50% de {$500|5000} son {$250|2500}, así que {$750|7500}. La subida se calcula sobre una cantidad menor.")]),
-        act("portfolio.buy", T("Stocks are unlocked! Practice: buy a small slice of one company — under 10% of your portfolio.", "¡Acciones desbloqueadas! Práctica: compra una parte pequeña de una empresa, menos del 10% de tu portafolio."), {type: "stock",maxShare: 0.1}),
+        act("portfolio.buy", T("Stocks are unlocked. Practice: buy a small slice of one company — under 10% of your portfolio.", "Acciones desbloqueadas. Práctica: compra una parte pequeña de una empresa, menos del 10% de tu portafolio."), {type: "stock",maxShare: 0.1}),
       ],
     },
   ],

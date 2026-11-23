@@ -69,10 +69,10 @@ const planBase = (g) => g.planBase ?? g.start;
 // A new goal and its plan: the monthly amount that reaches the target by
 // the date on its path. Milestones the starting amount already passes are
 // marked "start" (nothing to celebrate on day one, no achievement).
-export function newGoal({ id, templateId = "custom", name, target, months, start = 0, path, today, region = "US" }) {
+export function newGoal({ id, templateId = "custom", name, names, target, months, start = 0, path, today, region = "US" }) {
   const tpl = template(templateId);
   const n = Math.max(1, Math.round(months));
-  const g = { id: id || `g${Date.now().toString(36)}`, template: tpl.id, name: String(name || "").trim().slice(0, 40), currency: currencyOf(region), target: Math.max(1, Math.round(target)), start: Math.max(0, start), contributions: [], linked: [], status: "active", createdAt: today, planFrom: today, targetDate: addMonths(today, n), path: path || tpl.path, history: [] };
+  const g = { id: id || `g${Date.now().toString(36)}`, template: tpl.id, name: String(name || "").trim().slice(0, 40), ...(names && names.en && names.es ? { names: { en: String(names.en).slice(0, 40), es: String(names.es).slice(0, 40) } } : {}), currency: currencyOf(region), target: Math.max(1, Math.round(target)), start: Math.max(0, start), contributions: [], linked: [], status: "active", createdAt: today, planFrom: today, targetDate: addMonths(today, n), path: path || tpl.path, history: [] };
   g.planBase = g.start;
   g.milestones = Object.fromEntries(MILESTONES.filter((m) => (g.start / g.target) * 100 >= m).map((m) => [m, "start"]));
   return { ...g, monthly: Math.ceil(monthlyFor({ start: g.start, target: g.target, months: n, annualPct: rateOf(g) })) };

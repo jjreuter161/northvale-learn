@@ -5,6 +5,7 @@
 // done it shows a clear preview of what opens. Inside, the portfolio,
 // news and tools still open with the lessons that teach them.
 import { useState } from "react";
+import { claimAsk } from "./asks.js";
 import { getState, update, useAppState } from "./store.js";
 import { addStrings, money } from "./i18n.js";
 import { fact } from "./facts.js";
@@ -19,7 +20,7 @@ addStrings({
   "practice.locked.body": S("Practice investing with {cash} of pretend money, plus real-life missions, calculators and news.", "Practica invertir con {cash} de dinero de práctica, además de misiones de la vida real, calculadoras y noticias."),
   "practice.locked.n": S("{n} of 3 lessons", "{n} de 3 lecciones"),
   "practice.locked.go": S("Continue learning", "Seguir aprendiendo"),
-  "practice.fine": S("New tools show up here as you finish the lessons that use them.", "Las herramientas nuevas aparecen aquí al terminar las lecciones que las usan."),
+  "practice.fine": S("Locked parts open as you finish the lessons that teach them.", "Lo que está bloqueado se abre al terminar las lecciones que lo enseñan."),
   "practice.intro.title": S("New: Practice", "Nuevo: Práctica"),
   "practice.intro.body": S("You've finished 3 lessons, so real-life missions are open: small tasks, like finding the fees on a bank account. You do them on your own; no money moves.", "Terminaste 3 lecciones, así que ya están abiertas las misiones de la vida real: pequeñas tareas, como encontrar las comisiones de una cuenta. Las haces por tu cuenta; no se mueve dinero."),
   "practice.intro.more": S("The practice portfolio opens with the investing lessons, and News after 5 lessons.", "El portafolio de práctica se abre con las lecciones de inversión, y las noticias después de 5 lecciones."),
@@ -42,7 +43,8 @@ export default function Practice(ctx) {
   const { t, locale } = ctx;
   const progress = useAppState((s) => s.progress);
   const introSeen = useSeen("practice");
-  const [intro, setIntro] = useState(() => practiceOpen(progress) && !introSeen);
+  // An ask like the others: if something else has asked in this visit, it waits for the next time Practice opens (asks.js).
+  const [intro, setIntro] = useState(() => practiceOpen(progress) && !introSeen && claimAsk());
   const parts = allModules()
     .filter((m) => m.practice)
     .sort((a, b) => a.practice.order - b.practice.order);
@@ -74,7 +76,7 @@ export default function Practice(ctx) {
     <div>
       <Title sub={t("practice.sub")}>{t("nav.practice")}</Title>
       <div className="nv-cols">
-        <div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {parts.filter((m) => m.practice.Card).map((m) => (
             <m.practice.Card key={m.id} {...ctx} />
           ))}

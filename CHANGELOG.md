@@ -1,5 +1,51 @@
 # Changelog
 
+## Unreleased — Round 3 and a bug bash
+
+- **Keyboard:** Enter on a focused Check no longer checks and then skips the feedback; Escape in a lesson does what the X does ("Leave now?", or close on the finish screen).
+- **Offline:** a lesson whose unit hasn't downloaded yet shows "Try again" and "Close", tries again by itself when the connection is back, and Back or Escape close it without leaving the app.
+- **Words:** a review is "N ideas to refresh · 2–3 min" on Today, Me and Practice (it said "concepts" in two places).
+- **Goals:** the goal picked at the start is the first card, so "tap it below" needs no scrolling on a phone.
+- Tests: `test/bugbash.test.mjs` (fast taps, Back and Forward, reload mid-lesson, offline, long names on a 320 px phone, language and look switched mid-session, keyboard only, 200% zoom, a 2560 px monitor) runs in `npm test`; `test/usability.test.mjs` has R3 checks.
+
+## Unreleased — usability audit, Round 2
+
+- **The goal you picked is remembered everywhere.** Goals and Today's side panel named nothing ("No goal yet") after setup had asked what you are saving for; both now name it and lead to giving it an amount and a date.
+- **News is calm.** Every headline had a filled navy "Mark as read" button (the only place that color filled a button); it is now a plain button that turns into a quiet "Read".
+- **Me on a computer says things once.** Achievements and Skills were in the left column and again as rows on the right; the rows now show on a phone only.
+- **Curly quotes.** 372 straight quote marks in lessons, missions, Your Money Year, a practice set, the glossary and What's new became “ ” in both languages.
+- **A plainer toast:** "Goal saved." instead of "Goal saved. Future you says thanks."
+- **Firefox and Safari's engine:** installed for testing (`node node_modules/playwright-core/cli.js install firefox webkit`); `test/browsers.test.mjs` now runs the main flows in Chrome, Firefox and WebKit on a phone and a laptop.
+- Tests: `test/usability.test.mjs` has an "R2" check per fix. The browser test's daily-hooks check no longer fails on Sundays (the money week comes first that day, by design), and the screens test follows the new Me layout and Today panel wording.
+- `docs/TESTER-SCRIPT.md`: what to ask a new person to do in 10 minutes, what to watch, and five questions after, in English and Spanish.
+
+## Unreleased — usability audit, items 10 to 32
+
+- **Lessons:** every step says which lesson and which step ("3 of 12"; an extra card and a retry don't count), idea cards are labelled, and on a computer Continue sits under the text. A goal step that finds a goal already made is done at once; the goal wording no longer says "first".
+- **Today and Practice:** a computer shows the next few islands and "Show more units" (the page was 6,100 px tall); tapping a locked unit says when it opens; "goal met" replaces "55 / 20 XP"; "Streak freezes"; one always-true note on Practice and a locked News row that says how many lessons are done; gaps between cards; the Skills sheet only labels what has been started.
+- **Words:** no flag emoji (the welcome screen and Settings group Language and Country and use words); a goal made in a lesson keeps its name in both languages; "Falta 1 año"; "Streak: 1 day"; no stray capitals in the Money Year, which now names the month after a choice and explains Peace of mind and Credit health.
+- **Look:** the budget planner's bar has three tones and a key; every control is at least 43 px tall on a phone; the finish picture no longer has a boat on its caption and spans the window on a computer.
+- **Build:** Settings, About shows the version (commit and day, from `scripts/build-info.mjs`, written before each build); `.claude/launch.json` uses the server's real port (8950).
+- Tests: `test/usability.test.mjs` (one check per fix, phone and laptop where it matters); the browser and layout tests were updated where behaviour changed on purpose.
+
+## Unreleased — fewer interruptions, a plainer Ask, a steadier Ask sheet and Settings that start with language (usability audit, items 6 to 9)
+
+- **At most one ask per visit.** The survey, the age question, the account offer, the "New: Practice" sheet and the reminder offer take turns (`src/core/asks.js`): the first one due in a visit is shown, the rest wait for the next visit. The survey now waits for the fifth lesson, and the account offer is not on the first finish screen (it shows from the second lesson, once). An age card nobody answers keeps its turn each visit; "Not now" ends it.
+- **Ask without the AI key** says what it can do (explain money words, point to the lesson that covers a question) and shows words to tap. The example words never appeared before (the glossary could load before the sheet mounted); they do now. The "a free account turns on the full tutor" line shows only where the host has the tutor. Nothing about how the key is read or sent changed.
+- **The Ask sheet** keeps its title bar, close button and switches in place; only the messages scroll, and the newest answer stays in view (`Sheet` has a `fill` option).
+- **Settings** opens on "Language and country" (the account form is further down, after Colors), each row is labelled (Language, Country, Main currency), the note is shorter, and the buttons that mean "make or use an account" open the Account section.
+- Tests: the browser test now expects the survey at five lessons and has a one-ask-per-visit check; the layout test checks the new Settings order.
+
+## Unreleased — the first lesson, easier to use (usability audit, items 1 to 5)
+
+From `docs/USABILITY-AUDIT.md` (the owner's checkout, untracked): the five things a new person hits in the first lesson.
+
+- **The way forward stays on screen.** On the lesson-complete screen "Next" and "Done" are pinned to the bottom (as the buttons in a step already were), so a long finish screen with the account card no longer hides them.
+- **The goal you picked stays your goal.** A lesson's "your first goal" step now starts from the goal chosen at the start (its own amount, and a name that follows the language) instead of making a generic "Savings goal" that re-sorted the course. The two steps that do this are marked `own: true` in `save.js` and `budget.js`. Someone who chose "Just understanding money" gets what they got before.
+- **A clearer hands-on step.** While a tool waits there is one button, "Skip for now" (no greyed "Try it above to continue"); when it's done there is one, "Done — continue". After making a goal the card shows the goal, without "You already have a goal" and a button that can't be pressed. Toasts sit under a lesson's top bar instead of on its close, progress and Ask buttons.
+- **Chosen is not red.** Whatever is chosen (a language chip, an answer, a tab, a switch) is outlined in the text color; red stays for the main button. `--select` is the text color in every look (the colors test says so), and the extra outer ring on navy is gone.
+- **Back stays in the app.** On a phone and in a browser, Back closes what is open on top (a lesson asks "Leave now?", a sheet closes, a screen below a tab goes up one level, the finish screen closes) instead of leaving the app. New `src/core/back.js`: each open layer takes one history step and gives it back when it closes. Not done: an address for each screen, and the setup screens (they have their own back arrow).
+
 ## Unreleased — three browsers, and a plan for 50 units
 
 - **Safari and Firefox** are now tested: `test/browsers.test.mjs` runs the main flows (setup for someone new, then Today, every tab, Settings, the streak dialog, Ask, and a lesson) in Chrome, Firefox and Safari's engine (WebKit), each on a laptop and on a phone (WebKit as an iPhone 13), and fails on console errors, anything cut off, or raw text. Nothing needed fixing: all three pass. (Firefox and WebKit are installed for testing only: `node node_modules/playwright-core/cli.js install firefox webkit`.) The every-screen helpers moved to `test/lib/screens.mjs`.

@@ -33,7 +33,7 @@ export default {
         T("Two costs, one hidden", "Dos costos, uno escondido"),
         T("A transfer can cost a fee you see, plus a markup hidden in the exchange rate. Add both to get the total cost.", "Un envío puede costar una comisión que ves, más un margen escondido en el tipo de cambio. Suma los dos y tienes el costo total.")
       ),
-      tf("remit_cost", T("A service that says \"no fee\" can still be expensive.", "Un servicio que dice \"sin comisión\" aun así puede salir caro."), true, T("The cost can hide in a worse exchange rate.", "El costo puede esconderse en un tipo de cambio peor.")),
+      tf("remit_cost", T("A service that says “no fee” can still be expensive.", "Un servicio que dice “sin comisión” aun así puede salir caro."), true, T("The cost can hide in a worse exchange rate.", "El costo puede esconderse en un tipo de cambio peor.")),
       choice(
         "remit_cost",
         T("You send {US$100}. The fee is {US$4} and the markup is 1%. What's the total cost?", "Envías {US$100}. La comisión es de {US$4} y el margen es de 1%. ¿Cuál es el costo total?"),
@@ -93,7 +93,7 @@ export default {
           T("{US$50} × 18 = {MX$900}.", "{US$50} × 18 = {MX$900}."),
           [T("That's too small. Multiply 50 by 18, not by 1.8.", "Eso es muy poco. Multiplica 50 por 18, no por 1.8."), null, T("That's ten times too big. Check your zeros: 50 × 18 = 900.", "Eso es diez veces más. Revisa los ceros: 50 × 18 = 900.")]
         ),
-        card(T("The rate you're offered", "El tipo de cambio que te ofrecen"), T("Services often use a rate a bit worse than the fair one in the news. That gap is a cost, even when they say \"no fee\".", "Los servicios suelen usar un tipo de cambio algo peor que el justo de las noticias. Esa diferencia es un costo, aunque digan \"sin comisión\".")),
+        card(T("The rate you're offered", "El tipo de cambio que te ofrecen"), T("Services often use a rate a bit worse than the fair one in the news. That gap is a cost, even when they say “no fee”.", "Los servicios suelen usar un tipo de cambio algo peor que el justo de las noticias. Esa diferencia es un costo, aunque digan “sin comisión”.")),
         tf("fx_rates", T("When the dollar buys more pesos than last month, the peso has gotten weaker against the dollar.", "Cuando el dólar compra más pesos que el mes pasado, el peso se debilitó frente al dólar."), true, T("More pesos per dollar means each peso is worth less in dollars.", "Más pesos por dólar significa que cada peso vale menos en dólares.")),
         estimate(
           "fx_rates",
@@ -115,7 +115,7 @@ export default {
           T("Sending {US$500}: Service A charges {US$5} and marks up the rate 3%. Service B charges no fee and marks it up 5%. Which costs less?", "Enviando {US$500}: el Servicio A cobra {US$5} y sube el tipo de cambio 3%. El Servicio B no cobra comisión y lo sube 5%. ¿Cuál cuesta menos?"),
           [T("Service A", "Servicio A"), T("Service B", "Servicio B"), T("They cost the same", "Cuestan igual")],
           0,
-          T("A: {US$5} + about {US$15} = about {US$20}. B: {US$0} + {US$25} = {US$25}. \"No fee\" wasn't cheaper.", "A: {US$5} + casi {US$15} = casi {US$20}. B: {US$0} + {US$25} = {US$25}. \"Sin comisión\" no salió más barato."),
+          T("A: {US$5} + about {US$15} = about {US$20}. B: {US$0} + {US$25} = {US$25}. “No fee” wasn't cheaper.", "A: {US$5} + casi {US$15} = casi {US$20}. B: {US$0} + {US$25} = {US$25}. “Sin comisión” no salió más barato."),
           [null, T("No fee sounds cheaper, but 5% of {US$500} is {US$25}, more than A's total.", "Sin comisión suena más barato, pero el 5% de {US$500} es {US$25}, más que todo lo de A."), T("Add each service's fee and markup: about {US$20} against {US$25}.", "Suma comisión y margen: casi {US$20} contra {US$25}.")]
         ),
         tf("remit_cost", T("The cheapest service can change depending on how much you send.", "El servicio más barato puede cambiar según cuánto envíes."), true, T("A flat fee matters more on small amounts. A markup matters more on big ones.", "Una comisión fija pesa más en montos chicos. Un margen pesa más en montos grandes.")),

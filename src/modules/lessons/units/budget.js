@@ -56,9 +56,16 @@ export default {
       life: T("This week, write down three things your money will go to before it arrives.", "Esta semana, anota tres cosas a las que irá tu dinero antes de recibirlo."),
       steps: [
         card(T("A plan for your money", "Un plan para tu dinero"), T("A budget is just a plan: before you spend, you decide where your money goes. It's not about saying no to everything — it's about saying yes to what matters most to you.", "Un presupuesto es solo un plan: antes de gastar, decides a dónde va tu dinero. No se trata de decir que no a todo, sino de decir que sí a lo que más te importa.")),
-        card(T("The 50/30/20 idea", "La idea 50/30/20"), T("A simple starting point: about 50% for needs (things you must pay), 30% for wants (fun stuff), and 20% for saving. It's a guide, not a law — adjust it to your life.", "Un punto de partida sencillo: más o menos 50% para necesidades (lo que sí o sí debes pagar), 30% para gustos y 20% para ahorrar. Es una guía, no una ley: ajústala a tu vida.")),
+        card(T("The 50/30/20 idea", "La idea 50/30/20"), T("A simple starting point: about 50% for needs (things you must pay), 30% for wants (fun stuff), and 20% for saving. On {$1000|15000} a month, that is {$500|7500} for needs, {$300|4500} for wants and {$200|3000} for saving. It's a guide, not a law — adjust it to your life.", "Un punto de partida sencillo: más o menos 50% para necesidades (lo que sí o sí debes pagar), 30% para gustos y 20% para ahorrar. Con {$1000|15000} al mes son {$500|7500} para necesidades, {$300|4500} para gustos y {$200|3000} para ahorrar. Es una guía, no una ley: ajústala a tu vida.")),
         match("budgeting", T("Match each part of 50/30/20 to an example.", "Une cada parte del 50/30/20 con un ejemplo."), [[T("50% needs", "50% necesidades"), T("Rent, groceries, the bus to work", "Renta, comida, el camión al trabajo")], [T("30% wants", "30% gustos"), T("Streaming, eating out, a new game", "Streaming, comer fuera, un juego nuevo")], [T("20% saving", "20% ahorro"), T("An emergency fund and your goals", "Un fondo de emergencia y tus metas")]], T("It's a guide, not a law: adjust the split to your life.", "Es una guía, no una ley: ajusta la repartición a tu vida.")),
-        tf("budgeting", T("A budget means you can never buy anything fun.", "Tener presupuesto significa que nunca puedes comprar nada divertido."), false, T("Fun money is part of the plan. A budget just makes sure fun doesn't eat your rent or your savings.", "El dinero para gustos es parte del plan. El presupuesto solo cuida que los gustos no se coman tus pagos ni tu ahorro.")),
+        choice(
+          "budgeting",
+          T("A friend says budgets are for people who never have fun. Where does fun money go in 50/30/20?", "Un amigo dice que los presupuestos son para gente que nunca se divierte. ¿Dónde entra el dinero para divertirte en el 50/30/20?"),
+          [T("In the 30% for wants", "En el 30% de gustos"), T("Nowhere: a budget leaves no room for it", "En ningún lado: un presupuesto no deja espacio"), T("In the 20% for saving", "En el 20% de ahorro")],
+          0,
+          T("Wants get their own slice, about 30%. A budget makes room for fun and keeps it from eating your rent or your savings.", "Los gustos tienen su propia parte, cerca del 30%. El presupuesto le hace espacio a la diversión y evita que se coma la renta o el ahorro."),
+          [null, T("A budget plans for fun instead of banning it.", "Un presupuesto planea la diversión en lugar de prohibirla."), T("Saving is the 20%. Money for fun is a want.", "El ahorro es el 20%. El dinero para divertirte es un gusto.")]
+        ),
         number("budgeting", T("You get {$400|6000} a month and follow 50/30/20. How much goes to saving each month?", "Recibes {$400|6000} al mes y sigues el 50/30/20. ¿Cuánto va al ahorro cada mes?"), { unit: "money", answer: [80, 1200] }, [T("Saving is the 20%, which is 0.20.", "El ahorro es el 20%, o sea 0.20."), T("0.20 × {$400|6000} = {$80|1200} a month.", "0.20 × {$400|6000} = {$80|1200} al mes.")]),
         act("goals.budget", T("Split {$400|6000} a month your way. Try to save at least 10%.", "Reparte {$400|6000} al mes a tu manera. Intenta ahorrar al menos 10%."), {income: [400,6000]}),
       ],
@@ -77,7 +84,7 @@ export default {
           T("You can live without a third streaming app. Wants aren't bad — they're just the first thing to trim when money is tight.", "Puedes vivir sin una tercera app de streaming. Los gustos no son malos; solo son lo primero que se recorta cuando el dinero no alcanza."),
           [T("Getting to work is usually a need — without it, you can't earn.", "Llegar al trabajo suele ser una necesidad: sin eso no puedes ganar dinero."), null, T("Food is a need. (Fancy extras in the cart can be wants.)", "La comida es una necesidad. (Los antojos extra del carrito sí pueden ser gustos.)")]
         ),
-        card(T("Goals make it easier", "Las metas lo hacen más fácil"), T("Saying no to a want is easier when you're saying yes to a goal. \"I'm saving for a phone\" beats \"I'm not allowed to spend.\"", "Decirle que no a un gusto es más fácil cuando le dices que sí a una meta. \"Estoy ahorrando para un celular\" funciona mejor que \"no puedo gastar\".")),
+        card(T("Goals make it easier", "Las metas lo hacen más fácil"), T("Saying no to a want is easier when you're saying yes to a goal. “I'm saving for a phone” beats “I'm not allowed to spend.”", "Decirle que no a un gusto es más fácil cuando le dices que sí a una meta. “Estoy ahorrando para un celular” funciona mejor que “no puedo gastar”.")),
         tf("needs_wants", T("The same thing can be a need for one person and a want for another.", "Una misma cosa puede ser necesidad para una persona y gusto para otra."), true, T("A car is a need if there's no other way to get to work — and a want if the bus works fine. Context matters.", "Un coche es necesidad si no hay otra forma de llegar al trabajo, y es gusto si el transporte público te sirve bien. Depende de tu situación.")),
         scenario(
           "needs_wants",
@@ -89,7 +96,7 @@ export default {
           ],
           T("Needs get paid first; wants fit in the space that's left.", "Las necesidades se pagan primero; los gustos caben en lo que sobra.")
         ),
-        act("goals.create", T("Make your first goal: something you want, how much it costs, and when.", "Crea tu primera meta: algo que quieras, cuánto cuesta y para cuándo."), {name: {en: "New headphones",es: "Audífonos nuevos"},target: [300,5000],months: 6}),
+        act("goals.create", T("Make a goal: something you want, how much it costs, and when.", "Crea una meta: algo que quieras, cuánto cuesta y para cuándo."), {name: {en: "New headphones",es: "Audífonos nuevos"},target: [300,5000],months: 6,own: true}),
       ],
     },
     {
@@ -97,7 +104,7 @@ export default {
       title: T("Small leaks", "Gastos hormiga"),
       life: T("Find one small thing you buy often and multiply it by 52.", "Busca una cosa pequeña que compres seguido y multiplícala por 52."),
       steps: [
-        card(T("Tiny costs add up", "Lo pequeño suma"), T("Small, frequent buys — snacks, delivery fees, in-game coins — feel like nothing. But {$5|80} a few times a week becomes hundreds a year.", "Las compras pequeñas y frecuentes —botanas, envíos, monedas en juegos— parecen nada. Pero {$5|80} unas veces por semana se vuelven cientos al año.", { en: "In Mexico they're called \"gastos hormiga\" — ant expenses: tiny, but there are a lot of them. {$5|80} a few times a week becomes thousands of pesos a year.", es: "En México les decimos gastos hormiga: pequeñitos, pero son muchos. {$5|80} unas veces por semana se vuelven miles de pesos al año." })),
+        card(T("Tiny costs add up", "Lo pequeño suma"), T("Small, frequent buys — snacks, delivery fees, in-game coins — feel like nothing. But {$5|80} a few times a week becomes hundreds a year.", "Las compras pequeñas y frecuentes —botanas, envíos, monedas en juegos— parecen nada. Pero {$5|80} unas veces por semana se vuelven cientos al año.", { en: "In Mexico they're called “gastos hormiga” — ant expenses: tiny, but there are a lot of them. {$5|80} a few times a week becomes thousands of pesos a year.", es: "En México les decimos gastos hormiga: pequeñitos, pero son muchos. {$5|80} unas veces por semana se vuelven miles de pesos al año." })),
         choice(
           "small_leaks",
           T("{$5|80} three times a week. About how much is that in a year?", "{$5|80} tres veces por semana. ¿Cuánto es más o menos al año?"),

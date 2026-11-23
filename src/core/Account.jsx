@@ -1,6 +1,7 @@
 // ACCOUNT — sign up / sign in, the age question and the password reset screen. Small, and needed at the very
 // start (first-run sign-in, the age card on Today), so it lives apart from the big Settings screen.
 import { useState } from "react";
+import { useAsk } from "./asks.js";
 import { useAppState, update } from "./store.js";
 import { Button, Card, Field, Note, toast } from "./ui.jsx";
 import { useSession, signIn, signUp, forgotPassword, resetPassword } from "./session.js";
@@ -127,7 +128,8 @@ export function AccountForm({ t, mode: start = "signup", signinOnly, onDone }) {
 export function AgeCard({ t }) {
   const profile = useAppState((x) => x.profile);
   const lessons = useAppState((x) => x.progress.counters.lessons || 0);
-  if (profile.ageBand || profile.ageAsked || !lessons) return null;
+  const turn = useAsk(!(profile.ageBand || profile.ageAsked || !lessons));
+  if (profile.ageBand || profile.ageAsked || !lessons || !turn) return null;
   const answer = (ageBand) => update((x) => ({ ...x, profile: { ...x.profile, ageBand, ageAsked: true } }));
   return (
     <Card style={{ marginTop: 12 }}>

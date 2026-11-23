@@ -111,6 +111,8 @@ addStrings({
   "home.other_goals": S("Other goals", "Otras metas"),
   "home.new_goal": S("New goal", "Nueva meta"),
   "home.empty.title": S("No goal yet", "Todavía no tienes meta"),
+  "home.empty.picked": S("Your goal: {name}", "Tu meta: {name}"),
+  "home.empty.picked.sub": S("You picked this at the start. Tap it below to set how much and by when.", "Lo elegiste al empezar. Tócalo abajo para poner cuánto y para cuándo."),
   "home.empty.sub": S("Most people start with an emergency fund. It's the one that saves you from everything else.", "Casi todos empiezan con un fondo de emergencia: es el que te salva de todo lo demás."),
   "home.next_lesson": S("Next lesson", "Siguiente lección"),
   "home.start": S("Start", "Empezar"),
@@ -121,7 +123,7 @@ addStrings({
 
   // A goal
   "goal.of": S("of {target}", "de {target}"),
-  "goal.left": S("{time} left", "Faltan {time}"),
+  "goal.left": S("{time} left", "{n|Falta|Faltan} {time}"),
   "goal.due": S("Target date reached", "Fecha alcanzada"),
   "goal.by": S("By {date}", "Para {date}"),
   "goal.plan_line": S("{amount}/month · {path}", "{amount}/mes · {path}"),
@@ -191,7 +193,7 @@ addStrings({
   "edit.result.week": S("About {amount} a week, until {date}.", "Unos {amount} a la semana, hasta el {date}."),
   "edit.save": S("Save goal", "Guardar meta"),
   "edit.create": S("Create goal", "Crear meta"),
-  "edit.saved": S("Goal saved. Future you says thanks.", "Meta guardada. Tu yo del futuro te lo agradece."),
+  "edit.saved": S("Goal saved.", "Meta guardada."),
   "edit.replan": S("Saving re-plans from today, keeping what you've set aside.", "Al guardar se vuelve a planear desde hoy, conservando lo que ya apartaste."),
 
   // Milestones
@@ -216,7 +218,6 @@ addStrings({
 
   // Lesson step: make a goal
   "create.have": S("You already have a goal. Check its plan, or add another.", "Ya tienes una meta. Revisa su plan o agrega otra."),
-  "create.looks_right": S("This plan looks right", "Este plan me parece bien"),
   "create.another": S("Add another goal", "Agregar otra meta"),
 
   // Onboarding
@@ -241,7 +242,8 @@ const goalsNow = () => {
   const s = getState().modules.goals;
   return s ? s.goals.map((g) => migrate(g, locNow().region)) : [];
 };
-const nameOf = (g, t) => g.name || t(`tpl.${g.template}`);
+// A goal made in a lesson keeps its name in both languages ({ en, es }), so it follows the language setting.
+const nameOf = (g, t) => g.name || (g.names && t.locale ? text(g.names, t.locale) : "") || t(`tpl.${g.template}`);
 const fmtFor = (locale, g) => (n) => money(n, { ...locale, currency: g.currency });
 
 function createGoal(fields, region) {
@@ -361,7 +363,7 @@ const InvestLine = ({ t, row, fmt }) =>
   ) : null;
 const timeLeft = (t, g) => {
   const m = P.monthsLeft(g, today());
-  return m > 0 ? t("goal.left", { time: dur(t, m) }) : t("goal.due");
+  return m > 0 ? t("goal.left", { time: dur(t, m), n: m === 1 || m === 12 ? 1 : 2 }) : t("goal.due");
 };
 
 function TemplateIcon({ id, size = 40 }) {
@@ -375,7 +377,8 @@ function TemplateIcon({ id, size = 40 }) {
 function TemplateGrid({ t, onPick, highlight }) {
   return (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 10 }}>
-      {P.TEMPLATES.map((tp) => (
+      {/* The one picked at the start comes first, so "tap it below" finds it without scrolling on a phone. */}
+      {[...P.TEMPLATES].sort((a, b) => (b.id === highlight) - (a.id === highlight)).map((tp) => (
         <button key={tp.id} onClick={() => onPick(tp.id)} className="nv-press" style={{ textAlign: "left", ...(highlight === tp.id ? SELECTED : { border: "1px solid var(--line)" }), background: "var(--surface)", color: "var(--ink)", borderRadius: 8, padding: 14, cursor: "pointer", minHeight: 112, display: "flex", flexDirection: "column", gap: 10 }}>
           <TemplateIcon id={tp.id} size={36} />
           <span>
@@ -615,6 +618,7 @@ function CheckIn({ t, locale, rows, onRecord, onDone }) {
 function Home({ t, locale, go, data, setOpen, sheets, layout }) {
   const { slice, rows } = data;
   const goalFor = useAppState((s) => s.profile.goalFor);
+  const pickedGoal = goalFor && goalFor !== "basics" && P.TEMPLATES.some((x) => x.id === goalFor) ? goalFor : null; // (not "just understanding money")
   const lead = P.primaryGoal(rows.map((r) => r.g));
   const leadRow = lead && rows.find((r) => r.g.id === lead.id);
   const others = rows.filter((r) => r !== leadRow);
@@ -629,8 +633,8 @@ function Home({ t, locale, go, data, setOpen, sheets, layout }) {
           <div style={{ borderRadius: 12, overflow: "hidden", boxShadow: "var(--lift)", marginBottom: 14 }}>
             <Scene name="harbor" w={358} h={140} />
           </div>
-          <Label style={{ marginTop: 4 }}>{t("home.empty.title")}</Label>
-          <p style={{ fontSize: 15, color: "var(--mid)", lineHeight: 1.45, margin: "-4px 0 14px" }}>{t("home.empty.sub")}</p>
+          <Label style={{ marginTop: 4 }}>{pickedGoal ? t("home.empty.picked", { name: t(`tpl.${pickedGoal}`) }) : t("home.empty.title")}</Label>
+          <p style={{ fontSize: 15, color: "var(--mid)", lineHeight: 1.45, margin: "-4px 0 14px" }}>{pickedGoal ? t("home.empty.picked.sub") : t("home.empty.sub")}</p>
           <TemplateGrid t={t} onPick={(id) => sheets.newGoal(id)} highlight={goalFor} />
         </div>
       ) : (
@@ -897,7 +901,7 @@ function GoalPage({ t, locale, go, row, data, onBack, sheets }) {
                 {c.amount < 0 ? "−" : "+"}
                 {fmt(Math.abs(c.amount))}
               </span>
-              <button aria-label={t("goal.remove")} onClick={() => saveGoal(g.id, (x) => ({ ...x, contributions: x.contributions.filter((y) => y !== x.contributions[x.contributions.length - 1 - i]) }))} style={{ border: "none", background: "transparent", color: "var(--low)", width: 36, height: 36, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <button aria-label={t("goal.remove")} onClick={() => saveGoal(g.id, (x) => ({ ...x, contributions: x.contributions.filter((y) => y !== x.contributions[x.contributions.length - 1 - i]) }))} style={{ border: "none", background: "transparent", color: "var(--low)", width: 44, height: 44, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <Icon name="close" size={14} />
               </button>
             </span>
@@ -1000,14 +1004,19 @@ function CreateGoal({ params = {}, t, locale, onDone, done }) {
   const R = locale.region;
   const slice = useSlice("goals", DEFAULTS);
   const [another, setAnother] = useState(false);
+  const [made, setMade] = useState(false); // made in this step (not one that was already there)
   const goals = slice.goals.map((g) => migrate(g, R));
   const lead = params.template ? goals.find((g) => g.template === params.template) : P.primaryGoal(goals);
+  // A goal is already there: the step is done (nothing more to press), with "Add another goal" still on offer.
+  useEffect(() => {
+    if (lead && !another && !done && !made) (recordPractice("goal"), onDone && onDone());
+  }, [!!lead, another]);
   if (lead && !another) {
     const fmt = fmtFor(locale, lead);
     return (
       <Card>
-        <p style={{ margin: "0 0 12px", color: "var(--mid)", lineHeight: 1.45 }}>{t("create.have")}</p>
-        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
+        {!made && <p style={{ margin: "0 0 12px", color: "var(--mid)", lineHeight: 1.45 }}>{t("create.have")}</p>}
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <TemplateIcon id={lead.template} size={36} />
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontWeight: 650 }}>{nameOf(lead, t)}</div>
@@ -1016,19 +1025,20 @@ function CreateGoal({ params = {}, t, locale, onDone, done }) {
             </div>
           </div>
         </div>
-        <Button full disabled={done} onClick={() => (recordPractice("goal"), onDone && onDone())}>
-          {t("create.looks_right")}
-        </Button>
-        <Button full kind="ghost" style={{ marginTop: 6 }} onClick={() => setAnother(true)}>
-          {t("create.another")}
-        </Button>
+        {!made && (
+          <Button full kind="ghost" style={{ marginTop: 10 }} onClick={() => setAnother(true)}>
+            {t("create.another")}
+          </Button>
+        )}
       </Card>
     );
   }
-  const preset = { name: params.name ? text(params.name, locale) : "", target: params.target, months: params.months };
+  // A "your first goal" step (params.own) starts from the goal picked at the start, with that goal's own amount and a name that follows the language; any other step keeps its own example.
+  const mine = params.own && !params.template ? goalForNow() : null;
+  const preset = mine ? {} : { name: params.name ? text(params.name, locale) : "", target: params.target, months: params.months };
   return (
     <Card>
-      <GoalForm t={t} locale={locale} templateId={params.template} preset={preset} simple onSave={(f) => (createGoal(f, R), toast(t("edit.saved"), "good"), onDone && onDone())} />
+      <GoalForm t={t} locale={locale} templateId={mine || params.template} preset={preset} simple onSave={(f) => (setMade(true), setAnother(false), createGoal(mine ? { ...f, name: "" } : params.name && typeof params.name === "object" && f.name === preset.name ? { ...f, name: "", names: params.name } : f, R), toast(t("edit.saved"), "good"), onDone && onDone())} />
     </Card>
   );
 }
@@ -1202,7 +1212,7 @@ function RealCostCard({ t, locale, go }) {
       <div style={{ fontSize: 18, fontWeight: 700, lineHeight: 1.35, color: "var(--head)" }}>{t("rc.pick")}</div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8, margin: "12px 0" }} role="radiogroup" aria-label={t("rc.pick")}>
         {[...EVERYDAY.map((x) => [x[0], `${t(`rc.${x[0]}`)} · ${m(x[1][R])}`]), ["own", t("rc.own")]].map(([id, label]) => (
-          <button key={id} role="radio" aria-checked={pick === id} onClick={() => setPick(id)} className="nv-press" style={{ ...(pick === id ? SELECTED : { border: "2px solid transparent" }), borderRadius: 8, padding: "6px 14px", fontWeight: 650, fontSize: 15, cursor: "pointer", background: pick === id ? "var(--brand)" : "var(--bg)", color: pick === id ? "var(--onBrand)" : "var(--ink)", font: "inherit" }}>
+          <button key={id} role="radio" aria-checked={pick === id} onClick={() => setPick(id)} className="nv-press" style={{ ...(pick === id ? SELECTED : { border: "2px solid transparent" }), borderRadius: 8, padding: "6px 14px", minHeight: 44, fontWeight: 650, fontSize: 15, cursor: "pointer", background: pick === id ? "var(--brand)" : "var(--bg)", color: pick === id ? "var(--onBrand)" : "var(--ink)", font: "inherit" }}>
             {label}
           </button>
         ))}

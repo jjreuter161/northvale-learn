@@ -97,7 +97,7 @@ function Steps({ t, locale, onDone, phone }) {
         {/* The logo's boat out on open water (a picture; the name follows). */}
         {phone && (
           <div style={{ width: "calc(100% + 44px)", margin: "0 -22px", background: "var(--artSky)", paddingTop: "env(safe-area-inset-top)" }}>
-            <Scene name="welcome" w={390} h={280} style={{ height: "min(30dvh, 260px)", width: "100%" }} />
+            <Scene name="welcome" w={390} h={200} style={{ maxHeight: "min(26dvh, 220px)", width: "100%" }} />
           </div>
         )}
         {!phone && (
@@ -123,24 +123,26 @@ function Steps({ t, locale, onDone, phone }) {
           <Button full kind="secondary" onClick={() => setSigningIn(true)}>
             {t("onb.have_account")}
           </Button>
-          <div style={{ display: "flex", justifyContent: phone ? "center" : "flex-start", gap: 6, marginTop: 8, flexWrap: "wrap", marginLeft: phone ? 0 : -8 }}>
+          <div role="group" aria-label={t("settings.language.row")} style={{ display: "flex", alignItems: "center", justifyContent: phone ? "center" : "flex-start", gap: 6, marginTop: 8, flexWrap: "wrap", marginLeft: phone ? 0 : -8 }}>
+            <span style={{ fontSize: 13, fontWeight: 650, color: "var(--mid)", minWidth: 64, textAlign: phone ? "right" : "left", padding: phone ? 0 : "0 4px 0 8px" }}>{t("settings.language.row")}</span>
             {Object.entries(LANGS).map(([k, name]) => (
               <button key={k} onClick={() => setSetting("lang", k)} aria-pressed={locale.lang === k} style={chip(locale.lang === k)}>
                 {locale.lang === k && <Chosen size={14} />}
                 {name}
               </button>
             ))}
-            <span style={{ width: 1, background: "var(--line)", margin: "6px 4px" }} />
+          </div>
+          <div role="group" aria-label={t("settings.country")} style={{ display: "flex", alignItems: "center", justifyContent: phone ? "center" : "flex-start", gap: 6, flexWrap: "wrap", marginLeft: phone ? 0 : -8 }}>
+            <span style={{ fontSize: 13, fontWeight: 650, color: "var(--mid)", minWidth: 64, textAlign: phone ? "right" : "left", padding: phone ? 0 : "0 4px 0 8px" }}>{t("settings.country")}</span>
             {Object.entries(REGIONS).map(([k, r]) => (
               <button key={k} onClick={() => (setSetting("region", k), setSetting("both", false))} aria-pressed={!locale.both && locale.region === k} style={chip(!locale.both && locale.region === k)}>
                 {!locale.both && locale.region === k && <Chosen size={14} />}
-                <span aria-hidden="true">{r.flag}</span> {r.currency}
-                <span className="nv-sr"> · {r.name[locale.lang]}</span>
+                {r.name[locale.lang]}
               </button>
             ))}
             <button onClick={() => setSetting("both", true)} aria-pressed={!!locale.both} style={chip(!!locale.both)}>
               {locale.both && <Chosen size={14} />}
-              <span aria-hidden="true">🇺🇸🇲🇽</span> {t("settings.country.both")}
+              {t("settings.country.both")}
             </button>
           </div>
           <p style={{ fontSize: 13, color: "var(--low)", margin: "6px 0 0", lineHeight: 1.45 }}>{t("disclaimer.short")}</p>

@@ -6,6 +6,7 @@
 // progress. Where the browser can't do notifications, the calendar
 // reminder (an .ics file) still works.
 import { useState, useSyncExternalStore } from "react";
+import { useAsk } from "./asks.js";
 import { getState, update, useAppState } from "./store.js";
 import { addStrings } from "./i18n.js";
 import { api } from "./api.js";
@@ -178,7 +179,7 @@ export function ReminderSettings({ t, calendar }) {
       {error && <Note tone="bad" style={{ marginTop: 10 }}>{error}</Note>}
       {!r && calendar && (
         <details style={{ marginTop: 12 }}>
-          <summary style={{ cursor: "pointer", fontSize: 14, fontWeight: 650, color: "var(--mid)", minHeight: 32 }}>{t("remind.calendar")}</summary>
+          <summary style={{ cursor: "pointer", fontSize: 14, fontWeight: 650, color: "var(--mid)", minHeight: 44 }}>{t("remind.calendar")}</summary>
           <div style={{ marginTop: 10 }}>{calendar}</div>
         </details>
       )}
@@ -194,7 +195,9 @@ export function ReminderCard({ t }) {
   const r = useReminder();
   const [time, setTime] = useState("18:00");
   const [error, setError] = useState(null);
-  if (r || profile.remindAsked || days < 2 || !pushSupported() || !(profile.ageBand || profile.ageAsked)) return null;
+  const wanted = !(r || profile.remindAsked || days < 2 || !pushSupported() || !(profile.ageBand || profile.ageAsked));
+  const turn = useAsk(wanted);
+  if (!wanted || !turn) return null;
   const done = () => update((s) => ({ ...s, profile: { ...s.profile, remindAsked: true } }));
   return (
     <Card style={{ marginTop: 12 }}>

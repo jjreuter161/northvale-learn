@@ -100,7 +100,7 @@ try {
       await panel.waitFor();
       const text = await panel.innerText();
       assert.match(text, /5-day streak/);
-      assert.match(text, /Today: \d+ \/ 20 XP/);
+      assert.match(text, /Today: \d+ (\/ 20 XP|XP · goal met)/);
       assert.match(text, /My first car/);
       const p = await rectOf(page, `aside[aria-label="At a glance"]`);
       assert.ok(p.left > w * 0.55 && p.width >= 280 && p.width <= 320, `${name}: the panel sits on the right (${JSON.stringify(p)})`);
@@ -115,7 +115,7 @@ try {
     assert.ok(card.width <= 701, `${name}: Today's column is ${Math.round(card.width)}px (at most 700)`);
     assert.ok(today.left >= 0);
     await fits(page, `${name}: Today`);
-    if (computer) assert.equal(await page.getByText(/^Show \d+ more units?$/).count(), 0, `${name}: every island is shown`);
+    if (computer) assert.equal(await page.getByText(/^Show \d+ more units?$/).count(), 1, `${name}: the next few islands, then "Show more" (not all eighteen)`);
 
     // --- the other tabs ---
     for (const t of ["goals", "practice", "me"]) {
@@ -130,10 +130,11 @@ try {
     if (computer) {
       const side = page.getByRole("navigation", { name: "Settings" });
       assert.equal(await side.getByRole("button").count(), 9, `${name}: nine sections on the left`);
-      assert.ok(await page.getByText("Create a free account").count(), `${name}: Account is the first section`);
+      assert.equal(await page.getByRole("radiogroup", { name: "Language" }).count(), 1, `${name}: Language and country is the first section`);
+      assert.equal(await page.getByText("Create a free account").count(), 0, `${name}: the account form is not the first thing`);
       await side.getByRole("button", { name: "Colors" }).click();
       await page.getByRole("radiogroup", { name: "Colors" }).waitFor();
-      assert.equal(await page.getByText("Create a free account").count(), 0, `${name}: only the picked section shows`);
+      assert.equal(await page.getByRole("radiogroup", { name: "Language" }).count(), 0, `${name}: only the picked section shows`);
       const s = await rectOf(page, `nav[aria-label="Settings"]`);
       const o = await rectOf(page, `main [role="radiogroup"]`);
       assert.ok(o.left > s.right, `${name}: the options are to the right of the sections`);
@@ -142,6 +143,8 @@ try {
     } else {
       assert.equal(await page.getByRole("navigation", { name: "Settings" }).count(), 0, `${name}: no section list`);
       assert.ok(await page.getByRole("heading", { name: "Account" }).count(), `${name}: Settings is one page`);
+      const order = await page.locator("main h2").evaluateAll((hs) => hs.map((h) => h.innerText.trim()));
+      assert.ok(order.indexOf("Language and country") < order.indexOf("Account"), `${name}: language and country come before the account (${order.join(" > ")})`);
     }
     await fits(page, `${name}: Settings`);
 

@@ -162,6 +162,7 @@ async function playAll(lang, region, look) {
       for (let i = 0; i < queue.length; i++) {
         const s = queue[i];
         const here = `${where} step ${i + 1} (${s.type}${s.extra ? ", extra" : ""}${s.retry ? ", again" : ""})`;
+        if (process.env.NV_TRACE) console.log("step:", here);
         const shown = squash(await top().innerText());
         const expect = squash(text(isQ(s) ? s.q : s.type === "card" ? s.title : "", locale));
         assert.ok(shown.includes(expect), `${here}: expected "${expect}", the screen shows: ${shown.slice(0, 300)}`);

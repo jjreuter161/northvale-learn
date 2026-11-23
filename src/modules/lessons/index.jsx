@@ -12,7 +12,9 @@ import { track } from "../../core/analytics.js";
 import { text, addStrings } from "../../core/i18n.js";
 import { xpOn, dayKey, addDays, weekStart, weekXp } from "../../core/progress.js";
 import { Button, Card, Icon, Layer, List, ListRow, Loading, Mark, Progress, Ring, Scene, Sheet, StreakStar, UnitArt, WaveEdge, toast } from "../../core/ui.jsx";
-import { isDesk } from "../../core/layout.js";
+import { isDesk, useLayout } from "../../core/layout.js";
+import { holdBack } from "../../core/back.js";
+import { useAsk } from "../../core/asks.js";
 import { star, wave, boat, LANDMARK } from "../../core/art.js";
 import { AgeCard } from "../../core/Account.jsx";
 import { ReminderCard } from "../../core/reminders.jsx";
@@ -50,6 +52,9 @@ addStrings({
   "lessons.done_review": S("Completed · review", "Completada · repasar"),
   "lessons.review": S("Review", "Repasar"),
   "lessons.locked_short": S("Locked", "Bloqueada"),
+  "lessons.step_n": S("{i} of {n}", "{i} de {n}"),
+  "lessons.idea": S("Idea", "Idea"),
+  "lessons.unit_locked": S("This unit opens after Unit {n}.", "Esta unidad se abre después de la Unidad {n}."),
   "lessons.minutes": S("{n} min", "{n} min"),
   "lessons.locked": S("One at a time: finish the lesson before this one first.", "Una a la vez: primero termina la lección anterior."),
   "lessons.unit_n": S("Unit {n}", "Unidad {n}"),
@@ -58,6 +63,7 @@ addStrings({
   "lessons.streak_start": S("Do one lesson to start a streak.", "Haz una lección para empezar una racha."),
   // The finish screen and its moments
   "finish.today": S("{xp} of {goal} XP today · {n}-day streak", "{xp} de {goal} XP hoy · racha de {n} {n|día|días}"),
+  "finish.today_met": S("{xp} XP today, goal met · {n}-day streak", "{xp} XP hoy, meta cumplida · racha de {n} {n|día|días}"),
   "finish.life": S("In real life", "En la vida real"),
   "finish.solid": S("Now solid: {name}", "Ya lo tienes firme: {name}"),
   "finish.mastered": S("Mastered: {name}", "Dominado: {name}"),
@@ -84,7 +90,6 @@ addStrings({
   "lessons.wrong.again": S("You'll see this one again at the end.", "Esta la vas a ver otra vez al final."),
   "lessons.do_it": S("Practice", "Práctica"),
   "lessons.done_it": S("Done", "Hecho"),
-  "lessons.action_wait": S("Try it above to continue", "Pruébalo arriba para continuar"),
   "lessons.action_done": S("Done — continue", "Listo, continuar"),
   "lessons.explain": S("Ask about this", "Preguntar sobre esto"),
   "lessons.complete": S("Lesson complete", "Lección completa"),
@@ -110,7 +115,7 @@ addStrings({
   "today.title": S("Today", "Hoy"),
   "today.lesson_n": S("Lesson {i} of {n} · {min} min", "Lección {i} de {n} · {min} min"),
   "today.toward": S("Building toward: {name}", "Aprendes para: {name}"),
-  "today.review.sub": S("{n} {n|idea|ideas} to refresh · 2 min", "{n} {n|idea|ideas} para refrescar · 2 min"),
+  "today.review.sub": S("{n} {n|idea|ideas} to refresh · 2–3 min", "{n} {n|idea|ideas} para refrescar · 2–3 min"),
   "today.streak.none": S("Start a streak", "Empieza una racha"),
   "today.streak.done": S("Done for today. See you tomorrow.", "Listo por hoy. Nos vemos mañana."),
   "today.streak.keep": S("Today's lesson keeps it going", "La lección de hoy la mantiene"),
@@ -119,6 +124,8 @@ addStrings({
   "panel.title": S("At a glance", "De un vistazo"),
   "panel.goal.none": S("No goal yet. A goal gives your lessons a purpose.", "Todavía no tienes meta. Una meta le da un propósito a tus lecciones."),
   "panel.goal.cta": S("Set a goal", "Poner una meta"),
+  "panel.goal.picked": S("You picked {name}. Give it an amount and a date.", "Elegiste {name}. Ponle un monto y una fecha."),
+  "panel.goal.plan": S("Make a plan", "Hacer un plan"),
   "panel.mission.locked": S("Opens after your first three lessons.", "Se abre después de tus primeras tres lecciones."),
   "panel.myth.soon": S("A daily question, starting tomorrow.", "Una pregunta al día, desde mañana."),
   "overview.title": S("Your progress", "Tu progreso"),
@@ -279,6 +286,7 @@ function Panel({ t, locale, go, openStreak }) {
   useAppState((s) => s.modules.missions);
   const xp = xpOn(progress, dayKey());
   const goal = service("goals", "leadProgress")();
+  const picked = service("goals", "startPlan")(); // the goal picked at the start, before it has an amount
   const mission = practiceOpen(progress) && (service("missions", "status")(locale) || {}).mission;
   const row = { display: "flex", alignItems: "center", gap: 12 };
   const small = { fontSize: 14, color: "var(--mid)" };
@@ -298,7 +306,7 @@ function Panel({ t, locale, go, openStreak }) {
           <Ring value={xp} max={progress.dailyGoal} size={52} stroke={5} label={t("goal.aria", { xp, goal: progress.dailyGoal })}>
             <span style={{ fontSize: 12, fontWeight: 650, fontVariantNumeric: "tabular-nums" }}>{Math.min(100, Math.round((xp / progress.dailyGoal) * 100))}%</span>
           </Ring>
-          <div style={{ fontWeight: 650, fontSize: 15 }}>{t("me.today", { xp, goal: progress.dailyGoal })}</div>
+          <div style={{ fontWeight: 650, fontSize: 15 }}>{xp >= progress.dailyGoal ? t("me.today_met", { xp }) : t("me.today", { xp, goal: progress.dailyGoal })}</div>
         </div>
       </Card>
       {!goal && (
@@ -307,8 +315,8 @@ function Panel({ t, locale, go, openStreak }) {
             <Icon name="target" size={20} />
             <div>
               <div style={{ fontWeight: 700, fontSize: 16 }}>{t("goals.nav")}</div>
-              <div style={small}>{t("panel.goal.none")}</div>
-              <div style={{ fontSize: 14, fontWeight: 650, marginTop: 4 }}>{t("panel.goal.cta")}</div>
+              <div style={small}>{picked ? t("panel.goal.picked", { name: picked.name }) : t("panel.goal.none")}</div>
+              <div style={{ fontSize: 14, fontWeight: 650, marginTop: 4 }}>{picked ? t("panel.goal.plan") : t("panel.goal.cta")}</div>
             </div>
           </div>
         </Card>
@@ -713,7 +721,7 @@ function SeaChart({ t, tx, go, progress, ci, next, all, setAll, opened, toggle, 
       })}
       {list.length < UNITS.length && (
         <div style={{ position: "absolute", left: 0, right: 0, top: pct(H - 150, H), textAlign: "center" }}>
-          <button onClick={() => setAll(true)} className="nv-press" style={{ border: "none", background: "var(--surface)", borderRadius: 8, padding: "8px 16px", fontWeight: 650, fontSize: 14, color: "var(--head)", boxShadow: "var(--lift)", cursor: "pointer", font: "inherit", minHeight: 40 }}>
+          <button onClick={() => setAll(true)} className="nv-press" style={{ border: "none", background: "var(--surface)", borderRadius: 8, padding: "8px 16px", fontWeight: 650, fontSize: 14, color: "var(--head)", boxShadow: "var(--lift)", cursor: "pointer", font: "inherit", minHeight: 44 }}>
             {t("path.mist", { n: UNITS.length - list.length })}
           </button>
         </div>
@@ -729,8 +737,13 @@ function Course({ t, locale, go, route, layout }) {
   const progress = useAppState((s) => s.progress);
   const tx = useLocaleText(locale);
   const [opened, setOpened] = useState({});
-  const [all, setAll] = useState(isDesk(layout)); // a computer has the room for every island
-  const toggle = (id) => setOpened((o) => ({ ...o, [id]: !o[id] }));
+  const [all, setAll] = useState(false); // the next few islands, then "Show more" (on every screen size)
+  // A unit that is still locked says when it opens instead of doing nothing.
+  const toggle = (id) => {
+    const i = UNITS.findIndex((u) => u.id === id);
+    if (lessonState(progress, UNITS[i].lessons[0].id) === "locked" && !opened[id]) return toast(t("lessons.unit_locked", { n: Math.max(1, i) }));
+    setOpened((o) => ({ ...o, [id]: !o[id] }));
+  };
   const next = currentLesson(progress);
   const p = (route && route.params) || {};
   const playing = !!(p.lesson || p.review || p.challenge || p.startUnit);
@@ -770,7 +783,7 @@ function Course({ t, locale, go, route, layout }) {
           )}
         </button>
         {challenge && (
-          <button onClick={() => go("lessons", { challenge: l.id })} className="nv-press" style={{ border: "1px solid var(--line)", background: "var(--bg)", color: "var(--brand)", borderRadius: 8, padding: "6px 12px", marginRight: 14, fontSize: 13, fontWeight: 650, cursor: "pointer", minHeight: 36, flexShrink: 0 }}>
+          <button onClick={() => go("lessons", { challenge: l.id })} className="nv-press" style={{ border: "1px solid var(--line)", background: "var(--bg)", color: "var(--brand)", borderRadius: 8, padding: "6px 12px", marginRight: 14, fontSize: 13, fontWeight: 650, cursor: "pointer", minHeight: 44, flexShrink: 0 }}>
             {t("challenge.chip")}
           </button>
         )}
@@ -795,7 +808,7 @@ function Course({ t, locale, go, route, layout }) {
                 <div style={{ fontSize: 13, color: "var(--low)", fontWeight: 600 }}>{t("lessons.unit_n", { n: UNITS.indexOf(u) + 1 })}</div>
                 <div style={{ fontSize: 18, fontWeight: 750 }}>{tx(u.title)}</div>
               </div>
-              <button onClick={() => toggle(u.id)} aria-label={`${t("common.close")}: ${tx(u.title)}`} style={{ border: "none", background: "var(--surface2)", color: "var(--ink)", borderRadius: 18, width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+              <button onClick={() => toggle(u.id)} aria-label={`${t("common.close")}: ${tx(u.title)}`} style={{ border: "none", background: "var(--surface2)", color: "var(--ink)", borderRadius: 22, width: 44, height: 44, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
                 <Icon name="close" size={16} />
               </button>
             </div>
@@ -910,11 +923,13 @@ function Moment({ t, locale, result, unit, onDone }) {
 // confetti). The waves drift for a few seconds, then stop.
 // The one red spark on the sea chart: a small pennant on the island you're on.
 const spark = (x, y) => `<path d="M${x} ${y + 26}V${y}" stroke="var(--artInk)" stroke-width="2.4" stroke-linecap="round"/><path d="M${x + 1.2} ${y}L${x + 17} ${y + 6}L${x + 1.2} ${y + 12}Z" fill="var(--spark)"/>`;
-const SUNRISE = `<defs><linearGradient id="nvsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--bg)"/><stop offset="1" stop-color="var(--warmSoft)"/></linearGradient></defs><rect width="390" height="250" fill="url(#nvsky)"/><g class="nv-drift"><path d="${wave(440, 250, 7, 5, 196)}" fill="var(--artSea)"/><path d="${wave(440, 250, 6, 4, 218)}" fill="var(--artSea2)" opacity=".7"/></g>${boat(296, 156, 0.42)}<path d="${wave(390, 250, 8, 5, 240)}" fill="var(--bg)"/>`;
+// The finish picture, drawn at the width it is shown (390 on a phone, 640 in the centered column), so the boat stays where it was put.
+const sunrise = (w) => `<defs><linearGradient id="nvsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--bg)"/><stop offset="1" stop-color="var(--warmSoft)"/></linearGradient></defs><rect width="${w}" height="250" fill="url(#nvsky)"/><g class="nv-drift"><path d="${wave(w + 50, 250, 7, 5, 196)}" fill="var(--artSea)"/><path d="${wave(w + 50, 250, 6, 4, 218)}" fill="var(--artSea2)" opacity=".7"/></g>${boat(w - 90, 92, 0.42)}<path d="${wave(w, 250, 8, 5, 240)}" fill="var(--bg)"/>`;
 function Sunrise({ children }) {
+  const w = useLayout() === "phone" ? 390 : 640;
   return (
     <div style={{ position: "relative", margin: "-10px -18px 0", padding: "20px 18px 56px" }}>
-      <svg viewBox="0 0 390 250" preserveAspectRatio="xMidYMax slice" aria-hidden="true" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", display: "block" }} dangerouslySetInnerHTML={{ __html: SUNRISE }} />
+      <svg className="nv-sunrise" viewBox={`0 0 ${w} 250`} preserveAspectRatio="xMidYMax slice" aria-hidden="true" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", display: "block" }} dangerouslySetInnerHTML={{ __html: sunrise(w) }} />
       <div style={{ position: "relative" }}>{children}</div>
     </div>
   );
@@ -935,17 +950,18 @@ function FinishRing({ t, before, after, goal, gained, streak }) {
     const id = setTimeout(() => setShown(after), 30);
     return () => (cancelAnimationFrame(raf), clearTimeout(id));
   }, []);
+  const line = after > goal ? t("finish.today_met", { xp: after, n: streak }) : t("finish.today", { xp: after, goal, n: streak });
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
       <div style={{ borderRadius: "50%", background: "var(--surface)" }}>
-      <Ring value={Math.min(shown, goal)} max={goal} size={150} stroke={8} label={t("finish.today", { xp: after, goal, n: streak })}>
+      <Ring value={Math.min(shown, goal)} max={goal} size={150} stroke={8} label={line}>
         <div style={{ textAlign: "center", lineHeight: 1 }}>
           <div className="nv-disp" style={{ fontSize: 44, letterSpacing: -1, fontVariantNumeric: "tabular-nums", color: "var(--head)" }}>+{n}</div>
           <div style={{ fontSize: 13, color: "var(--mid)", marginTop: 4 }}>XP</div>
         </div>
       </Ring>
       </div>
-      <p style={{ fontSize: 14, color: "var(--mid)", margin: "10px 0 0" }}>{t("finish.today", { xp: after, goal, n: streak })}</p>
+      <p style={{ fontSize: 14, color: "var(--mid)", margin: "10px 0 0" }}>{line}</p>
     </div>
   );
 }
@@ -993,6 +1009,22 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
   const [quit, setQuit] = useState(false);
   const [momentDone, setMomentDone] = useState(false);
   const feedbackRef = useRef(null);
+  // Back (the phone's, the browser's) does what the X does: mid-lesson it asks "Leave now?" (and stays in the lesson), on the finish screen it closes. It never leaves the app.
+  const back = useRef(null);
+  back.current = { finished: !!result, finish: () => go("lessons"), ask: () => setQuit(true) };
+  useEffect(() => {
+    let release;
+    const hold = () => {
+      release = holdBack(() => {
+        const b = back.current;
+        if (b.finished) return b.finish();
+        b.ask();
+        hold();
+      });
+    };
+    hold();
+    return () => release();
+  }, []);
   // On a computer: 1–4 pick an answer, Enter checks and continues. A small hint, shown until the first lesson is over.
   const keysSeen = useSeen("keys");
   const hint = isDesk(ctx.layout) && !keysSeen;
@@ -1003,6 +1035,12 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
       if (!top || !top.hasAttribute("data-player")) return; // a sheet is open on top: it keeps its keys
       const el = e.target;
       if (el && (/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) || el.isContentEditable)) return;
+      // Escape does what the X does (a lesson is a dialog): "Leave now?" mid-lesson, close on the finish screen.
+      if (e.key === "Escape") {
+        e.preventDefault();
+        const b = back.current;
+        return b.finished ? b.finish() : b.ask();
+      }
       if (/^[1-9]$/.test(e.key)) {
         const o = top.querySelectorAll('[role="radio"]:not(:disabled)')[Number(e.key) - 1];
         if (o) (e.preventDefault(), o.click());
@@ -1085,6 +1123,9 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
     const k = (e) => {
       if (result || quit || !step) return;
       if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA" || (e.target.closest && e.target.closest("[data-q]"))) return;
+      // A focused button (Check, Continue, Close) does its own thing on Enter. Acting here too made Enter on a focused
+      // Check check the answer and then, as the button turned into Continue, skip the feedback.
+      if (e.key === "Enter" && e.target.tagName === "BUTTON" && e.target.getAttribute("role") !== "radio") return;
       if ((step.type === "choice" || step.type === "tf") && !checked && /^[1-4]$/.test(e.key)) {
         const n = Number(e.key) - 1;
         if (step.type === "tf" && n < 2) setPicked(n === 0);
@@ -1157,16 +1198,23 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
             </div>
           )}
         </div>
-        {!ctx.session.user && ctx.session.online && (progress.counters.lessons || 0) === 1 && (
-          <Card style={{ margin: "0 0 14px" }}>
-            <div style={{ fontWeight: 650 }}>{t("lessons.save.title")}</div>
-            <p style={{ fontSize: 14, color: "var(--mid)", margin: "4px 0 12px", lineHeight: 1.45 }}>{t("lessons.save.body")}</p>
-            <Button full size="md" kind="secondary" onClick={() => go("settings")}>
-              {t("lessons.save.yes")}
-            </Button>
-          </Card>
+        {!ctx.session.user && ctx.session.online && (progress.counters.lessons || 0) >= 2 && <SaveOffer t={t} go={go} />}
+        {(mistakes === 0 || result.unitJustDone) && (
+          <div style={{ display: "flex", justifyContent: "center", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
+            {mistakes === 0 && (
+              <Button kind="ghost" size="md" onClick={() => go("lessons", { challenge: lesson.id })}>
+                {t("challenge.offer")}
+              </Button>
+            )}
+            {result.unitJustDone && (
+              <Button kind="ghost" size="md" onClick={() => openShare({ kind: "unit", title: tx(unit.title) })}>
+                <Icon name="share" size={18} /> {t("share.button")}
+              </Button>
+            )}
+          </div>
         )}
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {/* The way forward stays on screen, however long the cards above it are (same as the buttons in a step). */}
+        <div data-go="" style={{ position: "sticky", bottom: 0, background: "var(--bg)", padding: "8px 0 4px", boxShadow: "0 -10px 12px -6px var(--bg)", display: "flex", flexDirection: "column", gap: 10 }}>
           {nl && nl.id !== lesson.id && (
             <Button full onClick={() => go("lessons", { lesson: nl.id })}>
               {t("lessons.next_named", { title: tx(nl.title) })}
@@ -1175,20 +1223,6 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
           <Button full kind={nl && nl.id !== lesson.id ? "secondary" : "primary"} onClick={() => go("lessons")}>
             {t("common.done")}
           </Button>
-          {(mistakes === 0 || result.unitJustDone) && (
-            <div style={{ display: "flex", justifyContent: "center", gap: 8, flexWrap: "wrap" }}>
-              {mistakes === 0 && (
-                <Button kind="ghost" size="md" onClick={() => go("lessons", { challenge: lesson.id })}>
-                  {t("challenge.offer")}
-                </Button>
-              )}
-              {result.unitJustDone && (
-                <Button kind="ghost" size="md" onClick={() => openShare({ kind: "unit", title: tx(unit.title) })}>
-                  <Icon name="share" size={18} /> {t("share.button")}
-                </Button>
-              )}
-            </div>
-          )}
         </div>
       </Overlay>
     );
@@ -1208,7 +1242,7 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
             <Mark size={26} color="var(--artInk)" />
           </span>
         </div>
-        <button onClick={() => service("tutor", "open")({ context: tx(step.title || step.q || step.prompt || "") })} className="nv-press" style={{ border: "1px solid var(--line)", background: "var(--bg)", color: "var(--ink)", borderRadius: 8, height: 36, padding: "0 12px", display: "inline-flex", alignItems: "center", gap: 6, fontWeight: 650, fontSize: 14, cursor: "pointer", flexShrink: 0 }}>
+        <button onClick={() => service("tutor", "open")({ context: tx(step.title || step.q || step.prompt || "") })} className="nv-press" style={{ border: "1px solid var(--line)", background: "var(--bg)", color: "var(--ink)", borderRadius: 8, height: 44, padding: "0 14px", display: "inline-flex", alignItems: "center", gap: 6, fontWeight: 650, fontSize: 14, cursor: "pointer", flexShrink: 0 }}>
           <Icon name="chat" size={16} /> {t("nav.ask")}
         </button>
         <button onClick={() => service("feedback", "open")({ kind: "content", context: `${mode === "lesson" ? lesson.id : `${mode} ${step.c || ""}`} · step ${at + 1} · ${tx(step.title || step.q || step.prompt || "")}`.slice(0, 280) })} aria-label={t("lessons.report")} title={t("lessons.report")} style={{ border: "none", background: "transparent", color: "var(--low)", width: 44, height: 44, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
@@ -1216,9 +1250,15 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
         </button>
       </div>
 
-      <div key={step.key} className="nv-in" style={{ flex: 1, overflowY: "auto" }}>
+      {/* Where you are: the lesson, and "3 of 12" (the extra card and the retry after a miss don't count). */}
+      <div style={{ fontSize: 13, fontWeight: 600, color: "var(--mid)", margin: "-8px 0 12px" }}>
+        {mode === "lesson" ? tx(lesson.title) : run.title}
+        {!step.extra && !step.retry && ` · ${t("lessons.step_n", { i: queue.slice(0, at + 1).filter((q) => !q.extra && !q.retry).length, n: run.steps.length })}`}
+      </div>
+      <div key={step.key} className="nv-in" style={{ flex: isDesk(ctx.layout) ? "0 0 auto" : 1, overflowY: "auto" }}>
         {step.type === "card" && (
           <div>
+            <div style={{ fontSize: 13, fontWeight: 650, color: "var(--mid)", marginBottom: 6 }}>{t("lessons.idea")}</div>
             <h2 className="nv-disp" style={{ fontSize: 28, margin: "0 0 12px", lineHeight: 1.15 }}>{tx(step.title)}</h2>
             <p style={{ fontSize: 18, lineHeight: 1.55, margin: 0 }}>{tx(step.body)}</p>
             {service("tutor", "canExplain")(`${tx(step.title)} ${tx(step.body)}`) && <button onClick={() => service("tutor", "explain")({ question: tx(step.title), context: tx(step.body) })} className="nv-press" style={{ marginTop: 18, border: "1px solid var(--line)", background: "var(--bg)", color: "var(--brand)", borderRadius: 8, padding: "10px 16px", fontWeight: 650, fontSize: 15, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 8, minHeight: 44 }}>
@@ -1272,11 +1312,14 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
           ))}
         {step.type === "action" && (
           <>
-            <Button full disabled={!actionDone && !!Widget} onClick={advance}>
-              {actionDone ? t("lessons.action_done") : Widget ? t("lessons.action_wait") : t("common.continue")}
-            </Button>
+            {/* One live button at a time: while the tool is waiting there's only "Skip for now"; once it's done, "Done — continue". */}
+            {(actionDone || !Widget) && (
+              <Button full onClick={advance}>
+                {actionDone ? t("lessons.action_done") : t("common.continue")}
+              </Button>
+            )}
             {Widget && !actionDone && (
-              <Button full kind="ghost" onClick={advance} style={{ marginTop: 4 }}>
+              <Button full kind="ghost" onClick={advance}>
                 {t("lessons.skip_action")}
               </Button>
             )}
@@ -1301,8 +1344,26 @@ function Player({ t, locale, run, onExit, go, ...ctx }) {
   );
 }
 
+// The account offer on a finish screen: not on the very first one, shown once, and only if nothing else has asked in this visit (asks.js).
+function SaveOffer({ t, go }) {
+  const seen = useSeen("save");
+  const turn = useAsk(!seen);
+  useEffect(() => () => turn && markIntro("save"), [turn]);
+  if (seen || !turn) return null;
+  return (
+    <Card style={{ margin: "0 0 14px" }}>
+      <div style={{ fontWeight: 650 }}>{t("lessons.save.title")}</div>
+      <p style={{ fontSize: 14, color: "var(--mid)", margin: "4px 0 12px", lineHeight: 1.45 }}>{t("lessons.save.body")}</p>
+      <Button full size="md" kind="secondary" onClick={() => go("settings", { section: "account" })}>
+        {t("lessons.save.yes")}
+      </Button>
+    </Card>
+  );
+}
+
 // Full screen, above everything — a lesson is a focused moment.
-function Overlay({ label, children }) {
+// `onClose` (the loading screen; the player handles its own keys): Back and Escape close it.
+function Overlay({ label, children, onClose }) {
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -1310,9 +1371,17 @@ function Overlay({ label, children }) {
       document.body.style.overflow = prev;
     };
   }, []);
+  const close = useRef(onClose);
+  close.current = onClose;
+  useEffect(() => {
+    if (!onClose) return undefined;
+    const k = (e) => e.key === "Escape" && close.current && close.current();
+    window.addEventListener("keydown", k);
+    return () => window.removeEventListener("keydown", k);
+  }, [!onClose]);
   return (
-    <Layer>
-      <div role="dialog" aria-modal="true" aria-label={label} data-player="" style={{ position: "fixed", inset: 0, zIndex: 40, background: "var(--bg)", color: "var(--ink)", overflowY: "auto" }}>
+    <Layer onBack={onClose ? () => close.current && close.current() : undefined}>
+      <div role="dialog" aria-modal="true" aria-label={label} data-player="" style={{ position: "fixed", inset: 0, zIndex: 40, background: "var(--bg)", color: "var(--ink)", overflowY: "auto", overflowX: "hidden" }}>
         <div className="nv-ovl" style={{ maxWidth: 640, minHeight: "100%", margin: "0 auto", display: "flex", flexDirection: "column", padding: "calc(10px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom))" }}>{children}</div>
       </div>
     </Layer>
@@ -1363,6 +1432,7 @@ function Screen(ctx) {
   // the lesson opens at once; otherwise the boat shows for a moment.
   const needs = key ? unitsFor(p).filter(Boolean) : [];
   const [loaded, setLoaded] = useState(null); // the key whose units arrived, or "!key" if they couldn't
+  const [tries, setTries] = useState(0);
   useEffect(() => {
     if (!key || needs.every(unitLoaded)) return undefined;
     let on = true;
@@ -1370,19 +1440,30 @@ function Screen(ctx) {
     return () => {
       on = false;
     };
-  }, [key]);
+  }, [key, tries]);
+  const failed = loaded === `!${key}`;
+  const retry = () => (setLoaded(null), setTries((n) => n + 1));
+  // Offline: it tries again by itself as soon as the connection is back.
+  useEffect(() => {
+    if (!failed) return undefined;
+    addEventListener("online", retry);
+    return () => removeEventListener("online", retry);
+  }, [failed]);
   const ready = !!key && (loaded === key || needs.every(unitLoaded));
   const session = useMemo(() => (ready ? sessionFor(p, ctx.t, ctx.locale) : null), [key, ready]);
   return (
     <>
       <Learn {...ctx} />
       {key && !ready && (
-        <Overlay label={ctx.t("common.loading")}>
-          <div aria-busy={loaded !== `!${key}`} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 18, textAlign: "center" }}>
-            {loaded === `!${key}` ? (
+        <Overlay label={ctx.t("common.loading")} onClose={() => ctx.go("lessons")}>
+          <div aria-busy={!failed} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 18, textAlign: "center" }}>
+            {failed ? (
               <>
                 <p role="alert" style={{ fontSize: 17, maxWidth: 320, margin: 0 }}>{ctx.t("common.load_error")}</p>
-                <Button onClick={() => ctx.go("lessons")}>{ctx.t("common.close")}</Button>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10, width: "100%", maxWidth: 320 }}>
+                  <Button full onClick={retry}>{ctx.t("common.try_again")}</Button>
+                  <Button full kind="secondary" onClick={() => ctx.go("lessons")}>{ctx.t("common.close")}</Button>
+                </div>
               </>
             ) : (
               <Loading label={ctx.t("common.loading")} />
