@@ -1,6 +1,8 @@
 // npm run preview:sync — the copy of the app that a preview runs from.
 // Some previews can only read a folder of their own (Claude's preview pane
-// can't read ~/Downloads), so this builds the app and copies what the
+// couldn't read ~/Downloads, which is why the project now lives in
+// ~/Projects and the preview runs straight from it; this is for a folder a
+// preview still can't read), so this builds the app and copies what the
 // server needs into PREVIEW_DIR: package.json, server/, src/, web/ and
 // docs/ (no node_modules, .env, .git or design screenshots). The copy's
 // data (server/data) is kept. If it has no demo people yet, they're made
