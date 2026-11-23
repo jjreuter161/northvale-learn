@@ -5,6 +5,7 @@
 // installed: brew install qrencode).
 //   npm run home-test              (port 8960; --port 9000 for another)
 //   npm run home-test -- --fresh   (forget the practice data from last time)
+// It runs from the branch "main" only (the folder ~/Projects/northvale-learn); --any-branch allows another.
 // Nothing here uses your real keys: .env is not read, the AI tutor stays in
 // offline mode, and the data lives in a temporary folder, not in the project.
 // Only devices on the same Wi-Fi can reach it, and only while this runs.
@@ -33,6 +34,24 @@ if (!ip) {
   process.exit(1);
 }
 
+// Testers should see the main version of the app: the one in ~/Projects/northvale-learn, on the branch "main".
+// Another branch (drafts, a redesign) stops here unless you pass --any-branch on purpose.
+const git = (...a) => {
+  try {
+    return execFileSync("git", a, { cwd: ROOT, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
+  } catch {
+    return "";
+  }
+};
+const branch = git("rev-parse", "--abbrev-ref", "HEAD") || "unknown";
+const commit = git("rev-parse", "--short", "HEAD") || "unknown";
+if (branch !== "main" && !args.includes("--any-branch")) {
+  console.error(`This folder is on the branch "${branch}", not "main", so a phone would see that version.
+For the main version, run it from the main folder:  cd ~/Projects/northvale-learn && npm run home-test
+(To test this branch on purpose: npm run home-test -- --any-branch)`);
+  process.exit(1);
+}
+
 if (args.includes("--fresh")) rmSync(DATA, { recursive: true, force: true });
 mkdirSync(DATA, { recursive: true });
 execFileSync("npm", ["run", "build", "--silent"], { cwd: ROOT, stdio: "inherit" });
@@ -42,7 +61,7 @@ const env = { ...process.env, NORTHVALE_DOTENV: "0", HOST: "0.0.0.0", PORT: Stri
 for (const k of ["ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN", "SMTP_USER", "SMTP_PASS", "PUBLIC_URL", "ADMIN_TOKEN", "ALERT_WEBHOOK_URL"]) delete env[k];
 
 console.log(`
-  Home test: open this on a phone that is on the same Wi-Fi:
+  Home test of "${branch}" (${commit}). Open this on a phone that is on the same Wi-Fi:
 
       ${url}
 `);
