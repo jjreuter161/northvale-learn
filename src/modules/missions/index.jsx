@@ -94,7 +94,7 @@ function Head({ t, locale, m, sub }) {
 }
 
 const body = { fontSize: "var(--t-body)", lineHeight: 1.5, margin: "12px 0 16px" };
-const textBtn = { display: "block", margin: "8px auto 0", border: "none", background: "transparent", color: "var(--mid)", fontSize: "var(--t-sm)", fontWeight: 600, cursor: "pointer", padding: "12px 12px", minHeight: 44 };
+const textBtn = { display: "block", margin: "8px auto 0", border: "none", background: "transparent", color: "var(--mid)", fontSize: "var(--t-sm)", fontWeight: 600, cursor: "pointer", padding: 12, minHeight: 44 };
 
 // Finishing: an optional note, then XP and (for "set money aside") a way
 // to record the amount on the goal.

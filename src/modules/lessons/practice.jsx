@@ -8,7 +8,7 @@ import { addStrings, shortDate, text } from "../../core/i18n.js";
 import { dayKey } from "../../core/progress.js";
 import { track } from "../../core/analytics.js";
 import { service } from "../../core/registry.js";
-import { SELECTED, Chosen, Button, Card, Icon, Label, Loading, Sheet } from "../../core/ui.jsx";
+import { SELECTED, Chosen, OptionMark, Button, Card, Icon, Label, Loading, Sheet } from "../../core/ui.jsx";
 import * as M from "./mastery.js";
 import { UNITS, conceptsOfLesson, conceptsOfUnit, loadUnits } from "./content.js";
 import { CONCEPTS, PLACEMENT, conceptById } from "./concepts.js";
@@ -105,7 +105,7 @@ export function QuestionView({ t, locale, step, picked, setPicked, checked, labe
               className="nv-press nv-opt"
               style={{ flex: step.type === "tf" ? 1 : undefined, border: `2px ${isWrongPick ? "dashed" : "solid"} ${isAnswer ? "var(--right)" : isWrongPick ? "var(--warn)" : sel ? "var(--select)" : "var(--line)"}`, boxShadow: sel && !isAnswer && !isWrongPick ? SELECTED.boxShadow : undefined, background: isAnswer ? "var(--rightSoft)" : isWrongPick ? "var(--warnSoft)" : sel ? "var(--brandSoft)" : "var(--surface)" }}
             >
-              <span aria-hidden className={`nv-k${sel || isAnswer ? " on" : ""}`}>{sel || isAnswer ? <Icon name="check" size={16} stroke={3} /> : i + 1}</span>
+              <OptionMark n={i + 1} mark={isAnswer ? "right" : isWrongPick ? "wrong" : sel ? "pick" : null} />
               <span style={{ flex: 1 }}>{o.label}</span>
             </button>
           );
@@ -212,7 +212,7 @@ export function SessionDone({ t, locale, mode, result, answers, onDone }) {
           <p style={{ color: "var(--mid)", margin: "8px 0 0" }}>{t("challenge.score", { right, total: answers.length })}</p>
           <p style={{ fontSize: "var(--t-sm)", color: "var(--mid)", margin: "12px 0 0" }}>{facts.join("  ·  ")}</p>
         </div>
-        <Card pad="4px 18px">
+        <Card pad="4px 16px">
           {ids.map((c, i) => {
             const level = M.levelOf(concepts[c]);
             return (
@@ -281,7 +281,7 @@ export function SkillsCard({ t, locale }) {
         {UNITS.map((u) => (
           <div key={u.id} style={{ marginBottom: 16 }}>
             <div style={{ fontSize: "var(--t-sm)", fontWeight: 600, color: "var(--low)", marginBottom: 4 }}>{x(u.title)}</div>
-            <Card pad="2px 16px">
+            <Card pad="4px 16px">
               {conceptsOfUnit(u.id).map((c, i) => (
                 <div key={c} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 0", borderTop: i ? "1px solid var(--line)" : "none" }}>
                   <span style={{ flex: 1, fontSize: "var(--t-body)" }}>{x(conceptById(c).name)}</span>
@@ -366,7 +366,7 @@ export function Placement({ t, locale, header, startUnit, onNext, begin = "ask" 
     setPhase("result");
   };
   const option = (key, label, sub, onClick) => (
-    <button key={key} onClick={onClick} className="nv-press" style={{ display: "flex", alignItems: "center", gap: 16, width: "100%", textAlign: "left", border: "1px solid var(--line)", background: "var(--surface)", color: "var(--ink)", borderRadius: 12, padding: "16px 16px", marginBottom: 12, cursor: "pointer", minHeight: 64 }}>
+    <button key={key} onClick={onClick} className="nv-press" style={{ display: "flex", alignItems: "center", gap: 16, width: "100%", textAlign: "left", border: "1px solid var(--line)", background: "var(--surface)", color: "var(--ink)", borderRadius: 12, padding: 16, marginBottom: 12, cursor: "pointer", minHeight: 64 }}>
       <span style={{ flex: 1 }}>
         <span style={{ display: "block", fontSize: "var(--t-body)", fontWeight: 600 }}>{label}</span>
         <span style={{ display: "block", fontSize: "var(--t-sm)", color: "var(--mid)", marginTop: 4 }}>{sub}</span>
@@ -395,7 +395,7 @@ export function Placement({ t, locale, header, startUnit, onNext, begin = "ask" 
       <>
         {header(units.length ? t("place.result", { n: units.length }) : t("place.result.none"), units.length ? t("place.result.sub") : t("place.result.none.sub"), () => (setResults([]), setPhase("ask")))}
         {units.length > 0 && (
-          <Card pad="4px 18px" style={{ marginBottom: 16 }}>
+          <Card pad="4px 16px" style={{ marginBottom: 16 }}>
             {units.map((u, i) => (
               <div key={u} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 0", borderTop: i ? "1px solid var(--line)" : "none" }}>
                 <Icon name="check" size={18} color="var(--accent)" stroke={2.4} />

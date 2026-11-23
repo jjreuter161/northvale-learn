@@ -189,12 +189,24 @@ export function validateContent() {
           text(s.body, `${where} body`);
           const ex = s.example;
           if (ex) {
+            // An amount is written as one {$US|MX} amount, so the parts can be added up in both currencies.
+            const amount = (x) => { const m = x && typeof x.en === "string" && x.en.trim().match(/^\{\$(\d+(?:\.\d+)?)\|(\d+(?:\.\d+)?)\}$/); return m ? [Number(m[1]), Number(m[2])] : null; };
             if (!Array.isArray(ex.total) || ex.total.length !== 2) fail(where, "example: total is [label, amount]");
             else ex.total.forEach((x, i) => text(x, `${where} example total ${i ? "amount" : "label"}`));
-            if (!Array.isArray(ex.split) || ex.split.length < 2 || ex.split.length > 3) fail(where, "example: split into 2 or 3 parts");
+            if (!Array.isArray(ex.split) || ex.split.length < 2 || ex.split.length > 3 || ex.split.some((p) => !Array.isArray(p) || p.length !== 3 || typeof p[2] !== "number")) fail(where, "example: split into 2 or 3 parts, each [label, amount, share]");
             else {
               ex.split.forEach(([label, amount], i) => (text(label, `${where} example part ${i + 1} label`), text(amount, `${where} example part ${i + 1} amount`)));
               if (ex.split.reduce((n, p) => n + p[2], 0) !== 100) fail(where, "example: the shares add up to 100");
+              const total = Array.isArray(ex.total) && ex.total.length === 2 ? amount(ex.total[1]) : null;
+              const parts = ex.split.map((p) => amount(p[1]));
+              if (!total || parts.some((p) => !p)) fail(where, "example: each amount is one {$US|MX} amount (nothing else in it)");
+              else
+                for (const r of [0, 1]) {
+                  const R = r ? "Mexico" : "US";
+                  const sum = parts.reduce((n, p) => n + p[r], 0);
+                  if (Math.abs(sum - total[r]) > 0.5) fail(where, `example (${R}): the parts add up to ${sum}, not ${total[r]}`);
+                  ex.split.forEach((p, i) => Math.abs((100 * parts[i][r]) / total[r] - p[2]) > 1 && fail(where, `example (${R}): part ${i + 1} is ${Math.round((100 * parts[i][r]) / total[r])}% of the total, not ${p[2]}%`));
+                }
             }
           }
         }

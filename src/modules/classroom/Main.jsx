@@ -107,7 +107,7 @@ addStrings({
   "cls.t.hard.row": S("{missed} of {seen} answers missed · {n} students", "{missed} de {seen} respuestas falladas · {n} estudiantes"),
   "cls.t.hard.none": S("Shows once 3 or more students have answered questions on a topic.", "Aparece cuando 3 o más estudiantes hayan respondido preguntas de un tema."),
   "cls.t.archive": S("Archive class", "Archivar clase"),
-  "cls.t.archive.sub": S("Students can no longer use it, and it's deleted for good 90 days later.", "Los estudiantes ya no pueden usarla y se borra por completo 90 días después."),
+  "cls.t.archive.sub": S("Students can no longer use it, and it's deleted for good 90 days later.", "Ya nadie en la clase puede usarla y se borra por completo 90 días después."),
   "cls.t.restore": S("Restore", "Restaurar"),
   "cls.t.delete": S("Delete now", "Borrar ya"),
   "cls.t.delete.body": S("Delete {name} and everything in it? This can't be undone.", "¿Borrar {name} y todo lo que tiene? No se puede deshacer."),
@@ -227,7 +227,7 @@ function JoinSheet({ t, go, initialCode, onClose }) {
           {!profile.ageBand && (
             <label style={{ display: "block", marginBottom: 16 }}>
               <span style={{ display: "block", fontSize: "var(--t-sm)", fontWeight: 600, color: "var(--mid)", marginBottom: 8 }}>{t("onb.age.title")}</span>
-              <select required value={age} onChange={(e) => setAge(e.target.value)} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 12, padding: "12px 12px", background: "var(--surface)", color: "var(--ink)", fontSize: "var(--t-body)" }}>
+              <select required value={age} onChange={(e) => setAge(e.target.value)} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 12, padding: 12, background: "var(--surface)", color: "var(--ink)", fontSize: "var(--t-body)" }}>
                 <option value="" disabled>
                   {t("account.age.pick")}
                 </option>
@@ -473,7 +473,7 @@ function ClassAdmin({ t, locale, id, onBack }) {
   const all = units();
   const unitTitle = (u) => text((all.find((x) => x.id === u) || { title: { en: u } }).title, locale);
   const link = `${location.origin}/?join=${v.code}`;
-  const cell = { padding: "8px 8px", borderTop: "1px solid var(--line)", fontSize: "var(--t-sm)", textAlign: "left", fontVariantNumeric: "tabular-nums" };
+  const cell = { padding: 8, borderTop: "1px solid var(--line)", fontSize: "var(--t-sm)", textAlign: "left", fontVariantNumeric: "tabular-nums" };
   return (
     <div>
       {back}
@@ -497,7 +497,7 @@ function ClassAdmin({ t, locale, id, onBack }) {
           <div aria-label={t("cls.code")} style={{ fontSize: "var(--t-fig)", fontWeight: 700, letterSpacing: 6, fontVariantNumeric: "tabular-nums", margin: "4px 0 12px" }}>{v.code}</div>
           <div style={{ fontSize: "var(--t-sm)", color: "var(--mid)", fontWeight: 600 }}>{t("cls.t.link")}</div>
           <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 4 }}>
-            <div style={{ flex: 1, minWidth: 0, padding: "12px 12px", borderRadius: 12, background: "var(--surface2)", fontSize: "var(--t-sm)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{link}</div>
+            <div style={{ flex: 1, minWidth: 0, padding: 12, borderRadius: 12, background: "var(--surface2)", fontSize: "var(--t-sm)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{link}</div>
             <Button size="md" kind="secondary" aria-label={t("inv.copy")} onClick={() => navigator.clipboard.writeText(link).then(() => toast(t("cls.t.copied"), "good"), () => {})}>
               <Icon name="copy" size={18} />
             </Button>
@@ -548,7 +548,7 @@ function ClassAdmin({ t, locale, id, onBack }) {
             </label>
             <label style={{ flex: 1, minWidth: 140 }}>
               <span style={{ display: "block", fontSize: "var(--t-sm)", fontWeight: 600, color: "var(--mid)", marginBottom: 8 }}>{t("cls.t.due")}</span>
-              <input type="date" required min={dayKey()} value={due} onChange={(e) => setDue(e.target.value)} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 12, padding: "12px 12px", background: "var(--surface)", color: "var(--ink)", fontSize: "var(--t-body)" }} />
+              <input type="date" required min={dayKey()} value={due} onChange={(e) => setDue(e.target.value)} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 12, padding: 12, background: "var(--surface)", color: "var(--ink)", fontSize: "var(--t-body)" }} />
             </label>
             <Button size="md" type="submit">
               {t("cls.t.assign")}

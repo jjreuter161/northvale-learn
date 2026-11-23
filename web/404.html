@@ -11,7 +11,7 @@
       @font-face { font-family: "Inter"; font-weight: 100 900; font-display: swap; src: url(/fonts/inter-latin-wght-normal.woff2) format("woff2"); }
       @font-face { font-family: "EB Garamond"; font-weight: 600 700; font-display: swap; src: url(/fonts/eb-garamond-latin-600-normal.woff2) format("woff2"); }
       /* The app's own values (docs/DESIGN-SYSTEM.md): navy, cream and signal red; the type, spacing and radius tokens. */
-      :root { --bg: #F7F2E8; --surface: #FFFDF8; --line: #E3D9C6; --ink: #1B3560; --mid: #3E5376; --fill: #C8202A; --onfill: #F7F2E8; --ring: transparent; --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px; --s7: 48px; --r2: 18px; --t-cap: 12px; --t-body: 16px; --t-lead: 18px; --t-head: 28px; --w1: 450; --w2: 600; --w3: 700; --touch: 56px; }
+      :root { --bg: #F7F2E8; --surface: #FFFDF8; --line: #E3D9C6; --ink: #1B3560; --mid: #3E5376; --fill: #C8202A; --onfill: #F7F2E8; --ring: transparent; --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px; --s7: 48px; --r2: 18px; --t-cap: 12px; --t-body: 16px; --t-lead: 18px; --t-head: 28px; --w1: 450; --w2: 600; --w3: 700; --btn: 56px; }
       @media (min-width: 1024px) { :root { --t-cap: 13px; --t-body: 18px; --t-lead: 20px; --t-head: 34px; } }
       @media (prefers-color-scheme: dark) { :root { --bg: #1B3560; --surface: #233F70; --line: #46679F; --ink: #F7F2E8; --mid: #D4D4D2; --ring: #F7F2E8; } }
       * { box-sizing: border-box; }
@@ -23,7 +23,7 @@
       h1 { font-size: var(--t-head); font-weight: var(--w3); letter-spacing: -0.022em; line-height: 1.2; margin: 0 0 var(--s2); }
       p { margin: 0 0 var(--s5); color: var(--mid); font-size: var(--t-lead); }
       .block + .block { margin-top: var(--s6); padding-top: var(--s6); border-top: 1px solid var(--line); }
-      a.btn { display: flex; align-items: center; justify-content: center; min-height: var(--touch); padding: var(--s3) var(--s5); border-radius: var(--r2); font-size: var(--t-lead); font-weight: var(--w2); line-height: 1.2; text-decoration: none; background: var(--fill); color: var(--onfill); box-shadow: 0 0 0 2px var(--ring); }
+      a.btn { display: flex; align-items: center; justify-content: center; min-height: var(--btn); padding: var(--s3) var(--s5); border-radius: var(--r2); font-size: var(--t-lead); font-weight: var(--w2); line-height: 1.2; text-decoration: none; background: var(--fill); color: var(--onfill); box-shadow: 0 0 0 2px var(--ring); }
       a.btn.second { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 2px var(--ink); }
       a.btn:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
     </style>

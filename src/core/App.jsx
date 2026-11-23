@@ -131,6 +131,7 @@ export default function App() {
   };
   // Back (the phone's, the browser's) from a screen below a tab does what the header's back button does, instead of leaving the app (back.js).
   const upTo = useRef(null);
+  const upParams = useRef({}); // where Back lands inside that screen (a Settings page, say)
   const onRoot = TABS.some((x) => x.route === route.id) && !(route.id === "me" && route.params.section);
   useEffect(() => {
     if (onRoot) return;
@@ -138,7 +139,7 @@ export default function App() {
     const hold = () => {
       release = holdBack(() => {
         const to = upTo.current;
-        go(to);
+        go(to, upParams.current);
         if (!TABS.some((x) => x.route === to)) hold();
       });
     };
@@ -196,6 +197,7 @@ export default function App() {
   const from = route.params.from;
   const back = from ? (getModule(from) && getModule(from).nav ? getModule(from).nav.label : CORE_TITLE[from]) : tab.label;
   upTo.current = from || tab.route;
+  upParams.current = route.params.fromSection ? { section: route.params.fromSection } : {};
   const today = dayKey();
   const ctx = { t, locale, go, route, session, layout, wide: layout !== "phone", openStreak: () => setStreakOpen(true) };
   const openTab = (x) => (setVisit((v) => v + 1), go(x.route));
@@ -206,7 +208,7 @@ export default function App() {
   const header = (
     <header style={{ position: "sticky", top: 0, zIndex: 20, background: "var(--bg)", padding: desk ? "14px 32px 6px" : "calc(8px + env(safe-area-inset-top)) 12px 6px 16px", display: "flex", alignItems: "center", gap: 8 }}>
       {!isRoot && (
-        <button onClick={() => go(from || tab.route)} aria-label={`${t("common.back")}: ${t(back)}`} className="nv-press" style={{ ...iconBtn, width: "auto", gap: 4, padding: "0 12px 0 4px", marginLeft: -8, fontSize: "var(--t-body)", fontWeight: 600, minWidth: 0 }}>
+        <button onClick={() => go(from || tab.route, upParams.current)} aria-label={`${t("common.back")}: ${t(back)}`} className="nv-press" style={{ ...iconBtn, width: "auto", gap: 4, padding: "0 12px 0 4px", marginLeft: -8, fontSize: "var(--t-body)", fontWeight: 600, minWidth: 0 }}>
           <Icon name="back" /> <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t(back)}</span>
         </button>
       )}

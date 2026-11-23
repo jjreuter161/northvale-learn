@@ -8,7 +8,7 @@
 // the amounts differ (text uses {$100|2000} the same way).
 import { useMemo, useState } from "react";
 import { addStrings, money, number, text } from "../../core/i18n.js";
-import { Icon, SELECTED } from "../../core/ui.jsx";
+import { Icon, OptionMark, SELECTED } from "../../core/ui.jsx";
 import { QuestionView } from "./practice.jsx";
 import { fv } from "./units/helpers.js";
 
@@ -54,12 +54,8 @@ const tx = (locale) => (x, vars) => text(x, locale, vars);
 // An answer option is `.nv-opt` (ui.jsx); this adds what state it's in. A pick is outlined in the text color; right is solid, a miss is dashed (and never red).
 const tone = (state) =>
   state === "right" ? { border: "2px solid var(--right)", background: "var(--rightSoft)" } : state === "wrong" ? { border: "2px dashed var(--warn)", background: "var(--warnSoft)" } : state === "on" ? { ...SELECTED, background: "var(--brandSoft)" } : {};
-// The number of an option (or its place in an order); `check` shows a check once it's picked.
-const Badge = ({ n, on, check }) => (
-  <span aria-hidden className={`nv-k${on ? " on" : ""}`}>
-    {on && check ? <Icon name="check" size={16} stroke={3} /> : n || ""}
-  </span>
-);
+// The number of an option (or its place in an order): the shared badge (ui.jsx).
+const Badge = OptionMark;
 const Mark = ({ right }) => <Icon name={right ? "check" : "info"} size={18} color={right ? "var(--right)" : "var(--warn)"} stroke={2.6} />;
 const Hint = ({ children }) => <p style={{ fontSize: "var(--t-sm)", color: "var(--mid)", margin: "12px 4px 0" }}>{children}</p>;
 
@@ -238,7 +234,7 @@ const parseNum = (v) => Number(String(v).replace(/[,\s$%]/g, ""));
 function NumberView({ step, value, setValue, checked, right, t, locale, submit }) {
   const s = spec(step, locale.region);
   return (
-    <label style={{ display: "flex", alignItems: "center", gap: 8, border: "2px solid var(--line)", background: "var(--surface)", borderRadius: 18, padding: "12px 16px", ...tone(checked ? (right ? "right" : "wrong") : value ? "on" : null) }}>
+    <label className="nv-numbox" style={{ display: "flex", alignItems: "center", gap: 8, border: "2px solid var(--line)", background: "var(--surface)", borderRadius: 18, padding: "12px 16px", ...tone(checked ? (right ? "right" : "wrong") : value ? "on" : null) }}>
       {s.unit === "money" && <span style={{ fontSize: "var(--t-title)", color: "var(--mid)", fontWeight: 600 }}>$</span>}
       <input data-q="number" inputMode="decimal" autoComplete="off" value={value} disabled={!!checked} onChange={(e) => setValue(e.target.value.slice(0, 14))} onKeyDown={(e) => e.key === "Enter" && submit()} aria-label={t("q.number.label")} placeholder="0" style={{ flex: 1, minWidth: 0, border: "none", background: "transparent", fontSize: "var(--t-head)", fontWeight: 700, color: "var(--ink)", outline: "none", fontVariantNumeric: "tabular-nums" }} />
       {s.unit === "percent" && <span style={{ fontSize: "var(--t-title)", color: "var(--mid)", fontWeight: 600 }}>%</span>}
@@ -270,7 +266,7 @@ function SpotView({ step, value, setValue, checked, t, locale }) {
             const state = checked ? (p.flag && on ? "right" : p.flag || on ? "wrong" : null) : on ? "on" : null;
             const border = state === "right" ? "var(--right)" : state === "wrong" ? "var(--warn)" : state === "on" ? "var(--select)" : "var(--line)";
             return (
-              <button key={i} data-q="spot-part" data-i={i} disabled={!!checked} aria-pressed={on} aria-label={`${x(p.tap)}${checked && p.flag ? `, ${t("q.spot.flag")}` : ""}`} onClick={() => tap(i)} style={{ font: "inherit", color: "var(--ink)", background: state === "right" ? "var(--rightSoft)" : state === "wrong" ? "var(--warnSoft)" : state === "on" ? "var(--brandSoft)" : "transparent", border: `2px ${(checked && p.flag && !on) || state === "wrong" ? "dashed" : "solid"} ${lines && !state ? "transparent" : border}`, borderRadius: lines ? 12 : 12, padding: lines ? "8px 12px" : "0 4px", margin: lines ? 0 : "0 0px", textAlign: "left", width: lines ? "100%" : undefined, cursor: checked ? "default" : "pointer", lineHeight: 1.5, fontVariantNumeric: "tabular-nums" }}>
+              <button key={i} data-q="spot-part" data-i={i} disabled={!!checked} aria-pressed={on} aria-label={`${x(p.tap)}${checked && p.flag ? `, ${t("q.spot.flag")}` : ""}`} onClick={() => tap(i)} style={{ font: "inherit", color: "var(--ink)", background: state === "right" ? "var(--rightSoft)" : state === "wrong" ? "var(--warnSoft)" : state === "on" ? "var(--brandSoft)" : "transparent", border: `2px ${(checked && p.flag && !on) || state === "wrong" ? "dashed" : "solid"} ${lines && !state ? "transparent" : border}`, borderRadius: 12, padding: lines ? "8px 12px" : "0 4px", margin: 0, textAlign: "left", width: lines ? "100%" : undefined, cursor: checked ? "default" : "pointer", lineHeight: 1.5, fontVariantNumeric: "tabular-nums" }}>
                 {x(p.tap)}
               </button>
             );
@@ -294,7 +290,7 @@ function ScenarioView({ step, value, setValue, checked, t, locale }) {
         const state = checked ? (sel ? (o.fit === "poor" ? "wrong" : "right") : null) : sel ? "on" : null;
         return (
           <button key={i} role="radio" aria-checked={sel} disabled={!!checked} onClick={() => setValue(i)} className="nv-press nv-opt" style={{ ...tone(state), opacity: checked && !sel ? 0.55 : 1 }}>
-            <Badge n={i + 1} on={sel} check />
+            <Badge n={i + 1} on={sel} mark={state === "right" ? "right" : state === "wrong" ? "wrong" : state === "on" ? "pick" : null} />
             <span style={{ flex: 1 }}>{x(o.text)}</span>
           </button>
         );

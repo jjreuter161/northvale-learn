@@ -79,8 +79,10 @@ h1,h2{color:var(--head)}
 button.nv-card{cursor:pointer}
 .nv-list{background:var(--surface);border:1px solid var(--line);border-radius:var(--r2);overflow:hidden}
 .nv-list>*+*{border-top:1px solid var(--line)}
-.nv-row{display:flex;align-items:center;gap:var(--s3);width:100%;min-height:56px;padding:var(--s3) var(--s4);text-align:left;border:0;background:transparent;color:var(--ink);font:inherit}
+.nv-row{display:flex;align-items:center;gap:var(--s3);width:100%;min-height:var(--touch-primary);padding:var(--s3) var(--s4);text-align:left;border:0;background:transparent;color:var(--ink);font:inherit}
 button.nv-row{cursor:pointer}
+.nv-row:focus-visible,.nv-list>*:focus-visible{outline-offset:-3px}
+.nv-numbox:focus-within{outline:3px solid var(--focus);outline-offset:2px}
 .nv-ico{display:flex;align-items:center;justify-content:center;flex-shrink:0;width:40px;height:40px;border-radius:var(--r1);background:var(--surface2)}
 .nv-tag{display:inline-flex;align-items:center;gap:var(--s1);min-height:28px;padding:0 var(--s3);border-radius:999px;background:var(--surface2);color:var(--ink);font-size:var(--t-cap);font-weight:var(--w2);line-height:var(--lh-tight);white-space:nowrap}
 .nv-chip{display:inline-flex;align-items:center;gap:var(--s2);min-height:var(--touch);padding:var(--s2) var(--s4);border:2px solid var(--line);border-radius:var(--r1);background:var(--surface);color:var(--ink);font-size:var(--t-body);font-weight:var(--w2);cursor:pointer}
@@ -92,12 +94,15 @@ button.nv-row{cursor:pointer}
 .nv-switch::after{content:"";position:absolute;left:6px;top:10px;width:24px;height:24px;border-radius:50%;background:var(--low);transition:left var(--m-press) ease-out,background-color var(--m-press) ease-out}
 .nv-switch[aria-checked=true]::before{background:var(--brand);border-color:var(--brand)}
 .nv-switch[aria-checked=true]::after{left:24px;background:var(--onBrand)}
+@media (forced-colors:active){.nv-switch{forced-color-adjust:none}.nv-switch::before{border-color:ButtonText;background:Canvas}.nv-switch::after{background:ButtonText}.nv-switch[aria-checked=true]::before{background:Highlight;border-color:Highlight}.nv-switch[aria-checked=true]::after{background:HighlightText}}
 .nv-field{display:block;width:100%;min-height:var(--touch-control);padding:var(--s3) var(--s4);border:1px solid var(--low);border-radius:var(--r1);background:var(--surface);color:var(--ink)}
 .nv-iconbtn{display:flex;align-items:center;justify-content:center;flex-shrink:0;width:var(--touch);height:var(--touch);border:0;border-radius:50%;background:var(--surface2);color:var(--ink);cursor:pointer}
 .nv-iconbtn.plain{background:transparent}
 .nv-cap{font-size:var(--t-cap);font-weight:var(--w2);letter-spacing:.06em;text-transform:uppercase;color:var(--mid)}
 
 /* A lesson: the header (close, progress, "3 of 6"), the reading column, the pinned action, and on a laptop the side panel. */
+[role=dialog]:focus,[role=dialog]:focus-visible{outline:none}
+[data-player]{scroll-padding-bottom:calc(var(--s8) + var(--s6));scroll-padding-top:var(--s7)}
 .nv-ovl{max-width:640px;min-height:100%;margin:0 auto;display:flex;flex-direction:column;padding:calc(var(--s2) + env(safe-area-inset-top)) var(--s4) calc(var(--s4) + env(safe-area-inset-bottom))}
 .nv-lhead{display:flex;align-items:center;gap:var(--s3);min-height:var(--touch-primary);margin-bottom:var(--s3)}
 .nv-lhead .count{flex-shrink:0;min-width:var(--touch);text-align:right;color:var(--mid);font-size:var(--t-sm);font-weight:var(--w2);white-space:nowrap}
@@ -105,8 +110,8 @@ button.nv-row{cursor:pointer}
 .nv-lesson{flex:1;display:flex;flex-direction:column;min-height:0}
 .nv-main{flex:1;display:flex;flex-direction:column;min-width:0}
 .nv-lside{display:none}
-.nv-dock{position:sticky;bottom:0;background:var(--bg);padding:var(--s3) 0 var(--s1);box-shadow:0 -12px 12px -8px var(--bg)}
-.nv-opt{display:flex;align-items:center;gap:var(--s3);width:100%;min-height:64px;padding:var(--s3) var(--s4);border:2px solid var(--line);border-radius:var(--r2);background:var(--surface);color:var(--ink);font:inherit;font-size:var(--t-lead);font-weight:var(--w2);text-align:left;cursor:pointer}
+.nv-dock{position:sticky;bottom:0;background:var(--bg);padding:var(--s3) 0 calc(var(--s1) + env(safe-area-inset-bottom));margin-bottom:calc(-1 * env(safe-area-inset-bottom));box-shadow:0 -12px 12px -8px var(--bg)}
+.nv-opt{display:flex;align-items:center;gap:var(--s3);width:100%;min-height:var(--touch-option);padding:var(--s3) var(--s4);border:2px solid var(--line);border-radius:var(--r2);background:var(--surface);color:var(--ink);font:inherit;font-size:var(--t-lead);font-weight:var(--w2);text-align:left;cursor:pointer}
 .nv-opt:disabled{cursor:default}
 .nv-k{display:flex;align-items:center;justify-content:center;flex-shrink:0;width:32px;height:32px;border:2px solid var(--line);border-radius:50%;color:var(--mid);font-size:var(--t-sm);font-weight:var(--w2)}
 .nv-k.on{background:var(--ink);border-color:var(--ink);color:var(--bg)}
@@ -236,6 +241,16 @@ export function Icon({ name, size = 22, color = "currentColor", stroke = 2, fill
 // whatever wears SELECTED also shows a check or a filled dot.
 export const SELECTED = { border: "2px solid var(--select)", boxShadow: "inset 0 0 0 1px var(--select)" };
 export const Chosen = ({ size = 18 }) => <Icon name="check" size={size} stroke={3} color="var(--ink)" />;
+// The badge of an answer option: its number. `mark` says what happened to it: "pick" (chosen, not yet checked) and "right" show a filled
+// check; "wrong" (a pick that missed) shows the hint icon on an unfilled badge, so after a miss the two differ by icon as well as by edge.
+export function OptionMark({ n, on, mark }) {
+  const check = mark === "right" || mark === "pick";
+  return (
+    <span aria-hidden="true" data-mark={mark || undefined} className={`nv-k${on || check ? " on" : ""}`}>
+      {check ? <Icon name="check" size={16} stroke={3} /> : mark === "wrong" ? <Icon name="info" size={16} stroke={2.4} /> : n || ""}
+    </span>
+  );
+}
 
 // BUTTONS — kind "primary" is the one red main button of a screen; "secondary" is outlined in the text color; "ghost" is
 // a plain link; "bad" is the final confirm of something that can't be undone. A button that can't be pressed yet is quiet
@@ -332,12 +347,24 @@ export function Chip({ active, onClick, children, style }) {
 
 // Two to four choices side by side (language, country, a daily goal).
 export function Segmented({ options, value, onChange, label, toggle }) {
+  const picked = options.findIndex((o) => o.value === value);
+  // Arrow keys, Home and End move the choice (and the focus with it).
+  const keys = (e) => {
+    if (toggle) return;
+    const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+    const to = step ? (Math.max(picked, 0) + step + options.length) % options.length : e.key === "Home" ? 0 : e.key === "End" ? options.length - 1 : -1;
+    if (to < 0) return;
+    e.preventDefault();
+    onChange(options[to].value);
+    const group = e.currentTarget;
+    requestAnimationFrame(() => group.querySelectorAll('[role="radio"]')[to]?.focus());
+  };
   return (
-    <div role={toggle ? "group" : "radiogroup"} aria-label={label} className="nv-seg">
-      {options.map((o) => {
+    <div role={toggle ? "group" : "radiogroup"} aria-label={label} className="nv-seg" onKeyDown={keys}>
+      {options.map((o, i) => {
         const on = value === o.value;
         return (
-          <button key={o.value} {...(toggle ? { "aria-pressed": on } : { role: "radio", "aria-checked": on })} onClick={() => onChange(o.value)} style={on ? SELECTED : undefined}>
+          <button key={o.value} {...(toggle ? { "aria-pressed": on } : { role: "radio", "aria-checked": on, tabIndex: on || (picked < 0 && i === 0) ? 0 : -1 })} onClick={() => onChange(o.value)} style={on ? SELECTED : undefined}>
             {o.label}
           </button>
         );
@@ -370,12 +397,21 @@ export function Layer({ children, onBack }) {
   const back = useRef(onBack);
   back.current = onBack;
   useEffect(() => {
+    const opener = document.activeElement;
     const root = document.getElementById("root");
     if (root) root.inert = ++layers > 0;
     const release = back.current ? holdBack(() => back.current && back.current()) : null;
+    // The dialog takes focus (so a screen reader starts in it and Tab stays in it).
+    const raf = requestAnimationFrame(() => {
+      const dialog = [...document.querySelectorAll('[role="dialog"]')].pop();
+      if (dialog && !dialog.contains(document.activeElement)) dialog.focus({ preventScroll: true });
+    });
     return () => {
+      cancelAnimationFrame(raf);
       if (root) root.inert = --layers > 0;
       if (release) release();
+      // Back to the button that opened it, if that is still there.
+      if (opener && opener !== document.body && document.contains(opener)) opener.focus({ preventScroll: true });
     };
   }, []);
   return createPortal(children, document.body);
@@ -394,7 +430,7 @@ export function Sheet({ open, onClose, title, children, tall, fill }) {
   if (!open) return null;
   return (
     <Layer onBack={onClose}>
-      <div role="dialog" aria-modal="true" aria-label={title} className="nv-sheetwrap" style={{ position: "fixed", inset: 0, zIndex: 60, display: "flex", justifyContent: "center", color: "var(--ink)", fontFamily: FONT }}>
+      <div role="dialog" aria-modal="true" aria-label={title} tabIndex={-1} className="nv-sheetwrap" style={{ position: "fixed", inset: 0, zIndex: 60, display: "flex", justifyContent: "center", color: "var(--ink)", fontFamily: FONT }}>
         <div onClick={onClose} className="nv-scrim" />
         <div className="nv-sheet" style={{ maxHeight: tall ? "92dvh" : "85dvh", ...(fill ? { height: "92dvh", display: "flex", flexDirection: "column", overflow: "hidden" } : { overflowY: "auto" }) }}>
           <div className="nv-grab" />
@@ -539,7 +575,7 @@ export const WaveEdge = ({ color = "var(--surface)", style }) => (
 );
 
 // TOASTS — short notes at the top ("+5 XP", "Saved"). Anyone can call toast(). One shows at a time, under the header; the
-// rest wait their turn (three at most, the same words never twice).
+// rest wait their turn (six at most, the same words never twice).
 const toastListeners = new Set();
 export function toast(message, tone = "info") {
   toastListeners.forEach((l) => l({ id: Math.random(), message, tone }));
@@ -555,7 +591,8 @@ export function Toasts() {
       timer = current ? setTimeout(next, 2400) : 0;
     };
     const l = (t) => {
-      if (queue.length < 3 && t.message !== (current && current.message) && !queue.some((q) => q.message === t.message)) queue.push(t);
+      if (t.message !== (current && current.message) && !queue.some((q) => q.message === t.message)) queue.push(t);
+      if (queue.length > 6) queue.shift();
       if (!timer) next();
     };
     toastListeners.add(l);

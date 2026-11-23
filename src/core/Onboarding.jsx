@@ -66,7 +66,7 @@ function Steps({ t, locale, onDone, phone }) {
     </>
   );
   const option = (key, icon, label, sub, onClick) => (
-    <button key={key} onClick={onClick} className="nv-press" style={{ display: "flex", alignItems: "center", gap: 16, width: "100%", textAlign: "left", border: "1px solid var(--line)", background: "var(--surface)", color: "var(--ink)", borderRadius: 12, padding: "16px 16px", marginBottom: 12, cursor: "pointer", minHeight: 64 }}>
+    <button key={key} onClick={onClick} className="nv-press" style={{ display: "flex", alignItems: "center", gap: 16, width: "100%", textAlign: "left", border: "1px solid var(--line)", background: "var(--surface)", color: "var(--ink)", borderRadius: 12, padding: 16, marginBottom: 12, cursor: "pointer", minHeight: 64 }}>
       {icon && (
         <span style={{ width: 38, height: 38, borderRadius: 12, background: "var(--brandSoft)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
           <Icon name={icon} size={20} />

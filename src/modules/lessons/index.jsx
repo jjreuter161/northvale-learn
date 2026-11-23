@@ -40,7 +40,7 @@ addStrings({
   "best.more": S("You've done today's lesson. One more builds on it.", "Ya hiciste la lección de hoy. Otra más refuerza lo aprendido."),
   "best.review": S("You have {n} {n|idea|ideas} to refresh. A short review helps you keep them.", "Tienes {n} {n|idea|ideas} por repasar. Un repaso corto ayuda a retenerlas."),
   "best.mission": S("You've done today's lesson. Next, something real: this week's mission.", "Ya hiciste la lección de hoy. Sigue algo real: la misión de esta semana."),
-  "best.year_new": S("Try a year of money choices in about 10 minutes. Example numbers, no risk.", "Prueba un año de decisiones de dinero en unos 10 minutos. Números de ejemplo, sin riesgo."),
+  "best.year_new": S("Try a year of money choices in about 10 minutes. Example numbers, pretend money.", "Prueba un año de decisiones de dinero en unos 10 minutos. Números de ejemplo, dinero de práctica."),
   "best.year_go": S("You're in month {m} of 12. Pick up where you left off.", "Vas en el mes {m} de 12. Sigue donde te quedaste."),
   "best.cta.review": S("Start review", "Empezar repaso"),
   "best.cta.mission": S("See the mission", "Ver la misión"),
@@ -822,7 +822,7 @@ function Course({ t, locale, go, route, layout }) {
       <SeaChart layout={layout} t={t} tx={tx} go={go} progress={progress} ci={ci} next={next} all={all} setAll={setAll} opened={opened} toggle={toggle} currentRef={currentRef} />
       <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 16 }}>
         {openedCards.map((u) => (
-          <Card key={u.id} pad="14px 0 6px">
+          <Card key={u.id} pad="16px 0 8px">
             <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "0 12px 4px 16px" }}>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: "var(--t-sm)", color: "var(--low)", fontWeight: 600 }}>{t("lessons.unit_n", { n: UNITS.indexOf(u) + 1 })}</div>
@@ -837,7 +837,7 @@ function Course({ t, locale, go, route, layout }) {
         ))}
         {current && (
           <div ref={currentRef} style={{ scrollMarginTop: 80 }}>
-            <Card pad="16px 0 6px">
+            <Card pad="16px 0 8px">
               <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "0 16px 8px 16px" }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: "var(--t-sm)", color: "var(--low)", fontWeight: 600 }}>{t("path.now", { n: ci + 1 })}</div>
@@ -1434,7 +1434,7 @@ function Overlay({ label, children, wide }) {
   }, []);
   return (
     <Layer>
-      <div role="dialog" aria-modal="true" aria-label={label} data-player="" style={{ position: "fixed", inset: 0, zIndex: 40, background: "var(--bg)", color: "var(--ink)", overflowY: "auto", overflowX: "hidden" }}>
+      <div role="dialog" aria-modal="true" aria-label={label} data-player="" tabIndex={-1} style={{ position: "fixed", inset: 0, zIndex: 40, background: "var(--bg)", color: "var(--ink)", overflowY: "auto", overflowX: "hidden" }}>
         <div className={`nv-ovl${wide ? " wide" : ""}`}>{children}</div>
       </div>
     </Layer>

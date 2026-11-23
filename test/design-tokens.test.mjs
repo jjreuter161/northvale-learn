@@ -23,6 +23,10 @@ const bads = {
   "an odd padding": ['<div style={{ padding: 14 }} />', "space"],
   "an odd padding in a string": ['<div style={{ padding: "10px 16px" }} />', "space"],
   "an odd gap in a choice": ['<div style={{ gap: big ? 6 : 8 }} />', "space"],
+  "an odd Card pad": ["<Card pad={14}>", "space"],
+  "an odd Card pad in a choice": ["<Card pad={big ? 20 : 16}>", "space"],
+  "an odd Card pad written as a string": ['<Card pad="6px 18px">', "space"],
+  "an odd Card pad written as a string, single quotes": ["<Card pad='14px 0 6px'>", "space"],
   "an odd margin in CSS": [".a{margin-top:10px}", "space"],
   "a size in pixels": ['<p style={{ fontSize: 13 }} />', "font"],
   "a size in CSS": [".a{font-size:15px}", "font"],
@@ -39,6 +43,7 @@ for (const [what, [code, kind]] of Object.entries(bads)) assert.ok(scanSource(co
 const goods = [
   '<div style={{ padding: 16, gap: 8, margin: "0 auto", marginTop: -4 }} />',
   '<div style={{ padding: "12px 24px", paddingBottom: "calc(96px + env(safe-area-inset-bottom))" }} />',
+  '<Card pad={0}><Card pad={16}><Card pad="8px 16px"><Card pad="16px 0 8px"><Card pad={big ? 24 : 16}>',
   '<p style={{ fontSize: "var(--t-body)", fontWeight: 600, lineHeight: 1.5, borderRadius: 18 }} />',
   '<p style={{ fontSize: big ? "var(--t-title)" : "var(--t-lead)", borderRadius: "50%" }} />',
   '<p style={{ fontSize: size }} />', // a size passed in (the wordmark)

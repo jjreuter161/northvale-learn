@@ -122,11 +122,11 @@ export default {
     {
       id: "insurance-3",
       title: T("Health, car and renters", "Salud, auto y hogar"),
-      life: T("If you rent or drive, find out which insurance you're required to have.", "Si rentas o manejas, averigua qué seguro estás obligado a tener."),
+      life: T("If you rent or drive, find out which insurance you're required to have.", "Si rentas o manejas, averigua qué seguro es obligatorio para ti."),
       steps: [
         card(
           T("Health", "Salud"),
-          T("Medical bills are one of the biggest money risks in the US. You can usually stay on a parent's plan until {@parentHealthPlanAge}; after that, jobs, the marketplace (HealthCare.gov) or Medicaid are the main options.", "Las cuentas médicas son uno de los mayores riesgos de dinero en EE. UU. Normalmente puedes seguir en el plan de tu mamá o papá hasta los {@parentHealthPlanAge}; después, las opciones principales son el trabajo, el mercado de seguros (HealthCare.gov) o Medicaid.", { en: "With a formal job you get IMSS care; students at public high schools and universities can also get IMSS coverage (the \"seguro facultativo\"). Private major-medical insurance (\"gastos médicos mayores\") is for big hospital bills, and many families add it.", es: "Con un trabajo formal tienes atención del IMSS; los estudiantes de preparatorias y universidades públicas también pueden tener IMSS (el seguro facultativo). El seguro privado de gastos médicos mayores es para cuentas grandes de hospital, y muchas familias lo contratan." })
+          T("Medical bills are one of the biggest money risks in the US. You can usually stay on a parent's plan until {@parentHealthPlanAge}; after that, jobs, the marketplace (HealthCare.gov) or Medicaid are the main options.", "Las cuentas médicas son uno de los mayores riesgos de dinero en EE. UU. Normalmente puedes seguir en el plan de tu mamá o papá hasta los {@parentHealthPlanAge}; después, las opciones principales son el trabajo, el mercado de seguros (HealthCare.gov) o Medicaid.", { en: "With a formal job you get IMSS care; students at public high schools and universities can also get IMSS coverage (the \"seguro facultativo\"). Private major-medical insurance (\"gastos médicos mayores\") is for big hospital bills, and many families add it.", es: "Con un trabajo formal tienes atención del IMSS; quienes estudian en preparatorias y universidades públicas también pueden tener IMSS (el seguro facultativo). El seguro privado de gastos médicos mayores es para cuentas grandes de hospital, y muchas familias lo contratan." })
         ),
         card(
           T("Car and home", "Auto y hogar"),

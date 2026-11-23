@@ -840,7 +840,7 @@ function GoalPage({ t, locale, go, row, data, onBack, sheets }) {
       </Card>
 
       <Label>{t("goal.paths", { amount: fmt(g.monthly) })}</Label>
-      <Card pad="6px 18px">
+      <Card pad="8px 16px">
         {n.byPath.map((p) => (
           <div key={p.path} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "12px 0", borderTop: p.path === "cash" ? "none" : "1px solid var(--line)" }}>
             <span style={{ display: "flex", alignItems: "center", gap: 12, fontSize: "var(--t-body)" }}>
@@ -891,7 +891,7 @@ function GoalPage({ t, locale, go, row, data, onBack, sheets }) {
       </Card>
 
       <Label>{t("goal.saved")}</Label>
-      <Card pad="6px 18px">
+      <Card pad="8px 16px">
         {entries.map((c, i) => (
           <div key={`${c.date}${i}`} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "12px 0", borderTop: i ? "1px solid var(--line)" : "none", ...NUM }}>
             <span style={{ fontSize: "var(--t-sm)", color: "var(--mid)" }}>{shortDate(c.date, locale)}</span>
@@ -915,7 +915,7 @@ function GoalPage({ t, locale, go, row, data, onBack, sheets }) {
       {lessons.length > 0 && (
         <>
           <Label>{t("goal.lessons")}</Label>
-          <Card pad="4px 18px">
+          <Card pad="4px 16px">
             {lessons.map((l, i) => (
               <button key={l.id} onClick={() => go("lessons", { lesson: l.id })} className="nv-press" style={{ display: "flex", alignItems: "center", gap: 12, width: "100%", textAlign: "left", border: "none", borderTop: i ? "1px solid var(--line)" : "none", background: "transparent", color: "var(--ink)", padding: "12px 0", cursor: "pointer", minHeight: 52 }}>
                 <Icon name="book" size={18} color="var(--mid)" />

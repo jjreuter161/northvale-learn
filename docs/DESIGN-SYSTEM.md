@@ -26,7 +26,7 @@ Three colors and their tints, all in `src/core/colors.js`. `lookFrom(background,
 
 Looks: Cream, Navy, Navy & cream, Cream & navy, Match my device (follows the phone), and Choose your own (only readable combinations are offered; `test/colors.test.mjs`).
 
-Use the **role variables**, never a color: `--bg` the page · `--surface` a card · `--surface2` a quiet fill · `--line` an edge · `--ink` text · `--head` a heading · `--mid` secondary text · `--low` the quietest readable text · `--brand` words, icons and borders in the text color · `--fill` and `--onFill` the main button and its label · `--select` a picked option's outline · `--focus` the keyboard ring · `--right` / `--rightSoft` a correct answer · `--scrim`, `--shade`, `--knobLift` depth only.
+Use the **role variables**, never a color: `--bg` the page · `--surface` a card · `--surface2` a quiet fill · `--line` an edge · `--ink` text · `--head` a heading · `--mid` secondary text · `--low` the quietest readable text · `--brand` words, icons and borders in the text color · `--fill` and `--onFill` the main button and its label · `--select` a picked option's outline · `--focus` the keyboard ring · `--right` / `--rightSoft` a correct answer · `--scrim` and `--shade` depth only.
 
 Rules (tested in `test/colors.test.mjs`):
 
@@ -95,7 +95,8 @@ Rules (tested in `test/colors.test.mjs`):
 | --- | --- | --- |
 | `--touch` | 44 | the smallest anything tappable may be (a small button, a chip, a row) |
 | `--touch-control` | 52 | a field, a segmented control, a normal button |
-| `--touch-primary` | 56 | the one main button on a screen |
+| `--touch-primary` | 56 | the one main button on a screen; a list row is as tall |
+| `--touch-option` | 64 | an answer option |
 
 **Motion** (exits take 70% as long; with reduced motion every transition and animation is instant)
 
@@ -142,7 +143,7 @@ Built once in `src/core/ui.jsx`; a screen uses them as they are and doesn't rest
 | `Switch` | A pill with a knob. Off is a quiet fill with a low knob; on is the text color with a light knob. A 44px target. |
 | `Field` | A text field: 52 high, a 1px edge in the quiet text color, corners 12; the focus ring comes from the page. |
 | `Sheet` | A bottom sheet (a centered dialog on a laptop): grab handle, title, a 44px close. Escape or the dim behind it closes it. |
-| `Toasts` | One note at a time under the header; the rest wait their turn (three at most). |
+| `Toasts` | One note at a time under the header; the rest wait their turn (six at most). |
 | `Note`, `Title`, `Label` | An inline note; a screen's title (`head`) with a line under it; a section heading. |
 | `Progress`, `Ring` | A 6 to 12px bar and a ring, on the `--line` track, filling in the text color. |
 | tab bar, rail | Phone: four tabs, a filled pill and a bold label for the current one. Computer: a left rail, 24px icons, `body` labels, the current one filled. Both mark it with `aria-current`. |

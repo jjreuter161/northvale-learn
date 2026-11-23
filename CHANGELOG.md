@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased — the redesign: one design system, a new lesson, Today, Settings and Ask
+
+The look is now a system (`docs/DESIGN-SYSTEM.md`): every size, weight, spacing, radius, duration and color the app uses comes from `src/core/tokens.js` and `src/core/colors.js`. The owner approved the proposal (`docs/design/redesign/`) on 2026-11-19.
+
+- **Design system:** eight text sizes (with a larger scale on a computer), three weights, two line heights, nine spacing steps, three corner radii, touch sizes of 56, 52 and 44, three motion speeds. `test/design-tokens.test.mjs` fails on any other value (1,548 stray ones were moved onto the tokens); `CLAUDE.md` carries the Design rules, including that any design change needs the owner's approval.
+- **Shared pieces rebuilt:** buttons (the one red main button is 56 high), flat cards with a 1px line, list rows, tags, chips, labelled two-to-four-way controls, a switch that is a 44px target, fields, sheets, one toast at a time, a tab bar with a filled pill and a left rail on a computer. Keyboard focus is a 3px ring in the text color (no second red thing when you type).
+- **Lesson:** a header with close, a progress bar and "3 of 6"; the kind of step and the lesson named above the text; reading-size text; bigger answer options with a numbered badge that becomes a check; the Correct / Not quite card sits right under the choices; one pinned button; a finish screen with a ring, one line of facts, the "In real life" card, one red button and a quiet Done. On a computer the steps show in a panel beside the text with "Ask about this". An idea card can carry a worked example in numbers (two do so far).
+- **Today:** one next-step card with the one red button, a five-unit path strip, at most two quiet rows (the course map's own Continue is no longer a second red button). **Welcome:** the whole picture, labelled language and country controls. **Settings:** a short first page (language and country, colors as four named looks), and the rest open as pages; Back closes the page first. **Ask:** one control on top, the offline note inside the first card, the answer depth as a switch under the field. **Not found:** a calm page in English and Spanish.
+- **Fixed on the way:** the Me level bar ran off the screen at 200% zoom; the Myth and Fact buttons could run off a narrow screen; the Close button of a sheet said "Close" in Spanish.
+- Tests: `test/redesign.test.mjs` (the strip, Back from a Settings page, the switch size, the focus ring, the welcome language buttons, the laptop lesson panel); a one-red-button check on every main screen; the usability, layout, quality, colors and browser tests were updated where the approved design changed what they expect.
+
 ## Unreleased — usability audit, items 10 to 32
 
 - **Lessons:** every step says which lesson and which step ("3 of 12"; an extra card and a retry don't count), idea cards are labelled, and on a computer Continue sits under the text. A goal step that finds a goal already made is done at once; the goal wording no longer says "first".

@@ -109,7 +109,7 @@ export default {
           "freelancing",
           T("A new client wants you to start their website now and pay “when it's done”. What do you do?", "Un cliente nuevo quiere que empieces su página web ya y te pague “cuando esté lista”. ¿Qué haces?"),
           [
-            fit(T("Ask for half up front and a short written agreement", "Pedir la mitad por adelantado y un acuerdo corto por escrito"), "good", T("You're protected if they disappear, and you both know what “done” means.", "Estás protegido si desaparecen, y los dos saben qué significa “lista”.")),
+            fit(T("Ask for half up front and a short written agreement", "Pedir la mitad por adelantado y un acuerdo corto por escrito"), "good", T("You're protected if they disappear, and you both know what “done” means.", "Tienes protección si desaparecen, y ambas partes saben qué significa “lista”.")),
             fit(T("Start, but email them the price and dates first", "Empezar, pero mandarles antes por correo el precio y las fechas"), "ok", T("Something in writing helps, though you still carry all the risk.", "Algo por escrito ayuda, aunque todo el riesgo sigue siendo tuyo.")),
             fit(T("Start right away with nothing in writing", "Empezar de inmediato sin nada por escrito"), "poor", T("If they never pay, you have nothing to point to.", "Si nunca pagan, no tienes nada con qué respaldarte.")),
           ],

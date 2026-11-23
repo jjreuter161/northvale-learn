@@ -93,7 +93,7 @@ try {
     await app.page.getByRole("heading", { name: "Today" }).waitFor();
     await app.page.waitForTimeout(300);
     const h = await app.page.evaluate(() => document.documentElement.scrollHeight);
-    assert.ok(h < 3500, `Today on a laptop is ${h}px tall (it was 6,100; the design system's larger type and spacing added a little to the 3,200 it settled at)`);
+    assert.ok(h < 3400, `Today on a laptop is ${h}px tall (it was 6,100, then 3,200 before the design system's larger type and spacing; it measures about 3,300 now)`);
     assert.ok(await app.page.getByRole("button", { name: /^Show \d+ more units$/ }).count(), "\"Show more units\" on a computer too");
     await app.close();
   }

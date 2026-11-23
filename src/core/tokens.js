@@ -6,7 +6,7 @@
 //
 // A screen asks for a token (`fontSize: "var(--t-sm)"`, `padding: 16`, `borderRadius: 18`)
 // and never invents a value. test/design-tokens.test.mjs fails when a value outside
-// these lists is added, and its baseline can only go down. Changing a value here, or
+// these lists is added (it allows none). Changing a value here, or
 // adding one, is a design change and needs the owner's approval (CLAUDE.md, "Design rules").
 
 // Spacing, on a 4px base. --s1 … --s8. Gutters are 16 on a phone and 32 to 48 on a laptop.
@@ -20,7 +20,7 @@ export const WEIGHT = { 1: 450, 2: 600, 3: 700 };
 // Line height: 1.5 for text you read, 1.2 for headings and big numbers.
 export const LEADING = { text: 1.5, tight: 1.2 };
 // Touch targets: nothing you tap is smaller than min; a main button is primary.
-export const TOUCH = { min: 44, control: 52, primary: 56 };
+export const TOUCH = { min: 44, control: 52, primary: 56, option: 64 };
 // Motion, in milliseconds: a press, something entering, a sheet, and the boat gliding between lessons (a picture, so slower). Exits take 70% as long. Reduced motion makes it instant.
 export const MOTION = { press: 120, enter: 200, sheet: 320, glide: 700 };
 
@@ -38,6 +38,6 @@ export function tokensCss() {
     ...Object.entries(RADIUS).map(([k, v]) => `--r${k}:${v}px`),
     ...Object.entries(TYPE).map(([k, v]) => `--t-${k}:${v[i]}px`),
   ];
-  const fixed = [...Object.entries(WEIGHT).map(([k, v]) => `--w${k}:${v}`), ...Object.entries(MOTION).map(([k, v]) => `--m-${k}:${v}ms`), ...Object.entries(LEADING).map(([k, v]) => `--lh-${k}:${v}`), `--touch:${TOUCH.min}px`, `--touch-control:${TOUCH.control}px`, `--touch-primary:${TOUCH.primary}px`];
+  const fixed = [...Object.entries(WEIGHT).map(([k, v]) => `--w${k}:${v}`), ...Object.entries(MOTION).map(([k, v]) => `--m-${k}:${v}ms`), ...Object.entries(LEADING).map(([k, v]) => `--lh-${k}:${v}`), `--touch:${TOUCH.min}px`, `--touch-control:${TOUCH.control}px`, `--touch-primary:${TOUCH.primary}px`, `--touch-option:${TOUCH.option}px`];
   return `:root{${[...vars(0), ...fixed].join(";")}}@media(min-width:1024px){:root{${Object.entries(TYPE).map(([k, v]) => `--t-${k}:${v[1]}px`).join(";")}}}`;
 }

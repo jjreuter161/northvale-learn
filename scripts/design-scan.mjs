@@ -122,12 +122,15 @@ export function scanSource(src, rel = "snippet.jsx") {
     const val = src.slice(at, at + 240).replace(/^["'`]/, "").split(/[;}"'`\n]/)[0];
     for (const d of val.matchAll(/(?<![\w.-])(\d*\.?\d+)(ms|s)\b/g)) if (!(parseFloat(d[1]) === 0.01 && d[2] === "ms")) found.push({ file: rel, kind: "motion", line: line(m.index), prop: "duration", value: val.trim().slice(0, 60), n: d[0], abs: -1, len: 0 });
   }
-  // A Card's pad={…} prop is spacing too.
-  for (const m of src.matchAll(/\bpad=\{/g)) {
-    const valStart = m.index + m[0].length;
-    let depth = 1, j = valStart;
-    for (; j < src.length && depth; j++) depth += src[j] === "{" ? 1 : src[j] === "}" ? -1 : 0;
-    const val = src.slice(valStart, j - 1);
+  // A Card's pad prop is spacing too: pad={16}, pad={big ? 24 : 16}, pad="4px 16px".
+  for (const m of src.matchAll(/\bpad=(\{|"[^"\n]*"|'[^'\n]*')/g)) {
+    let valStart = m.index + 4, val;
+    if (m[1] === "{") {
+      valStart += 1;
+      let depth = 1, j = valStart;
+      for (; j < src.length && depth; j++) depth += src[j] === "{" ? 1 : src[j] === "}" ? -1 : 0;
+      val = src.slice(valStart, j - 1);
+    } else val = m[1];
     for (const b of bad("space", val)) found.push({ file: rel, kind: "space", line: line(m.index), prop: "pad", value: val.trim().slice(0, 60), n: b.n, abs: valStart + b.idx, len: b.len, px: b.px, quoted: b.quoted });
   }
   // Colors: a hex value or rgb()/hsl() written outside colors.js. A comment doesn't count.

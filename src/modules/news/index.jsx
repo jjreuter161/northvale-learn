@@ -83,7 +83,7 @@ function Story({ item, t, onRead, read }) {
           <Icon name="sparkles" size={16} /> {t("news.ask")}
         </Button>
         {item.link && (
-          <a href={item.link} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: "var(--t-body)", fontWeight: 600, color: "var(--sky)", textDecoration: "none", padding: "8px 8px", minHeight: 36 }}>
+          <a href={item.link} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: "var(--t-body)", fontWeight: 600, color: "var(--sky)", textDecoration: "none", padding: 8, minHeight: 36 }}>
             {t("news.read")} <Icon name="external" size={15} />
           </a>
         )}

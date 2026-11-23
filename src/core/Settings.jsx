@@ -144,7 +144,7 @@ export default function Settings({ t, locale, go, layout, route }) {
         <div style={{ fontSize: "var(--t-sm)", fontWeight: 600, color: "var(--mid)", marginBottom: 8 }}>{t("onb.avatar")}</div>
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
           {AVATARS.map((c, i) => (
-            <button key={c} onClick={() => update((s) => ({ ...s, profile: { ...s.profile, avatar: i } }))} aria-label={t("onb.avatar.n", { n: i + 1 })} aria-pressed={profile.avatar === i} style={{ width: 40, height: 40, borderRadius: 18, background: c, border: profile.avatar === i ? "3px solid var(--ink)" : "3px solid transparent", cursor: "pointer" }} />
+            <button key={c} onClick={() => update((s) => ({ ...s, profile: { ...s.profile, avatar: i } }))} aria-label={t("onb.avatar.n", { n: i + 1 })} aria-pressed={profile.avatar === i} style={{ width: 44, height: 44, borderRadius: 999, background: c, border: profile.avatar === i ? "3px solid var(--ink)" : "3px solid transparent", cursor: "pointer" }} />
           ))}
         </div>
       </Card>
@@ -249,7 +249,7 @@ export default function Settings({ t, locale, go, layout, route }) {
           ["privacy", t("legal.privacy")],
           ["terms", t("legal.terms")],
         ].map(([doc, label]) => (
-          <ListRow key={doc} title={label} onClick={() => go("legal", { doc, from: "settings" })} right={<span className="nv-tag">{t("legal.draft")}</span>} />
+          <ListRow key={doc} title={label} onClick={() => go("legal", { doc, from: "settings", fromSection: "legal" })} right={<span className="nv-tag">{t("legal.draft")}</span>} />
         ))}
       </List>
       </Sec>

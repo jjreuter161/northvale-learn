@@ -82,7 +82,7 @@ export function AccountForm({ t, mode: start = "signup", signinOnly, onDone }) {
           <Field label={t("onb.nick.label")} value={nickname} onChange={(e) => setNick(e.target.value)} placeholder={t("onb.nick.placeholder")} maxLength={24} autoComplete="nickname" hint={t("onb.nick.hint")} />
           <label style={{ display: "block", marginBottom: 16 }}>
             <span style={{ display: "block", fontSize: "var(--t-sm)", fontWeight: 600, color: "var(--mid)", marginBottom: 8 }}>{t("onb.age.title")}</span>
-            <select required value={age} onChange={(e) => setAge(e.target.value)} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 12, padding: "12px 12px", background: "var(--surface)", color: "var(--ink)" }}>
+            <select required value={age} onChange={(e) => setAge(e.target.value)} style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 12, padding: 12, background: "var(--surface)", color: "var(--ink)" }}>
               <option value="" disabled>{t("account.age.pick")}</option>
               <option value="under13">{t("onb.age.under13")}</option>
               <option value="13-17">13–17</option>

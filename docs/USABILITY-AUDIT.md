@@ -9,15 +9,15 @@ The audit text below is the original, written before any fix. This table says wh
 | 1 | Finish screen hides Next and Done | Fixed (commit 8fa5e93) |
 | 2 | The chosen goal is replaced and the path jumps | Fixed (8fa5e93) |
 | 3 | The hands-on step is confusing | Fixed (8fa5e93); the lesson-3 repeat is item 11 |
-| 4 | Red means chosen | Fixed (8fa5e93); keyboard focus is still the red ring on purpose |
+| 4 | Red means chosen | Fixed (8fa5e93); keyboard focus is now a 3px ring in the text color too (the redesign, decision D4), so typing in a field never adds a second red thing |
 | 5 | Back leaves the app | Fixed in Chrome (8fa5e93); real phones unconfirmed |
 | 6 | Too many asks on day one | Fixed (30b239a) |
 | 7 | Ask without the AI key | Fixed for the offline experience (30b239a); the real tutor needs `ANTHROPIC_API_KEY` on the host |
 | 8 | Ask sheet on a phone | Fixed in Chrome (30b239a); the on-screen keyboard is unconfirmed |
 | 9 | Settings order and labels | Fixed (30b239a) |
-| 10 | Lesson cards are text on an empty screen | Partly fixed: the lesson and "3 of 12" show above every step, idea cards are labelled, and on a computer Continue sits under the text. Not done (art is frozen): pictures, and a worked number on each card (content) |
+| 10 | Lesson cards are text on an empty screen | Mostly fixed by the redesign: reading-size text under a clear heading, "3 of 6" in the header, the lesson named above the card, and a slot for a **worked example in numbers** (two cards have one so far; Part 4 writes the rest). On a computer the steps show beside the text. Still plain where a card has no example |
 | 11 | "Make your first goal" again | Fixed: a goal step that finds a goal is done at once; the wording no longer says "first" |
-| 12 | Today repeats itself and is endless | Partly fixed: a computer shows the next few islands and "Show more units" (Today 6,100 px to under 3,200). The same lesson still shows in the big card, the course card and the list (they are different views of it); the big card's reason line says why it changed |
+| 12 | Today repeats itself and is endless | Mostly fixed: one next-step card with the one red button, a five-unit path strip, and at most two quiet rows; the course map's own Continue is no longer a second red button; a computer shows the next few islands and "Show more units" (6,100 px to about 3,300). The same lesson can still appear in the card and, further down, in the course map (two views of one thing) |
 | 13 | Scores not explained | Fixed: "goal met" instead of 55 / 20 and 30 of 20, "Streak freezes", the Money Year scores explained, "1 day" singular. The streak star is unchanged (tapping it explains it) |
 | 14 | Spanish and Mexico slips | Fixed: a lesson's goal name follows the language, "Falta 1 año", no stray capital. Not changed: a bare "$" in the Both setting (it is how amounts are written everywhere) |
 | 15 | Welcome chips | Fixed: two labelled groups, words not flags, the picture is not cropped |
@@ -29,7 +29,7 @@ The audit text below is the original, written before any fix. This table says wh
 | 21 | Review looked long | Not changed: only reproducible by missing every question; a normal review is three questions |
 | 22 | No step count | Fixed |
 | 23 | Locked unit says nothing | Fixed |
-| 24 | Finish screen clutter | Partly fixed: the boat no longer sits on the caption |
+| 24 | Finish screen clutter | Fixed by the redesign: a ring with the XP, "Lesson complete", one line of facts, one "In real life" card, one red button for what is next and a quiet Done |
 | 25 | Wrong answers always repeat | Not changed: it is how mastery works, and it repeats once |
 | 26 | Missions list has no filter | Not changed: it would be a new feature (feature freeze) |
 | 27 | Skills sheet "New" wall | Fixed |
@@ -38,6 +38,14 @@ The audit text below is the original, written before any fix. This table says wh
 | 30 | macOS blocks the preview from ~/Downloads | Fixed by moving the project (and its worktrees) to `~/Projects/northvale-learn`, which macOS does not protect; `.claude/launch.json` runs `npm run dev` there |
 | 31 | "1 days" | Fixed |
 | 32 | Flag emoji | Fixed (with 15) |
+
+## Round 3: after the redesign (2026-11-20)
+
+The redesign (`docs/DESIGN-SYSTEM.md`) rebuilt the shared pieces and the main screens, so the audit was repeated by machine and by eye.
+
+**The sweep** (`node scripts/ui-sweep.mjs`) opens every screen a person can reach (Today, Goals, Practice, Me, the missions, Your Money Year, tools, news, achievements, skills, all seven Settings pages, Ask, the streak sheet, the course) at 320, 390, 768 and 1366 px wide, in English and Spanish, in Cream and Navy: 327 screens. For each it checks that nothing runs off the side, nothing you tap is under 44 px, no text is under 12 px or cut off, every picture and button has a name, there are no console errors, and there is at most one red button. `--spacing` repeats it with the text spacing people can set (WCAG 1.4.12). **Found:** the six avatar color buttons on Settings, Profile were 40 px (now 44). Nothing else: no overflow, tiny text, cut-off text, unnamed controls, console errors or second red buttons at any size.
+
+**The keyboard sweep** (`node scripts/focus-sweep.mjs`) presses Tab through every main screen and a lesson (an idea card, a question, its feedback) on a small phone (390 × 667) in English and Spanish and on a laptop, 1,128 stops, and checks that the focused control is on screen, not hidden behind the tab bar or the pinned button, and shows a ring (WCAG 2.4.7 and 2.4.11). **Found:** in a lesson's feedback, "Ask about this" could take focus while sitting behind the pinned Continue button (fixed: the lesson scrolls clear of it).
 
 Audit date: Wednesday 18 November 2026. Nothing was fixed. No app code was changed, nothing was committed or pushed.
 
