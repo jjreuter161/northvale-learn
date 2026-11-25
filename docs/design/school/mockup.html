@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Personal and school: a mockup</title>
+<!-- Mockup only (docs/SCHOOL-PLAN.md). Open with #en or #es. Rendered to PNG by docs/design/school/render.mjs. -->
+<style>
+  @font-face { font-family: "Inter"; font-weight: 100 900; src: url(../../../web/fonts/inter-latin-wght-normal.woff2) format("woff2"); }
+  @font-face { font-family: "EB Garamond"; font-weight: 600 700; src: url(../../../web/fonts/eb-garamond-latin-600-normal.woff2) format("woff2"); }
+  :root { --bg: #F7F2E8; --surface: #FFFDF8; --surface2: #EFE7D8; --ink: #1B3560; --mid: #3e5376; --low: #546683; --line: #E3D9C6; --red: #C8202A; --navy: #1B3560; --navyCard: #233F70; --cream: #F7F2E8; --sky: #E8EDF5; --sea: #D3DDEA; --sea2: #A9BBD5 }
+  * { box-sizing: border-box }
+  body { margin: 0; padding: 28px; background: #E9E1D1; color: var(--ink); font: 15px/1.4 Inter, system-ui, sans-serif }
+  h1.page { font-size: 20px; margin: 0 0 4px } p.note { margin: 0 0 22px; color: var(--mid); max-width: 1100px }
+  .frames { display: flex; gap: 32px; align-items: flex-start; flex-wrap: wrap }
+  figure { margin: 0 } figcaption { font-size: 13px; font-weight: 650; color: var(--mid); margin: 0 2px 8px }
+  .phone { width: 390px; height: 844px; background: var(--bg); border: 1px solid #cdbf9f; border-radius: 28px; overflow: hidden; position: relative; display: flex; flex-direction: column }
+  .laptop { width: 1366px; height: 768px; background: var(--bg); border: 1px solid #cdbf9f; border-radius: 12px; overflow: hidden; position: relative; display: flex }
+  .pad { padding: 18px 20px; flex: 1; display: flex; flex-direction: column; min-height: 0 }
+  .word { font: 650 24px "EB Garamond", serif; letter-spacing: -.3px; display: flex; align-items: center; gap: 8px }
+  .beta { font: 700 10px Inter; letter-spacing: .8px; background: var(--surface2); border-radius: 6px; padding: 3px 7px }
+  h2 { font-size: 30px; line-height: 1.1; margin: 18px 0 8px; letter-spacing: -.4px }
+  h3 { font-size: 17px; margin: 18px 0 8px }
+  .sub { color: var(--mid); margin: 0 0 16px; font-size: 15px }
+  .card { background: var(--surface); border-radius: 12px; box-shadow: 0 1px 3px rgba(27,53,96,.14); padding: 16px }
+  .choice { display: flex; gap: 14px; align-items: flex-start; background: var(--surface); border: 1.5px solid var(--line); border-radius: 12px; padding: 16px; margin-bottom: 12px }
+  .choice.on { border: 2px solid var(--ink); background: var(--surface) }
+  .choice b { display: block; font-size: 18px; margin-bottom: 3px }
+  .choice span { color: var(--mid); font-size: 14px }
+  .ico { width: 42px; height: 42px; border-radius: 10px; background: var(--surface2); display: flex; align-items: center; justify-content: center; flex: none }
+  .btn { display: flex; align-items: center; justify-content: center; min-height: 52px; border-radius: 18px; font-weight: 700; font-size: 17px; background: var(--red); color: var(--cream); border: none; width: 100% }
+  .btn.sec { background: var(--surface); color: var(--ink); border: 1.5px solid var(--line); font-size: 15px; min-height: 44px; border-radius: 15px }
+  .btn.sm { width: auto; padding: 0 16px; min-height: 44px; font-size: 15px; border-radius: 15px }
+  .link { color: var(--ink); font-weight: 650; text-align: center; font-size: 15px; margin: 6px 0 }
+  .grow { flex: 1 }
+  .field { margin-bottom: 12px } .field label { display: block; font-size: 14px; font-weight: 650; color: var(--mid); margin-bottom: 5px }
+  .input { border: 1px solid var(--line); border-radius: 8px; background: var(--bg); padding: 12px 14px; font-size: 16px; min-height: 46px }
+  .check { display: flex; gap: 10px; align-items: flex-start; font-size: 15px; margin: 10px 0 } .box { width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--ink); flex: none; display: flex; align-items: center; justify-content: center; background: var(--ink); color: var(--cream); font-size: 14px; font-weight: 800 }
+  .note { background: var(--surface2); border-radius: 10px; padding: 12px 14px; font-size: 14px; display: flex; gap: 10px; color: var(--ink) }
+  .note svg { flex: none } .note ul { margin: 0; padding-left: 18px } .note li { margin: 2px 0 }
+  .code { font-size: 40px; font-weight: 800; letter-spacing: 6px; margin: 2px 0 10px }
+  .tiny { font-size: 13px; color: var(--low) }
+  .row { display: flex; align-items: center; justify-content: space-between; gap: 10px }
+  .list { background: var(--surface); border-radius: 12px; box-shadow: 0 1px 3px rgba(27,53,96,.14); overflow: hidden }
+  .list .it { padding: 13px 16px; border-top: 1px solid var(--line) } .list .it:first-child { border-top: none }
+  .nick { font-weight: 700; font-size: 16px }
+  .units { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 6px; font-size: 13px; color: var(--mid) }
+  .dots { display: inline-flex; gap: 3px; margin-left: 6px; vertical-align: middle } .dots i { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid var(--ink); display: inline-block } .dots i.f { background: var(--ink) }
+  .yes, .no { display: flex; gap: 8px; align-items: flex-start; margin: 5px 0; font-size: 15px } .yes::before { content: "✓"; font-weight: 800 } .no::before { content: "✕"; color: var(--low); font-weight: 700 }
+  .tabbar { display: flex; justify-content: space-around; border-top: 1px solid var(--line); padding: 8px 0 14px; font-size: 12px; font-weight: 650; color: var(--low) } .tabbar .on { color: var(--ink) }
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; top: 70px; background: var(--bg); border-radius: 16px 16px 0 0; box-shadow: 0 -8px 30px rgba(5,12,25,.25); padding: 12px 20px 20px; display: flex; flex-direction: column }
+  .dim { position: absolute; inset: 0; background: rgba(5,12,25,.45) }
+  .grab { width: 40px; height: 5px; border-radius: 3px; background: var(--line); margin: 0 auto 10px }
+  .side { width: 240px; border-right: 1px solid var(--line); padding: 22px 14px; display: flex; flex-direction: column; gap: 6px; flex: none }
+  .nav { padding: 11px 14px; border-radius: 12px; font-weight: 650; color: var(--mid); display: flex; gap: 10px } .nav.on { border: 2px solid var(--ink); background: var(--surface2); color: var(--ink) }
+  .main { flex: 1; padding: 30px 48px; overflow: hidden }
+  table { border-collapse: collapse; width: 100%; font-size: 14px }
+  th, td { text-align: center; padding: 9px 6px; border-bottom: 1px solid var(--line) } th { font-size: 12px; color: var(--mid); font-weight: 650 } td:first-child, th:first-child { text-align: left; font-weight: 700; font-size: 15px; padding-left: 16px }
+  th.unit { font-size: 13px; color: var(--ink); border-bottom: none; padding-bottom: 0 }
+  .ok { font-weight: 800 } .dash { color: var(--line) }
+  .welcome-left { width: 50%; background: var(--navy); color: var(--cream); padding: 40px; display: flex; flex-direction: column }
+  .welcome-right { width: 50%; padding: 60px 90px; display: flex; flex-direction: column; justify-content: center }
+  .sea { height: 110px; border-radius: 12px; background: linear-gradient(var(--sky), #DCE5F0); position: relative; overflow: hidden; margin-bottom: 14px }
+  .sea::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 34px; background: var(--sea); border-radius: 50% 50% 0 0 / 30% 30% 0 0 }
+  .pill { display: inline-block; font-size: 12px; font-weight: 700; border-radius: 6px; padding: 2px 8px; background: var(--surface2) }
+</style>
+</head>
+<body>
+<h1 class="page" id="title"></h1>
+<p class="note" id="lead"></p>
+<div class="frames" id="phones"></div>
+<div class="frames" id="laptops" style="margin-top:36px"></div>
+<script>
+const L = (location.hash || "#en").slice(1) === "es" ? "es" : "en";
+document.documentElement.lang = L;
+const t = (en, es) => (L === "es" ? es : en);
+const sail = `<svg width="22" height="24" viewBox="0 0 22 24"><path d="M11 1v18M11 3 4 17h7zM12 6l6 11h-6z" fill="currentColor" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M2 19h18l-3 4H5z" fill="currentColor"/></svg>`;
+const icon = (d) => `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+const BOOK = icon('<path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/>');
+const USERS = icon('<circle cx="9" cy="8" r="3.2"/><path d="M3 20c.6-3.4 3-5.5 6-5.5s5.4 2.1 6 5.5"/><circle cx="17" cy="9" r="2.6"/><path d="M16.5 14.6c2.4.3 4 2 4.5 5"/>');
+const SHIELD = icon('<path d="M12 3 5 6v6c0 4.2 3 7.4 7 9 4-1.6 7-4.8 7-9V6z"/>');
+const CLASS = t("Period 3 Economics", "Economía 3.º B");
+const dots = (n, of = 3) => `<span class="dots">${Array.from({ length: of }, (_, i) => `<i class="${i < n ? "f" : ""}"></i>`).join("")}</span>`;
+const STUDENTS = [["Beto", { budget: 2 }], ["Caro", { budget: 1 }], ["Dani", { budget: 3, save: 1 }], ["Eli", {}]];
+const UNIT = { budget: t("Budgeting", "Presupuesto"), save: t("Saving", "Ahorro") };
+const lessonsOf = (u) => Object.values(u).reduce((a, b) => a + b, 0);
+const phoneTop = `<div class="row"><div class="word">${sail} Northvale <span class="beta">BETA</span></div><span class="pill">${t("Ask", "Preguntar")}</span></div>`;
+const tabs = (on) => `<div class="tabbar">${[t("Learn", "Aprender"), t("Goals", "Metas"), t("Practice", "Práctica"), t("Me", "Yo")].map((x, i) => `<span class="${i === on ? "on" : ""}">${x}</span>`).join("")}</div>`;
+
+// ---- phone screens ----
+const P = [];
+P.push([t("1 · The one choice at the start", "1 · La única elección al empezar"), `<div class="pad">
+  <div class="word">${sail} Northvale <span class="beta">BETA</span></div>
+  <h2>${t("How will you use Northvale?", "¿Cómo vas a usar Northvale?")}</h2>
+  <p class="sub">${t("Same lessons either way. You can change this later in Settings.", "Las mismas lecciones en los dos casos. Puedes cambiarlo después en Ajustes.")}</p>
+  <div class="choice on"><div class="ico">${BOOK}</div><div><b>${t("I'm a student", "Soy estudiante")}</b><span>${t("Learn money step by step, on your own or with your class.", "Aprende de dinero paso a paso, por tu cuenta o con tu clase.")}</span></div></div>
+  <div class="choice"><div class="ico">${USERS}</div><div><b>${t("I'm a teacher", "Soy docente")}</b><span>${t("Make a class, share a code, and see who finished which lessons. Free during the pilot.", "Crea una clase, comparte un código y ve quién terminó qué lecciones. Gratis durante el piloto.")}</span></div></div>
+  <div class="link" style="margin-top:6px">${t("Have a class code? Join a class", "¿Tienes un código de clase? Únete a una clase")}</div>
+  <div class="grow"></div>
+  <div class="tiny" style="margin-bottom:10px">${t("Language: English · Español &nbsp;&nbsp; Country: US · México", "Idioma: English · Español &nbsp;&nbsp; País: US · México")}</div>
+  <div class="btn">${t("Continue", "Continuar")}</div></div>`]);
+
+P.push([t("2 · Teacher: one setup screen", "2 · Docente: una sola pantalla para empezar"), `<div class="pad">
+  <div class="tiny">‹ ${t("Back", "Atrás")}</div>
+  <h2 style="font-size:26px">${t("Set up your teacher account", "Crea tu cuenta de docente")}</h2>
+  <div class="field"><label>${t("Email", "Correo")}</label><div class="input">ms.rivera@school.edu</div></div>
+  <div class="field"><label>${t("Password", "Contraseña")}</label><div class="input">••••••••••••</div></div>
+  <div class="check"><span class="box">✓</span>${t("I'm 18 or older", "Tengo 18 años o más")}</div>
+  <div class="check"><span class="box">✓</span><span>${t("I agree to the <u>teacher terms</u>", "Acepto los <u>términos para docentes</u>")}</span></div>
+  <div class="note" style="margin:8px 0 14px">${SHIELD}<ul>
+    <li>${t("Free during the pilot. No ads, ever.", "Gratis durante el piloto. Nunca hay anuncios.")}</li>
+    <li>${t("We never sell or share student data.", "Nunca vendemos ni compartimos datos de estudiantes.")}</li>
+    <li>${t("Students use nicknames. You see which lessons they finish, nothing else.", "Los estudiantes usan apodos. Ves qué lecciones terminan, nada más.")}</li></ul></div>
+  <div class="grow"></div>
+  <div class="btn">${t("Create account", "Crear cuenta")}</div>
+  <div class="tiny" style="text-align:center;margin-top:8px">${t("Next: confirm your email, then name your class.", "Después: confirma tu correo y ponle nombre a tu clase.")}</div></div>`]);
+
+P.push([t("3 · Teacher: the class (one list)", "3 · Docente: la clase (una sola lista)"), `<div class="pad">
+  ${phoneTop}
+  <div class="tiny" style="margin-top:10px">‹ ${t("Classes", "Clases")}</div>
+  <h2 style="font-size:26px;margin-top:6px">${CLASS}</h2>
+  <div class="card"><div class="tiny">${t("Class code", "Código de la clase")}</div><div class="code">5JNW3B</div>
+    <div class="row"><span class="tiny" style="max-width:190px">${t("Students tap “Join a class” and type it, or open the link.", "Los estudiantes tocan “Únete a una clase” y lo escriben, o abren el enlace.")}</span><span class="btn sec sm">${t("Copy link", "Copiar enlace")}</span></div></div>
+  <h3>${t("Who finished which lessons", "Quién terminó qué lecciones")} <span class="tiny" style="font-weight:500">· ${t("4 students", "4 estudiantes")}</span></h3>
+  <div class="list">${STUDENTS.map(([n, u]) => `<div class="it"><div class="row"><span class="nick">${n}</span><span class="tiny">${lessonsOf(u) ? t(`${lessonsOf(u)} ${lessonsOf(u) === 1 ? "lesson" : "lessons"}`, `${lessonsOf(u)} ${lessonsOf(u) === 1 ? "lección" : "lecciones"}`) : t("No lessons yet", "Aún sin lecciones")}</span></div>${lessonsOf(u) ? `<div class="units">${Object.entries(u).map(([k, v]) => `<span>${UNIT[k]}${dots(v)}</span>`).join("")}</div>` : ""}</div>`).join("")}</div>
+  <div class="grow"></div>
+  <div class="tiny" style="text-align:center">${t("You see nicknames and finished lessons. Nothing else.", "Ves apodos y lecciones terminadas. Nada más.")}</div>
+  <div class="link">${t("Class settings", "Ajustes de la clase")}</div></div>${tabs(3)}`]);
+
+P.push([t("4 · Student: joining with a code", "4 · Estudiante: unirse con un código"), `<div class="pad" style="opacity:.5">${phoneTop}</div><div class="dim"></div><div class="sheet"><div class="grab"></div>
+  <div class="row"><h2 style="font-size:26px;margin:4px 0 12px">${t("Join a class", "Únete a una clase")}</h2><span class="pill" style="font-size:16px">✕</span></div>
+  <div class="field"><label>${t("Class code", "Código de la clase")}</label><div class="input" style="letter-spacing:3px;font-weight:700">5JNW3B</div><div class="tiny" style="margin-top:5px">✓ ${CLASS}</div></div>
+  <div class="card" style="padding:12px 14px">
+    <div style="font-weight:700;margin-bottom:2px">${t("Your teacher sees", "Tu profe ve")}</div>
+    <div class="yes">${t("Your nickname", "Tu apodo")}</div><div class="yes">${t("Which lessons you finish from now on", "Qué lecciones terminas desde ahora")}</div>
+    <div style="font-weight:700;margin:8px 0 2px">${t("Never", "Nunca")}</div>
+    <div class="no">${t("Your goals, amounts or notes", "Tus metas, cantidades ni notas")}</div><div class="no">${t("What you ask the tutor", "Lo que le preguntas al tutor")}</div><div class="no">${t("Your age or email", "Tu edad ni tu correo")}</div>
+    <div class="tiny" style="margin-top:8px">${t("No messages. Leave anytime; your progress stays yours.", "Sin mensajes. Sal cuando quieras; tu avance sigue siendo tuyo.")}</div></div>
+  <div class="field" style="margin-top:12px"><label>${t("Nickname for this class", "Apodo para esta clase")}</label><div class="input">Ana</div><div class="tiny" style="margin-top:5px">${t("A nickname, not your full name.", "Un apodo, no tu nombre completo.")}</div></div>
+  <div class="grow"></div><div class="btn">${t("Join class", "Unirme a la clase")}</div></div>`]);
+
+P.push([t("5 · Student: home, at school or at home", "5 · Estudiante: inicio, en la escuela o en casa"), `<div class="pad">
+  ${phoneTop}
+  <div class="tiny" style="margin-top:12px;font-weight:600">${t("Monday, December 1", "Lunes, 1 de diciembre")}</div>
+  <h2 style="margin-top:2px;font-size:34px">${t("Today", "Hoy")}</h2>
+  <div class="card" style="padding:0;overflow:hidden"><div class="sea" style="border-radius:0;margin:0;height:96px"></div><div style="padding:12px 16px 16px">
+    <div class="tiny">${t("Unit 1 · Budgeting", "Unidad 1 · Presupuesto")}</div><div style="font-size:24px;font-weight:750;margin:2px 0 10px">${t("Needs vs. wants", "Necesidades y gustos")}</div>
+    <div class="btn">${t("Continue", "Continuar")}</div></div></div>
+  <div class="card" style="margin-top:12px;display:flex;gap:12px;align-items:center"><div class="ico">${USERS}</div><div style="flex:1"><b>${t("Your class:", "Tu clase:")} ${CLASS}</b><div class="tiny">${t("Your teacher sees which lessons you finish.", "Tu profe ve qué lecciones terminas.")}</div></div><span>›</span></div>
+  <div class="card" style="margin-top:12px"><b>${t("Use Northvale at home too", "Usa Northvale también en casa")}</b>
+    <div class="tiny" style="margin:4px 0 10px">${t("Save your progress with a free account; your lessons and your class follow you to any phone or computer. Under 18: a parent or guardian says OK first.", "Guarda tu avance con una cuenta gratis; tus lecciones y tu clase te siguen en cualquier teléfono o computadora. Menores de 18: primero da el OK una mamá, papá o tutor.")}</div>
+    <div class="btn sec">${t("Save my progress", "Guardar mi avance")}</div></div>
+  <div class="grow"></div></div>${tabs(0)}`]);
+
+// ---- laptop screens ----
+const SIDE = (on) => `<div class="side"><div class="word" style="margin:0 6px 18px">${sail} Northvale <span class="beta">BETA</span></div>${[[t("Learn", "Aprender")], [t("Goals", "Metas")], [t("Practice", "Práctica")], [t("Me", "Yo")]].map(([x], i) => `<div class="nav ${i === on ? "on" : ""}">${x}</div>`).join("")}${on === 3 ? `<div class="nav" style="margin-left:22px;font-size:14px;border:2px solid var(--line)">${t("Classes", "Clases")}</div>` : ""}<div class="grow"></div><div class="nav" style="background:var(--surface)">${t("Ask", "Preguntar")}</div></div>`;
+const LP = [];
+LP.push([t("Laptop · the choice at the start", "Laptop · la elección al empezar"), `<div class="welcome-left"><div class="word" style="color:var(--cream)">${sail} Northvale</div><div class="grow"></div>
+  <div style="font-size:44px;font-weight:750;line-height:1.05;letter-spacing:-.6px">${t("Find your open water", "Encuentra tu mar abierto")}</div>
+  <p style="opacity:.85;max-width:420px;font-size:17px">${t("Calm, practical money lessons in English and Spanish, made for life in the US and Mexico.", "Lecciones de dinero tranquilas y prácticas, en español e inglés, para la vida en México y EE. UU.")}</p><div class="grow"></div></div>
+  <div class="welcome-right"><h2 style="font-size:34px;margin:0 0 8px">${t("How will you use Northvale?", "¿Cómo vas a usar Northvale?")}</h2>
+  <p class="sub">${t("Same lessons either way. You can change this later in Settings.", "Las mismas lecciones en los dos casos. Puedes cambiarlo después en Ajustes.")}</p>
+  <div class="choice on"><div class="ico">${BOOK}</div><div><b>${t("I'm a student", "Soy estudiante")}</b><span>${t("Learn money step by step, on your own or with your class.", "Aprende de dinero paso a paso, por tu cuenta o con tu clase.")}</span></div></div>
+  <div class="choice"><div class="ico">${USERS}</div><div><b>${t("I'm a teacher", "Soy docente")}</b><span>${t("Make a class, share a code, and see who finished which lessons. Free during the pilot.", "Crea una clase, comparte un código y ve quién terminó qué lecciones. Gratis durante el piloto.")}</span></div></div>
+  <div class="link" style="text-align:left;margin:4px 0 22px">${t("Have a class code? Join a class", "¿Tienes un código de clase? Únete a una clase")}</div>
+  <div class="btn" style="max-width:420px">${t("Continue", "Continuar")}</div></div>`]);
+
+const COLS = [["budget", 3], ["save", 3]];
+const UNIT2 = { ...UNIT, banking: t("Banking", "Banco") };
+LP.push([t("Laptop · teacher: the class", "Laptop · docente: la clase"), `${SIDE(3)}<div class="main">
+  <div class="tiny">‹ ${t("Classes", "Clases")}</div>
+  <div class="row" style="align-items:flex-start;gap:30px"><div style="flex:1">
+    <h2 style="margin:6px 0 4px">${CLASS}</h2><p class="sub">${t("Who finished which lessons · 4 students", "Quién terminó qué lecciones · 4 estudiantes")}</p>
+    <div class="list" style="padding:6px 0"><table>
+      <tr><th></th>${COLS.map(([u, n]) => `<th class="unit" colspan="${n}">${UNIT2[u]}</th>`).join("")}<th></th></tr>
+      <tr><th>${t("Nickname", "Apodo")}</th>${COLS.map(([, n]) => Array.from({ length: n }, (_, i) => `<th>${i + 1}</th>`).join("")).join("")}<th>${t("Lessons", "Lecciones")}</th></tr>
+      ${STUDENTS.map(([nm, u]) => `<tr><td>${nm}</td>${COLS.map(([k, n]) => Array.from({ length: n }, (_, i) => `<td>${i < (u[k] || 0) ? '<span class="ok">✓</span>' : '<span class="dash">·</span>'}</td>`).join("")).join("")}<td>${lessonsOf(u)}</td></tr>`).join("")}
+    </table></div>
+    <p class="tiny" style="margin-top:10px">${t("Units show once someone in the class starts them. You see nicknames and finished lessons, nothing else: never goals, amounts, notes, tutor questions, age or email.", "Las unidades aparecen cuando alguien de la clase las empieza. Ves apodos y lecciones terminadas, nada más: nunca metas, cantidades, notas, preguntas al tutor, edad ni correo.")}</p></div>
+  <div style="width:330px;flex:none;margin-top:44px"><div class="card"><div class="tiny">${t("Class code", "Código de la clase")}</div><div class="code">5JNW3B</div><div class="btn sec">${t("Copy join link", "Copiar enlace para unirse")}</div>
+    <div class="tiny" style="margin-top:10px">${t("Students tap “Join a class” and type the code, or open the link.", "Los estudiantes tocan “Únete a una clase” y escriben el código, o abren el enlace.")}</div></div>
+    <div class="card" style="margin-top:12px"><b>${t("Class settings", "Ajustes de la clase")}</b><div class="tiny" style="margin-top:4px">${t("Taking new students · New code · End the class", "Acepta estudiantes nuevos · Código nuevo · Terminar la clase")}</div></div>
+    <div class="note" style="margin-top:12px">${SHIELD}<span>${t("Free during the pilot. No ads, ever. Student data is never sold or shared.", "Gratis durante el piloto. Nunca hay anuncios. Los datos de estudiantes nunca se venden ni se comparten.")}</span></div></div></div></div>`]);
+
+LP.push([t("Laptop · student: joining with a code", "Laptop · estudiante: unirse con un código"), `${SIDE(0)}<div class="main" style="opacity:.45"><div class="tiny">${t("Monday, December 1", "Lunes, 1 de diciembre")}</div><h2 style="font-size:40px;margin-top:2px">${t("Today", "Hoy")}</h2><div class="sea" style="height:240px;max-width:700px"></div></div>
+  <div class="dim"></div><div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:520px;background:var(--bg);border-radius:16px;padding:22px 26px;box-shadow:0 10px 40px rgba(5,12,25,.35)">
+  <div class="row"><h2 style="font-size:28px;margin:0 0 12px">${t("Join a class", "Únete a una clase")}</h2><span class="pill" style="font-size:16px">✕</span></div>
+  <div class="row" style="gap:14px;align-items:flex-start"><div class="field" style="flex:1"><label>${t("Class code", "Código de la clase")}</label><div class="input" style="letter-spacing:3px;font-weight:700">5JNW3B</div><div class="tiny" style="margin-top:5px">✓ ${CLASS}</div></div>
+  <div class="field" style="flex:1"><label>${t("Nickname for this class", "Apodo para esta clase")}</label><div class="input">Ana</div><div class="tiny" style="margin-top:5px">${t("Not your full name.", "No tu nombre completo.")}</div></div></div>
+  <div class="card" style="padding:12px 14px;display:flex;gap:20px"><div style="flex:1"><div style="font-weight:700">${t("Your teacher sees", "Tu profe ve")}</div><div class="yes">${t("Your nickname", "Tu apodo")}</div><div class="yes">${t("Which lessons you finish from now on", "Qué lecciones terminas desde ahora")}</div></div>
+  <div style="flex:1"><div style="font-weight:700">${t("Never", "Nunca")}</div><div class="no">${t("Your goals, amounts or notes", "Tus metas, cantidades ni notas")}</div><div class="no">${t("What you ask the tutor", "Lo que le preguntas al tutor")}</div><div class="no">${t("Your age or email", "Tu edad ni tu correo")}</div></div></div>
+  <div class="tiny" style="margin:10px 0 14px">${t("No messages. Leave anytime; your progress stays yours.", "Sin mensajes. Sal cuando quieras; tu avance sigue siendo tuyo.")}</div>
+  <div class="btn">${t("Join class", "Unirme a la clase")}</div></div>`]);
+
+document.getElementById("title").textContent = t("Personal and school, one app: mockups for approval", "Personal y escuela, una sola app: bocetos para aprobar");
+document.getElementById("lead").textContent = t("Not working screens. The same app, colors and type; only what changes for school is shown. Phone 390 × 844, laptop 1366 × 768.", "No son pantallas reales. La misma app, colores y letra; solo se muestra lo que cambia para la escuela. Teléfono 390 × 844, laptop 1366 × 768.");
+document.getElementById("phones").innerHTML = P.map(([c, h]) => `<figure><figcaption>${c}</figcaption><div class="phone">${h}</div></figure>`).join("");
+document.getElementById("laptops").innerHTML = LP.map(([c, h]) => `<figure><figcaption>${c}</figcaption><div class="laptop">${h}</div></figure>`).join("");
+</script>
+</body>
+</html>
