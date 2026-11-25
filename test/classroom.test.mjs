@@ -206,3 +206,48 @@ const week = recap.recapFor({ user: leo, state: { settings: { lang: "en" }, prog
 assert.match(week.text, /PO Box 123, Austin, TX 78701$/);
 delete process.env.MAIL_POSTAL_ADDRESS;
 console.log("ok: the recap pauses itself after 4 quiet weeks with one short note (\"Turn them back on anytime in Settings\"); the mailing address goes in the footer once it's set");
+
+// ACCOUNTS AND CLASSES (docs/SCHOOL-PLAN.md, Step 3): any account can belong to classes; the account stands in
+// for the device's key, so a class follows a student from a school computer to their phone; progress never lives
+// in a class.
+{
+  const t2 = store.addUser({ email: "t2@school.example", passwordHash: "x", nickname: "T2", ageBand: "26+" });
+  store.updateUser(t2.id, { emailVerifiedAt: new Date().toISOString(), teacherTermsAt: new Date().toISOString() });
+  flags.set("classroom", { email: "t2@school.example", on: true });
+  const { id: cid } = classes.create(t2, "Linked class");
+  const code2 = classes.list(t2).find((c) => c.id === cid).code;
+  const user = (u) => store.userById(u.id);
+  const kid = store.addUser({ email: "kid@home.example", passwordHash: "x", nickname: "Kid", ageBand: "13-17" });
+  // Joined while signed in: linked at once.
+  const j = classes.join({ code: code2, nickname: "Kid", ageBand: "13-17" }, "10.7.0.1", kid);
+  assert.deepEqual(user(kid).classes, [{ classId: j.classId, memberId: j.memberId }]);
+  // Another device: no key, the account stands in; signed out, the device keeps it (401, not "gone").
+  const noKey = { classId: j.classId, memberId: j.memberId };
+  assert.equal(classes.studentView(noKey, user(kid)).name, "Linked class");
+  assert.equal(code(() => classes.studentView(noKey)), "SIGNED_OUT");
+  const stranger = store.addUser({ email: "stranger@example.com", passwordHash: "x", nickname: "S", ageBand: "26+" });
+  assert.equal(code(() => classes.studentView(noKey, stranger)), "GONE", "someone else's account can't");
+  assert.deepEqual(classes.myClasses(user(kid)).classes.map((c) => [c.name, c.nickname]), [["Linked class", "Kid"]]);
+  classes.report(noKey, { lessons: [UNITS[0].lessons[0].id] }, user(kid));
+  assert.deepEqual(classes.teacherView(t2, cid).students.find((s) => s.nickname === "Kid").done, [UNITS[0].lessons[0].id], "a report from the other device counts");
+  // A device that joined first, then signs in: the account claims the class.
+  const later = store.addUser({ email: "later@home.example", passwordHash: "x", nickname: "Later", ageBand: "13-17" });
+  const j2 = classes.join({ code: code2, nickname: "Later", ageBand: "13-17" }, "10.7.0.1");
+  assert.equal(code(() => classes.claim(later, { ...j2, key: "wrong" })), "GONE", "only with the device's key");
+  classes.claim(later, j2);
+  assert.deepEqual(user(later).classes, [{ classId: j2.classId, memberId: j2.memberId }]);
+  // Leaving, from any device, unlinks the account (the progress was never in the class).
+  classes.leave(noKey, user(kid));
+  assert.deepEqual(user(kid).classes, []);
+  assert.equal(classes.teacherView(t2, cid).students.some((s) => s.nickname === "Kid"), false);
+  // Removed by the teacher: the account's link is tidied away the next time it's read.
+  classes.removeStudent(t2, cid, j2.memberId);
+  assert.deepEqual(classes.myClasses(user(later)).classes, []);
+  assert.deepEqual(user(later).classes, []);
+  // An account deleted: its class records go with it.
+  const gone = store.addUser({ email: "gone@home.example", passwordHash: "x", nickname: "Gone", ageBand: "13-17" });
+  classes.join({ code: code2, nickname: "Gone", ageBand: "13-17" }, "10.7.0.1", gone);
+  classes.dropStudent(user(gone));
+  assert.equal(classes.teacherView(t2, cid).students.some((s) => s.nickname === "Gone"), false);
+}
+console.log("ok: any account can belong to classes: joined signed in or claimed later, then the account stands in for the device's key on another device; leaving or being removed unlinks it; deleting the account removes its class records");

@@ -15,6 +15,12 @@
 //   once 3+ students have answered on that concept.
 // - Students can hide from the class leaderboard and leave at any time
 //   (their record is deleted). There are no messages of any kind.
+// - Any account can belong to classes (user.classes: the class and member
+//   IDs, nothing else). A signed-in student who joins is linked at once; one
+//   who joined first links the class when they sign in (claim). The account
+//   then stands in for the device's key, so the class follows them from a
+//   school computer to their phone. Progress never lives in a class: leaving,
+//   being removed or the class ending deletes only the class's record.
 // - Archived classes are deleted 90 days later; deleting a teacher's
 //   account deletes their classes.
 // ponytail: classes live in the one data file and are found by scanning —
@@ -172,6 +178,17 @@ export function removeStudent(user, id, mid) {
 
 // ---- students ------------------------------------------------------------------
 
+// The classes an account belongs to (user.classes), kept to ones that still exist.
+const links = (user) => (user && Array.isArray(user.classes) ? user.classes : []);
+const linked = (user, classId, memberId) => links(user).some((x) => x.classId === classId && x.memberId === memberId);
+function link(user, classId, memberId) {
+  if (!user || linked(user, classId, memberId)) return;
+  store.updateUser(user.id, { classes: [...links(user), { classId, memberId }] });
+}
+function unlink(user, memberId) {
+  if (user && links(user).some((x) => x.memberId === memberId)) store.updateUser(user.id, { classes: links(user).filter((x) => x.memberId !== memberId) });
+}
+
 function byCode(code, ip) {
   const keys = [`join:${ip}`];
   if (throttled(keys)) throw fail(429, "Too many tries. Wait 15 minutes, then try again.");
@@ -186,7 +203,7 @@ function byCode(code, ip) {
 // Before joining: the class's name, to show with what the teacher will see.
 export const lookup = (code, ip) => ({ name: byCode(code, ip).name });
 
-export function join({ code, nickname, ageBand }, ip) {
+export function join({ code, nickname, ageBand }, ip, user = null) {
   const c = byCode(code, ip);
   // 13 and up (the app asks first; this is the rule, not the UI).
   if (!AGE_BANDS.includes(ageBand)) throw fail(400, "Classes are for ages 13 and up.", "AGE");
@@ -199,23 +216,47 @@ export function join({ code, nickname, ageBand }, ip) {
   const key = randomBytes(24).toString("base64url");
   c.members[mid] = { keyHash: sha256(key), nickname: nick, joined: dayKey(), hidden: false, report: null };
   store.changed();
+  link(user, c.id, mid);
   return { classId: c.id, memberId: mid, key, name: c.name, joined: dayKey() };
 }
 
-// A student's own membership, by its secret key. Gone (left, removed, or
-// the class deleted) → 404, and the app forgets it.
-function member({ classId, memberId, key }) {
+// A student's own membership: by its secret key (the device that joined), or by the signed-in account it's
+// linked to (any of the student's devices). Gone (left, removed, or the class deleted) → 404, and the app forgets
+// it; no key and not signed in → 401, and the app keeps it for when they sign in.
+function member({ classId, memberId, key }, user = null) {
   const c = own(all(), String(classId));
   const m = c && own(c.members, String(memberId));
-  if (!m || !sameHash(m.keyHash, sha256(String(key || "")))) throw fail(404, "You're not in this class anymore.", "GONE");
-  return { c, m };
+  if (!m) {
+    unlink(user, String(memberId));
+    throw fail(404, "You're not in this class anymore.", "GONE");
+  }
+  if (key ? sameHash(m.keyHash, sha256(String(key))) : linked(user, c.id, String(memberId))) return { c, m };
+  if (!key && !user) throw fail(401, "Sign in to see this class.", "SIGNED_OUT");
+  throw fail(404, "You're not in this class anymore.", "GONE");
+}
+// Signing in on a device that joined first: the account takes the class along.
+export function claim(user, who) {
+  const { c, m } = member(who);
+  link(user, c.id, String(who.memberId));
+  return { ok: true, name: c.name, joined: m.joined };
+}
+// The account's classes, for a device that doesn't know them yet (no key: the account stands in for it).
+export function myClasses(user) {
+  const out = [];
+  for (const { classId, memberId } of links(user)) {
+    const c = own(all(), classId);
+    const m = c && own(c.members, memberId);
+    if (m) out.push({ classId, memberId, name: c.name, joined: m.joined, nickname: m.nickname });
+  }
+  if (out.length !== links(user).length) store.updateUser(user.id, { classes: out.map(({ classId, memberId }) => ({ classId, memberId })) });
+  return { classes: out };
 }
 const status = (c) => (c.archivedAt ? "ended" : live(c) ? "ok" : "paused");
 
 // What the student's device says it did since joining — checked against
 // what exists, and capped, so a made-up report can't break the class.
-export function report(who, r = {}) {
-  const { c, m } = member(who);
+export function report(who, r = {}, user = null) {
+  const { c, m } = member(who, user);
   if (status(c) !== "ok") return { ok: false, status: status(c) };
   if (!allowed(`report:${who.memberId}`, 300)) return { ok: true, dropped: true };
   const concepts = {};
@@ -241,8 +282,8 @@ export function report(who, r = {}) {
 
 // The class as a student sees it: its name, assignments, and the
 // leaderboard (nicknames and this week's XP; hidden students left out).
-export function studentView(who) {
-  const { c, m } = member(who);
+export function studentView(who, user = null) {
+  const { c, m } = member(who, user);
   const week = weekStart(dayKey());
   const xp = (x) => (x.report && x.report.week === week ? x.report.xp : 0);
   return {
@@ -256,17 +297,18 @@ export function studentView(who) {
       .sort((a, b) => b.xp - a.xp || a.nickname.localeCompare(b.nickname)),
   };
 }
-export function hide(who, hidden) {
-  const { m } = member(who);
+export function hide(who, hidden, user = null) {
+  const { m } = member(who, user);
   m.hidden = hidden === true;
   store.changed();
   return { ok: true };
 }
-// Leaving deletes the student's record: the teacher no longer sees them.
-export function leave(who) {
-  const { c } = member(who);
+// Leaving deletes the student's class record (the teacher no longer sees them), never their progress.
+export function leave(who, user = null) {
+  const { c } = member(who, user);
   delete c.members[String(who.memberId)];
   store.changed();
+  unlink(user, String(who.memberId));
   return { ok: true };
 }
 
@@ -275,6 +317,14 @@ export function leave(who) {
 // Daily: archived classes go 90 days after archiving.
 export function purge(today = dayKey()) {
   for (const [id, c] of Object.entries(all())) if (c.archivedAt && addDays(c.archivedAt, KEEP_ARCHIVED_DAYS) <= today) delete all()[id];
+  store.changed();
+}
+// A student's account deleted: their class records go with it.
+export function dropStudent(user) {
+  for (const { classId, memberId } of links(user)) {
+    const c = own(all(), classId);
+    if (c && own(c.members, memberId)) delete c.members[memberId];
+  }
   store.changed();
 }
 // A teacher's account deleted: their classes go with it.

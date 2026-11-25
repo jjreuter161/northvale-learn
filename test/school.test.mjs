@@ -4,7 +4,8 @@
 //   - a teacher signs up on one screen (an adult age band, the teacher terms, what the school gets), then confirms
 //     their email and names a class; the server refuses a teacher sign-up from 13–17 or without the terms;
 //   - "Have a class code?" at the start opens the join screen over Today; the student's class shows on Today;
-//   - the teacher's one list shows which lessons each student finished, and nothing else.
+//   - the teacher's one list shows which lessons each student finished, and nothing else;
+//   - school and home: an account carries a student's lessons and class to another device, and leaving keeps them.
 // Runs after `npm run build`.
 import { spawn } from "node:child_process";
 import { mkdtempSync } from "node:fs";
@@ -12,6 +13,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import assert from "node:assert/strict";
 import { chromium } from "playwright-core";
+import { UNITS } from "../src/modules/lessons/units/all.js";
 
 const ROOT = join(import.meta.dirname, "..");
 const port = 20000 + Math.floor(Math.random() * 20000);
@@ -45,6 +47,33 @@ async function open(size, url = `${BASE}?school=on`) {
   return { page, context, top, tab, classes, errors, close: () => context.close() };
 }
 const ok = (m) => console.log(`ok: ${m}`);
+// Plays a lesson of the first unit through, answering each step right (as test/lessons.test.mjs does).
+async function play(app, lesson) {
+  const dlg = app.top();
+  const btn = (name) => dlg.getByRole("button", { name, exact: typeof name === "string" }).first();
+  const q = (k) => dlg.locator(`[data-q="${k}"]`);
+  const at = (v) => (Array.isArray(v) ? v[0] : v);
+  for (const st of lesson.steps) {
+    if (st.type === "card") await btn("Continue").click();
+    else if (st.type === "action") await btn(/^(Skip for now|Done — continue)$/).click();
+    else {
+      if (st.type === "choice") await dlg.getByRole("radio").nth(st.answer).click();
+      else if (st.type === "tf") await dlg.getByRole("radio").nth(st.answer ? 0 : 1).click();
+      else if (st.type === "scenario") await dlg.getByRole("radio").nth(st.options.findIndex((o) => o.fit !== "poor")).click();
+      else if (st.type === "number") await q("number").fill(String(at(st.spec.answer)));
+      else if (st.type === "match") for (let k = 0; k < st.pairs.length; k++) (await q("match-left").nth(k).click(), await q("match-right").and(dlg.locator(`[data-i="${k}"]`)).click());
+      else if (st.type === "order") for (let i = 0; i < st.items.length; i++) await q("order-item").and(dlg.locator(`[data-i="${i}"]`)).click();
+      else throw new Error(`no answer for ${st.type}`);
+      await btn("Check").click();
+      await btn("Continue").click();
+    }
+  }
+  if (await dlg.locator("[data-moment]").count()) await btn("Continue").click();
+  await btn("Done").click();
+  await app.page.getByRole("dialog").first().waitFor({ state: "detached" });
+}
+// (The app saves to the browser 0.3 s after a change.)
+const lessonsDone = async (page) => (await page.waitForTimeout(600), page.evaluate(() => Object.entries(JSON.parse(localStorage.getItem("northvale-learn-v1") || '{"progress":{"lessons":{}}}').progress.lessons).filter(([, l]) => l.done).map(([id]) => id).sort()));
 const RAW = /\b(cls|onb)\.[a-z]+(\.[a-z]+)*\b/;
 
 try {
@@ -170,6 +199,63 @@ try {
     assert.deepEqual(T.errors, []);
   }
   ok("the teacher's one list: a tick per finished lesson under each unit someone started; the rest is in Class settings");
+
+  // --- school and home: the same account, the same progress and class ---
+  {
+    // At school (a phone, no account yet): a lesson, then the offer to use it at home, then an account.
+    await T.page.keyboard.press("Escape");
+    const { page } = S;
+    await page.getByText("Use Northvale at home too").waitFor();
+    await page.getByRole("button", { name: /^(Start|Continue)$/ }).first().click();
+    await play(S, UNITS[0].lessons[0]);
+    assert.deepEqual(await lessonsDone(page), ["budget-1"]);
+    await page.evaluate(() => fetch("/api/auth/signup", { method: "POST", headers: { "X-Northvale": "1", "Content-Type": "application/json" }, body: JSON.stringify({ email: "ana@home.test", password: "a long student password", nickname: "Ana", ageBand: "13-17", guardian: true, avatar: 0 }) }));
+    await page.reload();
+    await page.waitForFunction(async () => (await (await fetch("/api/class/mine", { headers: { "X-Northvale": "1" } })).json()).classes.length === 1, null, { timeout: 15000 });
+    await page.getByText("Use Northvale at home too").waitFor({ state: "detached" });
+    // At home (a laptop): sign in, and the lesson and the class are there.
+    const H = await open(LAPTOP, BASE);
+    await H.page.getByRole("button", { name: "I already have an account" }).click();
+    await H.page.getByLabel("Email").fill("ana@home.test");
+    await H.page.getByLabel("Password").fill("a long student password");
+    await H.page.getByRole("button", { name: "Sign in", exact: true }).click();
+    await H.page.getByText("Your class: Period 3").waitFor({ timeout: 10000 });
+    assert.deepEqual(await lessonsDone(H.page), ["budget-1"], "the lesson from school is here");
+    // Without this device's own key the account stands in for it.
+    await H.page.evaluate(() => {
+      const s = JSON.parse(localStorage.getItem("northvale-learn-v1"));
+      s.modules.classroom.memberships = s.modules.classroom.memberships.map(({ key, ...m }) => m);
+      localStorage.setItem("northvale-learn-v1", JSON.stringify(s));
+    });
+    await H.page.reload();
+    await H.classes();
+    await H.page.getByText("Your teacher sees which lessons you finish, nothing else.").waitFor();
+    await H.page.waitForTimeout(500);
+    assert.equal(await H.page.getByText("You're not in this class anymore", { exact: false }).count(), 0);
+    // A lesson at home counts for the class too.
+    await H.tab("Learn");
+    await H.page.getByRole("button", { name: /^(Start|Continue)$/ }).first().click();
+    await play(H, UNITS[0].lessons[1]);
+    await H.page.waitForTimeout(6000); // the report goes out a few seconds after a change
+    const view = await T.page.evaluate(async () => {
+      const id = (await (await fetch("/api/teach", { headers: { "X-Northvale": "1" } })).json()).classes[0].id;
+      return (await fetch(`/api/teach/class?id=${encodeURIComponent(id)}`, { headers: { "X-Northvale": "1" } })).json();
+    });
+    assert.deepEqual(view.students.find((x) => x.nickname === "Ana").done.sort(), ["budget-1", "budget-2"], "school and home, one record");
+    // Leaving, at home: the class goes, every lesson stays; the school device forgets the class too.
+    await H.classes();
+    await H.page.getByRole("button", { name: "Leave class" }).click();
+    await H.top().getByText("You keep all your lessons and progress.", { exact: false }).waitFor();
+    await H.top().getByRole("button", { name: "Leave class" }).click();
+    await H.page.getByText("You left Period 3").waitFor();
+    assert.deepEqual(await lessonsDone(H.page), ["budget-1", "budget-2"], "leaving keeps every lesson");
+    await S.classes();
+    await page.getByText("You're no longer in Period 3").waitFor();
+    assert.ok((await lessonsDone(page)).includes("budget-1"), "and on the school device too");
+    assert.deepEqual([...S.errors, ...H.errors].filter((e) => !/not in this class|401|404/.test(e)), []);
+    await H.close();
+  }
+  ok("school and home: a student's account carries the lessons and the class to another device (the account stands in for the device's key); a lesson at home counts for the class; leaving keeps every lesson");
   await S.close();
   await T.close();
 } finally {

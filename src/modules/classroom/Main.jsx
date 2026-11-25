@@ -232,7 +232,8 @@ function JoinSheet({ t, go, initialCode, onClose }) {
   const join = () =>
     run(async () => {
       const r = await api("/api/class/join", { method: "POST", body: { code, nickname, ageBand: age } });
-      save((s) => ({ ...s, memberships: [...s.memberships, { classId: r.classId, memberId: r.memberId, key: r.key, name: r.name, joined: r.joined, nickname: nickname.trim() }] }));
+      // (Signed in: the server linked the class to the account already.)
+      save((s) => ({ ...s, memberships: [...s.memberships, { classId: r.classId, memberId: r.memberId, key: r.key, name: r.name, joined: r.joined, nickname: nickname.trim(), linked: !!sessionNow().user }] }));
       if (!profile.ageBand) update((s) => ({ ...s, profile: { ...s.profile, ageBand: age, ageAsked: true } }));
       if (!profile.role) update((s) => ({ ...s, profile: { ...s.profile, role: "student" } }));
       sendReports();

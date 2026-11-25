@@ -315,6 +315,7 @@ const routes = {
         throw fail(401, "That password isn't right.");
       }
       classes.dropTeacher(c.user.id);
+      classes.dropStudent(c.user);
       invites.dropUser(c.user.id);
       flags.forget(c.user.id);
       store.removeUser(c.user.id);
@@ -375,11 +376,14 @@ const routes = {
   // …and students, with the class code, then their member key (in the
   // body, never the address).
   "POST /api/class/lookup": { open: true, run: async (c) => classes.lookup(c.body.code, c.ip) },
-  "POST /api/class/join": { open: true, run: async (c) => classes.join(c.body, c.ip) },
-  "POST /api/class/report": { open: true, limit: 32000, run: async (c) => classes.report(c.body, c.body.report) },
-  "POST /api/class/view": { open: true, run: async (c) => classes.studentView(c.body) },
-  "POST /api/class/hide": { open: true, run: async (c) => classes.hide(c.body, c.body.hidden) },
-  "POST /api/class/leave": { open: true, run: async (c) => classes.leave(c.body) },
+  "POST /api/class/join": { open: true, run: async (c) => classes.join(c.body, c.ip, c.user) },
+  "POST /api/class/report": { open: true, limit: 32000, run: async (c) => classes.report(c.body, c.body.report, c.user) },
+  "POST /api/class/view": { open: true, run: async (c) => classes.studentView(c.body, c.user) },
+  "POST /api/class/hide": { open: true, run: async (c) => classes.hide(c.body, c.body.hidden, c.user) },
+  "POST /api/class/leave": { open: true, run: async (c) => classes.leave(c.body, c.user) },
+  // An account's classes: linking one this device joined, and listing them for another device.
+  "POST /api/class/claim": { run: async (c) => classes.claim(c.user, c.body) },
+  "GET /api/class/mine": { run: async (c) => classes.myClasses(c.user) },
 
   // One tutor reply, streamed as Server-Sent Events: "text" as it's
   // written, then "done" (or "error").

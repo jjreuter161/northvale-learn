@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased — school mode, Step 3: accounts and classes
+
+- **Any account can belong to classes.** The server keeps, on the account, which classes it's in (the class and member IDs, nothing else). A student who joins while signed in is linked at once; one who joined first links the class when they sign in.
+- **School and home, one student.** On another device the account stands in for the device's secret key, so the class (and, as before, the progress) follows a student from a school computer to their phone. A lesson finished at home counts for the class.
+- **Progress never lives in a class.** Leaving, being removed or the class ending deletes only the class's record; a device that's simply signed out keeps its class for when they sign in again. Deleting an account removes its class records.
+- **"Use Northvale at home too"** on Today for a student in a class without an account (a parent's or guardian's OK under 18, as before).
+- No payments: schools are free during the pilot; nothing to build.
+- Tests: account links in `test/classroom.test.mjs`; school to home, leaving keeps progress, in `test/school.test.mjs`.
+
 ## Unreleased — school mode, Step 2: the smallest teacher tool (behind the classroom flag)
 
 From `docs/SCHOOL-PLAN.md`: one app with two ways in. Nothing changes for anyone unless school mode is on (a tester link, `?school=on`, or the classroom flag on for everyone).
