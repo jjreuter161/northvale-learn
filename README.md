@@ -102,6 +102,8 @@ Everything works without keys. To turn on the AI tutor, real prices and reset em
 | [docs/VERIFY-BEFORE-LAUNCH.md](docs/VERIFY-BEFORE-LAUNCH.md) | **Every fact, number and rule to check before launch,** with sources (written from the code) |
 | [docs/marketing/](docs/marketing) | **The marketing kit** (English/Spanish): landing page copy, a printable flyer and about sheet (PDFs with a QR code), a teacher message, a 15-post social plan, a 45-second video script, and the honesty rules. `npm run marketing` rebuilds the PDFs for your web address |
 | [docs/LAUNCH.md](docs/LAUNCH.md) | **Launch day, in order:** your steps (accounts, keys, `.env`, Fly.io), the builder's steps after "go", the invite messages, the parent note, the one-week questions, and what to watch on `/admin` |
+| [docs/SCHOOL-PLAN.md](docs/SCHOOL-PLAN.md) | **Personal and school, one app:** the classroom mode review, the simple version (one choice at the start, one teacher list, a short join screen, accounts that belong to classes, the pilot quiz), and the decisions |
+| [docs/PILOT-PLAN.md](docs/PILOT-PLAN.md) | **A free 2–4 week school pilot:** what the teacher and school agree to, a parent note (English and Spanish), the timeline, running the quizzes, the proof to collect |
 | [docs/SETUP-KEYS.md](docs/SETUP-KEYS.md) | Getting the Twelve Data and Anthropic keys, AI costs by model, the tutor safety check |
 | [docs/DEPLOY.md](docs/DEPLOY.md) | Hosting recommendation, deploying to Fly.io step by step, backups, alerts, installing on phones |
 | [docs/BETA.md](docs/BETA.md) | Finding 20–50 testers, invite messages (English/Spanish), the one-week plan, what to ask |

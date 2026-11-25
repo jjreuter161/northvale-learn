@@ -383,6 +383,9 @@ const routes = {
   "POST /api/class/leave": { open: true, run: async (c) => classes.leave(c.body, c.user) },
   // An account's classes: linking one this device joined, and listing them for another device.
   "POST /api/class/claim": { run: async (c) => classes.claim(c.user, c.body) },
+  // The pilot: a student's quiz answers, then the end-of-pilot questions.
+  "POST /api/class/quiz": { open: true, run: async (c) => classes.answerQuiz(c.body, c.body, c.user) },
+  "POST /api/class/feedback": { open: true, run: async (c) => classes.feedback(c.body, c.body, c.user) },
   "GET /api/class/mine": { run: async (c) => classes.myClasses(c.user) },
 
   // One tutor reply, streamed as Server-Sent Events: "text" as it's
@@ -464,7 +467,7 @@ const routes = {
       s.comingBack.push.devicesNow = push.deviceCount();
       s.comingBack.recap.optedIn = store.allUsers().filter((u) => u.recap).length;
       s.comingBack.recap.emailOn = mail.mailMode() !== "off";
-      return { ...s, accounts: store.userCount(), waitlist: waitlist.summary(), growth: invites.stats(), classroom: classes.stats(), flags: flags.list(), ai: { ...ai, budget: AI_BUDGET, on: aiOpen(), explainLimit: EXPLAIN_DAILY_LIMIT, explainPerUse: ai.explainCalls ? ai.explain / ai.explainCalls : null }, generatedAt: new Date().toISOString() };
+      return { ...s, accounts: store.userCount(), waitlist: waitlist.summary(), growth: invites.stats(), classroom: { ...classes.stats(), comments: classes.pilotComments() }, flags: flags.list(), ai: { ...ai, budget: AI_BUDGET, on: aiOpen(), explainLimit: EXPLAIN_DAILY_LIMIT, explainPerUse: ai.explainCalls ? ai.explain / ai.explainCalls : null }, generatedAt: new Date().toISOString() };
     },
   },
   "POST /api/admin/waitlist/export": {

@@ -55,6 +55,9 @@ function growth(s) {
     table(["Share card", "Shared or saved"], Object.entries(s.shares).map(([k, n]) => [kinds[k] || k, n])),
     el("h2", {}, "Classroom mode (testers only)"),
     el("div", { class: "grid" }, card("Classes", c.classes, `${c.archived} archived (deleted 90 days after archiving)`), card("Teachers", c.teachers), card("Students", c.students, `${c.reporting} have sent progress`)),
+    // What students typed at the end of a pilot: for the owner only (teachers see totals). No nicknames.
+    el("h2", {}, "Pilot comments from students (owner only)"),
+    table(["Day", "Class", "What they wrote"], (c.comments || []).map((x) => [x.day, x.className, x.text])),
   ];
 }
 // The landing page's waitlist: who's on it, a CSV download, and deleting.

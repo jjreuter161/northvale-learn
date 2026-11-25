@@ -100,7 +100,8 @@ classes.report(who(s3), { lessons: ["nope", lessonIds[0]], concepts: { budgeting
 classes.assign(teacher, id, { unit: "budget", due: addDays(today, 7) });
 assert.equal(code(() => classes.assign(teacher, id, { unit: "budget", due: "2001-01-01" })), 400);
 view = classes.teacherView(teacher, id);
-assert.deepEqual(Object.keys(view).sort(), ["archivedAt", "assignments", "code", "concepts", "deletesOn", "id", "name", "open", "students"]);
+assert.deepEqual(Object.keys(view).sort(), ["archivedAt", "assignments", "code", "concepts", "deletesOn", "id", "name", "open", "pilot", "students"]);
+assert.deepEqual(Object.keys(view.pilot).sort(), ["feedback", "phase", "post", "pre", "questions", "started", "units"], "the pilot: totals only (tested below)");
 assert.deepEqual(Object.keys(view.students[0]).sort(), ["assignments", "done", "id", "lessons", "missions", "nickname", "units"], "per student: only these");
 const ana = view.students.find((s) => s.nickname === "Ana");
 assert.equal(ana.lessons, lessonIds.length);
@@ -251,3 +252,68 @@ console.log("ok: the recap pauses itself after 4 quiet weeks with one short note
   assert.equal(classes.teacherView(t2, cid).students.some((s) => s.nickname === "Gone"), false);
 }
 console.log("ok: any account can belong to classes: joined signed in or claimed later, then the account stands in for the device's key on another device; leaving or being removed unlinks it; deleting the account removes its class records");
+
+// THE PILOT QUIZ AND FEEDBACK (docs/PILOT-PLAN.md): the same 10 questions before and after, from up to 4 units;
+// graded on the server; the teacher sees totals only, from 3 students on; typed comments go to the owner only.
+{
+  const { quizFor } = await import("../src/modules/classroom/quiz.js");
+  const { UNITS: FULL } = await import("../src/modules/lessons/units/all.js");
+  const t3 = store.addUser({ email: "t3@school.example", passwordHash: "x", nickname: "T3", ageBand: "26+" });
+  store.updateUser(t3.id, { emailVerifiedAt: new Date().toISOString(), teacherTermsAt: new Date().toISOString() });
+  flags.set("classroom", { email: "t3@school.example", on: true });
+  const { id: pid } = classes.create(t3, "Pilot class");
+  const pcode = classes.list(t3).find((c) => c.id === pid).code;
+  const kids = ["P1", "P2", "P3", "P4"].map((nickname) => classes.join({ code: pcode, nickname, ageBand: "13-17" }, "10.8.0.1"));
+  const pv = () => classes.teacherView(t3, pid).pilot;
+  assert.equal(code(() => classes.update(t3, pid, { quiz: "pre" })), "NO_UNITS", "units first");
+  classes.update(t3, pid, { pilotUnits: ["budget", "save", "banking", "credit", "scams", "nope"] });
+  assert.deepEqual(pv().units, ["budget", "save", "banking", "credit"], "up to 4 real units");
+  classes.update(t3, pid, { pilotUnits: ["budget", "save", "banking"] });
+  const qs = quizFor(FULL, ["budget", "save", "banking"]);
+  assert.equal(qs.length, 10, "10 questions, taken in turn from each unit");
+  assert.equal(quizFor(FULL, ["budget"]).length, 4, "fewer when the units have fewer");
+  assert.deepEqual(pv().questions.map((q) => q.id), qs.map((q) => q.id), "the teacher sees the same questions");
+  assert.equal(code(() => classes.answerQuiz(kids[0], { phase: "pre", answers: [] })), "CLOSED_QUIZ", "not before it opens");
+  classes.update(t3, pid, { quiz: "pre" });
+  const seen = classes.studentView(kids[0]).quiz;
+  assert.equal(seen.phase, "pre");
+  assert.equal(seen.questions.length, 10);
+  assert.ok(seen.questions.every((q) => !("answer" in q)), "a device never gets the answers");
+  const right = qs.map((q) => q.answer);
+  const wrong = qs.map((q) => (q.answer + 1) % (q.tf ? 2 : q.options.length));
+  assert.deepEqual(classes.answerQuiz(kids[0], { phase: "pre", answers: right }), { score: 10, of: 10 });
+  assert.equal(code(() => classes.answerQuiz(kids[0], { phase: "pre", answers: right })), "TAKEN", "once");
+  classes.answerQuiz(kids[1], { phase: "pre", answers: wrong });
+  assert.deepEqual(pv().pre, { taken: 2 }, "under 3 students: a count, no scores");
+  assert.equal(code(() => classes.update(t3, pid, { pilotUnits: ["credit"] })), "STARTED", "units stay once it's started");
+  classes.answerQuiz(kids[2], { phase: "pre", answers: right.map((a, i) => (i < 5 ? a : wrong[i])) });
+  assert.equal(pv().pre.taken, 3);
+  assert.equal(pv().pre.average, 50, "(10 + 0 + 5) of 30");
+  assert.equal(pv().pre.perQuestion.length, 10);
+  assert.equal(classes.studentView(kids[0]).quiz.taken, true);
+  assert.equal(classes.studentView(kids[0]).quiz.questions, null);
+  // After: everyone right; then the end-of-pilot questions.
+  classes.update(t3, pid, { quiz: "post" });
+  assert.equal(code(() => classes.feedback(kids[0], { enjoyed: "yes", learned: "yes", again: "yes" })), 400, "only after the after quiz");
+  for (const k of kids.slice(0, 3)) classes.answerQuiz(k, { phase: "post", answers: right });
+  assert.equal(pv().post.average, 100);
+  assert.deepEqual(classes.studentView(kids[0]).feedback, { given: false });
+  assert.equal(code(() => classes.feedback(kids[0], { enjoyed: "yes", learned: "maybe", again: "yes" })), 400, "real choices only");
+  classes.feedback(kids[0], { enjoyed: "yes", learned: "yes", again: "maybe", comment: "The <b>zebracorn</b> card confused me" });
+  classes.feedback(kids[1], { enjoyed: "some", learned: "yes", again: "yes" });
+  assert.deepEqual(pv().feedback, { n: 2 }, "under 3: a count only");
+  classes.feedback(kids[2], { enjoyed: "yes", learned: "some", again: "no" });
+  assert.deepEqual(pv().feedback, { n: 3, enjoyed: { yes: 2, some: 1, no: 0 }, learned: { yes: 2, some: 1, no: 0 }, again: { yes: 1, maybe: 1, no: 1 } });
+  const comments = classes.pilotComments();
+  assert.equal(comments[0].text, "The  b zebracorn /b  card confused me", "no markup kept");
+  assert.equal(comments[0].className, "Pilot class");
+  assert.deepEqual(Object.keys(comments[0]).sort(), ["className", "day", "text"], "no nickname or member with a comment");
+  const tv = JSON.stringify(classes.teacherView(t3, pid));
+  assert.ok(!tv.includes("zebracorn"), "the teacher never sees what students typed");
+  assert.ok(!/"score"|"P1"[^}]*"pre"/.test(tv), "no per-student scores");
+  // Leaving takes a student's answers out of the totals.
+  classes.leave(kids[0]);
+  assert.equal(pv().pre.taken, 2);
+  assert.deepEqual(pv().feedback, { n: 2 });
+}
+console.log("ok: the pilot quiz: up to 4 units, the same 10 questions before and after, graded on the server (a device never gets the answers), once per student, totals only from 3 students; end-of-pilot answers as totals, typed comments for the owner only; leaving takes a student's answers out");

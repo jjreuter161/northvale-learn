@@ -1,4 +1,4 @@
-# Personal and school, one app: the plan (Step 1, for approval)
+# Personal and school, one app: the plan (approved 25 November 2026)
 
 One app with two ways in. The school version is the personal app plus a small teacher layer: the same lessons, the same Voyage, the same code. Nothing here is built yet. Mockups: `docs/design/school/` (phone and laptop, English and Spanish).
 
@@ -71,3 +71,7 @@ Rough size: Step 2 is the biggest (the choice, the teacher setup, the new list, 
 3. **Students without an account.** Recommended: allowed, as today; progress stays on that device until they make an account. The alternative, requiring an account to join, means progress always follows them, but every student under 18 needs a parent's OK before the first lesson in class.
 4. **Hide or delete the extras** (assignments, topic analytics, leaderboard). Recommended: hide them, and stop collecting their data now; delete the code after the pilot if no teacher asks for them.
 5. **Who sees typed feedback.** Recommended: the owner only; the teacher sees totals.
+
+**Decided (25 November 2026, as recommended):** 1. keep "I'm a student / I'm a teacher"; 2. the compliance notes stay private, outside the repository (`~/Projects/northvale-private/COMPLIANCE.md`); 3. students can join without an account; 4. hide the extras and stop collecting their data; 5. typed feedback reaches the owner only.
+
+**One change while building:** the teacher setup asks for an age band ("18–25" or "26 or older") instead of a box "I'm 18 or older": the server needs a band for every account, and both bands are adults.

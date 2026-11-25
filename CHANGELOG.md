@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased — school mode, Step 4: pilot tools
+
+- **The pilot quiz:** the teacher picks up to 4 units; the app builds one set of questions from them (up to 10, multiple-choice and true-or-false from the lessons, English and Spanish) and uses the same set before and after. The teacher opens and closes each quiz. A student takes it one question at a time and sees only their own score. The server grades it; a device never gets the answers. The units lock once anyone has taken a quiz.
+- **The teacher sees totals only:** how many took it, the average before and after, the change, and the share right per question, and nothing until 3 or more students have answered. Never a student's score.
+- **End-of-pilot questions:** after the after quiz, three taps (enjoyed it, learned something, would keep using it) and an optional comment. The teacher sees the totals (from 3 students); the comment goes to the owner only (admin page), with the class's name and the day, never the nickname.
+- Leaving or being removed takes a student's quiz and pilot answers out of the totals.
+- `docs/PILOT-PLAN.md`: the checklist for a free 2–4 week pilot with one class, a parent note in English and Spanish, the timeline, running the quizzes, and the proof to collect.
+- The teacher guides (`/teacher-guide.html`, `/guia-docente.html`) describe the simple version and a four-week pilot.
+- The compliance notes were updated for the pilot, in the private notes outside this repository (decided: they stay out of the public repository).
+- Tests: the pilot rules in `test/classroom.test.mjs`; the teacher's and a student's pilot in `test/school.test.mjs`.
+
 ## Unreleased — school mode, Step 3: accounts and classes
 
 - **Any account can belong to classes.** The server keeps, on the account, which classes it's in (the class and member IDs, nothing else). A student who joins while signed in is linked at once; one who joined first links the class when they sign in.

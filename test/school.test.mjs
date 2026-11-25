@@ -5,7 +5,8 @@
 //     their email and names a class; the server refuses a teacher sign-up from 13–17 or without the terms;
 //   - "Have a class code?" at the start opens the join screen over Today; the student's class shows on Today;
 //   - the teacher's one list shows which lessons each student finished, and nothing else;
-//   - school and home: an account carries a student's lessons and class to another device, and leaving keeps them.
+//   - school and home: an account carries a student's lessons and class to another device, and leaving keeps them;
+//   - the pilot quiz (before and after) and the end-of-pilot questions: totals only for the teacher.
 // Runs after `npm run build`.
 import { spawn } from "node:child_process";
 import { mkdtempSync } from "node:fs";
@@ -256,6 +257,78 @@ try {
     await H.close();
   }
   ok("school and home: a student's account carries the lessons and the class to another device (the account stands in for the device's key); a lesson at home counts for the class; leaving keeps every lesson");
+
+  // --- the pilot quiz and the end-of-pilot questions, as a teacher and a student see them ---
+  {
+    const { quizFor } = await import("../src/modules/classroom/quiz.js");
+    const qs = quizFor(UNITS, ["budget", "save", "banking"]);
+    const wrong = qs.map((q) => (q.answer + 1) % (q.tf ? 2 : q.options.length));
+    const { page } = T;
+    const openClass = async () => (await T.classes(), await page.getByText(/students? ·/).first().click(), page.locator("[data-pilot]"));
+    let pilot = await openClass();
+    for (const u of ["Budgeting", "Saving", "Banking for real"]) await pilot.getByRole("button", { name: u }).click();
+    await pilot.getByText("10 questions", { exact: true }).waitFor();
+    await pilot.getByRole("button", { name: "Open the before quiz" }).click();
+    await pilot.getByText("The before quiz is open.").waitFor();
+    // Two classmates on other devices, all wrong.
+    const mates = [];
+    for (const nickname of ["Q1", "Q2"]) {
+      const m = await post("/api/class/join", { code, nickname, ageBand: "13-17" });
+      mates.push(m);
+      await post("/api/class/quiz", { ...m, phase: "pre", answers: wrong });
+    }
+    // A student on a phone, in the app: one question at a time, then only their own score.
+    const P = await open(PHONE);
+    await P.page.getByRole("button", { name: "Have a class code? Join a class" }).click();
+    await P.top().getByLabel("Class code").fill(code);
+    await P.top().getByRole("button", { name: "Continue" }).click();
+    await P.top().getByLabel("Nickname for this class").fill("Pia");
+    await P.top().getByRole("combobox").selectOption("13-17");
+    await P.top().getByRole("button", { name: "Join class" }).click();
+    await P.page.getByText("Class quiz: 10 questions, about 5 minutes").waitFor();
+    await P.page.getByText("Your teacher sees class totals only, never your score.").waitFor();
+    await P.page.getByRole("button", { name: "Start the quiz" }).click();
+    const takeQuiz = async () => {
+      for (const [i, q] of qs.entries()) {
+        await P.top().getByText(`Question ${i + 1} of 10`).waitFor();
+        await P.top().getByRole("radio").nth(q.answer).click();
+        await P.top().getByRole("button", { name: i < 9 ? "Next" : "Finish" }).click();
+      }
+      await P.top().getByText("You got 10 of 10 right.").waitFor();
+      await P.top().getByRole("button", { name: "Done" }).click();
+    };
+    await takeQuiz();
+    await P.page.getByRole("button", { name: "Start the quiz" }).waitFor({ state: "detached" });
+    pilot = await openClass();
+    await pilot.getByText("3 students took it · 33% right on average").waitFor();
+    assert.equal(await pilot.getByText("Pia", { exact: false }).count(), 0, "no names or scores by student");
+    // The after quiz; then the end-of-pilot questions.
+    await pilot.getByRole("button", { name: "Close the quiz" }).click();
+    await pilot.getByRole("button", { name: "Open the after quiz" }).click();
+    await pilot.getByText("The after quiz is open.").waitFor();
+    for (const m of mates) await post("/api/class/quiz", { ...m, phase: "post", answers: qs.map((q) => q.answer) });
+    await P.classes();
+    await P.page.getByRole("button", { name: "Start the quiz" }).click();
+    await takeQuiz();
+    await P.page.getByText("A few questions about the pilot").waitFor();
+    await P.page.getByRole("button", { name: "Answer" }).click();
+    for (const q of ["Did you enjoy using Northvale?", "Did you learn something about money?", "Would you keep using it?"]) await P.top().getByRole("radiogroup", { name: q }).getByRole("radio", { name: "Yes" }).click();
+    await P.top().getByText("Only the Northvale team reads this, not your teacher.", { exact: false }).waitFor();
+    await P.top().getByLabel("What was confusing? (optional)").fill("The interest card about APY was hard");
+    await P.top().getByRole("button", { name: "Send" }).click();
+    await P.page.getByText("Thank you. Your answers help make Northvale better.").waitFor();
+    for (const m of mates) await post("/api/class/feedback", { ...m, enjoyed: "some", learned: "yes", again: "maybe" });
+    pilot = await openClass();
+    await pilot.getByText("Change: +67 points").waitFor();
+    await pilot.getByText("Enjoyed it: 1 yes · 2 somewhat · 0 no").waitFor();
+    await pilot.getByText("Would keep using it: 1 yes · 2 maybe · 0 no").waitFor();
+    assert.ok(!(await page.evaluate(() => document.body.innerText)).includes("interest card about APY"), "the teacher never sees what a student typed");
+    const adminView = await (await fetch(`${BASE}api/admin/stats`, { headers: { "X-Northvale": "1", "X-Admin-Token": env.ADMIN_TOKEN } })).json();
+    assert.deepEqual(adminView.classroom.comments.map((x) => [x.className, x.text]), [["Period 3", "The interest card about APY was hard"]], "the owner sees it, with the class but no nickname");
+    assert.deepEqual([...T.errors, ...P.errors], []);
+    await P.close();
+  }
+  ok("the pilot quiz: the teacher picks units and opens the before and after quiz; a student takes it in the app and sees only their own score; the teacher sees totals from 3 students on and the change; the end-of-pilot answers show as totals, what a student types reaches the owner only");
   await S.close();
   await T.close();
 } finally {

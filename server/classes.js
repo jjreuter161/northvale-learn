@@ -33,6 +33,8 @@ import { isOn } from "./flags.js";
 import { ALL_LESSONS, UNITS } from "../src/modules/lessons/content.js";
 import { CONCEPTS } from "../src/modules/lessons/concepts.js";
 import { addDays, dayKey, weekStart } from "../src/core/progress.js";
+import { UNITS as FULL_UNITS } from "../src/modules/lessons/units/all.js";
+import { MAX_PILOT_UNITS, QUIZ_SIZE, forStudent, quizFor } from "../src/modules/classroom/quiz.js";
 
 export const KEEP_ARCHIVED_DAYS = 90;
 export const MIN_GROUP = 3; // students before a concept's totals show
@@ -57,6 +59,34 @@ const teacherOf = (c) => store.userById(c.teacherId);
 const live = (c) => !c.archivedAt && isOn("classroom", teacherOf(c));
 const unitLessons = Object.fromEntries(UNITS.map((u) => [u.id, u.lessons.map((l) => l.id)]));
 const unitsDone = (lessons) => UNITS.filter((u) => unitLessons[u.id].every((id) => lessons.includes(id))).map((u) => u.id);
+
+// ---- the pilot (docs/PILOT-PLAN.md) ----------------------------------------------
+// A class's pilot: the units its quiz comes from, which quiz is open ("pre" before, "post" after, or none), each
+// student's answers (right or wrong per question, by member), and their end-of-pilot answers. The teacher sees
+// totals only, and only from 3 students on; a student's typed comment goes to the owner, never the teacher.
+const PHASES = ["pre", "post"];
+const FEEDBACK = { enjoyed: ["yes", "some", "no"], learned: ["yes", "some", "no"], again: ["yes", "maybe", "no"] };
+const pilotOf = (c) => (c.pilot ||= { units: [], phase: null, results: { pre: {}, post: {} }, feedback: {} });
+const questionsOf = (c) => quizFor(FULL_UNITS, pilotOf(c).units);
+const takenAny = (c) => PHASES.some((ph) => Object.keys(pilotOf(c).results[ph]).length > 0);
+function forgetMember(c, mid) {
+  if (!c.pilot) return;
+  for (const ph of PHASES) delete c.pilot.results[ph][mid];
+  delete c.pilot.feedback[mid];
+}
+function quizTotals(c, ph) {
+  const rows = Object.values(pilotOf(c).results[ph]);
+  const n = rows.length;
+  if (n < MIN_GROUP) return { taken: n };
+  const qs = questionsOf(c);
+  const right = rows.reduce((t, r) => t + r.filter(Boolean).length, 0);
+  return { taken: n, average: Math.round((100 * right) / (n * qs.length)), perQuestion: qs.map((_, i) => Math.round((100 * rows.filter((r) => r[i]).length) / n)) };
+}
+function feedbackTotals(c) {
+  const rows = Object.values(pilotOf(c).feedback);
+  if (rows.length < MIN_GROUP) return { n: rows.length };
+  return { n: rows.length, ...Object.fromEntries(Object.entries(FEEDBACK).map(([k, opts]) => [k, Object.fromEntries(opts.map((o) => [o, rows.filter((r) => r[k] === o).length]))])) };
+}
 
 // ---- teachers ------------------------------------------------------------------
 
@@ -133,11 +163,22 @@ export function teacherView(user, id) {
       .filter((x) => x.students >= MIN_GROUP && x.missed > 0)
       .sort((a, b) => b.missed / b.seen - a.missed / a.seen || b.missed - a.missed)
       .slice(0, 6),
+    // The pilot: totals only (quizTotals, feedbackTotals), and the questions so the totals can be read.
+    pilot: { units: pilotOf(c).units, phase: pilotOf(c).phase, started: takenAny(c), questions: questionsOf(c).map(({ id, q }) => ({ id, q })), pre: quizTotals(c, "pre"), post: quizTotals(c, "post"), feedback: feedbackTotals(c) },
   };
 }
 
-export function update(user, id, { name, open, newCode: rotate, archived }) {
+export function update(user, id, { name, open, newCode: rotate, archived, pilotUnits, quiz }) {
   const c = mine(user, id);
+  if (pilotUnits !== undefined) {
+    if (takenAny(c)) throw fail(400, "The quiz has started, so its units stay as they are.", "STARTED");
+    pilotOf(c).units = [...new Set(Array.isArray(pilotUnits) ? pilotUnits.map(String) : [])].filter((u) => UNIT_IDS.has(u)).slice(0, MAX_PILOT_UNITS);
+  }
+  if (quiz !== undefined) {
+    if (quiz !== null && !PHASES.includes(quiz)) throw fail(400, "Open the before quiz or the after quiz.");
+    if (quiz && !pilotOf(c).units.length) throw fail(400, "Pick the units for the quiz first.", "NO_UNITS");
+    pilotOf(c).phase = quiz;
+  }
   if (name !== undefined) {
     if (!cleanName(name)) throw fail(400, "Give the class a name.");
     c.name = cleanName(name);
@@ -172,6 +213,7 @@ export function unassign(user, id, aid) {
 export function removeStudent(user, id, mid) {
   const c = mine(user, id);
   delete c.members[mid];
+  forgetMember(c, String(mid));
   store.changed();
   return { ok: true };
 }
@@ -286,9 +328,16 @@ export function studentView(who, user = null) {
   const { c, m } = member(who, user);
   const week = weekStart(dayKey());
   const xp = (x) => (x.report && x.report.week === week ? x.report.xp : 0);
+  // The open quiz, if any: whether this student took it, and its questions (no answers) if not; whether they've
+  // answered the end-of-pilot questions.
+  const p = c.pilot;
+  const mid = String(who.memberId);
+  const quiz = p && p.phase ? { phase: p.phase, taken: !!p.results[p.phase][mid], questions: p.results[p.phase][mid] ? null : forStudent(questionsOf(c)) } : null;
   return {
     name: c.name,
     status: status(c),
+    quiz,
+    feedback: !!(p && p.results.post[mid]) && { given: !!p.feedback[mid] },
     hidden: m.hidden,
     assignments: c.assignments.map((a) => ({ id: a.id, unit: a.unit, due: a.due })),
     board: Object.values(c.members)
@@ -297,6 +346,40 @@ export function studentView(who, user = null) {
       .sort((a, b) => b.xp - a.xp || a.nickname.localeCompare(b.nickname)),
   };
 }
+// A student's answers to the open quiz, once: graded here, kept as right or wrong per question; they get their
+// own score back, the teacher only class totals.
+export function answerQuiz(who, { phase, answers } = {}, user = null) {
+  const { c } = member(who, user);
+  if (status(c) !== "ok") throw fail(403, "This class is paused or ended.");
+  const p = pilotOf(c);
+  if (!p.phase || p.phase !== phase) throw fail(400, "This quiz isn't open.", "CLOSED_QUIZ");
+  const mid = String(who.memberId);
+  if (p.results[phase][mid]) throw fail(409, "You've already taken this quiz.", "TAKEN");
+  const qs = questionsOf(c);
+  const given = Array.isArray(answers) ? answers.slice(0, QUIZ_SIZE) : [];
+  const right = qs.map((q, i) => Number.isInteger(given[i]) && given[i] === q.answer);
+  p.results[phase][mid] = right;
+  store.changed();
+  return { score: right.filter(Boolean).length, of: qs.length };
+}
+// The end-of-pilot questions, after the after quiz. The three choices count toward the teacher's totals; anything
+// typed is kept apart, without the nickname, for the owner only (pilotComments).
+export function feedback(who, body = {}, user = null) {
+  const { c } = member(who, user);
+  const p = pilotOf(c);
+  const mid = String(who.memberId);
+  if (!p.results.post[mid]) throw fail(400, "This comes after the after quiz.");
+  const answer = Object.fromEntries(Object.entries(FEEDBACK).map(([k, opts]) => [k, opts.includes(body[k]) ? body[k] : null]));
+  if (Object.values(answer).some((v) => !v)) throw fail(400, "Pick an answer for each question.");
+  p.feedback[mid] = answer;
+  const said = String(body.comment || "").replace(/[\u0000-\u001f\u007f<>]/g, " ").trim().slice(0, 500);
+  if (said) store.section("pilotComments", () => []).push({ day: dayKey(), className: c.name, text: said });
+  store.changed();
+  return { ok: true };
+}
+// For the owner's admin page: what students typed, newest first, with the class's name and the day only.
+export const pilotComments = () => [...store.section("pilotComments", () => [])].reverse().slice(0, 500);
+
 export function hide(who, hidden, user = null) {
   const { m } = member(who, user);
   m.hidden = hidden === true;
@@ -307,6 +390,7 @@ export function hide(who, hidden, user = null) {
 export function leave(who, user = null) {
   const { c } = member(who, user);
   delete c.members[String(who.memberId)];
+  forgetMember(c, String(who.memberId));
   store.changed();
   unlink(user, String(who.memberId));
   return { ok: true };
@@ -323,7 +407,7 @@ export function purge(today = dayKey()) {
 export function dropStudent(user) {
   for (const { classId, memberId } of links(user)) {
     const c = own(all(), classId);
-    if (c && own(c.members, memberId)) delete c.members[memberId];
+    if (c && own(c.members, memberId)) (delete c.members[memberId], forgetMember(c, memberId));
   }
   store.changed();
 }
