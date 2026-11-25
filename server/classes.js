@@ -95,9 +95,10 @@ export const list = (user) =>
     .sort((a, b) => !!a.archivedAt - !!b.archivedAt || a.name.localeCompare(b.name)));
 
 // EVERYTHING A TEACHER SEES — built field by field, so nothing else can
-// slip in: nicknames; lessons and units finished, missions finished and
-// assignment progress, all since the student joined; and class-wide
-// totals for the concepts the class misses most.
+// slip in: nicknames; which lessons each student finished since joining
+// (`done`, the list the app shows); and, kept for after the pilot but not
+// shown or collected now (docs/SCHOOL-PLAN.md): units, missions,
+// assignment progress and class-wide totals for hard concepts.
 export function teacherView(user, id) {
   const c = mine(user, id);
   const members = Object.entries(c.members).map(([mid, m]) => ({ mid, nickname: m.nickname, r: m.report || { lessons: [], missions: 0, concepts: {} } }));
@@ -119,7 +120,7 @@ export function teacherView(user, id) {
     archivedAt: c.archivedAt,
     deletesOn: c.archivedAt ? addDays(c.archivedAt, KEEP_ARCHIVED_DAYS) : null,
     students: members
-      .map(({ mid, nickname, r }) => ({ id: mid, nickname, lessons: r.lessons.length, units: unitsDone(r.lessons).length, missions: r.missions, assignments: Object.fromEntries(c.assignments.map((a) => [a.id, progressOn(r, a)])) }))
+      .map(({ mid, nickname, r }) => ({ id: mid, nickname, done: r.lessons, lessons: r.lessons.length, units: unitsDone(r.lessons).length, missions: r.missions, assignments: Object.fromEntries(c.assignments.map((a) => [a.id, progressOn(r, a)])) }))
       .sort((a, b) => a.nickname.localeCompare(b.nickname)),
     assignments: c.assignments.map((a) => ({ id: a.id, unit: a.unit, due: a.due, done: members.filter(({ r }) => progressOn(r, a).done === unitLessons[a.unit].length).length, of: members.length })),
     concepts: Object.values(concepts)

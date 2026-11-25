@@ -367,7 +367,7 @@ function Panel({ t, locale, go, openStreak }) {
   );
 }
 
-function Today({ t, locale, go, openStreak, layout }) {
+function Today({ t, locale, go, openStreak, layout, session }) {
   const progress = useAppState((s) => s.progress);
   useAppState((s) => s.modules.goals); // the "Building toward" line and check-in
   useAppState((s) => s.modules.missions);
@@ -390,6 +390,7 @@ function Today({ t, locale, go, openStreak, layout }) {
   const heroCta = best && { review: t("best.cta.review"), mission: t("best.cta.mission"), year: best.reason === "year_go" ? t("common.continue") : t("best.cta.year_new") }[best.kind];
   const checkIn = service("goals", "checkInDue")();
   const PlanPrompt = service("goals", "PlanPrompt");
+  const ClassToday = service("classroom", "TodayCard"); // the class a student is in, or a teacher's classes
   const planDue = service("goals", "planPromptDue")();
   const MoneyWeek = service("goals", "MoneyWeek");
   const [weekOpen, setWeekOpen] = useState(false);
@@ -478,6 +479,7 @@ function Today({ t, locale, go, openStreak, layout }) {
           .filter(Boolean)
           .slice(0, 2)}
       </List>
+      <ClassToday t={t} go={go} session={session} />
       {layout !== "phone" && <Overview t={t} locale={locale} go={go} />}
       <WhatsNewCard t={t} locale={locale} />
       {planDue ? (

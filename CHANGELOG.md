@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased — school mode, Step 2: the smallest teacher tool (behind the classroom flag)
+
+From `docs/SCHOOL-PLAN.md`: one app with two ways in. Nothing changes for anyone unless school mode is on (a tester link, `?school=on`, or the classroom flag on for everyone).
+- **The choice at the start:** "How will you use Northvale?" with "I'm a student" (today's first steps) or "I'm a teacher", plus "Have a class code? Join a class".
+- **One teacher setup screen:** email, password, an adult age band, the teacher terms, and in plain words: free during the pilot, no ads, student data never sold or shared. The confirmation email goes out at once; then the teacher names a class and lands on it.
+- **The class is one list:** which lessons each student finished, as a tick under each unit someone started (laptop) or a dot per lesson (phone). The code and "Copy join link" sit beside it; taking new students, a new code, removing a student and ending the class are in Class settings.
+- **A short join screen:** your teacher sees your nickname and which lessons you finish from now on; never your goals, amounts or notes, tutor questions, age or email; no messages; leave anytime and keep your progress.
+- **Hidden for the pilot, not deleted:** assignments, topic totals, the class leaderboard (and Me's "My class" league), the missions column and "count earlier lessons". A student's device now reports only the lessons finished since joining.
+- **On Today:** "Your class" for a student, "Your classes" for a teacher.
+- Tests: `test/school.test.mjs` (new); the browser test's classroom walkthrough follows the simple version (and checks the device sends only finished lessons, and that leaving keeps a student's progress); the classroom test's allow-list includes the lesson list.
+
 ## Unreleased — Round 3 and a bug bash
 
 - **Keyboard:** Enter on a focused Check no longer checks and then skips the feedback; Escape in a lesson does what the X does ("Leave now?", or close on the finish screen).

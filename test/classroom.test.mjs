@@ -101,9 +101,12 @@ classes.assign(teacher, id, { unit: "budget", due: addDays(today, 7) });
 assert.equal(code(() => classes.assign(teacher, id, { unit: "budget", due: "2001-01-01" })), 400);
 view = classes.teacherView(teacher, id);
 assert.deepEqual(Object.keys(view).sort(), ["archivedAt", "assignments", "code", "concepts", "deletesOn", "id", "name", "open", "students"]);
-assert.deepEqual(Object.keys(view.students[0]).sort(), ["assignments", "id", "lessons", "missions", "nickname", "units"], "per student: only these");
+assert.deepEqual(Object.keys(view.students[0]).sort(), ["assignments", "done", "id", "lessons", "missions", "nickname", "units"], "per student: only these");
 const ana = view.students.find((s) => s.nickname === "Ana");
 assert.equal(ana.lessons, lessonIds.length);
+// `done`: which lessons, the list the teacher's screen shows. Only real lesson IDs, nothing else.
+assert.deepEqual(ana.done, lessonIds);
+assert.deepEqual(view.students.find((s) => s.nickname === "Caro").done, [lessonIds[0]], "a made-up lesson ID is dropped");
 assert.equal(ana.units, 1);
 assert.equal(ana.missions, 1);
 assert.deepEqual(Object.values(ana.assignments)[0], { done: lessonIds.length, of: lessonIds.length });

@@ -180,7 +180,7 @@ export default function App() {
     return (
       <div style={rootStyle} className={settings.reduceMotion ? "nv-reduce" : undefined}>
         <style>{GLOBAL_CSS}</style>
-        <Onboarding t={t} locale={locale} onDone={(unit) => go("lessons", unit ? { startUnit: unit } : {})} />
+        <Onboarding t={t} locale={locale} onDone={(unit, route) => (route ? go(route) : go("lessons", unit ? { startUnit: unit } : {}))} />
         <Toasts />
       </div>
     );

@@ -105,7 +105,7 @@ const https = (req) => (TRUST_PROXY ? req.headers["x-forwarded-proto"] === "http
 // Behind a proxy, only the last X-Forwarded-For entry is the proxy's word.
 const ipOf = (req) => (TRUST_PROXY && req.headers["x-forwarded-for"] ? req.headers["x-forwarded-for"].split(",").pop().trim() : req.socket.remoteAddress);
 const fail = (status, message, code = null) => Object.assign(new Error(message), { status, code });
-const publicUser = (u) => ({ email: u.email, nickname: u.nickname, avatar: u.avatar, ageBand: u.ageBand, recap: !!u.recap, verified: !!u.emailVerifiedAt, teacherTerms: !!u.teacherTermsAt, league: u.league || "everyone", createdAt: u.createdAt });
+const publicUser = (u) => ({ email: u.email, nickname: u.nickname, avatar: u.avatar, ageBand: u.ageBand, recap: !!u.recap, verified: !!u.emailVerifiedAt, teacherTerms: !!u.teacherTermsAt, role: u.role === "teacher" ? "teacher" : "student", league: u.league || "everyone", createdAt: u.createdAt });
 // Links in emails point here.
 const baseOf = (c) => process.env.PUBLIC_URL || `${c.secure ? "https" : "http"}://${c.req.headers.host}`;
 const LEAGUES = ["everyone", "friends", "class"];
@@ -148,8 +148,16 @@ const routes = {
       if (!auth.validEmail(email)) throw fail(400, "Enter a real email address.");
       if (!auth.validPassword(c.body.password)) throw fail(400, `Use a password of at least ${auth.PASSWORD_MIN} characters.`);
       if (store.userByEmail(email)) throw fail(409, "There's already an account with that email. Sign in instead.");
+      // A teacher (the choice at the start): an adult who agrees to the teacher terms as they sign up.
+      const teacher = c.body.teacher === true;
+      if (teacher && c.body.ageBand === "13-17") throw fail(403, "Teacher accounts are for adults (18 and up).", "ADULT");
+      if (teacher && c.body.terms !== true) throw fail(400, "Agree to the teacher terms first.", "TERMS");
       // Each new account costs a hash and a little disk: count it.
       auth.recordMiss(keys);
+      if (teacher) {
+        const user = store.addUser({ email, passwordHash: await auth.hashPassword(c.body.password), nickname: c.body.nickname, ageBand: c.body.ageBand, avatar: c.body.avatar });
+        return startSession(c, store.updateUser(user.id, { role: "teacher", teacherTermsAt: new Date().toISOString() }));
+      }
       return startSession(c, store.addUser({ email, passwordHash: await auth.hashPassword(c.body.password), nickname: c.body.nickname, ageBand: c.body.ageBand, avatar: c.body.avatar, guardianConsentAt: c.body.ageBand === "13-17" ? new Date().toISOString() : null }));
     },
   },

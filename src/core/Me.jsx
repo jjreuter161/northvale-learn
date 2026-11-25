@@ -18,7 +18,8 @@ function League({ t, session, go }) {
   const [league, setLeague] = useState(null);
   const [reload, setReload] = useState(0);
   const progress = useAppState((s) => s.progress);
-  const inClass = !!service("classroom", "inClass")();
+  // "My class" only while the class leaderboard is on (it's hidden during the school pilot).
+  const inClass = !!service("classroom", "leagueOn")() && !!service("classroom", "inClass")();
   const modes = [...(session.user ? ["everyone", "friends"] : []), ...(inClass ? ["class"] : [])];
   const mode = modes.includes(session.user && session.user.league) ? session.user.league : modes[0];
   useEffect(() => {
@@ -86,7 +87,7 @@ function League({ t, session, go }) {
 
 // Open after 3 learning days — or already, for anyone in a class or with
 // friends here (nothing anyone had disappears).
-export const leagueOpen = (progress, session) => (progress.lessonDays || []).length >= 3 || !!service("classroom", "inClass")() || !!(session.user && session.user.league && session.user.league !== "everyone");
+export const leagueOpen = (progress, session) => (progress.lessonDays || []).length >= 3 || (!!service("classroom", "leagueOn")() && !!service("classroom", "inClass")()) || !!(session.user && session.user.league && session.user.league !== "everyone");
 
 // A row of badges, earned ones first, on the Me page: what's earned and what's next.
 function BadgePreview({ t, progress, go }) {

@@ -6,7 +6,8 @@
 // lives). The 2-minute "skip what you know" check is offered later, after a
 // lesson (Today and the finish screen), not before anyone has started.
 import { useState } from "react";
-import { update } from "./store.js";
+import { update, useAppState } from "./store.js";
+import { useSession } from "./session.js";
 import { LANGS, REGIONS } from "./i18n.js";
 import { Button, Scene, Wordmark, Icon, BetaTag, SELECTED, Chosen } from "./ui.jsx";
 import { LATEST_NOTE } from "./whatsnew.jsx";
@@ -14,7 +15,7 @@ import { AccountForm } from "./Account.jsx";
 import { track } from "./analytics.js";
 import { useLayout } from "./layout.js";
 import Split from "./Split.jsx";
-import { allModules } from "./registry.js";
+import { allModules, service } from "./registry.js";
 
 const ORDER = ["lessons", "goals"]; // the warm-up question first, then what you want money skills for
 const rank = (m) => (ORDER.includes(m.id) ? ORDER.indexOf(m.id) : ORDER.length);
@@ -33,6 +34,11 @@ function Steps({ t, locale, onDone, phone }) {
   const [reason, setReason] = useState("curious");
   const [startUnit, setStartUnit] = useState("budget");
   const [signingIn, setSigningIn] = useState(false);
+  // School mode (a tester link, or the classroom flag on for everyone): "I'm a student / I'm a teacher" first.
+  const session = useSession();
+  const school = !!(useAppState((s) => s.settings.school) || (session.flags || {}).classroom);
+  const [role, setRole] = useState("student");
+  const [teaching, setTeaching] = useState(false);
   const extra = allModules()
     .filter((m) => m.Onboard)
     .sort((a, b) => rank(a) - rank(b));
@@ -40,9 +46,22 @@ function Steps({ t, locale, onDone, phone }) {
   const setSetting = (k, v) => update((s) => ({ ...s, settings: { ...s.settings, [k]: v } }));
   const finish = (start) => {
     // Someone new doesn't need "What's new".
-    update((s) => ({ ...s, profile: { ...s.profile, onboarded: true, reason, seenNote: LATEST_NOTE }, progress: { ...s.progress, startUnit: start } }));
+    update((s) => ({ ...s, profile: { ...s.profile, onboarded: true, reason, seenNote: LATEST_NOTE, ...(school ? { role: "student" } : {}) }, progress: { ...s.progress, startUnit: start } }));
     track("onboarding", { reason });
     onDone(start);
+  };
+  // A teacher's account is made; their classes are next (the email to confirm, then a class to name).
+  const finishTeacher = () => {
+    update((s) => ({ ...s, profile: { ...s.profile, onboarded: true, reason: "teach", role: "teacher", seenNote: LATEST_NOTE } }));
+    track("onboarding", { reason: "teach" });
+    onDone(null, "classroom");
+  };
+  // "Have a class code?": straight to Today, where the join screen opens.
+  const joinClass = () => {
+    service("classroom", "askJoin")();
+    update((s) => ({ ...s, profile: { ...s.profile, onboarded: true, reason, role: "student", seenNote: LATEST_NOTE } }));
+    track("onboarding", { reason: "join" });
+    onDone(null);
   };
 
   const wrap = (children) => (
@@ -91,6 +110,38 @@ function Steps({ t, locale, onDone, phone }) {
       </>
     );
 
+  if (teaching) {
+    const Setup = service("classroom", "TeacherSetup");
+    return wrap(
+      <>
+        <button onClick={() => setTeaching(false)} aria-label={t("common.back")} style={{ border: "none", background: "transparent", color: "var(--ink)", width: 44, height: 44, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", marginBottom: 8 }}>
+          <Icon name="back" />
+        </button>
+        <h1 className="nv-disp" style={{ fontSize: 28, margin: "0 0 16px", lineHeight: 1.15 }}>{t("cls.setup.title")}</h1>
+        <Setup t={t} locale={locale} onDone={finishTeacher} onSignIn={() => (setTeaching(false), setSigningIn(true))} />
+      </>
+    );
+  }
+
+  const roles = school && (
+    <div role="radiogroup" aria-label={t("onb.role.title")} style={{ width: "100%", display: "flex", flexDirection: "column", gap: 10, textAlign: "left" }}>
+      {[["student", "book"], ["teacher", "users"]].map(([r, icon]) => (
+        <button key={r} role="radio" aria-checked={role === r} onClick={() => setRole(r)} className="nv-press" style={{ display: "flex", alignItems: "flex-start", gap: 14, width: "100%", textAlign: "left", background: "var(--surface)", color: "var(--ink)", borderRadius: 12, padding: "14px 16px", cursor: "pointer", ...(role === r ? SELECTED : { border: "1px solid var(--line)" }) }}>
+          <span style={{ width: 40, height: 40, borderRadius: 8, background: "var(--surface2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <Icon name={icon} size={20} />
+          </span>
+          <span style={{ flex: 1 }}>
+            <span style={{ display: "block", fontSize: 17, fontWeight: 700 }}>{t(`onb.role.${r}`)}</span>
+            <span style={{ display: "block", fontSize: 14, color: "var(--mid)", marginTop: 2, lineHeight: 1.4 }}>{t(`onb.role.${r}.sub`)}</span>
+          </span>
+        </button>
+      ))}
+      <Button kind="ghost" size="md" full onClick={joinClass}>
+        {t("onb.role.join")}
+      </Button>
+    </div>
+  );
+
   if (step === 0)
     return (
       <div className="nv-in" style={phone ? { maxWidth: 520, margin: "0 auto", minHeight: "100dvh", display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", padding: "0 22px calc(24px + env(safe-area-inset-bottom))" } : { width: "100%", maxWidth: 480, display: "flex", flexDirection: "column", gap: 28, padding: "24px 0" }}>
@@ -103,22 +154,24 @@ function Steps({ t, locale, onDone, phone }) {
         {!phone && (
           // On a computer the brand is the left half; here only what to do.
           <div>
-            <h1 className="nv-disp" style={{ fontSize: 38, lineHeight: 1.1, margin: 0 }}>{t("onb.tagline")}</h1>
-            <p style={{ fontSize: 18, color: "var(--mid)", lineHeight: 1.5, margin: "12px 0 0" }}>{t("onb.tagline.sub")}</p>
+            <h1 className="nv-disp" style={{ fontSize: 38, lineHeight: 1.1, margin: 0 }}>{t(school ? "onb.role.title" : "onb.tagline")}</h1>
+            <p style={{ fontSize: 18, color: "var(--mid)", lineHeight: 1.5, margin: "12px 0 0" }}>{t(school ? "onb.role.sub" : "onb.tagline.sub")}</p>
           </div>
         )}
+        {!phone && roles}
         {phone && <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: 10, paddingTop: 8 }}>
           <Wordmark size={50} />
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <span style={{ fontSize: 13, fontWeight: 650, letterSpacing: 4, color: "var(--low)" }}>LEARN</span> <BetaTag label={t("common.beta")} />
           </div>
           <div style={{ fontSize: 15, color: "var(--mid)", marginTop: 2 }}>{t("brand.tagline")}</div>
-          <h1 className="nv-disp" style={{ fontSize: 32, lineHeight: 1.12, margin: "26px 0 0" }}>{t("onb.tagline")}</h1>
-          <p style={{ fontSize: 17, color: "var(--mid)", maxWidth: 340, lineHeight: 1.45, margin: "4px 0 0" }}>{t("onb.tagline.sub")}</p>
+          <h1 className="nv-disp" style={{ fontSize: school ? 26 : 32, lineHeight: 1.12, margin: school ? "14px 0 0" : "26px 0 0" }}>{t(school ? "onb.role.title" : "onb.tagline")}</h1>
+          <p style={{ fontSize: 17, color: "var(--mid)", maxWidth: 340, lineHeight: 1.45, margin: "4px 0 0" }}>{t(school ? "onb.role.sub" : "onb.tagline.sub")}</p>
         </div>}
+        {phone && roles && <div style={{ width: "100%", marginTop: 14 }}>{roles}</div>}
         <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 10 }}>
-          <Button full onClick={() => setStep(1)}>
-            {t("onb.start")}
+          <Button full onClick={() => (school && role === "teacher" ? setTeaching(true) : setStep(1))}>
+            {t(school ? "common.continue" : "onb.start")}
           </Button>
           <Button full kind="secondary" onClick={() => setSigningIn(true)}>
             {t("onb.have_account")}

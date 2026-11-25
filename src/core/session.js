@@ -71,9 +71,10 @@ export function schedulePush() {
   pushTimer = setTimeout(push, 2500);
 }
 
-export async function signUp({ email, password, nickname, guardian }) {
+// A teacher (the choice at the start) signs up with their age band and the teacher terms in one step.
+export async function signUp({ email, password, nickname, guardian, ageBand, teacher }) {
   const s = getState();
-  const r = await api("/api/auth/signup", { method: "POST", body: { email, password, nickname: nickname || s.profile.nickname, ageBand: s.profile.ageBand, avatar: s.profile.avatar, guardian: !!guardian } });
+  const r = await api("/api/auth/signup", { method: "POST", body: { email, password, nickname: nickname || s.profile.nickname, ageBand: ageBand || s.profile.ageBand, avatar: s.profile.avatar, guardian: !!guardian, ...(teacher ? { teacher: true, terms: true } : {}) } });
   set({ user: r.user });
   track("account_created");
   refreshFlags();

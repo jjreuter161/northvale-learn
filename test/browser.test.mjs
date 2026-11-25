@@ -1115,7 +1115,7 @@ const lessons = Object.fromEntries(track.map((id) => [id, { done: true, at: day(
     await app.close();
   }
 
-  // --- classroom mode: a teacher (a tester), a student who joins and leaves ---
+  // --- classroom mode, the pilot's simple version (docs/SCHOOL-PLAN.md): a teacher (a tester), a student who joins and leaves ---
   {
     // What the student has that the teacher must never see.
     const PRIVATE = ["Secret Car Fund", "1,234", "5,000", "my private note", "13–17", "13-17", "ana@"];
@@ -1145,100 +1145,96 @@ const lessons = Object.fromEntries(track.map((id) => [id, { done: true, at: day(
     await T.button("Accept").click();
     await T.page.getByLabel("Class name").fill("Period 3");
     await T.button("Create class").click();
-    await T.page.getByText("0 students ·").click();
-    const code = await T.page.getByLabel("Class code", { exact: true }).innerText();
+    // A new class opens at once: its code, the link, and one list.
+    const code = (await T.page.getByLabel("Class code", { exact: true }).innerText()).trim();
     assert.match(code, /^[A-Z2-9]{6}$/);
-    await T.page.getByRole("combobox", { name: "Unit" }).selectOption("budget");
-    await T.page.getByLabel("Due date").fill(day(7));
-    await T.button("Assign").click();
-    await T.page.getByText("0 of 0 students finished").waitFor();
+    await T.page.getByText("Free during the pilot. No ads, ever.", { exact: false }).first().waitFor();
+    for (const gone of ["Assign", "Topics the class finds hard", "Missions", "Class leaderboard"]) assert.equal(await T.page.getByText(gone, { exact: true }).count(), 0, `the simple version has no "${gone}"`);
     await T.clean("teacher: a new class");
-    // Three classmates on other devices, so the class has topic totals.
+    // Three classmates on other devices.
     for (const nickname of ["Beto", "Caro", "Dani"]) {
       const m = await post("/api/class/join", { code, nickname, ageBand: "13-17" });
-      await post("/api/class/report", { ...m, report: { lessons: [], concepts: { budgeting: [2, 1], needs_wants: [1, 1] }, missions: 0, week: weekStart(day(0)), xp: 10 } });
+      await post("/api/class/report", { ...m, report: { lessons: [ALL_LESSONS[0].id] } });
     }
-    console.log("ok: a teacher (turned on from the admin page) confirms their email, accepts the teacher terms, makes a class and assigns a unit");
+    console.log("ok: a teacher (turned on from the admin page) confirms their email, accepts the teacher terms and makes a class: a code, a link and one list, no assignments or topic totals");
 
     const S = student;
     await S.page.goto(`${BASE}?join=${code}`);
-    await S.page.getByRole("dialog", { name: "Before you join" }).waitFor();
+    await S.page.getByRole("dialog", { name: "Join a class" }).waitFor();
     await S.top().getByText("Class: Period 3").waitFor();
-    for (const line of ["Your teacher sees", "Lessons and units you finish from now on", "Your teacher never sees", "Your goals or any amounts", "Your mission notes", "What you ask the tutor", "Your age or email", "Anything from before you join, unless you choose to count lessons you already finished for assignments", "You can leave anytime. Then your teacher no longer sees anything about you."]) await S.top().getByText(line, { exact: true }).waitFor();
+    for (const line of ["Your teacher sees", "Your nickname", "Which lessons you finish from now on", "Never", "Your goals, amounts or notes", "What you ask the tutor", "Your age or email", "No messages. Leave anytime; your progress stays yours."]) await S.top().getByText(line, { exact: true }).waitFor();
+    assert.equal(await S.top().getByRole("checkbox").count(), 0, "nothing to tick: no earlier lessons to share, no leaderboard");
     await S.clean("what your teacher sees, before joining");
     assert.equal(await S.top().getByLabel("Nickname for this class").inputValue(), "Ana");
-    assert.equal(await S.top().getByRole("checkbox", { name: /Count lessons I already finished/ }).isChecked(), false, "earlier lessons aren't shared unless the student chooses");
     await S.button("Join class", S.top()).click();
     await S.page.getByText("You joined Period 3").waitFor();
-    await S.page.getByText("Budgeting").waitFor();
-    await S.page.getByText("0 of 3 lessons").waitFor();
+    await S.page.getByText("Your teacher sees which lessons you finish, nothing else.").waitFor();
     await S.clean("student: the class");
-    console.log("ok: a student joins with the teacher's link and a nickname, after a screen that says what the teacher will and won't see");
+    console.log("ok: a student joins with the teacher's link and a nickname, after a short screen that says what the teacher will and won't see");
 
-    await S.button("Start").click();
-    await S.page.getByRole("dialog", { name: ALL_LESSONS[0].title.en }).waitFor();
+    // A lesson after joining: the teacher sees it; the two from before joining don't count.
+    await S.menu("Learn");
+    await S.page.getByText("Your class: Period 3").waitFor();
+    await S.button(/^(Continue|Start)$/).click();
     await play(S);
     await S.button("Done", S.top()).click();
-    await S.menu("Classes");
-    await S.page.getByText("1 of 3 lessons").waitFor();
     await S.page.waitForTimeout(6000); // the report goes out a few seconds after a change
     await T.button("All classes").click();
     await T.page.getByText("4 students ·").click();
-    await T.page.getByRole("cell", { name: "Ana" }).waitFor();
+    const list = T.page.locator("[data-progress]");
+    const nick = (n) => list.getByText(n, { exact: true });
+    await nick("Ana").waitFor();
     const shown = await T.page.evaluate(() => document.body.innerText);
-    assert.match(shown, /Ana\s+1\s+0\s+0\s+1\/3/, "Ana: 1 lesson since joining (not the one from before), 0 units, 0 missions, 1 of 3 assigned");
     const raw = await T.page.evaluate(async () => JSON.stringify(await (await fetch(`/api/teach/class?id=${encodeURIComponent((await (await fetch("/api/teach", { headers: { "X-Northvale": "1" } })).json()).classes[0].id)}`, { headers: { "X-Northvale": "1" } })).json()));
+    const view = JSON.parse(raw);
+    const ana = view.students.find((x) => x.nickname === "Ana");
+    assert.equal(ana.done.length, 1, "one lesson since joining (not the two from before)");
+    assert.ok(!ALL_LESSONS.slice(0, 2).some((l) => ana.done.includes(l.id)), "lessons from before joining aren't shared");
+    assert.deepEqual([ana.missions, view.concepts.length], [0, 0], "the device sends only finished lessons: no answers per topic, no missions");
+    // (On a phone: a row per student, a dot per lesson of each unit they started.)
+    assert.equal(await list.locator(":scope > div").filter({ hasText: /^Ana/ }).getByRole("img", { name: "Budgeting: 1 of 3 lessons" }).count(), 1, "one lesson for Ana, in Budgeting");
     for (const x of PRIVATE) {
       assert.ok(!shown.includes(x), `the teacher's screen shows "${x}"`);
       assert.ok(!raw.includes(x), `the teacher's data includes "${x}"`);
     }
-    await T.page.getByText(/answers missed · [34] students/).first().waitFor();
-    assert.ok(!/needs_wants|\bbudgeting\b/.test(shown), "topics show by name, not their ids");
     await T.clean("teacher: the class with a student");
-    console.log("ok: the teacher sees Ana's lessons since joining and assignment progress — none of her goals, amounts, notes or age");
+    console.log("ok: the teacher sees which lesson Ana finished since joining — none of her goals, amounts, notes or age, and her device sent nothing else");
 
-    // Ana chooses to count the lesson she'd finished before joining.
-    await S.page.getByRole("switch", { name: "Count lessons I already finished for class assignments" }).click();
-    await S.page.getByText("2 of 3 lessons").waitFor();
-    await S.page.waitForTimeout(6000);
-    await T.button("All classes").click();
-    await T.page.getByText("4 students ·").click();
-    await T.page.getByRole("cell", { name: "Ana" }).waitFor();
-    assert.match(await T.page.evaluate(() => document.body.innerText), /Ana\s+1\s+0\s+0\s+2\/3/, "it counts toward the assignment, not as a lesson since joining");
-    console.log("ok: a student can choose to count lessons finished before joining — for assignments only");
-
+    await S.menu("Classes");
     await S.button("What your teacher sees").click();
-    await S.top().getByText("Your teacher never sees", { exact: true }).waitFor();
+    await S.top().getByText("Never", { exact: true }).waitFor();
     await S.page.keyboard.press("Escape");
-    await S.page.getByRole("switch", { name: "Show me on the class leaderboard" }).click();
-    await S.page.getByText("Your row is hidden: only you see it.").waitFor();
-    // In Spanish (Mexico), then leaving.
+    // In Spanish (Mexico), then leaving: her progress stays hers.
+    const lessonsBefore = await S.page.evaluate(() => Object.values(JSON.parse(localStorage.getItem("northvale-learn-v1")).progress.lessons).filter((l) => l.done).length);
     await S.menu("Settings");
     await S.page.getByRole("radio", { name: "Español" }).click();
     await S.page.getByRole("radio", { name: /México/ }).click();
     await S.menu("Clases");
-    await S.page.getByText("Tu fila está oculta: solo tú la ves.").waitFor();
+    await S.page.getByText("Tu profe ve qué lecciones terminas, nada más.").waitFor();
     await S.clean("estudiante: la clase");
     await S.button("Salir de la clase").click();
+    await S.top().getByText("Conservas todas tus lecciones y tu avance.", { exact: false }).waitFor();
     await S.button("Salir de la clase", S.top()).click();
     await S.page.getByText("Saliste de Period 3").waitFor();
-    await S.page.getByText("No estás en ninguna clase.", { exact: false }).waitFor();
+    await S.page.getByText("Cuando tu profe te dé un código de clase, únete aquí.").waitFor();
+    assert.equal(await S.page.evaluate(() => Object.values(JSON.parse(localStorage.getItem("northvale-learn-v1")).progress.lessons).filter((l) => l.done).length), lessonsBefore, "leaving keeps every lesson");
     await S.clean("estudiante: después de salir");
     await T.button("All classes").click();
     await T.page.getByText("3 students ·").click();
-    await T.page.getByRole("cell", { name: "Beto" }).waitFor();
-    assert.equal(await T.page.getByRole("cell", { name: "Ana" }).count(), 0, "Ana is gone from the teacher's view");
-    // An old or duplicate entry: the teacher removes it.
-    await T.page.getByRole("row", { name: /Dani/ }).getByRole("button", { name: "Remove" }).click();
+    await nick("Beto").waitFor();
+    assert.equal(await nick("Ana").count(), 0, "Ana is gone from the teacher's view");
+    // An old or duplicate entry: the teacher removes it, from Class settings.
+    await T.button("Class settings").click();
+    await T.top().getByRole("button", { name: "Remove" }).nth(2).click();
     await T.button("Remove", T.top()).click();
-    await T.page.getByRole("cell", { name: "Dani" }).waitFor({ state: "detached" });
+    await nick("Dani").waitFor({ state: "detached" });
     await T.menu("Settings");
     await T.page.getByRole("radio", { name: "Español" }).click();
     await T.menu("Clases");
     await T.page.getByText("2 estudiantes ·").click();
-    await T.page.getByText("Temas que se le dificultan al grupo", { exact: false }).waitFor();
+    await T.page.getByText("Quién terminó qué lecciones", { exact: false }).waitFor();
     await T.clean("docente: la clase");
-    console.log("ok: the student can hide from the class leaderboard and leave (here in Spanish); leaving removes them from the teacher's view; a teacher removes an old entry");
+    console.log("ok: the student leaves (here in Spanish) and keeps her progress; leaving removes her from the teacher's view; a teacher removes an old entry");
     await S.close();
     await T.close();
   }
