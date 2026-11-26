@@ -317,3 +317,32 @@ console.log("ok: any account can belong to classes: joined signed in or claimed 
   assert.deepEqual(pv().feedback, { n: 2 });
 }
 console.log("ok: the pilot quiz: up to 4 units, the same 10 questions before and after, graded on the server (a device never gets the answers), once per student, totals only from 3 students; end-of-pilot answers as totals, typed comments for the owner only; leaving takes a student's answers out");
+
+// ON FOR TESTERS ONLY (docs/PILOT-PLAN.md): by email before the account exists, or listed in the environment; off
+// for everyone else.
+{
+  const later = () => store.userByEmail("pilot.teacher@school.example");
+  assert.deepEqual(flags.set("classroom", { email: "Pilot.Teacher@School.example", on: true }), { ok: true }, "an email with no account yet");
+  let row = flags.list().find((f) => f.flag === "classroom");
+  assert.ok(row.waiting.includes("pilot.teacher@school.example"));
+  assert.equal(row.all, false, "still off for everyone");
+  const pt = store.addUser({ email: "pilot.teacher@school.example", passwordHash: "x", nickname: "PT", ageBand: "26+" });
+  assert.equal(flags.isOn("classroom", pt), true, "it applies when they sign up");
+  assert.equal(flags.isOn("classroom", store.addUser({ email: "someone.else@example.com", passwordHash: "x", nickname: "S", ageBand: "26+" })), false, "nobody else");
+  row = flags.list().find((f) => f.flag === "classroom");
+  assert.ok(!row.waiting.includes("pilot.teacher@school.example"), "no longer waiting once the account exists");
+  flags.set("classroom", { email: "pilot.teacher@school.example", on: false });
+  assert.equal(flags.isOn("classroom", later()), false, "off again");
+  assert.equal(code(() => flags.set("classroom", { email: "not an email", on: true })), 400);
+  // Named in the environment (a host's .env, or a home test).
+  process.env.CLASSROOM_TESTERS = " Pilot.Teacher@school.example , other@x.example";
+  assert.equal(flags.isOn("classroom", later()), true);
+  assert.deepEqual(flags.list().find((f) => f.flag === "classroom").env, ["pilot.teacher@school.example", "other@x.example"]);
+  delete process.env.CLASSROOM_TESTERS;
+  assert.equal(flags.isOn("classroom", later()), false);
+  // An account deleted: its email is forgotten too.
+  flags.set("classroom", { email: "gone.teacher@school.example", on: true });
+  flags.forget("no-such-id", "gone.teacher@school.example");
+  assert.ok(!flags.list().find((f) => f.flag === "classroom").waiting.includes("gone.teacher@school.example"));
+}
+console.log("ok: classroom mode on for testers only: by email before they have an account (it applies at sign-up), or listed in CLASSROOM_TESTERS; nobody else; off again; a deleted account's email is forgotten");

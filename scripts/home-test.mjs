@@ -5,6 +5,8 @@
 // installed: brew install qrencode).
 //   npm run home-test              (port 8960; --port 9000 for another)
 //   npm run home-test -- --fresh   (forget the practice data from last time)
+//   npm run home-test -- --teacher you@example.com   (school mode: classroom mode on for that email, and the
+//                                  tester link that shows "I'm a student / I'm a teacher"; docs/PILOT-PLAN.md)
 // It runs from the branch "main" only (the folder ~/Projects/northvale-learn); --any-branch allows another.
 // Nothing here uses your real keys: .env is not read, the AI tutor stays in
 // offline mode, and the data lives in a temporary folder, not in the project.
@@ -19,6 +21,8 @@ const ROOT = join(import.meta.dirname, "..");
 const args = process.argv.slice(2);
 const portArg = args.indexOf("--port");
 const PORT = Number(portArg >= 0 ? args[portArg + 1] : process.env.PORT) || 8960;
+// School mode testers (repeat --teacher, or commas): classroom mode is on for these emails only, in this test.
+const teachers = args.flatMap((a, i) => (a === "--teacher" && args[i + 1] ? args[i + 1].split(",") : [])).map((e) => e.trim().toLowerCase()).filter((e) => e.includes("@"));
 const DATA = join(tmpdir(), "northvale-home-test");
 
 // The computer's Wi-Fi address: a private IPv4 address that isn't loopback.
@@ -57,14 +61,18 @@ mkdirSync(DATA, { recursive: true });
 execFileSync("npm", ["run", "build", "--silent"], { cwd: ROOT, stdio: "inherit" });
 
 const url = `http://${ip}:${PORT}`;
-const env = { ...process.env, NORTHVALE_DOTENV: "0", HOST: "0.0.0.0", PORT: String(PORT), ALLOWED_HOSTS: `${ip}:${PORT},${hostname()}:${PORT}`, NORTHVALE_DATA: DATA };
+const env = { ...process.env, NORTHVALE_DOTENV: "0", HOST: "0.0.0.0", PORT: String(PORT), ALLOWED_HOSTS: `${ip}:${PORT},${hostname()}:${PORT}`, NORTHVALE_DATA: DATA, CLASSROOM_TESTERS: teachers.join(",") };
 for (const k of ["ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN", "SMTP_USER", "SMTP_PASS", "PUBLIC_URL", "ADMIN_TOKEN", "ALERT_WEBHOOK_URL"]) delete env[k];
 
 console.log(`
   Home test of "${branch}" (${commit}). Open this on a phone that is on the same Wi-Fi:
 
       ${url}
-`);
+${teachers.length ? `
+  School mode: open this instead, to see "I'm a student / I'm a teacher" (the teacher signs up with ${teachers.join(" or ")}):
+
+      ${url}/?school=on
+` : ""}`);
 try {
   execFileSync("qrencode", ["-t", "ANSIUTF8", url], { stdio: "inherit" });
 } catch {

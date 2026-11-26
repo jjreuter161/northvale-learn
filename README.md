@@ -85,6 +85,7 @@ Everything works without keys. To turn on the AI tutor, real prices and reset em
 | `TWELVEDATA_API_KEY` | Real delayed prices (free key). Without it, prices are labeled samples. |
 | `CETES_RATE`, `CETES_RATE_DATE` | The rate for simulated CETES; otherwise an example rate is used and labeled as one. |
 | `ADMIN_TOKEN` | 20+ characters; opens the private stats page at `/admin`. |
+| `CLASSROOM_TESTERS` | Optional. Emails (comma-separated) that classroom mode is on for, before or after they sign up: the school pilot's teachers (docs/PILOT-PLAN.md). Empty keeps it off; the admin page can add testers too. |
 | `ALERT_WEBHOOK_URL` | A Discord or Slack webhook for new errors, budget alerts and failed backups. |
 | `SIGNUP_CODE` | Accounts need this code (for a closed beta). |
 | `SMTP_USER`, `SMTP_PASS`, `PUBLIC_URL` | Password reset emails and the weekly recap, sent from a dedicated Gmail with an app password (docs/SETUP-KEYS.md §4). Reminders need no key: the server makes its own (VAPID) on first start. |

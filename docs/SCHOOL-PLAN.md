@@ -1,5 +1,7 @@
 # Personal and school, one app: the plan (approved 25 November 2026)
 
+**Built** (Steps 2 to 5, on `main`, behind the classroom flag). The real screens, phone and laptop, English and Spanish: `docs/design/school/app-*.jpg`. On for testers only: the admin page or `CLASSROOM_TESTERS` (docs/PILOT-PLAN.md).
+
 One app with two ways in. The school version is the personal app plus a small teacher layer: the same lessons, the same Voyage, the same code. Nothing here is built yet. Mockups: `docs/design/school/` (phone and laptop, English and Spanish).
 
 ## 1. What exists today (classroom mode, Milestone 4 Phase 5)

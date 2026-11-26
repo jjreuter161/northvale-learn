@@ -20,7 +20,7 @@ What this is for: trying Northvale Learn with one real class, so we learn whethe
 - ☐ Agree on the dates, the units (for example Budgeting, Saving and Banking for real) and one 10–15 minute slot a week.
 
 **On our side**
-- ☐ Turn classroom mode on for the teacher's email on the admin page (`/admin`, Feature switches). It works before the teacher has an account: it applies when they sign up with that email.
+- ☐ Turn classroom mode on for the teacher's email: on the admin page (`/admin`, Feature switches), or in the host's `.env` (`CLASSROOM_TESTERS`, comma-separated). It works before the teacher has an account: it applies when they sign up with that email. It stays off for everyone else. (To try it at home first: `npm run home-test -- --teacher you@example.com`.)
 - ☐ Send the teacher the tester link: the app's address with `?school=on` at the end. It shows the choice "I'm a student / I'm a teacher" on that device.
 - ☐ The teacher sets up their account ("I'm a teacher"), confirms their email, and names the class.
 - ☐ In the class, under **Pilot quiz**, the teacher picks the pilot's units (up to 4). The quiz is up to 10 questions, the same before and after.

@@ -317,7 +317,7 @@ const routes = {
       classes.dropTeacher(c.user.id);
       classes.dropStudent(c.user);
       invites.dropUser(c.user.id);
-      flags.forget(c.user.id);
+      flags.forget(c.user.id, c.user.email);
       store.removeUser(c.user.id);
       c.setCookie(auth.clearedCookie(c.secure));
       return { ok: true };

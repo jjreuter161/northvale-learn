@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased — school mode, Step 5: on for testers only
+
+- **Classroom mode stays off for everyone.** It's on only for the testers the owner names: on the admin page by email (now also before that email has an account: it applies when they sign up), or in the host's `.env` as `CLASSROOM_TESTERS` (comma-separated). Deleting an account forgets its email.
+- **Trying it at home:** `npm run home-test -- --teacher you@example.com` turns it on for that email in the home test and prints the tester link (`?school=on`).
+- A teacher who isn't a tester gets an account and a plain note that classroom mode isn't on for it yet.
+- The pilot card shows only the chosen units once they're picked ("Change units" until a quiz is taken).
+- Screenshots of the real screens (phone and laptop, English and Spanish): `docs/design/school/app-*.jpg`.
+- Tests: testers by email and in the environment (`test/classroom.test.mjs`); a non-tester teacher, and the pilot teacher turned on before signing up (`test/school.test.mjs`).
+
 ## Unreleased — school mode, Step 4: pilot tools
 
 - **The pilot quiz:** the teacher picks up to 4 units; the app builds one set of questions from them (up to 10, multiple-choice and true-or-false from the lessons, English and Spanish) and uses the same set before and after. The teacher opens and closes each quiz. A student takes it one question at a time and sees only their own score. The server grades it; a device never gets the answers. The units lock once anyone has taken a quiz.

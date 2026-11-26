@@ -89,7 +89,7 @@ function flagsSection(list) {
     el("h2", {}, "Feature switches"),
     ...list.map((f) => {
       const out = el("span", { class: "muted" });
-      const email = el("input", { type: "email", placeholder: "Account email", autocomplete: "off" });
+      const email = el("input", { type: "email", placeholder: "Email (an account, or one that will sign up)", autocomplete: "off" });
       const send = async (body) => {
         out.textContent = " Saving…";
         const res = await fetch("/api/admin/flags", { method: "POST", headers: { "X-Northvale": "1", "Content-Type": "application/json", "X-Admin-Token": sessionStorage.getItem("nvl-admin") || "" }, body: JSON.stringify({ flag: f.flag, ...body }) });
@@ -97,20 +97,20 @@ function flagsSection(list) {
         if (!res.ok) return (out.textContent = ` ${(r.error && r.error.message) || "Failed."}`);
         load(sessionStorage.getItem("nvl-admin"));
       };
-      const add = el("button", { type: "button" }, "Turn on for this account");
+      const add = el("button", { type: "button" }, "Turn on for this email");
       add.addEventListener("click", () => send({ email: email.value, on: true }));
       const everyone = el("button", { type: "button", class: f.all ? "" : "quiet" }, f.all ? "Turn off for everyone" : "Turn on for everyone");
       everyone.addEventListener("click", () => (f.all || confirm(`Turn ${f.flag} on for EVERYONE?`)) && send({ all: !f.all }));
       return el(
         "div",
         { class: "card" },
-        el("div", { class: "big", style: "font-size:18px" }, `${f.flag}: ${f.all ? "on for everyone" : f.accounts.length ? `on for ${f.accounts.length} ${f.accounts.length === 1 ? "account" : "accounts"}` : "off"}`),
+        el("div", { class: "big", style: "font-size:18px" }, `${f.flag}: ${f.all ? "on for everyone" : f.accounts.length + (f.waiting || []).length + (f.env || []).length ? `on for ${f.accounts.length + (f.waiting || []).length + (f.env || []).length} testers` : "off"}`),
         el("div", { class: "label" }, f.about),
-        el("ul", {}, f.accounts.map((a) => {
+        el("ul", {}, [...f.accounts.map((a) => [a, ""]), ...(f.waiting || []).map((a) => [a, " (no account yet: it applies when they sign up)"])].map(([a, note]) => {
           const off = el("button", { type: "button", class: "quiet" }, "Turn off");
           off.addEventListener("click", () => send({ email: a, on: false }));
-          return el("li", {}, `${a} `, off);
-        })),
+          return el("li", {}, `${a}${note} `, off);
+        }), (f.env || []).map((a) => el("li", {}, `${a} (from CLASSROOM_TESTERS in .env)`))),
         el("div", { class: "row" }, email, add, everyone, out)
       );
     }),

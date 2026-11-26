@@ -111,8 +111,26 @@ try {
   }
   ok("the server refuses a teacher sign-up from 13–17, or without the teacher terms");
 
+  // --- a teacher who isn't a tester: the account works, classes don't ---
+  {
+    const X = await open(LAPTOP);
+    await X.page.getByRole("radio", { name: /^I'm a teacher/ }).click();
+    await X.page.getByRole("button", { name: "Continue", exact: true }).click();
+    await X.page.getByLabel("Email").fill("not.a.tester@school.test");
+    await X.page.getByLabel("Password").fill("a long teacher password");
+    await X.page.getByRole("radio", { name: "18–25" }).click();
+    await X.page.getByRole("checkbox", { name: "I agree to the teacher terms" }).check();
+    await X.page.getByRole("button", { name: "Create account" }).click();
+    await X.page.getByText("Classroom mode isn't on for your account yet.", { exact: false }).waitFor();
+    assert.equal(await X.page.getByLabel("Class name").count(), 0);
+    await X.close();
+  }
+  ok("a teacher who isn't one of the testers gets an account, and a plain note that classroom mode isn't on for it yet");
+
   // --- a teacher, on a laptop: one setup screen, then the email, then a class ---
   let code;
+  // The owner turns classroom mode on for the pilot teacher's email before they have an account.
+  assert.deepEqual(await admin("/api/admin/flags", { flag: "classroom", email: "ms.rivera@school.test", on: true }), { status: 200, ok: true });
   const T = await open(LAPTOP);
   {
     const { page } = T;
@@ -132,15 +150,10 @@ try {
     assert.ok(RAW.test(await page.evaluate(() => document.body.innerText)) === false, "no raw text keys");
     await create.click();
     await page.getByRole("heading", { name: "Classes" }).waitFor();
-    await page.getByText("Classroom mode isn't on for your account yet.", { exact: false }).waitFor();
-    // The owner turns it on for this teacher (a tester).
-    assert.deepEqual(await admin("/api/admin/flags", { flag: "classroom", email: "ms.rivera@school.test", on: true }), { status: 200, ok: true });
-    await page.reload();
-    await T.classes();
     await page.getByText("Confirm your email").waitFor();
     assert.equal(await page.getByRole("checkbox", { name: "I agree to the teacher terms" }).count(), 0, "the terms were accepted at sign-up");
     await page.waitForTimeout(300);
-    const link = (/(http:\/\/\S+#verify=[\w-]+)/.exec(serverOut) || [])[1];
+    const link = ([...serverOut.matchAll(/(http:\/\/\S+#verify=[\w-]+)/g)].pop() || [])[1]; // (the newest email: this teacher's)
     assert.ok(link, "the confirmation email went out at sign-up (printed)");
     await page.goto(link);
     await page.reload();
@@ -155,7 +168,7 @@ try {
     await page.getByText("Your classes").waitFor();
     assert.deepEqual(T.errors, []);
   }
-  ok("a teacher signs up on one screen (age band, terms, no ads, no selling data), confirms their email, and makes a class from Today's “Your classes”");
+  ok("a tester teacher (turned on by email before signing up) sets up on one screen (age band, terms, no ads, no selling data), confirms their email, and makes a class; Today shows “Your classes”");
 
   // --- a student, from “Have a class code?” at the start ---
   const S = await open(PHONE);
